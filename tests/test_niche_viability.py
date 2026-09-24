@@ -137,6 +137,25 @@ def test_robust_refugium_and_score():
     assert s[0] > s[1]
 
 
+def test_viability_composes_with_meristem_height_probability():
+    """Eq. 2.1/8.5: V = [prod (1 - h_tot)] * P[H_T >= H_min] -- the survival term from
+    REFUGIUM's own cohort.viability and the height term from MERISTEM's
+    growth.probability_reaches_height, composed exactly as Fig. 2 wires Module D into E.
+    """
+    m, t = 300, 30
+    h_min = 5.0
+    phi = np.full((m, t), 0.9)                      # a mildly stressed but viable ensemble
+    h_star, k, p = np.full(m, 22.0), np.full(m, 0.05), np.full(m, 1.5)
+    p_height_ok = growth.probability_reaches_height(phi, h_star, k, p, h_min, horizon_years=t)
+    assert 0.0 < p_height_ok <= 1.0
+
+    hazards = np.full((3, t), 0.01)                 # three low, steady cause-specific hazards
+    h_tot = cohort.combine_competing_hazards(hazards)
+    v = cohort.viability(h_tot, p_height_ok)
+    assert v == pytest.approx(np.prod(1 - h_tot) * p_height_ok)
+    assert 0.0 < v < 1.0
+
+
 def test_robust_refugium_full_eq_8_6_conjunction():
     v = np.array([[0.9, 0.9], [0.8, 0.8], [0.85, 0.85], [0.7, 0.7], [0.95, 0.95]])
     assert refugia.robust_refugium(v, v_star=0.6, rho=0.8).tolist() == [True, True]     # (a) alone: both pass

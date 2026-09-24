@@ -323,6 +323,38 @@ GEDI/canopy-height training data (`antar.io.gee_export.export_structure`, still 
 fit against -- same category as XYLEM's ABC calibration and MNEME's real dieback panel:
 the formulas are built and tested, the real fit waits on a data pull not yet done.
 
+## 2026-09-24 — REFUGIUM implementation (concept note Sec. 8.2)
+
+Most of Sec. 8.2 already existed and was tested: competing-hazard combination and cohort
+viability (`viability/cohort.py`, matches Eq. 8.5/2.1 exactly, confirmed against the
+existing `test_competing_risks_and_viability`), the buffer index and risk-averse refugium
+score (`viability/refugia.py`), and climate-analogue matching (`antar.climate.analogs`
+-- Mahalanobis distance, novelty percentile, Mahony et al. 2017 -- already covers the
+"climate analogues" subsection in full, just housed under `climate/` since it is climate-
+space math reused elsewhere too).
+
+One real gap, already fixed in the same pass as the MERISTEM work above:
+`refugia.robust_refugium` only implemented criterion (a) of the module's own documented
+Eq. 8.6 definition (ensemble viability), silently missing (b) topographic buffering and (c)
+area-of-applicability. Extended to accept both as optional arguments (defaulting to `None`
+= criterion skipped, so the existing single-criterion call sites keep working unchanged)
+and AND them together when supplied.
+
+Confirmed, not rebuilt: the "product assumes independence conditional on covariates ...
+tested by comparing the modelled all-cause hazard with observed all-cause plantation
+mortality" validation Sec. 8.2 calls for is exactly what `validation.metrics.
+calibration_slope_intercept` (or `brier_skill`) already does generically -- no
+REFUGIUM-specific code needed, just that usage. Compound events (drought followed by fire)
+are explicitly stated as entering "as interactions in Module C" (MNEME), not REFUGIUM's own
+job.
+
+New test: `test_viability_composes_with_meristem_height_probability` -- the actual
+Module D -> E handoff from Fig. 2 (MERISTEM's `growth.probability_reaches_height` feeding
+REFUGIUM's `cohort.viability`) had never been exercised together before; now it is.
+
+REFUGIUM was the last engine with meaningful spec gaps to close without real data. AEGIS
+(the decision layer) is the only engine not yet reviewed against the concept note.
+
 ## 2026-09-24 — SSH access to hyperion.wsl.ch
 
 Non-interactive key-based auth check (`ssh -o BatchMode=yes ohanyann@hyperion.wsl.ch true`) failed
