@@ -1,0 +1,49 @@
+\section{Module C: a hazard model fitted to observed mortality}\label{sec:C}
+
+Module B says what should happen to a tree of a given type. Module C says what has happened to the forests of Armenia, and it is the only part of the framework that is calibrated against outcomes. It is a discrete-time survival model on a panel of pixel-years.
+
+\subsection{Response and population at risk}
+The population at risk is every 30~m pixel that was forest at the start of the record, followed until a dieback event, until censoring by harvest or fire (which are competing events, handled in \S\ref{sec:E}), or until the end of 2024. This removes the survivorship bias of v1: pixels that died stay in the data as events. A dieback event in year $t$ is a standardised anomaly of annual maximum kNDVI, relative to the pixel's trailing 10-year median, below $-2$ that has not recovered above $-1$ within two seasons and coincides with no disturbance flag; the segmentation algorithm (LandTrendr or CCDC; \citealt{Kennedy2010,Zhu2014}) and thresholds are fixed in the configuration and versioned. Because satellite dieback is an imperfect measure of mortality, sensitivity $\mathrm{Se}$ and specificity $\mathrm{Sp}$ are estimated on a stratified sample of interpreted pixel-years, and the observed hazard is corrected with the standard misclassification identity \citep{Rogan1978},
+\begin{equation}\label{eq:rogan}
+h_{\text{obs}}=\mathrm{Se}\,h+(1-\mathrm{Sp})(1-h)\quad\Longrightarrow\quad h=\frac{h_{\text{obs}}-(1-\mathrm{Sp})}{\mathrm{Se}+\mathrm{Sp}-1},
+\end{equation}
+or the same relation is embedded in the likelihood. Tree-ring growth collapses (ring width below 40\,\% of the trailing 10-year median) form a second, independent response on the chronology network; they are used to test temporal skill and to link the remote-sensing definition to physiological stress.
+
+\subsection{The model}
+Let $h_{i,t}=\Prob(T_i=t\mid T_i\ge t,\,\text{history})$ be the annual hazard of pixel $i$. We use the complementary log-log link, the discrete-time counterpart of proportional hazards \citep{Prentice1978,Singer2003}:
+\begin{equation}\label{eq:cloglog}
+\cloglog(h_{i,t})=\ln\!\big[-\ln(1-h_{i,t})\big]=\ln\Delta_{i,t}+\eta_{i,t},\qquad S_i(t)=\prod_{s\le t}(1-h_{i,s})=\exp\!\Big(-\sum_{s\le t}\Delta_{i,s}\,e^{\eta_{i,s}}\Big),
+\end{equation}
+where the offset $\ln\Delta$ lets periods of unequal length (censoring within a year) enter one likelihood, and the identity on the right is exact. The linear predictor is
+\begin{equation}\label{eq:eta}
+\eta_{i,t}=\beta_0+f(a_{i,t})+{\bm\beta_W}^{\!\top}\tilde{\bm x}_{i,t}+{\bm\beta_B}^{\!\top}\bar{\bm x}_i+\sum_{j=1}^{J}\sum_{k=1}^{K}\theta_{jk}\sum_{\ell=0}^{L}b_j(z_{i,t-\ell})\,c_k(\ell)+\bm\gamma^{\top}\bm u_{i,t}.
+\end{equation}
+Its parts have distinct jobs.
+
+\textbf{Within and between (Mundlak).} Each climate covariate is split into a place mean and a departure, $\bar x_{i}=T_i^{-1}\sum_t x_{i,t}$ and $\tilde x_{i,t}=x_{i,t}-\bar x_i$ \citep{Mundlak1978,Bell2015}. $\bm\beta_W$ is the response to year-to-year departures at a fixed place, identified from within-place variation and therefore robust to any unmeasured, time-invariant site quality; it is the closest thing in the data to the effect of weather on mortality. $\bm\beta_B$ describes differences between places and contains adaptation, stand structure and everything else that differs across sites. Confounding of the two is how space-for-time substitution goes wrong, so the model keeps them apart.
+
+\textbf{Drought legacies.} The cross-basis term is a distributed-lag non-linear model \citep{Gasparrini2010}: the exposure $z$ (water-stress integral or CWD anomaly) enters through a spline basis $b_j$ and its effect is spread over lags $\ell=0,\dots,L$ ($L=4$~yr) through a second basis $c_k$. Drought legacies of several years are pervasive in forests \citep{Anderegg2015}, and a model without lags mistakes them for noise.
+
+\textbf{Stand terms.} $a_{i,t}$ is time since disturbance or planting, and $\bm u_{i,t}$ contains canopy height class, species-group composition and stand density proxies, with a size$\times$stress interaction whose sign is constrained a priori \citep{Bennett2015}. Coordinates and raw elevation are excluded: anything geographic must reach the model through a physical driver, or it is a place label that cannot be projected.
+
+\textbf{Rare events.} All events are kept; non-events are sampled within blocks with known fraction $\pi_0$ and weighted by $1/\pi_0$, which gives a consistent estimator of the full-data model \citep{King2001}. Uncertainty comes from a block bootstrap, not from the pixel-level standard errors, which are meaningless under spatial dependence.
+
+\subsection{Learners, stacking and the gate}\label{sec:gate}
+Three learners share the panel: (i) an elastic-net cloglog GLM, transparent and extrapolating linearly on the link scale, which is at least an assumption one can read; (ii) gradient boosting with monotone constraints on physically signed covariates (hazard non-decreasing in CWD, VPD, heat and stress duration; non-increasing in plant-available water); and (iii) as a benchmark only, a random forest, which cannot extrapolate. Out-of-fold link-scale predictions of (i) and (ii) are combined by non-negative least squares with weights summing to one \citep{Wolpert1992,Breiman1996}, inside a nested cross-validation so that stacking weights are never fitted on the data they are scored on. The result, $\hstat$, is trustworthy only where the data are.
+
+To decide where, we compute the dissimilarity index of \citet{Meyer2021}: the distance from a prediction cell to its nearest training cell in a standardised, importance-weighted covariate space, divided by the mean pairwise training distance, $\DI(x)=\min_j\|x-x_j\|/\bar d$. The threshold $\DI^\ast$ is the upper whisker of the training cells' own $\DI$ values, each computed against training cells in \emph{other} cross-validation folds, so that it reflects the distances over which the model was actually validated. The final hazard blends on the link scale,
+\begin{equation}\label{eq:gate}
+\begin{aligned}
+\cloglog(h)&=w\,\cloglog(\hstat)+(1-w)\,\cloglog(\tilde h^{\text{mech}}),\\
+w&=\exp\!\big[-\kappa\,\max\{0,\,\DI/\DI^\ast-1\}\big],\qquad\kappa=2,
+\end{aligned}
+\end{equation}
+so that $w=1$ inside the area of applicability, decays smoothly outside it, and cumulative hazards, not probabilities, are what get mixed. The share of cells and years outside the area of applicability is reported as an output for every scenario, the \emph{extrapolation footprint}: a statement of how much of the projected future rests on physics rather than on observation.
+
+\subsection{Bounding the space-for-time assumption}
+Projecting the within and between effects requires a decision about whether trees adapt to the shifted mean. We do not make it; we bracket it. With $x^{\text{proj}}_{i,t}$ the projected covariate and $\bar x^{\text{hist}}_i$, $\bar x^{\text{proj}}_i$ the historical and projected 20-year place means,
+\begin{equation}\label{eq:bracket}
+\eta^{\text{no adapt}}_{i,t}:\ \ \tilde x=x^{\text{proj}}_{i,t}-\bar x^{\text{hist}}_i,\ \ \bar x=\bar x^{\text{hist}}_i;\qquad
+\eta^{\text{full acclim}}_{i,t}:\ \ \tilde x=x^{\text{proj}}_{i,t}-\bar x^{\text{proj}}_i,\ \ \bar x=\bar x^{\text{proj}}_i.
+\end{equation}
+In the first, the within-place response applies to the whole climatic shift; in the second, $\bm\beta_B$, typically weaker because trees are adapted to their local mean, applies to the shift of the mean. Every projection is reported as this bracket, and the width between the bounds is itself a result: it measures how much of the future depends on an ecological assumption that no dataset can currently settle.

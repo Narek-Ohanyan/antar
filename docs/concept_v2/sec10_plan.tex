@@ -1,0 +1,69 @@
+\section{Work plan, gates, outputs and what would prove us wrong}\label{sec:plan}
+
+\subsection{Work packages and go/no-go gates}
+The plan is indicative and expressed in months from project start (24 in total); the calendar follows the funding decision. It is ordered so that the cheapest and most decisive questions are answered first: whether the physical drivers are right (WP2), and whether observed mortality can be predicted better than by a map of coordinates (WP4). The expensive parts, the field survey and the full ensemble, start only after the gates that justify them.
+
+\begin{table}[t]
+\centering
+\caption{Work packages. Months are from project start.}\label{tab:wp}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash\bfseries\sffamily}p{4.1cm}>{\raggedright\arraybackslash}p{1.4cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Work package & Months & Main outputs\\
+\midrule
+WP1 Data, labels, harmonisation & 1--8 & Master grid and data manifests; versioned dieback panel; plot and ring database\\
+WP2 Module A: topoclimate and water balance & 2--8 & 30~m forcing ensemble, PET ensemble, $\psi_s$; station cross-validation and closure tests\\
+WP3 Traits and hydraulic engine & 3--14 & Trait posteriors; local $P_{50}$, $g_{\min}(T)$, pressure--volume curves for 4--6 species; emulator; ABC calibration\\
+WP4 Mortality hazard model & 6--14 & Hazard stack, DI-based area of applicability, nested CV report\\
+WP5 Growth, establishment, plantation survey & 4--18 & Attainable-height and growth models; establishment hazard; two field seasons of planting-follow-up plots\\
+WP6 Uncertainty, viability and decision & 12--22 & Ensemble $V$, refugia, analogues; ANOVA and Sobol' partition; portfolio tool\\
+WP7 Validation, products and dissemination & 1--24 & Design-based sample (months 14--20); model cards; papers; training for Armenian partners\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Four gates decide whether the work continues as planned, and each names its fallback so that a failure is a result rather than a crisis.
+
+\textbf{G1, month 8: physics and data are adequate.} Module A closes its water balance, its downscaled temperature and precipitation reduce the raw ERA5-Land error at held-out stations, and it reproduces TerraClimate CWD within a stated tolerance; the minimum data of \S\ref{sec:data} exist. \emph{Fallback:} coarsen to 100~m and extend the label network before fitting anything.
+
+\textbf{G2, month 14: the hazard model earns its place.} Under spatial-block CV and forward chaining it meets the criteria of Table~\ref{tab:cv} against the coordinates-only and persistence baselines. \emph{Fallback:} the statistical component is retired to the role of benchmark, the mechanistic model is reported with widened uncertainty, and the failure itself, a negative result on dieback predictability from climate in this region, is published.
+
+\textbf{G3, month 18: the gate is justified.} In the extrapolation CV the hybrid is no worse than the better of its components, $\rho_s(\DI,\text{error})\ge0.4$, and the emulator reproduces the full engine to within 0.02 in hazard. \emph{Fallback:} report mechanistic and statistical bounds separately instead of a blended hazard.
+
+\textbf{G4, month 20: products are validated.} The design-based sample is complete and predicted $V$ agrees with observed class frequencies within $\pm0.10$, inside and outside the area of applicability separately. Maps and portfolios are released only after G4; before that they are labelled as provisional.
+
+\subsection{Deliverables and publication plan}
+The project produces an open-source package (the skeleton of \S\ref{sec:repo} developed to full implementation), versioned datasets of dieback labels and trait posteriors, viability, refugium and extrapolation-footprint layers with the uncertainty partition, a portfolio tool, a model card per product stating intended use, training data, validation results and known failure modes, and technical reports for the FORACCA partners. Three papers are planned; each stands on its own and none depends on the outcome of the others. Target venues are indicative and depend on the gate results.
+\begin{enumerate}
+\item \textbf{A hazard-model paper}: discrete-time cloglog survival modelling of forest dieback with within/between decomposition, drought legacies and label-error correction, for Armenia. Its central claim is methodological and testable: what the space-for-time assumption changes, measured by the width of the bracket in Eq.~\eqref{eq:bracket}. Candidate outlets: \emph{Global Change Biology}, \emph{Ecological Applications}.
+\item \textbf{A methods paper}: gating a mechanistic and a statistical hazard model by area of applicability, with the controlled experiment of Fig.~\ref{fig:extrap} extended to real held-out climates. Candidate outlet: \emph{Methods in Ecology and Evolution}.
+\item \textbf{A decision paper}: robust species--site portfolios under partitioned uncertainty, with the price of robustness and the value of measuring traits from the Sobol' analysis. Candidate outlets: \emph{Nature Sustainability}, \emph{Nature Communications}, or a specialist journal if the results warrant less.
+\end{enumerate}
+
+\subsection{Principal risks}
+The six risks that most threaten the schedule or the claims are listed in Table~\ref{tab:risk} with their fallbacks; each is tied to a gate above, so that a problem surfaces at a decision point rather than in the final year.
+\begin{table}[t]
+\centering
+\caption{Risk register (main items).}\label{tab:risk}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash\bfseries\sffamily}p{3.5cm}>{\raggedright\arraybackslash}p{4.7cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Risk & Consequence & Mitigation and fallback\\
+\midrule
+Satellite dieback labels are too noisy & Biased hazards, weak signal & Misclassification correction (Eq.~\ref{eq:rogan}); tree-ring collapses as second response; interpret-and-verify sample\\
+No local hydraulic traits for Caucasian species & Module B leans on priors & Hierarchical priors from XFT/TRY; measurement campaign for 4--6 species, targeted by the Sobol' ranking\\
+Little independent plantation data & Establishment hazard weakly identified & Prioritise WP5 survey; use plot regeneration data; report $V$ without the establishment factor where unsupported\\
+Compute at 30~m $\times$ ensemble & Schedule slips & Emulator; full ensemble at 100~m; 30~m only for median and decision subsets\\
+Station data hard to obtain & Weaker Module A validation & ERA5-Land reference with explicit sensitivity; validate on TerraClimate and satellite soil moisture\\
+Hybrid does not beat the statistical model & Gate is unnecessary & Report as a negative result; the gate reduces to a flag on the extrapolation footprint\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{The repository skeleton}\label{sec:repo}
+Alongside this document we provide a Python package, \texttt{foracca2}, that fixes the interfaces and implements the numerical kernels that the rest depends on: vapour-pressure and VPD algebra, slope radiation, a snow and soil bucket with mass-balance closure, PET formulations, the vulnerability curve, two-phase engine, $g_{\min}(T)$ and Monte Carlo failure probability, the cloglog hazard model with DLNM lags, the applicability index and gate, block, forward-chaining and group splits with variogram range, proper scoring rules, conformal intervals, design-based estimators, ANOVA and Sobol' analysis, the cohort viability and refugium logic, and the CVaR portfolio optimiser. About 1{,}700 lines of package code are covered by 77 tests, including closed-form checks (the two-phase engine against $B/E_{\min}$, the Ishigami function for Sobol' indices, mass balance to machine precision), physical bounds on derived quantities and regression tests that encode the v1 errors. Configuration files hold the scenario, validation and study-area choices; a Snakemake workflow declares the contract between modules. Data access (Earth Engine export) and the full-scale pipeline steps are declared but not implemented, and the species trait file contains clearly labelled placeholders that exercise the code and are not results.
+
+\subsection{Limitations, and what would falsify the framework}
+The framework has limits that are written down here so that they are not discovered later. Biotic mortality is a climate-independent baseline and is not projected. Carbon starvation, root--shoot dynamics and the CO$_2$ effect on water-use efficiency enter only through scenario knobs. Local adaptation and provenance effects are represented by trait classes rather than by genetics. Satellite dieback is a proxy for mortality whose error we model but cannot remove, and the number of Armenian tree-ring chronologies is small. The scenario ensemble is a set of stories rather than a probability distribution, and future extremes outside any observed range rest on physics that we can test in hindcast and in synthetic worlds but not in the future.
+
+Because the specification names its own tests, it can also fail visibly. It would be wrong, or at least not worth its complexity, if the coordinates-only baseline matched the hazard model under forward chaining; if calibration slopes lay outside 0.7--1.3 after recalibration; if the Boyce index of predicted viability against adult occurrence were not positive; if the dissimilarity index were unrelated to error in the extrapolation CV; or if the design-based sample showed that $V$ is systematically higher than the observed survival-and-height frequency. Any of these would be reported, and the corresponding module would revert to its documented fallback.

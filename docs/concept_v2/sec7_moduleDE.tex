@@ -1,0 +1,37 @@
+\section{Modules D and E: forest ecology, growth and cohort viability}\label{sec:DE}
+
+\subsection{Module D: niche, attainable height, growth and establishment}\label{sec:D}
+\textbf{Adult niche as a consistency test.} For each species we fit a penalised presence--background model on physically meaningful predictors (CWD, growing degree days, winter minimum, VPD, soil), with the background drawn from a target-group sample to absorb collection bias, and score it under spatial-block CV with the continuous Boyce index \citep{Hirzel2006}. With $P/E_b=(n^{\text{pres}}_b/n^{\text{pres}})/(n^{\text{bg}}_b/n^{\text{bg}})$ in suitability bin $b$, $\mathrm{CBI}=\rho_s(b,\,P/E_b)$, the Spearman rank correlation across bins, which needs no presence--absence data and no threshold. The niche is deliberately not a driver of $V$. It is a realised niche, shaped by competition, dispersal and land use; in the Caucasus competition alone contracts fundamental niche areas by a factor of 1.2--1.7 \citep{Pshegusov2022}, so it would veto exactly the sites where planting is most useful. Its job is consistency: sites with high $V$ should be enriched among adult occurrences, and the mismatch map separates climatic limitation from dispersal or land-use limitation.
+
+\textbf{Attainable height.} Observed canopy height reflects age and disturbance history as much as site quality, so its mean is a poor measure of potential. We estimate the upper envelope, as in site-index work \citep{Skovsgaard2008}, by quantile regression \citep{Cade2003} of GEDI and canopy-height-model heights on climate, soil and terrain,
+\begin{equation}\label{eq:qr}
+H^\ast(x)=\hat f_\tau(x),\qquad \hat f_\tau=\arg\min_f\sum_i\rho_\tau\big(H_i-f(x_i)\big),\quad \rho_\tau(u)=u\,\big(\tau-\ind[u<0]\big),\quad\tau=0.9,
+\end{equation}
+scored by pinball loss and by coverage of the $\tau$-quantile on held-out blocks, with conformalised quantile regression intervals \citep{Romano2019}. Outside the area of applicability, $H^\ast$ falls back on a water-limited scaling by the transpiration ratio $\mathrm{AET}/\mathrm{PET}$ from Module~A.
+
+\textbf{Growth in physiological age.} Height follows the Chapman--Richards curve in a physiological age that advances more slowly in stress years,
+\begin{equation}\label{eq:cr}
+H(a)=H^\ast\,\big(1-e^{-k a}\big)^{p},\qquad a_{y+1}=a_y+\varphi_y,\qquad \varphi_y=f_W\,f_T\,f_F,\qquad f_W=\frac{1}{1+(\CWD_y/\CWD_{50})^{m}},
+\end{equation}
+where $f_T$ is a growing-degree-day modifier, $f_F$ a late-frost modifier, $\varphi_y\in(0,1]$ (Liebig-type limitation as in 3-PG; \citealt{Landsberg1997}) and $\CWD_{50}$, $m$ are estimated from the tree-ring growth--CWD relation. Stress years delay development without reversing it, which keeps the closed form. The age at which a cohort reaches $\Hmin$ is $a^\ast=-k^{-1}\ln\!\big[1-(\Hmin/H^\ast)^{1/p}\big]$ (infinite if $\Hmin\ge H^\ast$), and $\Prob[H_T\ge\Hmin]=\Prob[\sum_{y\le T}\varphi_y\ge a^\ast]$ is evaluated over ensemble members and parameter draws. This is also where Module~A gets its leaf area: LAI follows $H(a)$, closing the loop between stand development and stand water use.
+
+\textbf{Establishment.} The regeneration niche is narrower than the adult niche \citep{Jackson2009,Dobrowski2015,Davis2019}, and the pattern is visible locally: the southern beech stand shows mature trees and no regeneration \citep{Stepanyan2026}. Planted seedlings pass through the same bottleneck, with shallow roots and little storage. Establishment is therefore a discrete-time hazard over the years until height exceeds a vulnerability height $H_{\text{est}}$,
+\begin{equation}\label{eq:est}
+h^{\text{est}}_{\tau}=\cloglog^{-1}\!\big(\beta_0+\bm\beta^{\top}\bm x_\tau+g(\tau)\big),\qquad S_{\text{est}}=\prod_{\tau}\big(1-h^{\text{est}}_\tau\big),
+\end{equation}
+with covariates in the first seasons after planting: minimum topsoil $\REW$, peak $\VPD_{\text{day}}$, heat days, late frosts, snow-cover duration, stock type and size, browsing protection and planting method. Data are plantation follow-up surveys and regeneration plots. The window length $\tau\le\tau_{\max}$ is set by the growth module, so that a site that slows growth also prolongs exposure.
+
+\subsection{Module E: cohort viability, refugia and analogues}\label{sec:E}
+\textbf{Competing hazards.} The all-cause annual hazard combines the mechanism-specific hazards $h_{k,y}$ for establishment, hydraulic failure, late frost, fire and biotic agents,
+\begin{equation}\label{eq:htot}
+h^{\mathrm{tot}}_{y}=1-\prod_k\big(1-h_{k,y}\big),\qquad V=\Big[\prod_{y=1}^{T}(1-h^{\mathrm{tot}}_y)\Big]\cdot\Prob[H_T\ge\Hmin],
+\end{equation}
+which is Eq.~\eqref{eq:V} with its factors named. $h_{\text{hyd}}$ is the gated hazard of Eq.~\eqref{eq:gate}; $h_{\text{frost}}$ and $h_{\text{fire}}$ are cloglog models on the late-frost index and on a fire-weather index with burned-area records; $h_{\text{bio}}$ (insects, disease, browsing) is a baseline from long-term plot mortality and is not projected with climate, which we state as a limitation rather than pretend otherwise. The product assumes independence conditional on covariates; it is tested by comparing the modelled all-cause hazard with observed all-cause plantation mortality, and compound events such as drought followed by fire enter as interactions in Module C.
+
+\textbf{Robust refugia.} A cell is a refugium for option $k$ at horizon $T$ only if it is viable in most of the ensemble, topographically decoupled from regional exposure, and inside the area of applicability:
+\begin{equation}\label{eq:refug}
+R_{ik}=\ind\big[\Prob_\omega(V_{ik}\ge v^\ast)\ge\rho\big]\cdot\ind[B_i>0]\cdot\ind[\DI\le\DI^\ast],\qquad B_i=\frac{\bar E_{\text{reg},i}-E_i}{\mathrm{sd}(E)},
+\end{equation}
+with $v^\ast=0.6$, $\rho=0.8$ as defaults, $E$ a standardised composite of CWD, growing-season VPD and heat exposure, and $\bar E_{\text{reg},i}$ its mean within a regional radius. Cells outside the area of applicability are flagged, not asserted. A risk-averse continuous score, $\mathrm{median}(V)-\lambda\,\mathrm{IQR}(V)$ across the ensemble, ranks cells within the refugium class.
+
+\textbf{Climate analogues.} For each cell and future window we find the present-day cell with the closest climate, using Mahalanobis distance in standardised space (mean and winter-minimum temperature, CWD, VPD, GDD, precipitation seasonality) under the covariance of the reference climate, and the novelty percentile of the distance among reference nearest-neighbour distances \citep{Mahony2017}. Two uses follow. Existing stands at the analogue location are candidate seed sources and provenance tests, with the usual caveat about local adaptation; and no-analogue cells are flagged as places where no statistical or niche model, ours included, should be trusted, which complements the area of applicability with a purely climatic criterion.

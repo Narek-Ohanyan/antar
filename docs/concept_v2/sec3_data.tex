@@ -1,0 +1,35 @@
+\section{Data, harmonisation and the traps we design around}\label{sec:data}
+
+All layers are resampled to one master grid (EPSG:32638, UTM 38N, 30~m). The full ensemble is computed at 100~m; the ensemble median and the decision-scale subsets are recomputed at 30~m. Table~\ref{tab:data} lists what each source is for, and what is wrong with it.
+
+\begin{table}[t]
+\centering
+\caption{Data plan. ``Role'' states what each layer is used for; ``caveat'' states what it must not be used for.}\label{tab:data}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash\bfseries\sffamily}p{2.15cm}>{\raggedright\arraybackslash}p{4.9cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{4.0cm}@{}}
+\toprule
+Group & Source (resolution) & Role & Caveat\\
+\midrule
+Climate reference & CHELSA v2.1 \citep{Karger2017} (1~km); ERA5-Land \citep{MunozSabater2021} (0.1$^\circ$, hourly); Armhydromet stations; TerraClimate \citep{Abatzoglou2018} (4~km) & Spatial pattern (CHELSA); daily variability and QDM reference (ERA5-Land, stations); independent water-balance benchmark (TerraClimate) & CHELSA is a climatology: never a source of interannual variability. Station network is sparse and needs homogenisation.\\
+Projections & ISIMIP3b \citep{Lange2019,Lange2021}: 5 GCMs, SSP1-2.6/3-7.0/5-8.5, 0.5$^\circ$ daily. NEX-GDDP-CMIP6 \citep{Thrasher2022}: 0.25$^\circ$ daily, wide GCM set incl.\ SSP2-4.5. ScenarioMIP overshoot runs where available & Primary ensemble (ISIMIP3b); SSP2-4.5 and structural breadth (NEX); overshoot stress test of lags and hysteresis & The five ISIMIP3b models span ECS $\approx$2.6--5.4~K \citep{Zelinka2020}; the top end is a hot model \citep{Hausfather2022}.\\
+Terrain and soils & Copernicus GLO-30 DEM (30~m); SoilGrids 2.0 \citep{Poggio2021} (250~m, with quantile uncertainty); pedotransfer functions \citep{Saxton2006} & Slope, aspect, horizon, sky-view, TPI, TWI, cold-air-pooling potential; plant-available water as a random variable & Rooting depth is not observed: treated as a species-specific prior, not a map.\\
+Optical time series & HLS v2 \citep{Claverie2018} (30~m, 2013--); Landsat archive (30~m, 1985--); kNDVI \citep{CampsValls2021} & Annual canopy-greenness histories $\rightarrow$ dieback events by temporal segmentation \citep{Kennedy2010,Zhu2014} & Dieback is not defoliation: events must persist $\ge2$ growing seasons.\\
+Structure and disturbance & S2-based height model (v1 layer); global 10~m canopy height \citep{Lang2023}; GEDI footprints \citep{Dubayah2020}; Hansen GFC \citep{Hansen2013}; MODIS burned area & Attainable-height training data; harvest and fire as competing events and masks & Height products saturate and smooth; use for upper envelopes, not stand means.\\
+Ground truth & National Forest Monitoring and Assessment plots; FORACCA plantation surveys (survival and height by planting year and method); tree-ring chronologies \citep{Voss2025,Stepanyan2026,OpalaOwczarek2021} & Independent validation sample; establishment hazard; growth--climate functions; extreme-year tests & Design-based sampling must be planned in advance, not opportunistic.\\
+Traits & XFT \citep{Choat2012}, TRY \citep{Kattge2020}, $g_{\min}$ compilation \citep{Duursma2019}; local vulnerability curves, pressure--volume curves and $g_{\min}$ dry-downs & Trait priors and posteriors for four functional groups and $\sim$15 species & Seedling and mature-tree values differ; seedlings need their own class.\\
+Occurrence & GBIF (filtered), plot presences/absences, herbarium records & Adult niche (\S\ref{sec:D}) & Presence-only, spatially biased.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Seven harmonisation rules are written into the workflow because each corresponds to a way the same project could go wrong:
+\begin{enumerate}
+\item \textbf{One reference period} (1991--2020) for every anomaly, standardised index and climatology, and never a rolling one; a rolling reference standardises the trend away.
+\item \textbf{Climatologies give pattern, reanalysis and stations give time.} Nothing static is allowed to masquerade as variability.
+\item \textbf{Humidity travels as vapour pressure.} It is downscaled through the dew point, and VPD is computed last, daily, with the temperature that drives the process in question (\S\ref{sec:A}).
+\item \textbf{One forest definition for training and projection}, fixed at the start of the record (tree cover in 2000 and the earliest Landsat composite), never by later survival.
+\item \textbf{Group-aware splits everywhere.} The unit of resampling is the block or the pixel, never the pixel-year.
+\item \textbf{Every derived quantity is unit-tested against physical expectation}, for example a thermodynamic bound on $\Delta\VPD/\Delta T_{\max}$; this would have caught the v1 table.
+\item \textbf{Every dataset enters through a manifest} (source, version, checksum, licence), and every export script is versioned.
+\end{enumerate}
+Minimum data for the work plan's first gate (\S\ref{sec:plan}) are: daily forcing 1981--2024; annual dieback labels for $\ge10^5$ forest pixels over $\ge10$ years; $\ge200$ tree-ring series; trait priors for four functional groups; and a stratified validation sample of $\ge300$ plots (sample-size logic in \S\ref{sec:design-based}).

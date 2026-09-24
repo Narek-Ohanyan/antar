@@ -1,0 +1,87 @@
+\section{Question, estimand and design principles}\label{sec:design}
+
+\subsection{Where the field stands, and what Armenia already tells us}
+Drought- and heat-induced tree mortality has been documented across forested biomes worldwide \citep{Allen2010} and is understood well enough mechanistically that it should not be estimated from correlations alone. Syntheses converge on hydraulic failure, often compounded by carbon limitation and biotic attack, as the proximate cause across biomes \citep{McDowell2008,Adams2017,Choat2018,Hartmann2018}, and xylem safety margins are strikingly convergent across forests \citep{Choat2012}. Two recent results sharpen this for our purposes. First, survival time under drought is a two-phase process: stomatal closure delays failure, after which the tree drains its own storage through the cuticle, and in a 16-species temperate experiment the first phase accounted for 85--97\,\% of total survival time \citep{Waite2026,Gauthey2026}, in line with the earlier argument that timely stomatal closure governs resistance \citep{MartinStPaul2017}. Second, the minimum leaf conductance $g_{\min}$ is not a constant: it rises steeply above a species-specific temperature \citep{Cochard2019,Duursma2019}, which is why heat waves can kill trees that drought alone would not. Trait-based hydraulic models such as SurEau \citep{Cochard2021,Ruffault2022} embody these ideas, but they need parameters we do not have for Caucasian species, and their probabilities have never been calibrated against Armenian mortality.
+
+The correlative alternative, species distribution models fitted to occurrence, is what most Caucasus studies use \citep{Pshegusov2022,Dagtekin2020}. It tells us where species are under present climate; it rests on an equilibrium assumption and leaves out demography and dispersal \citep{Guisan2005}; it is known to fail under non-analogue conditions \citep{Pearson2003,Fitzpatrick2009,Elith2010}, and it says nothing about whether a planted seedling survives its first summers. The productive middle path is hybrid: mechanism supplies the functional form outside the observed range, data supply calibration inside it \citep{Kearney2009,Reichstein2019}.
+
+Local evidence defines what the framework must reproduce. In southern Armenia the mean ring width of \emph{Fagus orientalis} at Shikahogh fell from 1.95~mm in 1965--1993 to 0.89~mm in 1994--2023, with no natural regeneration, while at the northern stand of Teghut it rose from 1.67 to 2.14~mm; local warming runs at 0.026--0.032\,$^\circ$C per year \citep{Stepanyan2026}. Oak and beech in Tavush lose growth and theoretical hydraulic conductivity in extreme dry years and recover within two years, beech faster \citep{Voss2025}; junipers at Khosrov are more drought-sensitive than oak at Tezharuyk \citep{OpalaOwczarek2021}. Caucasian distributions are governed by topography and water regime \citep{Pshegusov2022}, and \emph{F.~orientalis} is projected to contract sharply with the Caucasus retained as refugium \citep{Dagtekin2020}. These are patterns the calibrated model must pass, not decoration (\S\ref{sec:pom}). Finally, multi-model work on overshoot pathways shows for the Amazon that the risk of long-term dieback depends on how a warming level is reached and not only on where it ends, beginning at global warming levels as low as 1.3\,$^\circ$C and being largely averted only if temperatures are brought back below 1.5\,$^\circ$C \citep{Munday2025}. A planting decision therefore depends on the trajectory as well as the level, which is why the estimand below is trajectory-explicit.
+
+\subsection{The estimand}\label{sec:estimand}
+Let $i$ index a 30~m planting cell, $k$ a planting option (species or provenance, stock type, method), $t_0$ the planting year and $\omega$ one member of the climate ensemble. The quantity we predict is the \emph{cohort viability}
+\begin{equation}\label{eq:V}
+V_{ik}(t_0,\omega)\;=\;\Prob\big[\text{alive at }t_0{+}T\ \text{and}\ H\ge\Hmin\ \big|\ \text{climate }\omega\big]\;=\;\Big[\prod_{y=1}^{T}\big(1-h^{\mathrm{tot}}_{iky}(\omega)\big)\Big]\cdot\Prob_{ik}\!\big[H_T\ge\Hmin\,\big|\,\text{alive}\big],
+\end{equation}
+where $h^{\mathrm{tot}}$ is the annual probability that a member of the cohort dies from any cause (\S\ref{sec:E}) and the second factor is the probability that a survivor has reached canopy height. Defaults are $T=30$~yr and $\Hmin=10$~m for canopy species, with $T=15$ and $\Hmin=3$~m as a ``past browsing and late frost'' variant; both are parameters. Every element of Eq.~\eqref{eq:V} is an observable outcome of a planting, so $V$ can be validated against plantation follow-up with a probability sample (\S\ref{sec:design-based}). It is deliberately not a stress index: it is a probability, it has units of ``fraction of the cohort'', it compares across species, and a manager can multiply it by hectares.
+
+\subsection{Design principles}
+\begin{enumerate}
+\item \textbf{Estimand before estimator.} Eq.~\eqref{eq:V} is fixed first; every model exists to estimate a factor of it.
+\item \textbf{Fit hazards to events, not indices to patterns.} The response is something that happened to trees: dieback, growth collapse, planting failure.
+\item \textbf{Physics where data cannot speak, data where physics is unsure.} The two are blended by an explicit gate, never silently.
+\item \textbf{Validate the way the model will be used}, in unseen places, unseen years and unseen climates, against baselines that could embarrass it.
+\item \textbf{Uncertainty is an output.} It is partitioned by source, not summarised as a band.
+\item \textbf{Decide under uncertainty.} Allocation is optimised for robustness, not for the ensemble mean.
+\item \textbf{Specify, version, test.} Configuration lives in files, formulas live in tested code, and the validation plan is written down before any model is fitted.
+\end{enumerate}
+
+\section{Architecture}\label{sec:arch}
+Figure~\ref{fig:arch} shows the five modules. \textbf{A} converts climate and terrain into daily water and energy balance at 30~m for each ensemble member. \textbf{B} turns those indicators into a mechanistic annual failure probability for each species group. \textbf{C} fits observed-dieback hazards using the same indicators as covariates and hands over to B outside its area of applicability. \textbf{D} supplies attainable height, growth in physiological age and the establishment hazard. \textbf{E} combines competing hazards into $V$, derives robust refugia and analogues, and passes ensemble distributions to the decision layer. Uncertainty propagation and validation are cross-cutting, not final steps. Table~\ref{tab:coverage} states which processes each family of approaches represents.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,
+  box/.style={draw=navy,rounded corners=2.5pt,fill=white,align=center,font=\scriptsize,line width=0.6pt,inner sep=3.5pt},
+  mod/.style={box,fill=mist,text width=5.0cm,minimum height=1.9cm},
+  wide/.style={box,fill=mist,text width=8.7cm,minimum height=1.05cm},
+  inp/.style={box,fill=sand,text width=13.2cm,minimum height=0.8cm},
+  cross/.style={box,fill=white,draw=slate,text width=8.0cm,minimum height=1.0cm},
+  arr/.style={-{Stealth[length=2mm]},line width=0.6pt,color=slate},
+  lab/.style={font=\tiny\itshape,color=slate,fill=white,inner sep=1pt}]
+\node[inp] (drv) at (0,0) {\textbf{Drivers:} climate ensemble (ISIMIP3b, NEX-GDDP-CMIP6; ERA5-Land, CHELSA, stations) $\cdot$ terrain (Copernicus DEM, 30~m) $\cdot$ soils (SoilGrids 2.0)};
+\node[wide] (A) at (0,-1.75) {\textbf{A \ Topoclimate and water balance} (30~m, daily)\\ $T$, VPD, slope radiation, PET ensemble, snow, soil bucket $\rightarrow$ CWD, WSI, $\psi_s$, GDD, late frost};
+\node[mod] (B) at (-5.8,-4.55) {\textbf{B \ Hydraulic failure engine}\\ vulnerability curve, stomatal closure, $g_{\min}(T)$ phase transition, HFI\\ trait posteriors $\rightarrow h^{\mathrm{mech}}$\\[1pt] \textit{data: XFT, TRY, local traits}};
+\node[mod] (C) at (0,-4.55) {\textbf{C \ Mortality hazard}\\ cloglog panel model, Mundlak within/between, DLNM lags; GLM + monotone GBM stack $\rightarrow h^{\mathrm{stat}}$\\[1pt] \textit{data: dieback histories, tree rings, plots}};
+\node[mod] (D) at (5.8,-4.55) {\textbf{D \ Niche, height, growth, establishment}\\ Boyce-validated niche, attainable-height quantile model, Chapman--Richards in physiological age\\[1pt] \textit{data: occurrences, GEDI/CHM, planting surveys}};
+\node[box,fill=okamber,text width=5.6cm] (G) at (-2.9,-6.85) {\textbf{Area-of-applicability gate}\\ $h=w\,h^{\mathrm{stat}}+(1-w)\,h^{\mathrm{mech}}$ (link scale)};
+\node[wide] (E) at (0,-8.65) {\textbf{E \ Viability, refugia, analogues}\\ $V=\prod_y(1-h^{\mathrm{tot}}_y)\cdot\Prob(H_T\ge\Hmin)$; robust refugia; climate analogues};
+\node[wide,fill=okgreen] (X) at (0,-10.2) {\textbf{Decision layer} \ CVaR-robust species--site--method portfolio (MILP)};
+\node[cross] (U) at (-4.3,-11.75) {\textbf{Uncertainty:} SSP $\times$ GCM $\times$ downscaling $\times$ PET $\times$ traits $\times$ model; ANOVA and Sobol' partition};
+\node[cross] (Vd) at (4.3,-11.75) {\textbf{Validation:} spatial-block, forward-chaining, leave-province-out and extrapolation CV; AOA; conformal; design-based accuracy};
+\draw[arr] (drv) -- (A);
+\draw[arr] (A.south) ++(-3.4,0) -- ++(0,-0.25) -| node[lab,pos=0.25,above] {$\psi_s$, VPD, $T$} (B.north);
+\draw[arr] (A.south) -- node[lab,right,pos=0.45] {CWD, WSI, VPD, lags} (C.north);
+\draw[arr] (A.south) ++(3.4,0) -- ++(0,-0.25) -| node[lab,pos=0.25,above] {GDD, CWD, frost} (D.north);
+\draw[arr] (B.south) -- ++(0,-0.35) -| ($(G.north)+(-1.6,0)$);
+\draw[arr] (C.south) -- ++(0,-0.35) -| ($(G.north)+(1.6,0)$);
+\draw[arr] (G.south) -- node[lab,right,pos=0.5] {$h^{\mathrm{hyd}}$} ($(E.north)+(-2.9,0)$);
+\draw[arr] (D.south) -- ++(0,-0.35) -| node[lab,pos=0.2,above] {$H^\ast$, growth, $h^{\mathrm{est}}$} ($(E.north)+(3.2,0)$);
+\draw[arr] (E) -- (X);
+\end{tikzpicture}
+\caption{Architecture of FORACCA 2.0. Grey lines carry indicators or hazards between modules; uncertainty propagation and validation apply to every arrow, not only the last one.}\label{fig:arch}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Process coverage of the model families the framework builds on or replaces. ``Partial'' means represented through proxies or a single assumption.}\label{tab:coverage}
+\footnotesize
+\newcommand{\cyes}{\cellcolor{okgreen}yes}
+\newcommand{\cpart}{\cellcolor{okamber}partial}
+\newcommand{\cno}{\cellcolor{okred}no}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}p{1.55cm}>{\centering\arraybackslash}p{2.2cm}>{\centering\arraybackslash}p{2.6cm}>{\centering\arraybackslash}p{1.55cm}@{}}
+\toprule
+Process or property & v1 & Correlative SDM & Hydraulic model alone & v2\\
+\midrule
+Soil water balance and soil water potential & \cno & \cpart & \cyes & \cyes\\
+Stomatal-closure timing (phase 1) & \cno & \cno & \cyes & \cyes\\
+Cuticular loss and heat effect on $g_{\min}$ (phase 2) & \cno & \cno & \cyes & \cyes\\
+Calibration to observed mortality & \cno & \cpart & \cno & \cyes\\
+Drought legacies and lags & \cno & \cno & \cno & \cyes\\
+Establishment bottleneck after planting & \cno & \cno & \cno & \cyes\\
+Growth to canopy height (time to function) & \cno & \cno & \cno & \cyes\\
+Defined behaviour outside the training climate & \cno & \cno & \cyes & \cyes\\
+Uncertainty partitioned by source & \cno & \cpart & \cpart & \cyes\\
+Robust decision layer & \cno & \cno & \cno & \cyes\\
+\bottomrule
+\end{tabularx}
+\end{table}

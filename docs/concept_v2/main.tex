@@ -1,0 +1,102 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[a4paper,left=2.0cm,right=2.0cm,top=2.1cm,bottom=2.2cm,headheight=13pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs,tabularx,array,multirow}
+\usepackage[table]{xcolor}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[most]{tcolorbox}
+\usepackage[authoryear,round,sort]{natbib}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,backgrounds,calc}
+\usepackage{caption}
+\usepackage[colorlinks=true,linkcolor=navy,citecolor=navy,urlcolor=navy]{hyperref}
+
+\hypersetup{pdftitle={FORACCA 2.0: technical concept and methodological specification},pdfauthor={Narek Ohanyan},pdfsubject={A hybrid process--statistical framework for climate-smart reforestation in Armenia}}
+\definecolor{navy}{HTML}{16365C}
+\definecolor{teal}{HTML}{0F766E}
+\definecolor{rust}{HTML}{B4491F}
+\definecolor{sand}{HTML}{F4EFE6}
+\definecolor{mist}{HTML}{EAF0F6}
+\definecolor{slate}{HTML}{4B5563}
+\definecolor{okgreen}{HTML}{D9EFE3}
+\definecolor{okamber}{HTML}{FBF0CF}
+\definecolor{okred}{HTML}{F6DAD3}
+
+\setlength{\parskip}{3.2pt plus 1pt}
+\setlength{\parindent}{0pt}
+\linespread{1.02}
+\setlist{nosep,leftmargin=1.3em,itemsep=1.5pt}
+\numberwithin{equation}{section}
+\captionsetup{font=small,labelfont={bf,sf},labelsep=period,justification=raggedright,singlelinecheck=false}
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{9pt plus 2pt minus 3pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\setlength{\abovedisplayskip}{5pt plus 1pt minus 2pt}
+\setlength{\belowdisplayskip}{5pt plus 1pt minus 2pt}
+\renewcommand{\arraystretch}{1.12}
+\bibsep=1.4pt
+\setlength{\bibhang}{1.2em}
+
+\titleformat{\section}{\Large\sffamily\bfseries\color{navy}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalsize\sffamily\bfseries\color{navy}}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}[runin]{\normalsize\sffamily\bfseries\color{slate}}{}{0em}{}[.\ ]
+\titlespacing*{\section}{0pt}{11pt plus 2pt minus 2pt}{4pt}
+\titlespacing*{\subsection}{0pt}{7pt plus 2pt minus 1pt}{2pt}
+\titlespacing*{\subsubsection}{0pt}{3pt}{0.4em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\footnotesize\sffamily\color{slate}FORACCA 2.0 \textperiodcentered\ technical concept and methodological specification}
+\fancyhead[R]{\footnotesize\sffamily\color{slate}Draft v2.0 \textperiodcentered\ 21 September 2026}
+\fancyfoot[C]{\footnotesize\sffamily\thepage}
+
+% ---- shorthand
+\newcommand{\Hmin}{H_{\min}}
+\newcommand{\hmech}{h^{\text{mech}}}
+\newcommand{\hstat}{h^{\text{stat}}}
+\newcommand{\PLC}{\mathrm{PLC}}
+\newcommand{\HFI}{\mathrm{HFI}}
+\newcommand{\VPD}{\mathrm{VPD}}
+\newcommand{\CWD}{\mathrm{CWD}}
+\newcommand{\WSI}{\mathrm{WSI}}
+\newcommand{\REW}{\mathrm{REW}}
+\newcommand{\DI}{\mathrm{DI}}
+\newcommand{\cloglog}{\operatorname{cloglog}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\ind}{\mathbb{1}}
+\newcommand{\note}[1]{\textcolor{rust}{\textbf{#1}}}
+
+\newtcolorbox{keybox}[1][]{enhanced,breakable,colback=sand,colframe=navy!70,boxrule=0.5pt,arc=1.5pt,left=6pt,right=6pt,top=4pt,bottom=4pt,fonttitle=\sffamily\bfseries\small,#1}
+
+\begin{document}
+
+\input{sec0_front}
+\input{sec1_audit}
+\input{sec2_design}
+\input{sec3_data}
+\input{sec4_moduleA}
+\input{sec5_moduleB}
+\input{sec6_moduleC}
+\input{sec7_moduleDE}
+\input{sec8_ml}
+\input{sec9_uncertainty_decision}
+\input{sec10_plan}
+
+{\small
+\bibliographystyle{plainnat}
+\bibliography{references}
+}
+
+\end{document}

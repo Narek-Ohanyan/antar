@@ -1,0 +1,55 @@
+{
+  "extrapolation_experiment": {
+    "n_replicates": 10,
+    "worlds": {
+      "A": {
+        "mae_beyond_mean": {
+          "random_forest": 0.07946589808188662,
+          "cloglog_glm": 0.03022316809732032,
+          "mechanistic_only": 0.029441960093932906,
+          "hybrid_gated": 0.028591313472920148
+        },
+        "mae_beyond_sd": {
+          "random_forest": 0.003499927501209431,
+          "cloglog_glm": 0.0047236517856029175,
+          "mechanistic_only": 0.0002456122381384577,
+          "hybrid_gated": 0.00037909448298357746
+        },
+        "mae_inside_mean": {
+          "random_forest": 0.0024904898100305086,
+          "cloglog_glm": 0.001089874448259858,
+          "mechanistic_only": 0.002654199210269726,
+          "hybrid_gated": 0.001089874448259858
+        },
+        "mean_true_hazard_inside": 0.009976377559924272,
+        "mean_true_hazard_beyond": 0.10119826818513884,
+        "aoa_threshold_mean": 0.36068128977901875,
+        "n_events_mean": 395.1
+      },
+      "B": {
+        "mae_beyond_mean": {
+          "random_forest": 0.03308644471507979,
+          "cloglog_glm": 0.022637547559778603,
+          "mechanistic_only": 0.00802199525798256,
+          "hybrid_gated": 0.007249256361324431
+        },
+        "mae_beyond_sd": {
+          "random_forest": 0.0019270477250551577,
+          "cloglog_glm": 0.01482462104745111,
+          "mechanistic_only": 7.36372221455984e-05,
+          "hybrid_gated": 0.00043777655024376404
+        },
+        "mae_inside_mean": {
+          "random_forest": 0.002510736213291585,
+          "cloglog_glm": 0.0012325744237500177,
+          "mechanistic_only": 0.002651806447427235,
+          "hybrid_gated": 0.0012325744237500177
+        },
+        "mean_true_hazard_inside": 0.00993210027907239,
+        "mean_true_hazard_beyond": 0.05401449652241395,
+        "aoa_threshold_mean": 0.36094690294650145,
+        "n_events_mean": 383.4
+      }
+    }
+  }
+}

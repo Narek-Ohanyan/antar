@@ -1,0 +1,21 @@
+# Raw/derived climate and geospatial data: pulled per configs/ + manifests, never committed.
+data/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Notebooks
+.ipynb_checkpoints/

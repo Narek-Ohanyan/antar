@@ -1,0 +1,74 @@
+\section{Module A: topoclimate and water balance}\label{sec:A}
+
+Module A produces, for every 30~m cell and every ensemble member, the daily variables that drive everything downstream. Its design goal is that each quantity is computed with the variable that physically controls it, at the resolution at which that variable actually varies.
+
+\subsection{Forcing: from GCM to a 30~m day}
+\textbf{Bias adjustment.} ISIMIP3b fields arrive already trend-preserving \citep{Lange2019}; residual local bias against the station-corrected ERA5-Land reference (1991--2020) is removed with quantile delta mapping \citep{Cannon2015}. For a future value $x_f$ with model-future, model-historical and observed distributions $F_{m,f}$, $F_{m,h}$, $F_{o,h}$,
+\begin{equation}\label{eq:qdm}
+\begin{aligned}
+\tau&=F_{m,f}(x_f),\\
+\hat x_f&=F_{o,h}^{-1}(\tau)\cdot\frac{F_{m,f}^{-1}(\tau)}{F_{m,h}^{-1}(\tau)}\quad(\text{precipitation}),\\
+\hat x_f&=F_{o,h}^{-1}(\tau)+\big[F_{m,f}^{-1}(\tau)-F_{m,h}^{-1}(\tau)\big]\quad(\text{temperature}),
+\end{aligned}
+\end{equation}
+applied by month, so that the model's change in each quantile, and hence in extremes, survives the correction. A plain delta-change factor is retained as a second downscaling branch in the ensemble.
+
+\textbf{Topoclimate.} Daily temperature at cell $x$ is $T(x,d)=T_{\text{ref}}(d)+\Gamma_m\,[z(x)-z_{\text{ref}}]+\delta_{\text{CAP}}(x,d)$, where the monthly lapse rate $\Gamma_m$ is regressed from stations (not fixed at $-6.5$~K~km$^{-1}$) and $\delta_{\text{CAP}}\le0$ is a cold-air-pooling term for $T_{\min}$ that scales a terrain concavity index by the share of clear, calm nights. Precipitation follows a monthly elevation gradient with an exposure factor calibrated on CHELSA and the stations. This is where cool, high, shaded refugia first become visible to the model, and where 1~km deltas erase them.
+
+\textbf{Humidity and VPD.} Relative humidity is never interpolated. The reference actual vapour pressure $e_a$ is converted to a dew point, lapsed with elevation, and converted back:
+\begin{equation}\label{eq:dew}
+\begin{aligned}
+e_s(T)&=0.6108\,e^{\,17.27\,T/(T+237.3)},\qquad T_d=\frac{237.3\,\ln(e_a/0.6108)}{17.27-\ln(e_a/0.6108)},\\
+T_d(z)&=T_d(z_{\text{ref}})+\Gamma_d\,[z-z_{\text{ref}}],\qquad e_a(z)=\min\{e_s(T_d(z)),\,e_s(T_{\min})\},
+\end{aligned}
+\end{equation}
+with $\Gamma_d$ (order $-2$~K~km$^{-1}$) estimated from station dew points. Three VPDs are then computed, because three processes need three different ones:
+\begin{equation}\label{eq:vpd}
+\begin{aligned}
+\VPD_{\text{day}}&=e_s(T_{\text{day}})-e_a,\qquad T_{\text{day}}=T_{\text{mean}}+0.45\,(T_{\max}-T_{\text{mean}})\quad\text{\citep{Running1987}},\\
+\VPD_{\max}&=e_s(T_{\max})-e_a,\qquad \VPD_{24}=\tfrac12\big[e_s(T_{\max})+e_s(T_{\min})\big]-e_a.
+\end{aligned}
+\end{equation}
+Stomatal control uses $\VPD_{\text{day}}$; the upper bound of afternoon demand uses $\VPD_{\max}$; cuticular loss, which continues through the night, uses $\VPD_{24}$. The v1 construction, $e_s(T_{\max})(1-\mathrm{RH}_{\text{mean}})$, pairs a daily-mean humidity with the daily-maximum temperature and understates afternoon deficit; it is kept in the repository only as a regression test.
+
+\subsection{Radiation and potential evapotranspiration}
+Direct-beam radiation on a slope of inclination $\beta$ and aspect $\varphi_a$ scales with the cosine of the incidence angle, $\cos\theta=\cos\beta\cos Z+\sin\beta\sin Z\cos(\varphi_s-\varphi_a)$, with $Z$ and $\varphi_s$ the solar zenith and azimuth. The slope radiation is
+\begin{equation}\label{eq:rad}
+R_{s,\text{slope}}=R_b\,\frac{\max(\cos\theta,0)}{\max(\cos Z,\cos85^\circ)}\,(1-s_{\text{horizon}})+R_d\,\mathrm{SVF}+R_{\text{refl}},
+\end{equation}
+where $R_b$ and $R_d$ split the downscaled global radiation by clearness index, $s_{\text{horizon}}$ is the terrain-shading indicator from the horizon angle and $\mathrm{SVF}$ is the sky-view factor \citep{Dozier1990}. At 40.4$^\circ$N the clear-sky direct beam on a 25$^\circ$ slope, relative to level ground, is 1.27 for a south and 0.54 for a north aspect at the March equinox (no cast shadows; \texttt{slope\_radiation\_ratio} in the skeleton), a 2.4-fold contrast that is largest in the shoulder seasons, when snowmelt and budburst timing are set.
+
+Potential evapotranspiration is a structural uncertainty, not a number: Penman--Monteith with a fixed surface resistance overstates the atmospheric drying response to warming because it ignores the vegetation and CO$_2$ response \citep{Milly2016,Yang2019}. We therefore carry four formulations side by side: FAO-56 reference PM \citep{Allen1998}; Monteith's form with explicit aerodynamic and canopy conductances \citep{Monteith1965},
+\begin{equation}\label{eq:pm}
+\lambda E=\frac{\Delta\,(R_n-G)+\rho_a c_p\,\VPD\,g_a}{\Delta+\gamma\,(1+g_a/g_c)},\qquad g_c=g_{s,\max}\,f(\VPD)\,\mathrm{LAI};
+\end{equation}
+Priestley--Taylor $\lambda E=\alpha\,\Delta/(\Delta+\gamma)\,(R_n-G)$ with $\alpha=1.26$ \citep{Priestley1972}; and the energy-limited bound $(R_n-G)/\lambda$ \citep{Milly2016}. The CO$_2$ response enters through $g_{s,\max}$ as a scenario knob (none, moderate, strong).
+
+\subsection{Snow, soil water and the stress indicators}
+Precipitation is partitioned into rain and snow by a logistic function of temperature; snow accumulates and melts by a degree-day rule, and melt and rain form the water input $I_d$. Soil water is a daily bucket of capacity $W_{\max}=\theta_{\text{avail}}\,z_{\text{root}}$ (mm), following \citet{Granier1999}: with $W^\ast_d$ the storage after inputs and relative extractable water $\REW_d=W^\ast_d/W_{\max}$,
+\begin{equation}\label{eq:bucket}
+\begin{aligned}
+W^\ast_d&=\min\{W_{d-1}+I_d,\,W_{\max}\},\qquad W_d=W^\ast_d-\mathrm{AET}_d,\\
+\mathrm{AET}_d&=\min\Big\{W^\ast_d,\ \mathrm{PET}_d\cdot\min\big(1,\REW_d/\REW_{\text{crit}}\big)\Big\},
+\end{aligned}
+\end{equation}
+with $\REW_{\text{crit}}=0.4$; the excess above $W_{\max}$ drains, and the mass balance closes to machine precision (a unit test). From this we derive the annual climatic water deficit and a duration--intensity stress integral,
+\begin{equation}\label{eq:cwd}
+\begin{aligned}
+\CWD&=\sum_d(\mathrm{PET}_d-\mathrm{AET}_d)\quad\text{\citep{Stephenson1998,Lutz2010}},\\
+\WSI&=\sum_d\max\Big(0,\ \frac{\REW_{\text{crit}}-\REW_d}{\REW_{\text{crit}}}\Big),
+\end{aligned}
+\end{equation}
+and the soil water potential that Module B needs, from the Clapp--Hornberger relation \citep{Clapp1978},
+\begin{equation}\label{eq:psi}
+\psi_s=\psi_{\text{sat}}\,(\theta/\theta_{\text{sat}})^{-b},\qquad \theta=\theta_{\text{lim}}+(\theta_{\text{fc}}-\theta_{\text{lim}})\,W/W_{\max},
+\end{equation}
+with texture-dependent $\psi_{\text{sat}}$, $b$ and water contents from pedotransfer functions \citep{Saxton2006}. Plant-available water and rooting depth are sampled (50 draws) from the SoilGrids quantiles and species priors, so soil uncertainty is propagated rather than hidden.
+
+Further indicators are growing degree days above 5\,$^\circ$C, a late-frost index (days with $T_{\min}<-2\,^\circ$C after the budburst threshold is reached), heat-spell metrics (days above candidate $T_p$ values; \S\ref{sec:B}) and the multiscalar SPEI \citep{VicenteSerrano2010,Begueria2014}, whose log-logistic distribution is fitted once to 1991--2020 and then applied unchanged to the future.
+
+\subsection{Stand coupling}
+Forest ecology enters Module A through leaf area. Stand density, thinning and species mixture change $\mathrm{LAI}$ and rooting depth, hence $g_c$ in Eq.~\eqref{eq:pm} and the bucket, and therefore the stress that trees experience. LAI follows the growth module (\S\ref{sec:D}); thinning \citep{Sohn2016} and mixture effects \citep{Grossiord2020} are scenario knobs, which makes planting density a genuine decision variable rather than a nuisance parameter.
+
+\subsection{Validation of Module A}
+Downscaled $T$ and $P$ are cross-validated leave-one-station-out; $\psi_s$ and soil moisture are compared with ERA5-Land and satellite soil moisture, $\CWD$ with TerraClimate, and all with the unit and closure tests above. Skill in Module A is reported before any ecological model is fitted, so that errors in the physical drivers cannot later be mistaken for ecological signal.

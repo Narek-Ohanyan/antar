@@ -1,0 +1,64 @@
+# Scenario and ensemble design (see Concept Document, Section 10)
+#
+# 2026-09-24: adapted from the concept note's ISIMIP3b / NEX-GDDP-CMIP6 / SSP design to the
+# CMIP5 / RCP / CORDEX data actually present on hyperion.wsl.ch
+# (/storage/zilker/chelsaV2/output/FORACCA/Armenia/{pr,tas,tasrange,tasskew}/...). No CMIP6,
+# SSP, ISIMIP3b or NEX-GDDP-CMIP6 data was found there. See IMPLEMENTATION_LOG.md for the
+# reconnaissance this is based on -- a read-only directory listing, not a full inventory.
+
+reference_period: [1991, 2020]      # fixed reference for SPEI / anomalies (future is standardised against it)
+calibration_period: [2000, 2024]    # hazard-model training window (Landsat/HLS era)
+horizons: [2050, 2080, 2100]        # 20-year windows centred on these years
+
+scenarios:
+  primary: [rcp26, rcp85]           # the only RCPs found, present for every GCM below; no RCP4.5/RCP6.0 seen
+  overshoot_where_available: []     # CMIP5/RCP has no ScenarioMIP-style overshoot pathway; Sec. 10.1's overshoot
+                                     # stress test (SSP5-3.4-OS) has no CMIP5 equivalent and is dropped, not substituted
+  storyline_note: >
+    RCP8.5 is treated as a high-end stress test, not a forecast (as SSP5-8.5 was in the concept note;
+    Hausfather & Peters 2020's caution about "business as usual" framing applies equally to RCP8.5).
+
+gcms:
+  primary_source: "CORDEX WAS-22 regional climate models, bias-adjusted; hyperion.wsl.ch:/storage/zilker/chelsaV2/output/FORACCA/Armenia/"
+  primary_models: [MOHC-HadGEM2-ES, MPI-M-MPI-ESM-LR, MPI-M-MPI-ESM-MR, NCC-NorESM1-M]   # CMIP5; confirmed present on hyperion
+  regional_models: [GERICS-REMO2015, ORNL-RegCM4-7]   # both seen on hyperion; which RCM backs which GCM x RCP
+                                                        # combination varies (e.g. NCC-NorESM1-M carries both for
+                                                        # some RCPs) and must be enumerated exactly in the data
+                                                        # manifest before any pull, not assumed from this listing
+  secondary_source: null            # NEX-GDDP-CMIP6 was the concept note's secondary source; not found on hyperion,
+                                     # not substituted with anything
+  hot_model_policy: >
+    Not yet restated for CMIP5: the concept note's ECS-based screening (Zelinka et al. 2020; Hausfather et al.
+    2022) is CMIP6-specific and its numbers do not carry over to these CMIP5 models. Needs its own
+    literature-sourced ECS values per model before an equivalent policy can be written here -- flagged rather
+    than guessed at.
+  members: "use all available realisations per model to sample internal variability"
+  bias_adjustment_note: >
+    Filenames on hyperion (*_sim_hist_ba.nc, weights_pr.nc, *_qm_transfer_plot.png) indicate this RCM output is
+    already empirical-quantile-mapping bias-adjusted upstream, most likely against CHELSA itself as the
+    observational reference -- not confirmed. This differs from Sec. 5.1's assumption that raw ISIMIP3b arrives
+    already trend-preserving and only needs QDM against ERA5-Land: antar.climate.bias.quantile_delta_mapping
+    applied to this data would be correcting an already-adjusted product, not a raw GCM field. Confirm the exact
+    upstream reference before wiring this data through TOPOHYDRO's bias-adjustment step.
+
+structural_ensemble:
+  pet_formulations: [pm_fao56, canopy_pm_co2, priestley_taylor, energy_only]
+  downscaling: [delta_change_factor, qdm_trend_preserving]
+  soil_parameter_draws: 50
+  trait_draws: 200
+
+primary_variable_status:              # Table 4's "pr, tas, tasmax, tasmin", checked against hyperion directly
+  pr: present
+  tas: present
+  tasrange: present                   # diurnal range; not itself a Table 4 primary variable
+  tasskew: present                    # skewness parameter; not itself a Table 4 primary variable
+  tasmax: absent                      # directory exists on hyperion but holds no files
+  tasmin: absent                      # directory exists on hyperion but holds no files
+  # tasrange + tasskew present alongside empty tasmax/tasmin is consistent with CHELSA's published
+  # method of reconstructing daily tasmax/tasmin from tas+tasrange+tasskew rather than storing them
+  # directly -- plausible, not confirmed; check the CHELSA V2 daily-product methodology before relying on it.
+
+legacy_data_note: >
+  A version1/ subtree under the same Armenia/ directory holds derived indices (tmean/pr seasonal and annual
+  summaries, GDD days, r10mm/r20mm, CDD/CWD) per GCM x RCP. This reads as the prior project's own v1 pipeline
+  output and is not primary forcing data for this framework.

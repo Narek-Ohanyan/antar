@@ -1,0 +1,57 @@
+# ANTAR workflow skeleton (Snakemake).  Rules declare the *contract* between modules;
+# commands are placeholders that call the corresponding package entry points once implemented.
+configfile: "configs/study_area.yaml"
+
+rule all:
+    input:
+        "results/decision/robust_portfolio.parquet",
+        "results/validation/report.html"
+
+rule master_grid:
+    output: "data/interim/grid.json"
+    shell: "python -m antar.io.grid --out {output}"
+
+rule topoclimate:                      # TOPOHYDRO: downscaled forcing, PET ensemble, snow, soil water, CWD/REW/WSI/SPEI
+    input: "data/interim/grid.json"
+    output: "data/processed/climate_indices.zarr"
+    shell: "echo 'TOPOHYDRO: implement climate.* pipeline'"
+
+rule hydraulics_emulator:              # XYLEM: LHS runs of the two-phase engine + monotone surrogate
+    input: "data/processed/climate_indices.zarr", "configs/species_traits.csv"
+    output: "models/hydraulic_emulator.joblib"
+    shell: "echo 'XYLEM: run engine on LHS design, fit monotone emulator'"
+
+rule labels:                           # MNEME targets: vitality anomalies, events, cause attribution, design-based accuracy
+    input: "data/interim/grid.json"
+    output: "data/processed/hazard_panel.parquet"
+    shell: "echo 'MNEME: build person-period panel'"
+
+rule hazard_model:                     # MNEME: cloglog panel GLM + monotone GBM, nested blocked CV, NNLS stacking, AOA
+    input: "data/processed/hazard_panel.parquet", "models/hydraulic_emulator.joblib"
+    output: "models/hazard_stack.joblib", "results/validation/cv_scores.csv"
+    shell: "echo 'MNEME: fit + validate'"
+
+rule niche_structure_regeneration:     # MERISTEM
+    input: "data/processed/climate_indices.zarr"
+    output: "models/niche_height_regen.joblib"
+    shell: "echo 'MERISTEM: adult niche, attainable height, establishment hazard'"
+
+rule viability_refugia:                # REFUGIUM: per scenario member
+    input: "models/hazard_stack.joblib", "models/niche_height_regen.joblib"
+    output: "results/viability/ensemble.zarr"
+    shell: "echo 'REFUGIUM: cohort viability + refugia'"
+
+rule uncertainty:
+    input: "results/viability/ensemble.zarr"
+    output: "results/uncertainty/variance_decomposition.csv"
+    shell: "echo 'uncertainty: variance decomposition + Sobol'"
+
+rule decision:
+    input: "results/viability/ensemble.zarr", "results/uncertainty/variance_decomposition.csv"
+    output: "results/decision/robust_portfolio.parquet"
+    shell: "echo 'AEGIS: CVaR portfolio'"
+
+rule validation_report:
+    input: "results/validation/cv_scores.csv"
+    output: "results/validation/report.html"
+    shell: "echo 'design-based accuracy, AOA maps, calibration, model card'"

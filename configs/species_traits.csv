@@ -1,0 +1,8 @@
+group,example_taxa,p50_mpa,slope_pct_per_mpa,psi_close_mpa,gmin25_mmol_m2_s,tp_c,lethal_plc,capacitance_mmol_m2_mpa,status
+mesic_diffuse_porous_broadleaf,"Fagus orientalis; Carpinus betulus",-3.0,40,-2.2,3.0,38,88,30000,ILLUSTRATIVE_PLACEHOLDER
+ring_porous_oak,"Quercus macranthera; Q. iberica",-2.8,35,-2.4,3.5,38,88,30000,ILLUSTRATIVE_PLACEHOLDER
+pine,"Pinus kochiana",-3.6,30,-2.6,1.5,40,50,20000,ILLUSTRATIVE_PLACEHOLDER
+juniper_arid_conifer,"Juniperus polycarpos; J. excelsa",-9.0,25,-5.0,1.0,42,50,15000,ILLUSTRATIVE_PLACEHOLDER
+# IMPORTANT: every numeric value above is an order-of-magnitude placeholder used only to exercise the code.
+# Replace with posteriors built from XFT (Choat et al. 2012), TRY (Kattge et al. 2020), Duursma et al. (2019)
+# for g_min, and local measurements (ANAU and prior field campaigns) before any result is interpreted.

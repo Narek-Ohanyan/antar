@@ -1,0 +1,31 @@
+\thispagestyle{plain}
+{\raggedright
+{\sffamily\bfseries\Huge\color{navy} FORACCA 2.0}\\[3pt]
+{\sffamily\bfseries\Large A hybrid process--statistical framework for predicting where climate-resilient reforestation will hold in Armenia}\\[4pt]
+{\sffamily\small\color{slate} Technical concept and methodological specification \textperiodcentered\ successor to Output~1.2 (v1, 16~March 2026)}\\[3pt]
+{\sffamily\small Narek Ohanyan \textperiodcentered\ Acopian Center for the Environment, American University of Armenia \textperiodcentered\ Draft v2.0, 21~September 2026}\par}
+\vspace{4pt}
+\hrule height 0.6pt
+\vspace{6pt}
+
+\begin{tcolorbox}[enhanced,colback=mist,colframe=mist,boxrule=0pt,arc=1.5pt,left=7pt,right=7pt,top=5pt,bottom=5pt]
+\textbf{\sffamily Abstract.} Version~1 of the FORACCA vulnerability model asked a random forest to reproduce the local spread of canopy height from three climate deltas, and then read the answer as a forecast. Re-running its own training table shows why that cannot work: the model scores $R^2=0.29$ on a random split and $R^2=0.04$ when whole 25~km blocks are held out, while on the same random split a forest given only longitude and latitude scores 0.45. Beyond the training range its output is constant. Version~2 replaces the score with an estimand that can be tested, the probability $V$ that a planted cohort survives and reaches canopy height under a stated climate trajectory, and builds it from five coupled modules: topoclimate and water balance; a two-phase plant-hydraulic failure engine; a panel discrete-time hazard model fitted to observed dieback; an adult-niche, attainable-height, growth and establishment module; and a competing-risk viability integrator feeding a CVaR-robust planting portfolio. Physics decides where observations cannot, observations decide where physics is uncertain, and an area-of-applicability gate arbitrates between them. The validation protocol is fixed before fitting, uncertainty is partitioned rather than summarised, and the core formulas below are implemented and unit-tested in the accompanying Python skeleton.
+\end{tcolorbox}
+
+\vspace{2pt}
+\begin{keybox}[title={What changes from version 1 to version 2}]
+\small
+\renewcommand{\arraystretch}{1.14}
+\begin{tabularx}{\linewidth}{@{}>{\sffamily\bfseries}p{2.45cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+ & \textbf{\sffamily Version 1} & \textbf{\sffamily Version 2}\\[1pt]
+\hline
+Target & A vulnerability index (FVS) built from climate deltas scaled by the spread of canopy height & Cohort viability $V$: probability that planted trees survive and reach $\Hmin$ under trajectory $\omega$\\
+Climate & Epoch-mean deltas, one model, 1~km & Daily forcing, 5+ GCMs $\times$ 4 SSPs, trend-preserving downscaling to 30~m topoclimate; VPD built last from dew-point-downscaled humidity\\
+Physiology & Absent & Two-phase hydraulic failure: stomatal closure, then cuticular loss with a $g_{\min}$ heat phase transition\\
+Observations & One static canopy-height statistic on forest-mask survivors & Annual dieback events and tree-ring growth collapses for every forest pixel present at the start, censored by harvest and fire\\
+Learning & Random 80/20 split, random forest, Gini importances used as coefficients & Spatial-block, forward-chaining, leave-province-out and extrapolation CV; proper scores; monotone GLM/GBM stack; conformal intervals\\
+Extrapolation & Silent: output is flat outside the training range & Explicit: area-of-applicability gate hands over to the mechanistic hazard\\
+Forest ecology & Absent & Establishment hazard, attainable height, growth in physiological age, stand coupling through leaf area, adult niche as consistency test\\
+Uncertainty, decision & One realisation; no decision layer & Factorial ensemble with variance partitioning; CVaR-robust species--site portfolio\\
+\end{tabularx}
+\end{keybox}

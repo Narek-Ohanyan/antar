@@ -1,0 +1,9 @@
+crs: EPSG:32638
+resolution_m: 30
+ensemble_resolution_m: 100        # full ensemble at 100 m; 30 m for the median/decision-scale subsets
+bbox_wgs84: [43.4, 38.8, 46.7, 41.4]
+eligibility_mask_exclusions:      # do-no-harm layer for the decision module
+  - natural_grassland_steppe_and_subalpine_meadow
+  - wetlands_and_riparian_reserves
+  - cropland_and_settlements
+  - specially_protected_open_ecosystems

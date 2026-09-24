@@ -1,0 +1,17 @@
+# Placeholder leaf-area-index defaults (concept note Sec. 5.4, "Stand coupling").
+#
+# LAI should follow H(a) from MERISTEM's growth model, closing the loop between
+# stand development and stand water use (canopy_pm's g_c term). MERISTEM is
+# built after TOPOHYDRO in the engine build order, so until it exists this file
+# supplies a static, order-of-magnitude LAI per functional group -- matched to
+# the same groups as configs/species_traits.csv -- purely to exercise
+# antar.climate.pet.canopy_conductance end to end.
+#
+# These are NOT calibrated values and nothing computed from them is a result.
+# Replace with dynamic LAI(H(a)) once MERISTEM exists.
+lai_by_functional_group:
+  mesic_diffuse_porous_broadleaf: 4.5
+  ring_porous_oak: 3.5
+  pine: 3.0
+  juniper_arid_conifer: 1.2
+status: ILLUSTRATIVE_PLACEHOLDER

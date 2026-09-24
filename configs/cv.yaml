@@ -1,0 +1,18 @@
+# Validation design (Concept Document, Section 9)
+spatial_cv:
+  block_size_rule: "max(variogram practical range of residuals, NNDM-matched distance); default 25 km until estimated"
+  buffer_km: 2
+  folds: 5
+temporal_cv:
+  scheme: forward_chaining
+  min_train_years: 10
+  extreme_year_holdout: true     # leave the driest / hottest years out of training in separate runs
+group_cv:
+  leave_out: [province]          # e.g. Syunik, Tavush, Lori, Vayots Dzor, ...
+extrapolation_cv:
+  train_quantile: 0.70           # train on the coolest/wettest 70 % of the environmental range, test on the rest
+metrics:
+  probabilistic: [brier_skill, log_loss, murphy_reliability, murphy_resolution, ece, pr_auc, calibration_slope]
+  continuous: [rmse, mae, bias, crps_or_interval_score, pi90_coverage]
+  map_product: design_based_area_and_accuracy   # Olofsson et al. (2014)
+baselines: [climatology_null, persistence, coordinates_only]   # a climate model must beat coordinates_only under blocked CV

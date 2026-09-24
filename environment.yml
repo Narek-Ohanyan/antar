@@ -1,0 +1,29 @@
+name: antar
+channels: [conda-forge]
+dependencies:
+  - python=3.11
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+  - xarray
+  - rioxarray
+  - rasterio
+  - geopandas
+  - dask
+  - zarr
+  - netcdf4
+  - pyarrow
+  - matplotlib
+  - pyyaml
+  - pytest
+  - pip
+  - pip:
+      - pymc>=5
+      - arviz
+      - shap
+      - mapie
+      - snakemake
+      - dvc
+      - mlflow
+      - -e .

@@ -1,0 +1,52 @@
+\section{Scenarios, uncertainty and the decision layer}\label{sec:unc}
+
+\subsection{Scenario and ensemble design}
+Scenarios are choices about the world, not draws from a distribution, and we do not average them. Results are reported per pathway (SSP1-2.6, SSP2-4.5, SSP3-7.0, SSP5-8.5), with SSP5-8.5 used as a high-end stress test rather than a forecast \citep{Hausfather2020}, at 20-year windows centred on 2050, 2080 and 2100 against the fixed 1991--2020 reference. The primary ensemble is the five ISIMIP3b models; NEX-GDDP-CMIP6 supplies SSP2-4.5 and a wider model set to test whether conclusions depend on that particular five.
+
+Two safeguards address the fact that CMIP6 contains models whose sensitivity exceeds the assessed likely range. Every headline result is indexed by global warming level (1.5, 2, 3 and 4~K above pre-industrial) as well as by calendar year, which removes model sensitivity from the argument about \emph{when}; and ensemble statistics are shown with and without any model above the assessed very-likely upper bound of equilibrium sensitivity \citep{Hausfather2022,Zelinka2020}. Performance--independence weighting \citep{Brunner2020} is a sensitivity analysis, never the default. Where overshoot runs exist (SSP5-3.4-OS), they serve as a stress test of the lag structure of Module~C: if a cohort's viability at 2100 differs between a warming-then-cooling path and a monotone path that ends at the same climate, the framework is representing legacy and hysteresis, the trajectory dependence reported for Amazon dieback under overshoot \citep{Munday2025}.
+
+\subsection{Partitioning uncertainty}
+The output $V$ is itself a probability, so the ensemble yields a distribution over probabilities. Its spread has different origins that call for different responses (Table~\ref{tab:unc}), and the framework reports them separately: a scientist can reduce knowledge uncertainty by measuring, a manager can reduce exposure to scenario uncertainty by diversifying, and neither can do anything about internal variability except plan for it.
+
+\begin{table}[t]
+\centering
+\caption{Factors of the uncertainty ensemble.}\label{tab:unc}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash\bfseries\sffamily}p{3.0cm}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Factor & Levels & Kind & Treatment\\
+\midrule
+Pathway (SSP) & 4, plus overshoot stress test & Deep (a choice) & Conditional reporting; never averaged\\
+Climate model & 5 (ISIMIP3b); wider set (NEX-GDDP) & Structural & GWL indexing; with/without hot models\\
+Internal variability & Years within 20-yr windows, realisations & Aleatory & Distribution of annual hazards\\
+Downscaling & QDM, delta change & Structural & Both carried\\
+PET formulation & 4 (\S\ref{sec:A}) & Structural & All carried\\
+Soil and rooting depth & 50 draws & Epistemic & Random draws from SoilGrids quantiles and priors\\
+Traits & 50 hyper-parameter $\times$ 200 individual draws & Epistemic and aleatory & Two-level Monte Carlo (\S\ref{sec:B})\\
+Model class & Statistical, mechanistic, gated hybrid & Structural & All reported; hybrid is the default product\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Analysis of variance for discrete factors.} For an output $Y$ (for example regional mean $V$ or the area with $V\ge v^\ast$) evaluated on the crossed design of the discrete factors, the total variance is split by a standard ANOVA into main effects and interactions, $\mathrm{Var}(Y)=\sum_f \mathrm{Var}_f+\text{interactions}$, and the fractions $F_f=\mathrm{Var}_f/\mathrm{Var}(Y)$ are tracked as a function of lead time in the manner of \citet{Hawkins2009} and \citet{Lehner2020}. This tells us, for each horizon and region, whether the argument is about emissions, about the climate model, or about our own modelling.
+
+\textbf{Global sensitivity for the knowledge factors.} For the continuous, epistemic factors $X=(X_1,\dots,X_k)$ (rooting depth, plant-available water, trait hyper-parameters, recalibration constants) we use variance-based indices computed on the emulator of Module~B, since the full engine is too slow for the number of evaluations needed. The first-order and total-order indices are
+\begin{equation}\label{eq:sobol}
+S_i=\frac{\mathrm{Var}\big[\E(Y\mid X_i)\big]}{\mathrm{Var}(Y)},\qquad S_{T_i}=\frac{\E\big[\mathrm{Var}(Y\mid X_{\sim i})\big]}{\mathrm{Var}(Y)}\ \approx\ \frac{1}{2N\,\widehat{\mathrm{Var}}(Y)}\sum_{j=1}^{N}\Big[f(A)_j-f\big(A_B^{(i)}\big)_j\Big]^2,
+\end{equation}
+with the Jansen-type total-order estimator recommended by \citet{Saltelli2010}, in which $A$ and $B$ are independent sample matrices and $A_B^{(i)}$ is $A$ with column $i$ taken from $B$; the cost is $N(k+2)$ emulator runs. A large $S_{T_i}-S_i$ marks interactions, which in a threshold system like this one (phase transition, stomatal closure) are expected and should not be hidden. The result is a ranked list of which measurement would reduce uncertainty most, and it sets the priorities of the trait campaign in \S\ref{sec:plan}.
+
+\subsection{Decision layer: robust portfolios}
+Ranking species by expected viability cell by cell yields a landscape planted to whichever option is best on average, and that landscape fails all at once in the scenarios where the option is not. A planting programme is a portfolio, so it is optimised as one.
+
+Let $u$ index management units (aggregated 30~m cells, roughly 1~ha), $j$ planting options, and $\omega\in\Omega$ the members of the scenario ensemble. Let $x_{uj}\in\{0,1\}$ indicate that option $j$ is planted in unit $u$, $A_u$ its area, and $b_{uj\omega}=V_{uj\omega}\,v_j$ the benefit per hectare, viability times a value weight $v_j$ (canopy area, carbon or water services, set with stakeholders). The benefit of a plan in scenario $\omega$ is $B_\omega(x)=\sum_{u,j}A_u\,b_{uj\omega}\,x_{uj}$. The plan maximises a mixture of the mean and the mean of the worst tail,
+\begin{equation}\label{eq:cvar}
+\max_{x,\zeta,s}\ \ (1-\lambda)\,\frac1{|\Omega|}\sum_\omega B_\omega(x)\;+\;\lambda\Big[\zeta-\frac{1}{(1-\alpha)|\Omega|}\sum_\omega s_\omega\Big]\quad\text{s.t.}\quad s_\omega\ge\zeta-B_\omega(x),\ \ s_\omega\ge0,
+\end{equation}
+where the bracket is the conditional value-at-risk, the mean benefit over the worst $(1-\alpha)$ share of scenarios, in the linear form of \citet{Rockafellar2000}. The remaining constraints are
+\begin{equation}\label{eq:mip}
+\sum_j x_{uj}\le1,\qquad \sum_{u,j}A_u\,c_{uj}\,x_{uj}\le\mathrm{Budget},\qquad \sum_uA_u x_{uj}\le\sigma_{\max}\sum_{u,j'}A_u x_{uj'},\qquad x_{uj}\le e_{uj},
+\end{equation}
+one option per unit, a budget, a cap $\sigma_{\max}$ on the area share of any single option (response diversity), and an eligibility indicator $e_{uj}$ that is zero where the option is outside its applicability region or legally excluded. A per-basin cap on additional water use can be added as a further linear constraint. The problem is a mixed-integer linear programme, solved with HiGHS in the skeleton. With about 500 scenario members, $\alpha=0.8$ (the worst 100), a few thousand units and ten to fifteen options, it has of the order of $10^4$--$10^5$ binary variables, which is tractable after aggregation and, if necessary, scenario reduction.
+
+Sweeping $\lambda$ from 0 to 1 traces the mean--CVaR frontier, and the distance between its ends is the price of robustness, expressed in units of benefit (hectares of expected surviving canopy for canopy-area weights). The optimiser exploits whatever its scenario sample happens to contain, so the reported CVaR is evaluated on a fresh, independent set of ensemble members; a large gap between the in-sample and out-of-sample values is a warning that the portfolio is over-fitted to the ensemble. Areas with a large extrapolation footprint are not silently planted or silently excluded: they are flagged, and the plan states how much of its expected benefit comes from cells outside the area of applicability.
