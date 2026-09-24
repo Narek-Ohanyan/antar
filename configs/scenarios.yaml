@@ -1,14 +1,44 @@
 # Scenario and ensemble design (see Concept Document, Section 10)
 #
-# 2026-09-24: adapted from the concept note's ISIMIP3b / NEX-GDDP-CMIP6 / SSP design to the
-# CMIP5 / RCP / CORDEX data actually present on hyperion.wsl.ch
-# (/storage/zilker/chelsaV2/output/FORACCA/Armenia/{pr,tas,tasrange,tasskew}/...). No CMIP6,
-# SSP, ISIMIP3b or NEX-GDDP-CMIP6 data was found there. See IMPLEMENTATION_LOG.md for the
-# reconnaissance this is based on -- a read-only directory listing, not a full inventory.
+# 2026-09-24: two data-source decisions, both reconnaissance-driven (read the actual archive,
+# never assumed):
+#
+# (1) Historical reference: native CHELSA-daily (chelsa-climate.org / os.unil.cloud.switch.ch/
+#     chelsa02/chelsa/global/daily/), NOT the hyperion CORDEX output -- hyperion's tree is CORDEX
+#     regional-model output bias-adjusted *using* CHELSA as a reference, not CHELSA itself, and
+#     was missing tasmax/tasmin entirely. Real CHELSA-daily has pr/tas/tasmax/tasmin directly,
+#     confirmed via HTTP range-request access to the public COGs (no bulk download): tas/tasmax/
+#     tasmin 1979-2024, pr 1979-2019 (archive's own "active (incomplete)" status; confirmed gap,
+#     not assumed). 1979 start (not 2000) so the pull actually covers reference_period below,
+#     which the first attempt at this did not.
+# (2) Future projections: kept on the hyperion CORDEX/CMIP5/RCP pull (see the gcms: block below),
+#     per explicit decision -- CORDEX for the future horizon, CHELSA-daily for the historical
+#     reference, rather than mixing sources within the same time window.
+#
+# See IMPLEMENTATION_LOG.md for both reconnaissance passes and a real bug caught in the CHELSA
+# pull (filenames are DD_MM_YYYY, not MM_DD_YYYY -- verified empirically via the actual seasonal
+# temperature signal before trusting the naive guess).
 
-reference_period: [1991, 2020]      # fixed reference for SPEI / anomalies (future is standardised against it)
-calibration_period: [2000, 2024]    # hazard-model training window (Landsat/HLS era)
+reference_period: [1991, 2020]      # fixed reference for SPEI / anomalies (future is standardised against it);
+                                     # now actually covered by the CHELSA-daily pull (1979-2024/2019)
+calibration_period: [2000, 2024]    # hazard-model (MNEME) training window specifically -- tied to Landsat/HLS-era
+                                     # satellite coverage for dieback detection, not the climatological data itself
 horizons: [2050, 2080, 2100]        # 20-year windows centred on these years
+
+historical_source:
+  dataset: "CHELSA-daily V2.1"
+  url: "https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/daily/"
+  citation: "Karger, D. N. (2025). CHELSA-daily climate data at high resolution. EnviDat. https://www.doi.org/10.16904/envidat.687."
+  license: "CC0 1.0"
+  variables:
+    tas: {years: [1979, 2024], status: present}
+    tasmax: {years: [1979, 2024], status: present}
+    tasmin: {years: [1979, 2024], status: present}
+    pr: {years: [1979, 2019], status: "present through 2019; gap 2020-2024 in the source archive itself"}
+  access_method: >
+    Cloud-Optimized GeoTIFF, one global file per variable per day, accessed via HTTP range
+    requests (GDAL /vsicurl/) for Armenia's window only -- no full-file download. ~0.3 s per
+    file confirmed.
 
 scenarios:
   primary: [rcp26, rcp85]           # the only RCPs found, present for every GCM below; no RCP4.5/RCP6.0 seen
@@ -19,6 +49,7 @@ scenarios:
     Hausfather & Peters 2020's caution about "business as usual" framing applies equally to RCP8.5).
 
 gcms:
+  role: "future projections only (2025 onward) -- the historical/reference period is served by CHELSA-daily above"
   primary_source: "CORDEX WAS-22 regional climate models, bias-adjusted; hyperion.wsl.ch:/storage/zilker/chelsaV2/output/FORACCA/Armenia/"
   primary_models: [MOHC-HadGEM2-ES, MPI-M-MPI-ESM-LR, MPI-M-MPI-ESM-MR, NCC-NorESM1-M]   # CMIP5; confirmed present on hyperion
   regional_models: [GERICS-REMO2015, ORNL-RegCM4-7]   # both seen on hyperion; which RCM backs which GCM x RCP
@@ -47,16 +78,18 @@ structural_ensemble:
   soil_parameter_draws: 50
   trait_draws: 200
 
-primary_variable_status:              # Table 4's "pr, tas, tasmax, tasmin", checked against hyperion directly
-  pr: present
-  tas: present
-  tasrange: present                   # diurnal range; not itself a Table 4 primary variable
-  tasskew: present                    # skewness parameter; not itself a Table 4 primary variable
-  tasmax: absent                      # directory exists on hyperion but holds no files
-  tasmin: absent                      # directory exists on hyperion but holds no files
-  # tasrange + tasskew present alongside empty tasmax/tasmin is consistent with CHELSA's published
-  # method of reconstructing daily tasmax/tasmin from tas+tasrange+tasskew rather than storing them
-  # directly -- plausible, not confirmed; check the CHELSA V2 daily-product methodology before relying on it.
+primary_variable_status:              # Table 4's "pr, tas, tasmax, tasmin"
+  historical: {pr: present, tas: present, tasmax: present, tasmin: present}   # CHELSA-daily, direct
+  future_cordex_hyperion:
+    pr: present
+    tas: present
+    tasrange: present                 # diurnal range; not itself a Table 4 primary variable
+    tasskew: present                  # skewness parameter; not itself a Table 4 primary variable
+    tasmax: absent                    # directory exists on hyperion but holds no files
+    tasmin: absent                    # directory exists on hyperion but holds no files
+  # For the future period, tasmax/tasmin have no direct CORDEX source on hyperion and must be
+  # derived from tas + tasrange (min/max around the mean, tasskew informing the asymmetry) --
+  # not yet implemented; a real follow-up, not a silent gap.
 
 legacy_data_note: >
   A version1/ subtree under the same Armenia/ directory holds derived indices (tmean/pr seasonal and annual

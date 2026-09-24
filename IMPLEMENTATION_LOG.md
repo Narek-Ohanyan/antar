@@ -397,6 +397,61 @@ against real data once the hyperion/Earth Engine/EnviDat pulls finish, or (b) ge
 data-dependent items already flagged in earlier entries (LandTrendr/CCDC segmentation
 itself, XYLEM's ABC calibration, the real stacked-hazard fit).
 
+## 2026-09-24 — real CHELSA-daily found; historical/future data source split decided
+
+User pushed back on the hyperion CORDEX pull being treated as "the CHELSA data": correctly --
+hyperion's tree is CORDEX regional-model output bias-adjusted *using* CHELSA as a reference,
+not CHELSA's own product. The real public CHELSA archive lives at
+`os.unil.cloud.switch.ch/chelsa02/chelsa/global/` (found via the actual "Download" link's
+target on chelsa-climate.org, not guessed), as Cloud-Optimized GeoTIFFs, one global file per
+variable per day, openable directly over HTTP range requests (GDAL `/vsicurl/`) -- confirmed
+by opening one file and reading only Armenia's window: 0.3 s, no full-file download.
+
+**CHELSA-BIOCLIM+** (bonus find while checking the site): bioclimatic variables including
+GDD0/5/10, growing-season length via the **TREELIM methodology**, frost-change frequency, VPD,
+PET, wind, radiation, for 1981-2010 and, critically, future periods (2011-2100) broken out by
+GCM: **GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0, UKESM1-0-LL** -- exactly the five
+ISIMIP3b models the concept note specifies. Not pulled yet; noted for when MERISTEM's
+treeline/growing-season fitting needs it.
+
+**Decision (user): CHELSA-daily for the historical reference, CORDEX (hyperion) for future
+projections** -- not one source mixed across the whole timeline. Implemented as two separate
+pulls rather than reconciled into one.
+
+**A real bug caught by checking the actual data, not just that the pull ran**: the first
+CHELSA-daily attempt assumed filenames were `CHELSA_{var}_{MM}_{DD}_{YYYY}`. For days 1-12 of
+each month this silently returned *valid-looking data for the wrong date* (no error, no
+crash); for days 13-31 it correctly 404'd, which is what actually exposed the bug -- a partial
+month of real numbers would have looked completely plausible otherwise. Diagnosed by comparing
+the actual mean temperature of `CHELSA_tas_01_10_2000` (10.2 degC) against what January and
+October should look like in Armenia: 10.2 degC is unambiguously October, not January -- proving
+the field order is day-then-month (`DD_MM_YYYY`), not month-then-day. Fixed, re-verified
+(Jan 1 2000 now reads 0.9 degC, genuinely cold), and only then run at scale. This is exactly
+the "check the number, not just that the code ran" lesson from the earlier wind-speed bug,
+now caught a second time on a much larger, easier-to-miss pull.
+
+**Reference-period gap caught before, not after, the full pull**: the first attempt pulled
+2000-2024 (matching `calibration_period`), but the concept note's own `reference_period` for
+standardising every anomaly and index is 1991-2020 (`scenarios.yaml`) -- 2000-2024 does not
+cover it. User caught this too. Extended to 1979-2024 (tas/tasmax/tasmin) / 1979-2019 (pr,
+matching precipitation's real coverage ceiling) -- 1979 also matches the reanalysis-era
+convention (ERA5 itself starts 1979), not an arbitrary round number.
+
+**Confirmed variable coverage** (checked directly, year by year, not assumed from the
+dataset's blanket "1941-2025" label): `tas`/`tasmax`/`tasmin` complete 1979-2024;
+`pr` complete 1979-2019, genuinely absent 2020-2024 (matches the archive's own
+"active (incomplete)" status, verified: zero objects under `pr/2020/` through `pr/2024/`).
+
+Pulling via `/vsicurl/` windowed reads directly into local compressed `.npz` files (no
+intermediate full-resolution global downloads); `configs/scenarios.yaml` updated with the
+full historical-source block (dataset, URL, citation, license, per-variable coverage) and the
+CORDEX `gcms:` block re-scoped to "future projections only." CORDEX's future portion
+(2025-2100) extracted the same way as before (ncks, stride-6, hyperion-side) for all four
+CORDEX variables (pr, tas, tasrange, tasskew) -- superseding the earlier 2006-2024 historical
+CORDEX extracts, which are no longer the right thing to use now that CHELSA-daily covers that
+period directly. Future `tasmax`/`tasmin` still have no direct CORDEX source and would need
+deriving from `tas`+`tasrange` -- flagged in `scenarios.yaml`, not yet implemented.
+
 ## 2026-09-24 — S2-VHM pull complete; manifest convention for Drive-hosted data
 
 All 9 years (2017-2025) of the S2-VHM download-upload-to-Drive pipeline finished.
