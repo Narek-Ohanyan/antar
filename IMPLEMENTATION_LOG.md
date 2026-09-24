@@ -355,6 +355,40 @@ REFUGIUM's `cohort.viability`) had never been exercised together before; now it 
 REFUGIUM was the last engine with meaningful spec gaps to close without real data. AEGIS
 (the decision layer) is the only engine not yet reviewed against the concept note.
 
+## 2026-09-24 — AEGIS implementation (concept note Sec. 10.3)
+
+`decision/optimize.py` already implemented essentially all of Sec. 10.3's core: the
+CVaR-robust MILP (Rockafellar & Uryasev 2000 linear form, solved via `scipy.optimize.milp`
+-- which uses HiGHS, matching "solved with HiGHS in the skeleton"), the one-option-per-unit,
+budget, diversity-cap and eligibility constraints, the optional per-basin water-use cap, and
+`evaluate_portfolio` for the out-of-sample CVaR check the note explicitly calls for ("a
+large gap between the in-sample and out-of-sample values is a warning" of overfitting to
+the scenario sample). Confirmed correct against the exact constraint forms in the text
+before adding anything.
+
+Two things the text names explicitly but that were not yet implemented:
+
+* **`efficient_frontier`**: "sweeping lambda from 0 to 1 traces the mean-CVaR frontier, and
+  the distance between its ends is the price of robustness, expressed in units of benefit."
+  Solves `robust_portfolio` once per lambda in a caller-supplied grid and reports
+  `price_of_robustness` as the drop in expected benefit from the first to the last lambda
+  solved -- exactly the note's quantity when the grid runs 0 to 1 (the default), well-defined
+  but not that literal quantity for any other endpoints (documented in the docstring).
+* **`extrapolation_footprint`**: "areas with a large extrapolation footprint are not
+  silently planted or excluded: they are flagged, and the plan states how much of its
+  expected benefit comes from cells outside the area of applicability." This is a
+  *reporting* diagnostic on an already-solved plan, distinct from the `eligible` (e_uj)
+  constraint that hard-excludes legally-forbidden or out-of-region options from the
+  optimisation itself -- the note describes both mechanisms (an exclusion constraint and a
+  separate transparency report), and both are now present.
+
+This closes the last engine with clear, buildable-without-real-data gaps. All five
+scientific engines (TOPOHYDRO, XYLEM, MNEME, MERISTEM, REFUGIUM) plus AEGIS have now been
+checked against the concept note section by section; remaining work is either (a) fitting
+against real data once the hyperion/Earth Engine/EnviDat pulls finish, or (b) genuinely
+data-dependent items already flagged in earlier entries (LandTrendr/CCDC segmentation
+itself, XYLEM's ABC calibration, the real stacked-hazard fit).
+
 ## 2026-09-24 — SSH access to hyperion.wsl.ch
 
 Non-interactive key-based auth check (`ssh -o BatchMode=yes ohanyann@hyperion.wsl.ch true`) failed

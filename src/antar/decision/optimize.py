@@ -94,6 +94,61 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
     return {"x": x, "expected": float(bc @ w), "cvar": float(srt[:k].mean()), "scenario_benefit": bc}
 
 
+def efficient_frontier(benefit, area, cost, budget, lambdas=(0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
+                        scenario_weights=None, alpha: float = 0.8, **kw):
+    """Sec. 10.3: sweep lambda from 0 (pure mean) to 1 (pure CVaR) to trace the
+    mean-CVaR frontier. Solves :func:`robust_portfolio` once per lambda.
+
+    "The distance between its ends is the price of robustness, expressed in
+    units of benefit": ``price_of_robustness`` is the drop in expected benefit
+    between the first and last lambda solved -- exactly that distance when the
+    default grid (0 to 1) is used, and well-defined but not the note's literal
+    quantity for any other grid endpoints.
+    """
+    lambdas = np.asarray(lambdas, dtype=float)
+    plans = [
+        robust_portfolio(benefit, area, cost, budget, scenario_weights=scenario_weights, lam=float(lam), alpha=alpha, **kw)
+        for lam in lambdas
+    ]
+    expected = np.array([p["expected"] for p in plans])
+    cvar = np.array([p["cvar"] for p in plans])
+    return {
+        "lambdas": lambdas,
+        "expected": expected,
+        "cvar": cvar,
+        "price_of_robustness": float(expected[0] - expected[-1]),
+        "plans": plans,
+    }
+
+
+def extrapolation_footprint(x, benefit, area, inside_aoa, scenario_weights=None):
+    """Sec. 10.3: "areas with a large extrapolation footprint are not silently
+    planted or excluded: they are flagged, and the plan states how much of its
+    expected benefit comes from cells outside the area of applicability."
+
+    A reporting diagnostic on an already-solved plan ``x`` -- it does not
+    change the plan. ``inside_aoa``: (U,) or (U, J) boolean.
+    """
+    x = np.asarray(x, dtype=float)
+    benefit = np.asarray(benefit, dtype=float)
+    area = np.asarray(area, dtype=float)
+    U, J, C = benefit.shape
+    w = np.full(C, 1.0 / C) if scenario_weights is None else np.asarray(scenario_weights, dtype=float) / np.sum(scenario_weights)
+    expected_per_unit_option = np.einsum("uj,ujc,c->uj", x, benefit, w) * area[:, None]
+
+    inside = np.asarray(inside_aoa, dtype=bool)
+    if inside.ndim == 1:
+        inside = np.broadcast_to(inside[:, None], (U, J))
+
+    total = float(expected_per_unit_option.sum())
+    outside = float(expected_per_unit_option[~inside].sum())
+    return {
+        "total_expected_benefit": total,
+        "outside_aoa_expected_benefit": outside,
+        "outside_aoa_share": outside / total if total > 0 else 0.0,
+    }
+
+
 def evaluate_portfolio(x, benefit, area, alpha: float = 0.8, scenario_weights=None):
     """Score a fixed plan on an (independent) scenario set: expected benefit and lower-tail CVaR.
 

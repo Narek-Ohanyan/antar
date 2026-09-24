@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from antar.decision.optimize import evaluate_portfolio, robust_portfolio
+from antar.decision.optimize import efficient_frontier, evaluate_portfolio, extrapolation_footprint, robust_portfolio
 from antar.io.grid import audit_dvpd_dtmax_ratio
 from antar.uncertainty import variance
 
@@ -70,6 +70,37 @@ def test_portfolio_eligibility_mask_is_respected():
     r = robust_portfolio(b, area, cost, budget=10, lam=0.0, eligible=elig)
     assert r["x"][0, 1] == 0 and r["x"][0, 0] == 1
     assert r["x"][1:, 1].sum() == 2
+
+
+def test_efficient_frontier_traces_mean_to_cvar_tradeoff():
+    b = _toy()
+    area, cost = np.ones(3), np.ones((3, 2))
+    front = efficient_frontier(b, area, cost, budget=10, lambdas=(0.0, 0.5, 1.0), alpha=0.75)
+    assert front["expected"][0] >= front["expected"][-1]     # giving up mean benefit for robustness
+    assert front["cvar"][-1] >= front["cvar"][0]              # ... buys a better worst-case
+    assert front["price_of_robustness"] == pytest.approx(front["expected"][0] - front["expected"][-1])
+    assert front["price_of_robustness"] > 0                   # the two toy options genuinely trade off
+
+
+def test_extrapolation_footprint_reports_share_outside_aoa():
+    b = _toy()
+    area = np.ones(3)
+    x = np.zeros((3, 2))
+    x[:, 0] = 1.0                                              # every unit plants option 0 (benefit 10/ha, all scenarios)
+    inside_aoa = np.array([True, True, False])                 # unit 2 is outside the area of applicability
+    fp = extrapolation_footprint(x, b, area, inside_aoa)
+    assert fp["total_expected_benefit"] == pytest.approx(30.0)   # 3 units x 10/ha
+    assert fp["outside_aoa_expected_benefit"] == pytest.approx(10.0)
+    assert fp["outside_aoa_share"] == pytest.approx(1.0 / 3.0)
+
+
+def test_extrapolation_footprint_zero_when_fully_inside_aoa():
+    b = _toy()
+    area = np.ones(3)
+    x = np.zeros((3, 2))
+    x[:, 0] = 1.0
+    fp = extrapolation_footprint(x, b, area, inside_aoa=np.ones(3, dtype=bool))
+    assert fp["outside_aoa_share"] == pytest.approx(0.0)
 
 
 def test_evaluate_portfolio_matches_optimiser_and_detects_overfit():
