@@ -1,0 +1,135 @@
+- variable: canopy_height_max_2017
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/511abee2-19eb-45e9-b28c-23a3f8cada46/download/s2-vhm_2017_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: 7c9cea3b88b63d8246c1519c3e76f783aa88d7c19dfe85c5071f9fc13c7470db
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=1ZXgBCtuFNmoE6JgBhzRdE9CKSh5i5cpP. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.
+- variable: canopy_height_max_2018
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/cf0e2bc7-a73a-477a-86bc-6ed8e7cd8e8d/download/s2-vhm_2018_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: bf70513963d4e68bb47fe05f7249f2ede4f2b46767776b623342e1ed9177e8d0
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=1ZdBKRDNk_9sJvcL7LYtho-9-a-zZ7gRt. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.
+- variable: canopy_height_max_2019
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/7bde832d-dcba-4df3-b2ff-e01941712029/download/s2-vhm_2019_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: 247704211b809a88ac13fc67663e4ede116db57bc1d3c9cb4ba738a35771691d
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=1USp2qVL5Gt7JkTikigh7MHryN_UGYsl2. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.
+- variable: canopy_height_max_2020
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/1ccbef32-82b2-463e-a109-80f4f40037cd/download/s2-vhm_2020_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: 184d84eb4198502a60a1d2e964013a53a8a28993d74e4dce3023004772b12512
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=148e-HtfSiCuYqrHNJ6D78sN-Dww2fho8. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.
+- variable: canopy_height_max_2021
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/5b72d532-7a61-45a2-a09a-d83dfa61f9f2/download/s2-vhm_2021_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: 404cba449e8ffc92d3733629888b5996634d71a891394472e61b9afbda569027
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=1FP0hF-3Ja8bzVH03O0QcxiRSIgT245PP. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.
+- variable: canopy_height_max_2022
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/f0b468d3-1f4b-454d-93dc-d01a72902001/download/s2-vhm_2022_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: 8cf45f6c49e4a889fa357a420fef3af93de5a12b994625542e80e9191141774a
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=1m7wuYIk_qsanPoIEh7yNCHgNo1ckWssp. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.
+- variable: canopy_height_max_2023
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/692904ba-e575-4e69-8950-288ffe11a952/download/s2-vhm_2023_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: d89dce8a05430e696bc3d865d6cf3d98d9bc9006924287cceca5f95336e51c67
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=1JAkVF_lHXtnef7MJ8U88lgTiw1Q-seNJ. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.
+- variable: canopy_height_max_2024
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/98667a97-fe5d-4d46-a0a0-93a0e951c7e4/download/s2-vhm_2024_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: 8a6530396ca773943265d0e9bbb6373358c38a06704f48a8c6f7c9ab5b15b1e4
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=1Z7eX8xxN5eg_pNMo6aAJVlcmHAf2c2cC. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.
+- variable: canopy_height_max_2025
+  source: Sentinel-2 Vegetation Height Model Armenia (S2-VHM)
+  version: v1 (2025 release)
+  url: https://www.envidat.ch/dataset/d5dd3a3d-093e-4206-9e0b-76c6f21c9be1/resource/f1b1e699-6f6c-4bb0-89f6-89d8c455c5a2/download/s2-vhm_2025_max.tif
+  citation: Rueetschi, M., Ginzler, C. (2025). Sentinel-2 Vegetation Height Model
+    Armenia. EnviDat. https://www.doi.org/10.16904/envidat.690.
+  license: CC-BY-SA 4.0
+  access_date: '2026-09-24'
+  local_path: null
+  checksum_sha256: ce8bb08dd7f1a84764fcf6bf577b55cf360c53bcff2d1cc0a8055759ded1ac07
+  spatial_extent: Armenia
+  notes: Not stored locally (downloaded then uploaded to Google Drive, local copy
+    deleted by design -- see IMPLEMENTATION_LOG.md). Stored in Drive folder antar_gee_exports,
+    file id=1ZE7NSJEWyzF0Rby1ANgqaq9Bk89IvFoI. 10 m resolution, CNN-based max vegetation
+    height from Sentinel-2 May-Sept composites.

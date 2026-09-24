@@ -397,6 +397,23 @@ against real data once the hyperion/Earth Engine/EnviDat pulls finish, or (b) ge
 data-dependent items already flagged in earlier entries (LandTrendr/CCDC segmentation
 itself, XYLEM's ABC calibration, the real stacked-hazard fit).
 
+## 2026-09-24 — S2-VHM pull complete; manifest convention for Drive-hosted data
+
+All 9 years (2017-2025) of the S2-VHM download-upload-to-Drive pipeline finished.
+Registered as `antar.io.manifest.ManifestEntry` records in `configs/manifests/s2_vhm.yaml`
+-- a new, tracked (not gitignored) location for manifests, distinct from `data/` (raw
+content, gitignored). Each entry: `local_path=None` (genuinely not stored locally, by
+design -- downloaded, uploaded to Drive, deleted), `checksum_sha256` from the SHA-256
+computed before upload (still a real, verifiable property of the file's content even
+though the file itself lives in Drive), and the Drive file id recorded in `notes`.
+
+hyperion came back after the earlier outage (the user reconnected on their end). Killed
+the stale hung SSH process (`ServerAliveInterval`/`ServerAliveCountMax` added to the retry
+command this time, so a future silent drop is detected and killed rather than hanging
+indefinitely), re-pulled the already-completed `pr` extract (108,474,482 bytes, matches
+exactly -- it had finished on hyperion's side before the outage, only the local copy was
+lost), and restarted the `tas`/`tasrange`/`tasskew` extraction.
+
 ## 2026-09-24 — full Table 4 variable inventory: what's realistically obtainable
 
 Went through Table 4's full variable list systematically rather than continuing to pull
