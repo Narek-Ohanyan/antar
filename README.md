@@ -33,7 +33,7 @@ Supporting, cross-cutting packages:
 |---|---|
 | `antar.validation` | block / forward-chaining / group splits, variogram range, dissimilarity index and AOA, proper scoring rules, calibration, conformal intervals, design-based estimators |
 | `antar.uncertainty` | ANOVA variance fractions, Sobol' indices |
-| `antar.io` | master grid (EPSG:32638, 30 m); data manifests (source, version, URL, citation, licence, checksum) so no dataset enters through a hardcoded path; Earth Engine export contract (**not implemented**) |
+| `antar.io` | master grid (EPSG:32638, 30 m); data manifests (source, version, URL, citation, licence, checksum) so no dataset enters through a hardcoded path; Earth Engine exports covering most of Table 4's realistically-obtainable variables (vitality/kNDVI + LandTrendr, disturbance, canopy structure, terrain, soils, ERA5-Land forcing, vegetation state, snow, land tenure) |
 
 `configs/` holds the study area, scenario/ensemble design, validation design, hydraulic-trait placeholders
 (`species_traits.csv`) and the LAI placeholder standing in for MERISTEM until it exists (`stand_defaults.yaml`);

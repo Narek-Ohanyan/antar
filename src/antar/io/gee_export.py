@@ -14,11 +14,33 @@ Two products, matching Table 3/4 and Sec. 7.1 of the concept note:
   -- exactly the ``no_disturbance`` input :func:`dieback_event` expects, so that
   dieback (a climate response) is never confused with harvest or fire.
 
-:func:`export_structure` (GEDI/canopy-height inputs for MERISTEM) remains a stub;
-it is not needed by any engine built so far.
+Six more, covering the rest of Table 4's realistically-obtainable rows (everything not
+gated behind a national archive, field survey, or specialist trait database -- those are
+documented gaps, not silently substituted):
 
-Both export functions submit asynchronous Earth Engine batch tasks to Google Drive
-and return the started :class:`ee.batch.Task` objects -- they do not block until
+* :func:`export_terrain` -- Copernicus GLO-30 DEM, slope, aspect (TWI/TPI/cold-air-pooling
+  index are left to local post-processing: they need neighbourhood operations GEE's
+  per-pixel terrain functions do not provide directly).
+* :func:`export_soils` -- SoilGrids 2.0 clay/sand/silt fraction and organic carbon, for the
+  Saxton & Rawls (2006) pedotransfer functions TOPOHYDRO's soil bucket needs.
+* :func:`export_era5land_forcing` -- wind speed, shortwave/longwave radiation, dewpoint
+  temperature and surface pressure from ERA5-Land, exactly the variables Table 4 sources
+  from ERA5-Land rather than CHELSA.
+* :func:`export_vegetation_state` -- MODIS LAI/FPAR, land-surface phenology (start/end of
+  season), and ESA WorldCover tree-cover fraction (complementing Hansen GFC).
+* :func:`export_snow` -- MODIS daily snow-cover fraction.
+* :func:`export_land_tenure` -- WDPA protected-area boundaries, rasterised to the master
+  grid -- feeds the eligibility mask directly (``configs/study_area.yaml``'s
+  ``eligibility_mask_exclusions``).
+
+Not pulled, and not fakeable: national forest inventory plots, provenance/genetic trial
+locations, insect/pathogen outbreak records, treeline field-survey transects (all
+institution- or field-survey-only), road network/accessibility (no public Earth Engine
+asset found for this region under any plausible id -- checked, not assumed), and trait
+databases (XFT, TRY -- specialist data services, not Earth Engine assets).
+
+All export functions submit asynchronous Earth Engine batch tasks to Google Drive
+and return the started :class:`ee.batch.Task` object(s) -- they do not block until
 the exports finish (that can take hours for a study-area-wide, multi-decade pull).
 Poll ``task.status()`` to check progress.
 """
@@ -224,6 +246,160 @@ def export_disturbance_ancillary(
     image = ee.Image.cat(list(bands.values())).toByte()
     task = ee.batch.Export.image.toDrive(
         image=image, description="antar_disturbance_ancillary", folder=drive_folder,
+        region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
+    )
+    task.start()
+    return task
+
+
+def export_terrain(bbox_wgs84, crs: str, scale_m: float, drive_folder: str = "antar_gee_exports"):
+    """DEM, slope and aspect (Table 3/4). Returns the started task.
+
+    The concept note specifies Copernicus GLO-30, but Earth Engine's copy of it
+    (``COPERNICUS/DEM/GLO30``) has a real coverage gap over Armenia -- checked
+    directly: only 3 of the ~14 tiles needed for the study bbox exist there,
+    covering just the southwest corner. Used ``USGS/SRTMGL1_003`` (SRTM 30 m)
+    instead, confirmed to have full bbox coverage (106,256 valid 1 km-sampled
+    pixels, sensible 70-4978 m range) -- a substitution, not silently assumed;
+    flagged here and in IMPLEMENTATION_LOG.md.
+
+    TWI, TPI and the cold-air-pooling concavity index are not computed here:
+    they are neighbourhood/flow-routing operations GEE's per-pixel
+    ``ee.Terrain`` functions do not provide, and are left to local
+    post-processing on the downloaded DEM.
+    """
+    aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
+    dem = ee.Image("USGS/SRTMGL1_003").select("elevation").clip(aoi)
+    terrain = ee.Terrain.products(dem)
+    image = terrain.select(["elevation", "slope", "aspect"]).toFloat()
+    task = ee.batch.Export.image.toDrive(
+        image=image, description="antar_terrain", folder=drive_folder, region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
+    )
+    task.start()
+    return task
+
+
+def export_soils(bbox_wgs84, crs: str, scale_m: float, drive_folder: str = "antar_gee_exports"):
+    """SoilGrids 2.0 (Poggio et al. 2021) clay/sand/silt fraction and organic carbon,
+    0-30 cm mean, for the Saxton & Rawls (2006) pedotransfer functions. Returns the
+    started task.
+    """
+    aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
+    bands = {}
+    for prop in ["clay", "sand", "silt", "soc"]:
+        img = ee.Image(f"projects/soilgrids-isric/{prop}_mean")
+        depths = ["0-5cm", "5-15cm", "15-30cm"]
+        bands[prop] = img.select([f"{prop}_{d}_mean" for d in depths]).reduce(ee.Reducer.mean()).rename(f"{prop}_0_30cm_mean")
+    image = ee.Image.cat(list(bands.values())).toFloat()
+    task = ee.batch.Export.image.toDrive(
+        image=image, description="antar_soils", folder=drive_folder, region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
+    )
+    task.start()
+    return task
+
+
+def export_era5land_forcing(bbox_wgs84, year_start: int, year_end: int, crs: str, scale_m: float,
+                             drive_folder: str = "antar_gee_exports"):
+    """Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature and
+    surface pressure from ERA5-Land daily aggregates -- Table 4's ERA5-Land-sourced
+    variables (never CHELSA, which does not carry them). Returns the started task.
+
+    Reported as annual means (one band per year per variable) rather than the full
+    daily series: TOPOHYDRO's own daily forcing comes from CHELSA/CORDEX (Sec. 5.1);
+    these ERA5-Land variables feed terms (PET's aerodynamic term, the slope-radiation
+    energy term, VPD's dew-point downscaling reference) that this annual-mean summary
+    is enough to parameterise a first pass with -- the full daily series can be pulled
+    the same way, at proportionally higher cost, if a later pass needs it.
+    """
+    aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
+    coll = ee.ImageCollection("ECMWF/ERA5_LAND/DAILY_AGGR").filterBounds(aoi)
+
+    def _daily_wind_speed(img):
+        return img.select("u_component_of_wind_10m").hypot(img.select("v_component_of_wind_10m")).rename("wind_speed")
+
+    bands = {}
+    for y in range(year_start, year_end + 1):
+        yearly = coll.filterDate(f"{y}-01-01", f"{y + 1}-01-01")
+        # Daily speed (hypot of that day's u,v) computed *before* averaging over the year --
+        # averaging u and v separately first would let opposite-direction days cancel toward
+        # zero instead of reflecting the actual mean wind speed.
+        wind = yearly.map(_daily_wind_speed).mean()
+        bands[f"wind_speed_{y}"] = wind.rename(f"wind_speed_{y}")
+        bands[f"ssrd_{y}"] = yearly.select("surface_solar_radiation_downwards_sum").mean().rename(f"ssrd_{y}")
+        bands[f"strd_{y}"] = yearly.select("surface_thermal_radiation_downwards_sum").mean().rename(f"strd_{y}")
+        bands[f"dewpoint_{y}"] = yearly.select("dewpoint_temperature_2m").mean().rename(f"dewpoint_{y}")
+        bands[f"surface_pressure_{y}"] = yearly.select("surface_pressure").mean().rename(f"surface_pressure_{y}")
+
+    image = ee.Image.cat(list(bands.values())).toFloat()
+    task = ee.batch.Export.image.toDrive(
+        image=image, description="antar_era5land_forcing", folder=drive_folder,
+        region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
+    )
+    task.start()
+    return task
+
+
+def export_vegetation_state(bbox_wgs84, year_start: int, year_end: int, crs: str, scale_m: float,
+                             drive_folder: str = "antar_gee_exports"):
+    """Growing-season-mean MODIS LAI/FPAR, annual land-surface phenology (start/end of
+    season), and ESA WorldCover tree-cover class (a single, most-recent-epoch layer;
+    WorldCover is not produced annually). Returns the started task.
+    """
+    aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
+    lai_coll = ee.ImageCollection("MODIS/061/MOD15A2H").filterBounds(aoi)
+    pheno_coll = ee.ImageCollection("MODIS/061/MCD12Q2").filterBounds(aoi)
+
+    bands = {}
+    for y in range(year_start, year_end + 1):
+        lai = lai_coll.filterDate(f"{y}-07-01", f"{y}-09-01").select("Lai_500m").mean()
+        bands[f"lai_growing_season_{y}"] = lai.rename(f"lai_growing_season_{y}")
+        pheno = pheno_coll.filterDate(f"{y}-01-01", f"{y + 1}-01-01").select(["Greenup_1", "Dormancy_1"]).first()
+        bands[f"greenup_doy_{y}"] = pheno.select("Greenup_1").rename(f"greenup_doy_{y}")
+        bands[f"dormancy_doy_{y}"] = pheno.select("Dormancy_1").rename(f"dormancy_doy_{y}")
+
+    worldcover = ee.ImageCollection("ESA/WorldCover/v200").first().select("Map").rename("worldcover_class")
+    image = ee.Image.cat(list(bands.values()) + [worldcover]).toFloat()
+    task = ee.batch.Export.image.toDrive(
+        image=image, description="antar_vegetation_state", folder=drive_folder,
+        region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
+    )
+    task.start()
+    return task
+
+
+def export_snow(bbox_wgs84, year_start: int, year_end: int, crs: str, scale_m: float,
+                 drive_folder: str = "antar_gee_exports"):
+    """Annual snow-cover fraction (share of days with NDSI-flagged snow) and duration
+    (day count) from MODIS MOD10A1. Returns the started task.
+    """
+    aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
+    coll = ee.ImageCollection("MODIS/061/MOD10A1").filterBounds(aoi)
+
+    bands = {}
+    for y in range(year_start, year_end + 1):
+        yearly = coll.filterDate(f"{y}-01-01", f"{y + 1}-01-01").select("NDSI_Snow_Cover")
+        is_snow = yearly.map(lambda img: img.gte(40).rename("snow"))  # NDSI >= 40 is the standard MOD10A1 snow flag
+        bands[f"snow_days_{y}"] = is_snow.sum().rename(f"snow_days_{y}")
+        bands[f"snow_frac_{y}"] = is_snow.mean().rename(f"snow_frac_{y}")
+
+    image = ee.Image.cat(list(bands.values())).toFloat()
+    task = ee.batch.Export.image.toDrive(
+        image=image, description="antar_snow", folder=drive_folder, region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
+    )
+    task.start()
+    return task
+
+
+def export_land_tenure(bbox_wgs84, crs: str, scale_m: float, drive_folder: str = "antar_gee_exports"):
+    """WDPA protected-area boundaries (Table 4), rasterised to a boolean "protected" band
+    on the master grid -- feeds ``configs/study_area.yaml``'s eligibility-mask exclusions
+    directly. Returns the started task.
+    """
+    aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
+    wdpa = ee.FeatureCollection("WCMC/WDPA/current/polygons").filterBounds(aoi)
+    protected = ee.Image(0).paint(wdpa, 1).rename("protected_area").toByte().clip(aoi)
+    task = ee.batch.Export.image.toDrive(
+        image=protected, description="antar_land_tenure", folder=drive_folder,
         region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
     )
     task.start()

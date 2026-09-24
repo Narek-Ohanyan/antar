@@ -213,6 +213,14 @@ they finish and the GeoTIFFs are downloaded into the local, gitignored `data/` d
 each becomes an `antar.io.manifest.ManifestEntry` (source, version, checksum) rather than
 a hardcoded path, per the manifest convention -- not yet done, pending completion.
 
+**hyperion connectivity, ongoing**: the CHELSA remote-extraction pull (see the entry
+below on the ncks approach) hit repeated network interruptions -- some transient (Google
+Drive uploads recovered via retry), one not: hyperion.wsl.ch itself became unreachable
+mid-transfer (confirmed via ping: general internet fine, hyperion specifically timing
+out), killing the `pr` variable pull at 87.6 of ~108 MB. The incomplete file was deleted
+rather than left looking valid. This is on the institution's network, not something
+fixable from here; retry once hyperion is reachable again.
+
 **Bug found and fixed: LandTrendr export failed** with `Input array has length 24 on axis
 1, but 25 labels provided`. Root cause: LandTrendr's per-pixel output array drops years
 where that pixel's composite was masked (no valid satellite observation in that Jul-Aug
@@ -388,6 +396,47 @@ checked against the concept note section by section; remaining work is either (a
 against real data once the hyperion/Earth Engine/EnviDat pulls finish, or (b) genuinely
 data-dependent items already flagged in earlier entries (LandTrendr/CCDC segmentation
 itself, XYLEM's ABC calibration, the real stacked-hazard fit).
+
+## 2026-09-24 — full Table 4 variable inventory: what's realistically obtainable
+
+Went through Table 4's full variable list systematically rather than continuing to pull
+one dataset at a time. `antar.io.gee_export` extended with six more export functions,
+each checked for real Earth Engine availability before being written (not assumed):
+`export_terrain`, `export_soils`, `export_era5land_forcing`, `export_vegetation_state`,
+`export_snow`, `export_land_tenure`. All six submitted as real Drive export tasks
+(2000-2024 where the variable has a meaningful yearly value, single-layer where it
+doesn't -- terrain, soils, land tenure).
+
+**Two things caught during verification, before submitting real exports:**
+
+* **DEM source substituted.** The concept note specifies Copernicus GLO-30; Earth
+  Engine's copy of it (`COPERNICUS/DEM/GLO30`) has a real coverage gap over Armenia --
+  checked directly by probing tile ids, only 3 of the ~14 tiles the study bbox needs
+  exist there, covering just the southwest corner. Switched to `USGS/SRTMGL1_003`
+  (SRTM 30 m), confirmed full bbox coverage (106,256 valid 1 km-sampled pixels, sensible
+  70-4978 m range) before using it. A substitution, not a silent assumption.
+* **Wind speed bug caught by sanity-checking the actual number, not just that the code
+  ran.** First version averaged the u/v wind components separately over the year, then
+  took the magnitude of the averages -- since wind direction varies throughout the year,
+  opposite-direction days cancel toward zero in that averaging order, and the test point
+  came back at 0.11 m/s (implausibly calm). Fixed to compute daily speed (hypot of that
+  day's u,v) first, then average the daily speeds; the same point now returns 0.71 m/s,
+  a physically reasonable number for a sheltered mountain valley. This is exactly the
+  kind of error that runs without crashing and only shows up if the actual value is
+  checked against physical expectation -- worth remembering for every other new pull.
+
+**Confirmed NOT realistically obtainable** (genuine gaps, matching the concept note's own
+"not every row is available at the start... documented gap, not a silent zero"):
+national forest inventory plots, provenance/genetic trial locations, insect/pathogen
+outbreak records, treeline field-survey transects (institution/field-survey-only data);
+road network/accessibility (no public Earth Engine asset found under any plausible id for
+this region -- checked, not assumed); trait databases XFT/TRY (specialist data services
+requiring separate registration/API access, not Earth Engine assets).
+
+CO2 concentration trajectories (Table 4's "atmospheric CO2 trajectory" row) are not a
+spatial dataset -- they are the standard published SSP concentration pathways (a small,
+well-established reference table), not yet added as a `configs/` entry; a follow-up item,
+not a data-access gap.
 
 ## 2026-09-24 — SSH access to hyperion.wsl.ch
 
