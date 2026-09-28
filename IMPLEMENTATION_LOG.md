@@ -555,3 +555,56 @@ assumption that raw GCM output still needs `antar.climate.bias.quantile_delta_ma
 applied against ERA5-Land -- needs confirming before TOPOHYDRO's bias-adjustment step is
 wired to this data source. `tasmax`/`tasmin` are still absent from hyperion; not resolved
 here.
+
+## 2026-09-28 — CHELSA-daily pull completed; three real bugs hit and fixed along the way
+
+The extended CHELSA-daily pull (`scripts/pull_chelsa_daily.py`, 1979-2024 tas/tasmax/tasmin,
+1979-2019 pr) finished: all four variables complete, 0 confirmed-missing (404) anywhere,
+16802/16802/16802/14975 days respectively. Registered in `configs/manifests/chelsa_daily.yaml`
+(all four checksums verified against the actual local files via `antar.io.manifest.verify_entry`
+before being written down, not copied blind from the pull's own summary).
+
+Getting there took three real, self-caused failures on top of the disk-full kill already logged
+under 2026-09-24/25 -- recorded here in full rather than smoothed over, since each one changed
+the script's actual behaviour:
+
+1. **No incremental checkpointing.** The original script only wrote to disk once, at the very
+   end of each variable's ~16800-day fetch. A disk-full kill mid-`tas` (see the earlier entry)
+   lost all 16500 already-fetched days, because nothing had been persisted yet. Fixed: `_checkpoint`
+   now runs every 2000 days fetched, so an interruption only costs the work since the last
+   checkpoint, not the whole variable.
+2. **O(n^2) resume.** The first attempt at checkpointing still indexed the loaded `.npz` as
+   `saved["data"][i]` inside a loop over all prior days -- `NpzFile.__getitem__` re-decompresses
+   the *entire* stacked array on every call, so resuming a 14000-day checkpoint triggered ~14000
+   redundant full-array decompressions and never visibly progressed (looked hung; confirmed still
+   running via `ps`/CPU%, not actually stuck). Fixed by decompressing the array once outside the
+   loop.
+3. **Corrupted a good checkpoint by killing a redundant rewrite mid-write.** After fixing (1) and
+   (2), a resume with nothing new to fetch for `tas` still re-ran the full stack+compress+write
+   every time (wasted, but at the time believed harmless). Killing that redundant write mid-flight
+   corrupted the previously-complete, previously-good `tas` file (`np.savez_compressed` writes
+   straight to the target path, so a partial write left a truncated, unreadable `.npz` --
+   `zipfile.BadZipFile: File is not a zip file`). `tasmax`/`tasmin`/`pr` were untouched and verified
+   still readable; only `tas` had to be re-fetched from scratch. Fixed two ways: (a) skip the
+   stack/compress/write step entirely when there is nothing new to fetch, so a fully-complete
+   variable resumes instantly instead of redoing needless work; (b) make the write itself atomic --
+   write to a temp file, then `os.replace()` into place, so an interruption can never leave the real
+   file half-written again. First attempt at (b) had its own bug: `np.savez_compressed` silently
+   appends `.npz` to any filename that doesn't already end in it, so a `*.npz.tmp` temp path was
+   actually written to `*.npz.tmp.npz`, and the atomic rename then failed looking for a file that
+   didn't exist under the name it expected. Fixed by naming the temp file `*.tmp.npz` instead, and
+   smoke-tested standalone (dummy array, real `_checkpoint()` call, verified the file lands at the
+   right path and reloads) before trusting it against the real multi-GB pull again.
+
+Also hit, not a script bug: a stretch of `tas` days (~Feb-Mar 1996) failed with a mix of DNS
+resolution failures and connection timeouts during one run -- a genuine local-network outage on
+this machine, not a CHELSA-server or code problem. Retried cleanly on the next run once the
+network recovered; the `missing_404` vs `failed_read` split added earlier this same day (see the
+prior 2026-09-24 CHELSA entry's follow-up) is exactly what made that retry automatic rather than
+requiring a manual list of which days to redo.
+
+Separately: `hyperion.wsl.ch` failed to resolve via DNS entirely during this window (`nodename
+nor servname provided`) -- confirms it is only reachable from the office network/VPN, not the
+public internet. The CORDEX future-projection extraction (`tasrange`/`tasskew` for
+MOHC-HadGEM2-ES/rcp26, plus the other 7 of 8 GCM x RCP combinations) stays blocked until that
+access is available again; not attempted from outside it.

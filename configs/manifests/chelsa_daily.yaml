@@ -1,0 +1,57 @@
+- variable: tas
+  source: CHELSA-daily V2.1
+  version: '2.1'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/daily/
+  citation: Karger, D. N. (2025). CHELSA-daily climate data at high resolution. EnviDat.
+    https://www.doi.org/10.16904/envidat.687.
+  license: CC0 1.0
+  access_date: '2026-09-28'
+  local_path: data/chelsa/CHELSA_tas_2000_2024_armenia_daily.npz
+  checksum_sha256: 699a61d11ffa46aa9250430c9ef068d785ce9980ae31b947695051e80bab3613
+  spatial_extent: Armenia (clipped)
+  notes: Daily mean air temperature, 1979-01-01 to 2024-12-31 (16802 days), complete
+    -- 0 confirmed-missing, 0 failed-read. Pulled via HTTP range requests against
+    the public COGs (GDAL /vsicurl/), one file per day, no full-file download.
+    Historical reference source per the 2026-09-24 decision (see IMPLEMENTATION_LOG.md);
+    CORDEX (hyperion) covers the future horizon instead.
+- variable: tasmax
+  source: CHELSA-daily V2.1
+  version: '2.1'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/daily/
+  citation: Karger, D. N. (2025). CHELSA-daily climate data at high resolution. EnviDat.
+    https://www.doi.org/10.16904/envidat.687.
+  license: CC0 1.0
+  access_date: '2026-09-28'
+  local_path: data/chelsa/CHELSA_tasmax_2000_2024_armenia_daily.npz
+  checksum_sha256: 7831dd1996686eee942b6d8c89dea043b74450d495540ebf1b955ffd21f3b447
+  spatial_extent: Armenia (clipped)
+  notes: Daily maximum air temperature, 1979-01-01 to 2024-12-31 (16802 days), complete
+    -- 0 confirmed-missing, 0 failed-read.
+- variable: tasmin
+  source: CHELSA-daily V2.1
+  version: '2.1'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/daily/
+  citation: Karger, D. N. (2025). CHELSA-daily climate data at high resolution. EnviDat.
+    https://www.doi.org/10.16904/envidat.687.
+  license: CC0 1.0
+  access_date: '2026-09-28'
+  local_path: data/chelsa/CHELSA_tasmin_2000_2024_armenia_daily.npz
+  checksum_sha256: 3d146f5ff6d04dbbb59d196dfc6002651086fe06ac121b923b804464fecee2a3
+  spatial_extent: Armenia (clipped)
+  notes: Daily minimum air temperature, 1979-01-01 to 2024-12-31 (16802 days), complete
+    -- 0 confirmed-missing, 0 failed-read.
+- variable: pr
+  source: CHELSA-daily V2.1
+  version: '2.1'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/daily/
+  citation: Karger, D. N. (2025). CHELSA-daily climate data at high resolution. EnviDat.
+    https://www.doi.org/10.16904/envidat.687.
+  license: CC0 1.0
+  access_date: '2026-09-28'
+  local_path: data/chelsa/CHELSA_pr_2000_2019_armenia_daily.npz
+  checksum_sha256: 9221a0f8a21d8edd3d00c08b8db0f9b8f47feb41b7ee44faf0aceff2ccb5470c
+  spatial_extent: Armenia (clipped)
+  notes: Daily precipitation, 1979-01-01 to 2019-12-31 (14975 days) -- the source
+    archive's own coverage ends 2019; 2020-2024 is a genuine gap in CHELSA-daily
+    itself, not a pull failure. Complete over its available range -- 0 confirmed-missing,
+    0 failed-read.
