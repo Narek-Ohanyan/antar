@@ -1,0 +1,21 @@
+- variable: eppo_armenia_organisms
+  source: EPPO Global Database (European and Mediterranean Plant Protection Organization)
+  version: n/a
+  url: https://gd.eppo.int/country/AM/organisms.csv
+  citation: EPPO Global Database. https://gd.eppo.int. Accessed 2026-09-30.
+  license: See gd.eppo.int terms; freely downloadable, no registration.
+  access_date: '2026-09-30'
+  local_path: data/eppo/eppo_armenia_organisms.csv
+  checksum_sha256: 6f9fce79e68458108a524b087103a55cd3250bf9ba12770c51c765283dd781ee
+  spatial_extent: Armenia (national presence/absence only, no coordinates)
+  notes: >-
+    107 real pest/pathogen/invasive-plant organism records with Armenia presence status
+    (EPPOCode, organism_prefname, status, labelstatus columns). A real, checked limitation:
+    this is national-level presence/absence only, no coordinates -- usable to flag qualitative
+    biotic risk per species (e.g. for MNEME's biotic hazard cause or as context alongside
+    XYLEM's mechanistic hazard), not as a per-cell spatial covariate the way vitality/
+    disturbance/climate data are. Tree-relevant real findings already checked in this file:
+    Ips sexdentatus (pine bark beetle) "present, widespread"; Bursaphelenchus xylophilus (pine
+    wood nematode) "present, restricted distribution" -- both directly relevant to the pine
+    functional group; Ips typographus, Ceratocystis platani, Lymantria monacha, Scolytus
+    multistriatus/scolytus, Cameraria ohridella also present. Not yet wired into any engine.

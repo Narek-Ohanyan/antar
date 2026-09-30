@@ -1,0 +1,110 @@
+# Real findings for three of tonight's gridded-TOPOHYDRO-run placeholders (rooting_depth_mm,
+# gdd_budburst, calm_clear_night_frac) plus real canopy-height data characterization. Research
+# pass only -- nothing here has been applied to run_topohydro_grid.py or any config yet.
+
+- variable: rooting_depth_by_functional_group
+  source: Canadell, J., Jackson, R.B., Ehleringer, J.R., Mooney, H.A., Sala, O.E., Schulze, E-D.
+    (1996). Maximum rooting depth of vegetation types at the global scale. Oecologia 108, 583-595.
+  version: n/a
+  url: https://link.springer.com/article/10.1007/BF00329030
+  citation: Canadell et al. (1996), Oecologia 108, 583-595. https://doi.org/10.1007/BF00329030
+  license: n/a (citation only, no data file pulled)
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Global (290 observations, 255 species, by biome)
+  notes: >-
+    Real, genus-relevant, ready to replace the flat ROOTING_DEPTH_MM_PLACEHOLDER=1000 in
+    scripts/run_topohydro_grid.py with real per-functional-group values (biome-level, not
+    genus-level -- the paper reports by biome/functional-type, not individually for Fagus/
+    Quercus/Pinus/Juniperus, so this is still a real proxy, one level less specific than XFT's
+    species-level congeneric matches, but a large real improvement over a flat guess):
+    temperate deciduous forest (Fagus orientalis/Carpinus betulus, Quercus macranthera/iberica)
+    = 2.9 m; temperate coniferous forest (Pinus kochiana) = 3.9 m; desert/arid shrubland
+    (Juniperus polycarpos/excelsa, arid-adapted) = 9.5 m. All three real, all three meaningfully
+    different from the flat 1.0 m this session used and from each other -- juniper in particular
+    was likely getting a badly-undersized rooting depth (real arid-adapted junipers root far
+    deeper than the flat placeholder assumed), which would have understated w_max_mm and
+    therefore overstated its real drought stress in the gridded run.
+
+- variable: budburst_gdd_threshold
+  source: Multiple real phenology papers found via search; only one concrete numeric threshold
+    located and read directly (not a search-snippet paraphrase) -- Fagus sylvatica.
+  version: n/a
+  url: https://www.frontiersin.org/journals/forests-and-global-change/articles/10.3389/ffgc.2022.1063127/full
+  citation: See the Frontiers in Forests and Global Change (2022) article on European beech
+    bud-burst/senescence phenology (full citation to be confirmed from the article itself before
+    use -- only read via search summary tonight, not the primary text, unlike every other real
+    number in tonight's research).
+  license: n/a
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Europe (beech populations along an altitudinal transect)
+  notes: >-
+    Real but partial, and NOT yet as solidly verified as the rooting-depth or water-basin
+    figures (read via search summary only, not the primary article text -- flagged explicitly,
+    matching this project's own standard for what counts as "verified"): European beech
+    (Fagus sylvatica, the real XFT congeneric proxy species already used for the broadleaf
+    group's P50/slope) starts its growing season at a 10 degC thermal threshold with >=60 GDD
+    (base 0 degC) as a complementary condition. Two real gaps before this can replace
+    GDD_BUDBURST_PLACEHOLDER=200: (1) this project's topoclimate_forcing uses GDD base 5 degC by
+    default (gdd_base_c=5.0), not base 0 -- the 60-GDD-base-0 figure is not directly the same
+    quantity and would need either a recomputation at base 5 or passing gdd_base_c=0.0
+    specifically for the budburst/late-frost calculation; (2) no equivalent concrete number was
+    found yet for oak, pine, or juniper specifically -- only beech. Read the primary article
+    directly (not just the search summary) and search specifically for Quercus/Pinus sylvestris/
+    Juniperus budburst GDD before treating this as ready to use, the same bar every other real
+    number in this project has been held to.
+
+- variable: calm_clear_night_frac_real_fix
+  source: Not a literature number -- the real fix is architectural, not a search result.
+  version: n/a
+  url: n/a
+  citation: n/a
+  license: n/a
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: n/a
+  notes: >-
+    A national-average cloud-cover figure (what was searched for) would be the wrong level of
+    specificity for a per-cell, per-day cold-air-pooling term anyway. The real, better fix:
+    ECMWF/ERA5_LAND/DAILY_AGGR (the same Earth Engine collection antar.io.gee_export.
+    export_era5land_forcing already pulls wind/radiation/dewpoint/pressure from) also carries
+    real cloud-cover bands. Extending that existing, already-tested export function with one more
+    band (e.g. total_cloud_cover or low_cloud_cover, annual-mean to match the rest of that
+    export's convention) would give a real, per-cell calm_clear_night_frac proxy (e.g. the
+    fraction of low-cloud-cover below some threshold), replacing the flat 0.3 placeholder with
+    real spatial variation -- not found via a new pull, but via extending a data source this
+    session already uses extensively. This is a code change (gee_export.py + a re-export), not
+    a config/citation update -- flagged here as a plan, not applied.
+
+- variable: real_canopy_height_coverage_check
+  source: antar_structure (this project's own GEDI L2A RH98 + ETH Global Canopy Height export,
+    already registered in gee_exports.yaml) -- streamed and sampled at the same 80-point grid
+    used throughout tonight's real runs, to check real data validity before relying on it.
+  version: n/a
+  url: n/a
+  citation: See gee_exports.yaml's antar_structure entry for full citation.
+  license: n/a
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (80-point grid sample)
+  notes: >-
+    Real, checked result, not assumed from the export function's own docstring warning alone:
+    GEDI's own direct lidar RH98 footprints are valid at only 4/80 grid points (sparse orbital
+    tracks, exactly as export_structure's docstring warned) -- confirms GEDI alone cannot be
+    MERISTEM's primary per-cell height source at this grid's resolution. The Lang et al. (2023)
+    ETH global canopy height gap-fill (also in this same export) is valid at 77/80 points, real
+    range 0.0-33.0 m -- usable as the primary real per-cell height source, with GEDI's 4 real
+    footprints serving as a (very small) direct-measurement calibration check on it, not the main
+    source. Separately, configs/manifests/s2_vhm.yaml already has a real, Armenia-specific,
+    denser alternative (Sentinel-2 Vegetation Height Model, Rueetschi & Ginzler 2025, 10 m,
+    9 real years 2017-2025, already downloaded/checksummed/uploaded to Drive this session) --
+    not yet stream-checked for coverage the way antar_structure was here, but a real, likely
+    better candidate for MERISTEM's attainable-height model given it's wall-to-wall (not
+    orbital-track-sparse like GEDI) and Armenia-specific (not a global model like ETH CHM).
+    Next step (not done tonight): stream-sample s2_vhm the same way and compare real coverage/
+    plausibility against the ETH CHM numbers above before deciding which drives the real fit.

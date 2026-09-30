@@ -1,0 +1,206 @@
+# Real data sources for AEGIS's robust-portfolio inputs (antar.decision.optimize.robust_portfolio:
+# benefit = viability x value weight, area, cost, budget, eligibility, water_use/water_caps/basin).
+# Research pass only -- nothing here has been wired into a fit/optimization script yet.
+#
+# The concept note (docs/concept_v2/sec9_uncertainty_decision.tex) is explicit that the value
+# weight v_j ("canopy area, carbon or water services") is meant to be "set with stakeholders" --
+# i.e. a policy input, not something a dataset search can substitute for. The figure below is a
+# real, government/World-Bank-vetted *national-average* ecosystem-services valuation, offered as a
+# defensible starting point, not a stakeholder-elicited, species/option-specific value -- flagged
+# as such, not presented as the thing the concept note actually asked for.
+#
+# Four scope decisions made explicitly by the user (2026-09-30), not inferred:
+#   1. Value weight:  use the real $417/ha/year proxy now (not wait for stakeholder elicitation).
+#   2. Options j:      species x intervention-method combined (4 hydraulic functional groups x 8
+#                       real FLR intervention types, Box 3 below) -- the most realistic option,
+#                       and the most complex: several cells of that 4x8 cost/value grid will be
+#                       apportioned/estimated from the real aggregate figures below, not each
+#                       independently sourced (no data breaks cost down this finely in what was
+#                       found). Flag which cells are apportioned vs. directly sourced when built.
+#   3. Budget:         sweep the real range with antar.decision.optimize.efficient_frontier(),
+#                       not a single figure -- report the mean-CVaR frontier across real budget
+#                       levels from $9.3M to $663M rather than picking one.
+#   4. Water caps:      extract real numbers before building (done below), not skipped or
+#                       roughly estimated.
+
+- variable: aegis_ecosystem_services_value_and_restoration_cost
+  source: World Bank Armenia Forest Landscape Restoration Note (June 2023, revised 2024)
+  version: n/a
+  url: https://documents1.worldbank.org/curated/en/099090523175040850/pdf/P17173815d072503018f461b8c8ded40056.pdf
+  citation: 'World Bank. 2023. Armenia Forest Landscape Restoration Note. Washington, DC: World Bank.'
+  license: World Bank Open Access / reproducible with attribution (see document's own Rights and
+    Permissions page).
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (national)
+  notes: >-
+    Real, extracted figures (page numbers refer to the PDF as fetched; verified by direct read,
+    not summarized from a search snippet):
+
+    VALUE WEIGHT proxy (p.7, Ch.5/Table in "Economic contributions of forests"): aggregate
+    economic value of forest ecosystem services = $417/ha/year (2021 constant $), valuing 10 of
+    the ecosystem services forests provide (fuelwood, water, medicinal plants, wild fruits,
+    mushroom, honey, habitat/species protection, hydrological regulation, GHG removal,
+    recreation) via the benefit-transfer method; totals $138M/year nationally (334,100 ha
+    forested, 1.1% of 2020 GDP). Explicitly a national average across all forest types, not
+    species- or intervention-specific -- the report itself notes the true value is likely higher
+    since only 10 of many ecosystem services could be valued.
+
+    COST per hectare (p.40-41, "Cost estimates to achieve the Bonn Challenge by 2030"): the
+    government's own 'Landscape Restoration Strategy and Action Plan 2022-2032' costs 8 named FLR
+    intervention options (listed below) over a combined potential area of 387,000+ ha. Achieving
+    the 50,000 ha Bonn Challenge target costs from $9.3M (cheapest option mix: coppice forestry,
+    wildfire prevention, natural-regeneration support) to $663M (most expensive: windbreaks/
+    hedgerows) depending which options are used; ~$45M if all 8 options are used in the same
+    proportion as their identified areas (i.e. ~$900/ha blended). Real range: ~$186/ha (cheapest)
+    to ~$13,260/ha (most expensive, windbreaks), not a single figure.
+
+    BUDGET (same pages): the $9.3M-$663M range above IS the real national-program budget range
+    for the 50,000 ha NDC/Bonn Challenge target (2022-2032); ~$45M is the figure tied to the
+    strategy's own actual recommended option mix, the most defensible single "budget" figure to
+    start from.
+
+    The 8 real named FLR intervention options (Box 3, p.41) -- a real, more granular alternative
+    or complement to this project's 4 hydraulic functional groups as AEGIS's "planting options j":
+    (1) restoration of degraded forests through planting (oak/beech/pine), (2) natural
+    regeneration via tillage/soil mineralization (oak/beech/juniper), (3) coppicing of secondary
+    oak stands, (4) thinning of overly dense pine forests, (5) wildfire prevention
+    (roads/tilled strips), (6) anti-erosion/soil-protection plantations, (7) windbreaks and
+    hedgerows, (8) mining-site/landfill reclamation (incl. phytoremediation).
+
+    AREA/ELIGIBILITY context (p.8-9): forests are "almost entirely under public ownership,"
+    majority on state forest land, ~25% of which is in protected areas (so ~75% of state forest
+    land is a priori plantable, before other exclusions). UNECE (2019) identifies 100,000 ha of
+    real restoration potential (heavily degraded/deforested land) nationally -- a real upper
+    bound distinct from the 50,000 ha near-term NDC target.
+
+    NOT found in this document: a species-specific or per-hectare-by-tree-type cost breakdown
+    (costs are by intervention TYPE, Box 3 above, not by species); an explicit water-use-per-
+    option figure (see the HydroBASINS/RBMP entries below for the water dimension instead).
+
+- variable: aegis_land_eligibility_protected_areas
+  source: WCMC/WDPA (World Database on Protected Areas), already registered and exported this
+    project via antar.io.gee_export.export_land_tenure -- not new, cross-referenced here because
+    it is exactly AEGIS's eligible_{uj} input (Sec. 9's "legally excluded" criterion).
+  version: n/a
+  url: https://www.protectedplanet.net/en (WDPA); GEE export folder per
+    configs/manifests/gee_exports.yaml's antar_land_tenure entry
+  citation: UNEP-WCMC and IUCN (2024), Protected Planet, The World Database on Protected Areas
+    (WDPA), Cambridge, UK.
+  license: See protectedplanet.net terms (free for non-commercial research use with attribution).
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (from the same master-grid bbox every other export in this project uses)
+  notes: >-
+    Already a boolean "protected" raster on the master 30m grid (see
+    src/antar/io/gee_export.py:export_land_tenure, registered in gee_exports.yaml as
+    antar_land_tenure) -- real, already exported, just never loaded into anything yet. Directly
+    usable as (the inverse of) eligible_{uj} once streamed the same way terrain/soils/ERA5-Land/
+    vitality were this session.
+
+- variable: aegis_water_basins
+  source: WWF HydroSHEDS/HydroBASINS (SRTM-derived, Pfafstetter-coded nested watersheds, levels
+    1-12), accessible directly in Google Earth Engine (WWF/HydroSHEDS/v1/Basins/hybas_N).
+  version: v1
+  url: https://developers.google.com/earth-engine/datasets/catalog/WWF_HydroSHEDS_v1_Basins_hybas_7
+  citation: Lehner, B., Grill G. (2013). Global river hydrography and network routing baseline
+    data and new approaches to study the world's large river systems. Hydrological Processes,
+    27(15), 2171-2186. https://doi.org/10.1002/hyp.9740
+  license: Free for non-commercial and commercial use (HydroSHEDS terms).
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Global; Armenia is at ~40N, well within HydroSHEDS' full-quality SRTM coverage
+    (quality degrades only above 60N, not relevant here).
+  notes: >-
+    No export function for this exists yet in antar.io.gee_export -- a real, small gap (unlike
+    terrain/soils/ERA5-Land/vitality/disturbance/land_tenure, all already built). hybas_6 or
+    hybas_7 (sub-basin granularity) is the natural level to match Armenia's 6 official river basin
+    districts (Ararat, Southern, Akhuryan, Sevan, Hrazdan, Northern -- see the RBMP entry below);
+    would need a short new export_water_basins(...) function, same pattern as export_land_tenure,
+    rasterizing basin ID (not just a boolean) onto the master grid.
+
+- variable: aegis_water_allocation_caps
+  source: Draft River Basin Management Plans (RBMPs) for Armenia's real river basin districts,
+    published under the EU4Environment Water and Data programme with the Armenian government;
+    downloaded directly (not via WebFetch, which hit a size limit on the full Sevan PDF) and
+    read with pdftotext + targeted grep/page extraction.
+  version: n/a
+  url: 'Sevan RBMP: https://euwipluseast.eu/images/2020/11/PDF/Draft_Sevan_RBDMP_Final_Report_ENG_final_161020.pdf
+    ; Hrazdan RBMP: https://www.euwipluseast.eu/images/2021/05/PDF/Hrazdan_draft_RBMP_Report_ENG_VFinal_21042021.pdf
+    ; Kasakh sub-basin Water Quantitative Management Plan: https://eu4waterdata.eu/images/pdf/EU4ENV_A1.2.1_AM_Water%20Quantitative%20Management%20Plan%20for%20the%20Kasakh%20sub-basin%20in%20Armenia-Executive%20summary_ENG_VF.pdf
+    ; Akhuryan/Metsamor basin summary (secondary source, not independently verified against the
+    primary BMP document): http://blacksea-riverbasins.net/en/river-basin-analysis-akhuryan-and-metsamor-river-basins-armenia'
+  citation: EU4Environment Water and Data Programme / Republic of Armenia (draft River Basin
+    Management Plans, 2020-2021); Akhuryan figure via blacksea-riverbasins.net (EU-funded Black
+    Sea river basin analysis series).
+  license: Not stated on the documents fetched; public EU-programme technical reports, presumed
+    citable for non-commercial research (verify before any redistribution).
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Sevan, Hrazdan and Akhuryan/Metsamor river basin districts (3 of Armenia's 6);
+    Ararat, Southern and Northern districts have plans adopted/in development but no fetchable
+    document was located this pass.
+  notes: >-
+    Real, directly-extracted figures (Sevan and Hrazdan verified from the primary RBMP PDFs;
+    Akhuryan from a secondary summary, flagged as such):
+
+    HRAZDAN RBD (Hrazdan RBMP, Table 88 "Surface Water Supply" + groundwater section, p.159-160):
+    surface water supply (natural river flow minus required ecological flow, i.e. what's actually
+    available for human use) = 600 million m3/year total (Hrazdan River sub-basin: natural flow
+    732, ecological flow 319, supply 414; Kasakh River sub-basin: natural flow 274, ecological
+    flow 88, supply 186). Separately, usable/strategic/national groundwater resources of the
+    mountain and foothill zones = 788.5 million m3 (394.2 renewable + 157.7 strategic + 236.6
+    national) -- reported separately from surface supply, not summed, to avoid double-counting
+    surface/groundwater interaction the source document itself does not sum.
+
+    SEVAN RBD (Sevan RBMP, Table 102 "Future Water Supply in Sevan RBD", p.175-176): multi-year
+    average surface water supply = 677.0 million m3/year, groundwater = 259.5 million m3/year
+    (~936.5 million m3/year combined) -- both sources include an explicit declining projection
+    through 2027 under optimistic and pessimistic climate scenarios (real, already
+    climate-adjusted figures, not a static historical average).
+
+    KASAKH SUB-BASIN (within Hrazdan RBD, Water Quantitative Management Plan, Table 18): detailed
+    nodal-basin-level surface natural flow with real RCP6.0/RCP8.5 climate-change projections to
+    2100 (e.g. Kasakh upper flow: 192.2 million m3/year average, declining to 122.4 under RCP8.5
+    by 2100) -- the most granular real sub-basin data found, useful if AEGIS's units need finer
+    resolution than the 6 basin districts.
+
+    AKHURYAN/METSAMOR (secondary source, not independently verified against Akhuryan's own
+    primary BMP document): Akhuryan sub-basin ~391 million m3/year, Metsamor (Sevjur) sub-basin
+    ~711 million m3/year.
+
+    Real, structural finding, not a data gap: none of the three primary documents track water
+    abstraction/allocation by a "forestry" sector -- allocation accounting covers irrigation,
+    industry, fish farming, and municipal supply only, because Armenian afforestation as
+    documented (see aegis_ecosystem_services_value_and_restoration_cost above) is rainfed, not
+    irrigated, except explicitly riparian/cutting-based methods (e.g. willow cuttings planted in
+    riparian zones, GIZ-funded). This means a literal "water_use per planting option" input may
+    not be a real constraint for most of AEGIS's options at all -- worth deciding explicitly
+    (tomorrow) whether to model water use only for riparian/irrigated options, or omit the water
+    constraint for rainfed options rather than force a number that has no real basis.
+
+- variable: aegis_scenario_ensemble
+  source: This project's own real ISIMIP3b pull (configs/manifests/isimip3b.yaml, once
+    registered) -- not a new external source, cross-referenced here because it IS AEGIS's
+    scenario/model ensemble omega.
+  version: n/a
+  url: n/a
+  citation: See configs/manifests/isimip3b.yaml
+  license: See configs/manifests/isimip3b.yaml
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia
+  notes: >-
+    5 real GCMs (GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0, UKESM1-0-LL) x 3 real SSPs
+    (ssp126/ssp370/ssp585), real bias-adjusted daily climate -- the real scenario ensemble
+    Sec. 9's CVaR portfolio is meant to optimise over, once propagated through TOPOHYDRO/XYLEM/
+    MNEME/MERISTEM/REFUGIUM for each member (not yet done -- this is the "full production"
+    scope, separate from today's single-year 2019 reduced-scope REFUGIUM pass). No real
+    scenario-weighting scheme (w_c) has been sourced or decided; equal weighting across all 15
+    real GCM x SSP members is the natural default absent a stated reason to weight some more than
+    others -- a modelling choice to make explicitly when this is built, not a missing dataset.

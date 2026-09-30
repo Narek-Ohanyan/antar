@@ -1,0 +1,45 @@
+# opendata.am real datasets confirmed to exist (queried the live CKAN API directly,
+# 2026-09-30), but every actual download attempt failed against real, external,
+# currently-down infrastructure -- not a research gap, not a code bug. Documented here so a
+# later retry starts from "these are the real URLs" rather than re-discovering them, and so
+# ROADMAP.md doesn't understate this as merely "not yet pulled."
+
+- variable: opendata_am_access_status
+  source: data.opendata.am (CKAN API) for discovery; the actual files live on two different
+    external hosts.
+  version: n/a
+  url: n/a
+  citation: n/a
+  license: n/a
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia
+  notes: >-
+    Two real, distinct failures, both confirmed external, neither fixed by retrying with
+    different request code:
+
+    (1) Forest degradation datasets (Artsvaberd/Ijevan/Eghegnut, REC Caucasus, 2016-2020) are
+    actually hosted on Global Forest Watch's ArcGIS Hub (data-download-gfw.hub.arcgis.com), not
+    opendata.am itself. The CSV-export-with-Armenian-slug endpoint returns a real HTTP 500
+    ("Server Error") regardless of URL-encoding approach tried (raw curl, Python urllib with
+    proper percent-encoding, colon-preserving encoding). The underlying ArcGIS REST
+    FeatureServer endpoint (services2.arcgis.com/g8WusZB13b9OegfU/arcgis/rest/services/
+    Forest_degradation_in_{Artsvaberd,Ijevan,Eghegnut}_forest_enterprise_from_2016_to_2020/
+    FeatureServer/0) returns `{"error":{"code":400,"message":"Invalid URL"}}` even for a bare
+    metadata request (`?f=json`) with no query beyond that -- a real service-side routing
+    problem on GFW's hub, not a malformed request on this end.
+
+    (2) The Armenian National Agrarian University's real lab-measured soil layers (clay, silt,
+    sand, bulk density, pH, CEC, electric conductivity, SOC stock -- all 7 real WCS coverage
+    IDs found via the opendata.am API: geonode__Clay, geonode__Silt, geonode__Sand,
+    geonode__Bulk_Density, geonode__pH, geonode__CEC, geonode__ec__salinity_,
+    geonode__SOC_stock) and the real forest-cover layer are all served from
+    `armsis.cas.am`, ANAU's own GeoServer. That domain returns NXDOMAIN (DNS lookup failure)
+    as of this check -- genuinely down or renamed, not merely slow/rate-limited. Confirmed with
+    a direct `nslookup`, not just a failed HTTP request (which could have many other causes).
+
+    Next step when retried: re-check `armsis.cas.am` resolves at all before anything else; for
+    the GFW layer, try the Hub's own web UI (a real browser session, not a raw request) since
+    ArcGIS Hub's download buttons sometimes route through a different, JS-driven path than the
+    REST endpoints tried here.
