@@ -1,0 +1,28 @@
+- variable: co2_concentration_pathways
+  source: RCMIP v5.1.0 (Meinshausen et al. 2020, GMD)
+  version: '5.1.0'
+  url: https://zenodo.org/record/4589756/files/rcmip-concentrations-annual-means-v5-1-0.csv
+  citation: 'Meinshausen, M., Nicholls, Z.R.J., Lewis, J., et al. (2020). The
+    shared socio-economic pathway (SSP) greenhouse gas concentrations and their
+    extensions to 2500. Geoscientific Model Development, 13, 3571-3605.
+    https://doi.org/10.5194/gmd-13-3571-2020.'
+  license: See RCMIP/Zenodo record 4589756 for terms; freely downloadable, no
+    registration.
+  access_date: '2026-09-30'
+  local_path: configs/co2_concentration_pathways.csv
+  checksum_sha256: 7a30a695a095b05b18cae862a68467d946de12e683fafcdfea93e04b4fa5d46a
+  spatial_extent: Global (World region; CO2 is a well-mixed atmospheric quantity,
+    not gridded)
+  notes: >-
+    Atmospheric CO2 concentration (ppm), annual, 1979-2100, filtered from the
+    21 MB multi-model/multi-scenario RCMIP source (scripts/pull_co2_pathways.py) down
+    to exactly this project's scenarios -- both the CMIP5/RCP pathways backing the
+    CORDEX ensemble on hyperion (rcp26/rcp45/rcp60/rcp85) and the CMIP6/SSP pathways
+    backing CHELSA-BIOCLIM+/NASA-GDDP-CMIP6/ISIMIP3b (ssp126/ssp245/ssp370/ssp585),
+    plus historical, in one small table (9 rows, ~19 KB). Kept directly in configs/,
+    not Drive -- small enough that the cloud-first/storage-minimal convention doesn't
+    apply the same way it does to gridded rasters. Exists specifically to let the
+    RCP-to-SSP correspondence ROADMAP.md S0 requires be read off real forcing numbers,
+    e.g. rcp26 reaches roughly 421 ppm by 2100 in this table, ssp126 roughly 446 ppm --
+    close but not identical, confirming they are related but not interchangeable
+    pathways.
