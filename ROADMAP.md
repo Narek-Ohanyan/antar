@@ -217,6 +217,16 @@ Not started by design (explicitly deferred pending real model fits — see
       ISIMIP3b/NEX-GDDP-CMIP6 per §1.1's decision, SRTM vs. GLO-30 per §1.3, the treeline/GDD
       modifier split, the Eq. 8.6 conjunction implementation, etc.) — not a restatement of the
       concept note.
+  - [ ] A plain-language toggle/button on this page ("explain it simply" or similar) that
+        switches each formula/mechanism to a non-academic explanation built on concrete,
+        everyday analogies (e.g. a tree's water column under drought stress explained the way
+        you'd explain suction through a straw, or the two-phase hydraulic-failure threshold
+        explained the way you'd explain a dam overtopping) — no jargon, no equations, one
+        analogy per mechanism. Runs alongside the technical version, not instead of it: every
+        engine's page needs both a formula/equation view and a plain-language view, switchable
+        without leaving the page. Content has to be written per-mechanism once the real
+        methodology text exists (§3) — this is a content task as much as a UI one, not just a
+        toggle to build.
 - [ ] References page — every dataset in this roadmap and `IMPLEMENTATION_LOG.md`'s manifests,
       with its actual required citation (already recorded per-entry in `configs/manifests/*.yaml`
       — this page can likely be generated from those rather than hand-written).
