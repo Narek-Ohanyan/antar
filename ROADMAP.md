@@ -94,38 +94,41 @@ aren't.
       "should have full coverage now" note (from the initial research pass) was wrong — corrected
       here after checking the primary source directly rather than trusting it. SRTM 30 m stays
       the right substitute; no further action needed on this item.
-- [ ] **Road network / accessibility** — **CONFIRMED**, two real options: OpenStreetMap via
-      Geofabrik (`download.geofabrik.de/asia/armenia.html`, full national coverage, ODbL, zero
-      registration — the simplest path) or the Malaria Atlas Project's global travel-time-to-
-      cities layer (Weiss et al. 2018, 1 km, covers Armenia fully, on Earth Engine and direct
-      download, no registration; confirm the exact EE asset ID in the catalog before coding
-      against it). GRIP4 is also real (PBL portal) but its Earth Engine mirror splits by region
-      and Armenia's region membership wasn't confirmed.
+- [x] **Road network / accessibility — pulled (2026-09-30), via the Earth Engine path.**
+      Geofabrik's binary downloads (`.shp.zip`, `.osm.pbf`) hit a persistent redirect loop from
+      this environment when actually attempted — real server/network behavior, not a data
+      problem (the HTML listing page itself loads fine) — not pursued further once the EE
+      alternative confirmed working. Used the Malaria Atlas Project's global travel-time-to-
+      cities layer instead: confirmed real, asset id `Oxford/MAP/accessibility_to_cities_2015_v1_0`
+      (verified directly, single `accessibility` band, minutes-to-nearest-city), Armenia bbox
+      values 0-517 minutes (physically sensible for the terrain). Exported to Drive
+      (`antar_accessibility_to_cities`, task `3GOANAHUA6I5AINU42GBPF6M`, queued under restricted
+      mode as of this writing — register in `configs/manifests/` once it actually completes).
+      OSM via Geofabrik remains a real fallback if finer road-network detail (vs. travel-time)
+      is ever needed — retry from a different network/environment, or use the Overpass API
+      instead of the static mirror.
 
 ### 1.4 Bioclimate and occurrence
-- [ ] **CHELSA-BIOCLIM+** — **CONFIRMED** real (Karger et al. 2022, ESSD), hosted on EnviDat (DOI
-      10.16904/envidat.332). ~15 variables (GDD0/5/10, TREELIM growing-season set, frost-change
-      frequency, VPD, PET, wind, radiation, PDSI-like indices), same 5 ISIMIP3b GCMs, SSP126/370/
-      585 (no SSP245), historical 1980-2018 monthly / 1981-2010 climatology, future in 2011-2040/
-      2041-2070/2071-2100 windows. **UNVERIFIED**: whether it lives under the same
-      `os.unil.cloud.switch.ch/chelsa02/chelsa/global/` tree as CHELSA-daily (a `bioclim/`
-      sibling to `daily/`) — check directly before assuming the same `/vsicurl/` access pattern
-      works; format is GeoTIFF per the paper, COG-ness not confirmed at the paper level.
-- [ ] **GBIF occurrence data** — **CONFIRMED**, `api.gbif.org/v1/occurrence/search` works with no
-      registration (params: `country=AM`, `genus=`/`scientificName=`/`taxonKey=`, or WKT
-      geometry). Bulk citable Darwin Core Archive downloads need a free account. Real total for
-      Armenia across all taxa: 380,785 records — **genus-specific counts for the actual target
-      species (Quercus, Pinus, Fagus, Juniperus etc.) still need a real query**, the session's
-      attempt hit a caching artifact and returned the all-taxa count for every filter tried.
+- [x] **CHELSA-BIOCLIM+ — access confirmed (2026-09-30), not yet pulled.** `bioclim/` is a real
+      sibling directory to `daily/` on the same server (`os.unil.cloud.switch.ch/chelsa02/chelsa/
+      global/bioclim/`), same `/vsicurl/` access pattern, listed directly: bio01-19, cltmax/mean/
+      min/range, cmimax/mean/min/range, fcf, fgd, gdd0/5/10 and more. This is a properly scoped
+      pull job on its own (many variables x historical + 5 GCMs x SSP126/370/585 x 3 future
+      windows) — deliberately not rushed alongside the smaller items in this batch; next real
+      data-pull task once scoped.
+- [x] **GBIF occurrence data — pulled (2026-09-30).** 524 real presence records for the 7 target
+      species (`configs/species_traits.csv`'s example taxa), `configs/manifests/
+      gbif_occurrences.yaml`. A real data-quality bug was caught: `country=AM` alone let through
+      4 `(0,0)` "null island" bad-georeferencing records; fixed with an explicit bbox filter.
 
 ### 1.5 CO2 concentration pathways
-- [ ] **RCMIP / Meinshausen et al. (2020)** — the standard citable SSP CO2 concentration
-      trajectories. **UNVERIFIED**: a direct CSV candidate was found
-      (`zenodo.org/record/4589756/files/rcmip-concentrations-annual-means-v5-1-0.csv`) but not
-      opened this session; the paper's own Data Availability section (gmd.copernicus.org) wasn't
-      reachable either. ESGF input4MIPs is a gridded-netCDF alternative if a CSV table isn't
-      enough. IIASA SSP Database wasn't checked at all — access terms unknown. Small task, real
-      follow-up needed before treating it as done.
+- [x] **RCMIP / Meinshausen et al. (2020) — pulled (2026-09-30).** Real, direct, no registration
+      (`zenodo.org/record/4589756/files/rcmip-concentrations-annual-means-v5-1-0.csv`, 21 MB
+      confirmed downloadable). Filtered to exactly this project's scenarios — both RCP26/45/60/85
+      (CORDEX) and SSP126/245/370/585 (everything else) plus historical — into one small table,
+      `configs/co2_concentration_pathways.csv`, `configs/manifests/co2_pathways.yaml`. Real
+      numbers confirm RCP2.6 and SSP1-2.6 are close but not identical by 2100 (~421 vs. ~446 ppm)
+      — the §0 correspondence risk is real, not hypothetical.
 
 ### 1.6 Confirmed genuinely not obtainable as open data
 - [ ] Tree-ring chronologies for Armenia — **CONFIRMED absent from ITRDB**; the two real, recent

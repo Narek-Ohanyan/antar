@@ -669,3 +669,45 @@ bbox search) both return exactly the same 3 tiles as Earth Engine's `COPERNICUS/
 Copernicus system right now, confirmed from the authoritative catalog itself -- not a stale-copy
 problem. SRTM 30 m (`USGS/SRTMGL1_003`, already in `export_terrain`) remains the correct choice;
 this closes the question rather than leaving a plausible-sounding but unverified claim standing.
+
+**CO2 concentration pathways pulled** (`scripts/pull_co2_pathways.py`): RCMIP v5.1.0 confirmed
+real and directly downloadable, no registration. Filtered the 21 MB multi-model file down to
+exactly this project's scenarios -- both the CMIP5/RCP pathways (rcp26/45/60/85, backing CORDEX)
+and the CMIP6/SSP pathways (ssp126/245/370/585, backing everything else), plus historical -- into
+`configs/co2_concentration_pathways.csv` (9 rows). Real numbers now available for the RCP<->SSP
+correspondence question ROADMAP.md S0 raises: rcp26 and ssp126 are close (~421 vs ~446 ppm by
+2100) but not identical, confirming the concern was real, not hypothetical.
+
+**GBIF occurrence data pulled** (`scripts/pull_gbif_occurrences.py`): 524 real presence records
+for the 7 target species named in `configs/species_traits.csv` (Fagus orientalis, Carpinus
+betulus, Quercus macranthera, Quercus iberica, Pinus kochiana, Juniperus polycarpos, Juniperus
+excelsa), via GBIF's public search API, no registration. A real data-quality bug caught before
+trusting the output: `country=AM` alone let through a handful of `(0,0)` "null island" records --
+a classic bad-georeferencing artifact, not a real Armenian occurrence. Fixed with an explicit
+bbox filter (matching `configs/study_area.yaml`) rather than trusting the country filter alone;
+4 of 528 raw records dropped.
+
+**CHELSA-BIOCLIM+ access confirmed, not yet pulled**: `chelsa/global/bioclim/` is a real sibling
+directory to `chelsa/global/daily/` on the same server, listed directly (bio01-19, cltmax/mean/
+min/range, cmimax/mean/min/range, fcf, fgd, gdd0/5/10, and more) -- same `/vsicurl/` access
+pattern already proven for CHELSA-daily should work here too. Deliberately not pulled in this
+batch: it is a properly-scoped job on its own (many variables x historical + 5 GCMs x 3 SSPs x 3
+future windows), not a quick add alongside the smaller items done here.
+
+**Road/accessibility data: Geofabrik's binary downloads are broken from this environment,
+pivoted to the Earth Engine alternative.** `download.geofabrik.de/asia/armenia-latest-free.shp.zip`
+(and the `.osm.pbf` equivalent) return a persistent 301 redirect loop on every attempt (HEAD and
+GET, with and without a browser User-Agent) -- the HTML listing page itself loads fine, so this
+is a real server/proxy behavior for this specific binary-download path from this network, not a
+missing-data problem. Not chased further once the Malaria Atlas Project's global travel-time-to-
+cities layer (Weiss et al. 2018) confirmed working: `Oxford/MAP/accessibility_to_cities_2015_v1_0`
+on Earth Engine, verified directly (single `accessibility` band, values 0-517 minutes over the
+Armenia bbox -- physically sensible for the terrain, not just "the asset loaded"). Exported to
+Drive (`antar_accessibility_to_cities`); queued under the project's restricted-mode compute quota
+as of this writing, register once it actually completes.
+
+**Restricted-mode quota observed in practice**: both this accessibility export and the
+re-submitted `vegetation_state` export (see above) sat in `READY` (queued, not running) for the
+duration of this session after submission -- the noncommercial-quota restriction is throttling
+throughput, not just a one-line warning. Worth checking task state again before assuming any
+future EE export has actually run.
