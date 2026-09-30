@@ -345,6 +345,13 @@ def export_vegetation_state(bbox_wgs84, year_start: int, year_end: int, crs: str
     season), and ESA WorldCover tree-cover class (a single, most-recent-epoch layer;
     WorldCover is not produced annually). Returns the started task.
     """
+    # MCD12Q2 (land-surface phenology) only covers 2001 onward -- confirmed directly against
+    # the collection, not assumed. A year_start of 2000 (matching the other yearly exports)
+    # made .first() return null for 2000 and crash the whole batch ("Parameter 'input' is
+    # required and may not be null"). Phenology bands are genuinely omitted for years outside
+    # this coverage rather than filled with a fabricated masked value.
+    PHENO_MIN_YEAR = 2001
+
     aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
     lai_coll = ee.ImageCollection("MODIS/061/MOD15A2H").filterBounds(aoi)
     pheno_coll = ee.ImageCollection("MODIS/061/MCD12Q2").filterBounds(aoi)
@@ -353,6 +360,8 @@ def export_vegetation_state(bbox_wgs84, year_start: int, year_end: int, crs: str
     for y in range(year_start, year_end + 1):
         lai = lai_coll.filterDate(f"{y}-07-01", f"{y}-09-01").select("Lai_500m").mean()
         bands[f"lai_growing_season_{y}"] = lai.rename(f"lai_growing_season_{y}")
+        if y < PHENO_MIN_YEAR:
+            continue
         pheno = pheno_coll.filterDate(f"{y}-01-01", f"{y + 1}-01-01").select(["Greenup_1", "Dormancy_1"]).first()
         bands[f"greenup_doy_{y}"] = pheno.select("Greenup_1").rename(f"greenup_doy_{y}")
         bands[f"dormancy_doy_{y}"] = pheno.select("Dormancy_1").rename(f"dormancy_doy_{y}")

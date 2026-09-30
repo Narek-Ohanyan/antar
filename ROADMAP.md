@@ -74,14 +74,13 @@ aren't.
       tmmn/tmmx, pet, aet, soil moisture, runoff, PDSI, VPD. 1958-2024 monthly, ~4.6 km, CC0.
       Direct-download alternative (no EE account): `climatologylab.org/terraclimate.html`
       (THREDDS/OPeNDAP/wget).
-- [ ] **GHCN-Daily Armenian stations** — **CONFIRMED**, 53 real stations (Yerevan, Gyumri,
-      Vanadzor, Sevan, Artik, Aragats, Kapan, and others), free bulk download
-      (`ncei.noaa.gov/pub/data/ghcn/daily/`), no account. Mixed record lengths — several back to
-      1880s-1930s, a dense block ending ~1988-1992 (Soviet-era gap), a handful continuous through
-      2024-2026. **This replaces "Armhydromet stations are institution-only" from the earlier
-      manual-data list — they are not; use this as the real station-based downscaling/QDM
-      reference the concept note's Table `tab:data` calls for.** ECA&D also covers Armenia but far
-      more thinly (2-3 stations) — supplementary only.
+- [x] **GHCN-Daily Armenian stations — pulled and registered (2026-09-30)**: all 53 real
+      stations, 1,325,996 QC-passed observations, PRCP/TMAX/TMIN/TAVG/SNOW/SNWD, units
+      converted and validated against known physical values (Yerevan July ~26-30°C, January
+      ~0.7-6°C) before trusting the pull at scale. Drive-hosted, `configs/manifests/
+      ghcnd_armenia.yaml`. **This replaces "Armhydromet stations are institution-only" from the
+      earlier manual-data list — they were not.** ECA&D also covers Armenia but far more thinly
+      (2-3 stations) — not pulled, supplementary only if ever needed.
 
 ### 1.3 Terrain and accessibility
 - [ ] **Copernicus GLO-30 full Armenia coverage** — the earlier Earth-Engine gap (only ~3/14
@@ -142,14 +141,20 @@ aren't.
 
 ## 2. Data — already submitted but never verified/finished
 
-- [ ] **Six Earth Engine exports submitted to Drive and never confirmed**: `export_terrain`,
-      `export_soils`, `export_era5land_forcing`, `export_vegetation_state`, `export_snow`,
-      `export_land_tenure`, plus `export_vitality_composites`, `export_disturbance_ancillary`,
-      and `export_structure`. Only CHELSA-daily and S2-VHM have ever been registered in a
-      manifest — everything else exists only as `gee_export.py` functions that were called once,
-      with no confirmation the Drive tasks completed, no download to `data/`, no manifest entry.
-      **Needs your Earth Engine/GCP project ID** to check task status (`ee.data.getTaskList()`)
-      — I don't have it cached anywhere and couldn't find it in the repo.
+- [x] **Six-plus Earth Engine exports, checked and registered (2026-09-30)**: with the real
+      GCP project ID, `terrain`, `soils`, `era5land_forcing`, `snow`, `land_tenure`,
+      `vitality_composites`, `landtrendr_segmentation`, `structure`, and
+      `disturbance_ancillary` were all confirmed COMPLETED and registered in
+      `configs/manifests/gee_exports.yaml` (38 entries, ~85 GB, left on Drive by design —
+      cloud-first, nothing downloaded). `vegetation_state` had genuinely FAILED (`Image.select:
+      Parameter 'input' is required and may not be null`) — real bug: MCD12Q2 land-surface
+      phenology only covers 2001 onward, and the export loop's 2000 start hit `.first()` on an
+      empty collection. Fixed (`src/antar/io/gee_export.py`: phenology bands genuinely omitted
+      for years outside real coverage, not fabricated) and resubmitted — **your GCP project is
+      in Earth-Engine restricted mode (noncommercial compute quota exceeded)**, so the resubmit
+      is queued (`READY`), not yet run; check `ee.data.getTaskList()` again once it clears.
+- [x] **GHCN-Daily Armenian stations pulled and registered (2026-09-30)** — see §1.2 above;
+      `configs/manifests/ghcnd_armenia.yaml`, Drive-hosted, 5 MB.
 - [ ] **CORDEX future extraction on hyperion**: only 2 of 4 variables (`pr`, `tas`) done for 1 of
       8 GCM×RCP combinations (MOHC-HadGEM2-ES/rcp26). `tasrange`/`tasskew` for that combination,
       plus all 7 remaining combinations, still pending — blocked on hyperion network access.

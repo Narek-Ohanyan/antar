@@ -1,0 +1,41 @@
+- variable: ghcnd_armenia_observations
+  source: GHCN-Daily (Global Historical Climatology Network - Daily), NOAA NCEI
+  version: n/a
+  url: https://www.ncei.noaa.gov/pub/data/ghcn/daily/all/
+  citation: Menne, M.J., I. Durre, R.S. Vose, B.E. Gleason, and T.G. Houston, 2012.
+    An overview of the Global Historical Climatology Network-Daily Database.
+    Journal of Atmospheric and Oceanic Technology, 29, 897-910.
+  license: Public domain (NOAA/NCEI).
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: eb18875e5410316b232cbc54dccdf9f8679becd3b375709428f77ab639cd62d4
+  spatial_extent: Armenia (53 stations, country code AM, all real station coordinates
+    in ghcnd_armenia_stations)
+  notes: PRCP/TMAX/TMIN/TAVG/SNOW/SNWD, all 53 real Armenian GHCN-Daily stations,
+    1,325,996 QC-passed observations (QFLAG blank only; flagged values dropped, not
+    included), 1885-2026 (coverage varies per station -- several end ~1988-1992,
+    a handful continuous through 2024-2026; see the inventory file for per-station
+    detail). Units converted at parse time per GHCN's documented convention -- PRCP/
+    TMAX/TMIN/TAVG divided by 10 (raw values are tenths of mm / tenths of degC),
+    SNOW/SNWD left as-is (already whole mm). Not stored locally (cloud-first by
+    design) -- lives in Google Drive folder antar_gee_exports, file
+    id=1ucE2WXCFBV2IW-eESLxMnksC-hLwfaRK, gzip-compressed CSV, 5.0 MB. Real, freely
+    downloadable cross-check/downscaling reference for CHELSA-daily per the concept
+    note's Table tab:data ("daily variability and QDM reference") -- not
+    institution-only as earlier assessed.
+- variable: ghcnd_armenia_stations
+  source: GHCN-Daily station inventory, NOAA NCEI
+  version: n/a
+  url: https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt
+  citation: Menne, M.J., I. Durre, R.S. Vose, B.E. Gleason, and T.G. Houston, 2012.
+    An overview of the Global Historical Climatology Network-Daily Database.
+    Journal of Atmospheric and Oceanic Technology, 29, 897-910.
+  license: Public domain (NOAA/NCEI).
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (53 stations)
+  notes: Station id/lat/lon/elevation/name for all 53 real Armenian GHCN-Daily
+    stations -- the join key for ghcnd_armenia_observations. Not stored locally --
+    lives in Google Drive folder antar_gee_exports, file
+    id=12WOyIFvcr36zV66u2Vnw_KY6iYxXAZR7, JSON, <1 MB.

@@ -1,0 +1,700 @@
+- variable: antar_disturbance_ancillary
+  source: Google Earth Engine batch export (antar.io.gee_export.export_disturbance_ancillary)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Per-year ''no_disturbance'' boolean (NOT Hansen GFC loss OR MODIS MCD64A1
+    burn that year) -- the no_disturbance input antar.hazard.observation.dieback_event
+    expects. Not stored locally (cloud-first by design) -- lives in Google Drive folder
+    antar_gee_exports, file id=1-m_xKLBqBZYY8EFhFb9C_9iCzcJcB-jv, 38.2 MB, Drive MD5=1afa6d77503437c0a4de2a5e61e49628
+    (recorded instead of a SHA-256: hashing would mean downloading a multi-GB file
+    for no integrity benefit Drive doesn''t already provide).'
+- variable: antar_era5land_forcing-0000000000-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1kQxh_EDcCn6Ih5xyfvfIZuQE2mWNPqaS,
+    1568.5 MB, Drive MD5=33a4cae87bb4ac22a5896575acb0d17d (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000000000-0000003072
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1ZCNxrs6P3-_Y8DYg-MetdslHjQnV0phA,
+    1575.6 MB, Drive MD5=72cdcd2c928cad456e0f3e549dd9a6e1 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000000000-0000006144
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=13YdynAAjD0KwDYzpMt3C5GmnH3eKEDHP,
+    1576.4 MB, Drive MD5=62a19bd484e2f5d9c5fe051aced5b7af (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000000000-0000009216
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1rm4-5kX8tO5i855b3BGEP7cXqbb8htzT,
+    179.9 MB, Drive MD5=2363a8877699b03d9c7bca8a4194bb0c (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000003072-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1psHQxLuxdRcN1Oczv7VDh1mcB8a7N38s,
+    1567.1 MB, Drive MD5=d019ccf30b457b5f718183e67b05e1f5 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000003072-0000003072
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1LkBgsLjeZ1_uRlO1c6FHmsZ8pxpIPjnT,
+    1566.6 MB, Drive MD5=b0452ccc390c8791a00770eba40e7626 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000003072-0000006144
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1FE5mcNk6xONJ4sChXZ7qfmgWyS_45Uk1,
+    1574.0 MB, Drive MD5=850f8508ed2d50b2be4a31426f8e3a6b (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000003072-0000009216
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1C5RBC59v1ytFwsTWcCme0VM-VrG8wORe,
+    174.1 MB, Drive MD5=a71f99420419dadbfc496314d23bbfe8 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000006144-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1wtVOpllg9Q-PmQDaJeetU8ZIbKI1pjMr,
+    1572.3 MB, Drive MD5=6eaf3f12afe5ca752af383ab73cd1d14 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000006144-0000003072
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1zP8XI026RlIaFCR-3LnF1qxdbQSORnDf,
+    1558.8 MB, Drive MD5=29bd02b1d5eb02d0e23cc737e753e34a (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000006144-0000006144
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1_8tMT-0SnBrRUepjOcWzIo4hjcQrAtcH,
+    1574.4 MB, Drive MD5=360995bbe09a32fa2b604d2b7431f169 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000006144-0000009216
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1dp-96zRTfqwPDTTdn95tv1-yjmjHJDUp,
+    173.9 MB, Drive MD5=04f0bae982369b770bece325132a2853 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000009216-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1t-hg8gk3sKbWCSvFi7uom7PjGI5SNCwX,
+    210.0 MB, Drive MD5=28c52b398305cf269c296be7d01a4646 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000009216-0000003072
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1q6KXWJQAIOQgP-OGLtyTS7L3G7YIOvpk,
+    208.6 MB, Drive MD5=caebd9bc9023ad367aebe7286f08127a (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000009216-0000006144
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1qxYjAt8IwXexaStDAJCphgYXSCDxUzH_,
+    209.5 MB, Drive MD5=87741f10e9152eee752efefd75b9bf01 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_era5land_forcing-0000009216-0000009216
+  source: Google Earth Engine batch export (antar.io.gee_export.export_era5land_forcing)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual-mean wind speed, shortwave/longwave radiation, dewpoint temperature
+    and surface pressure, ERA5-Land, 2000-2024. Tiled (multiple files) -- EE split
+    the export by pixel-count limits, not by variable. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1sJHL1cLIxn9mSwpL9FrPXQBxl0LO1yFT,
+    23.2 MB, Drive MD5=fb872627d381b14372dbcf40c786b193 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_land_tenure
+  source: Google Earth Engine batch export (antar.io.gee_export.export_land_tenure)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'WDPA protected-area boundaries rasterised to a boolean ''protected'' band,
+    feeding configs/study_area.yaml''s eligibility-mask exclusions. Not stored locally
+    (cloud-first by design) -- lives in Google Drive folder antar_gee_exports, file
+    id=1s9ENmIU67yyi9SJcXoOtrmERYTE-i9zN, 0.9 MB, Drive MD5=44ae769902048032623172c7c4ee65c7
+    (recorded instead of a SHA-256: hashing would mean downloading a multi-GB file
+    for no integrity benefit Drive doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000000000-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=18TMmJpWocV79j0eWk9sP1EhCHrn86Toc, 2808.7
+    MB, Drive MD5=e82d4bdb3994ed88d33aa38770ae03dd (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000000000-0000003328
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=1Bqc-NQwfGIObsUAeJxMFZhlbQiifxO4r, 2837.8
+    MB, Drive MD5=2c29e3267eabebddeaa178716e49e80e (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000000000-0000006656
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=1f0FN0FhGTkS67dOytKF1cARbc3FZKQP-, 2564.8
+    MB, Drive MD5=f24ba66011ad422371d4b63937130fef (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000003328-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=1ZYcxBmILHMf9ixsQbgubYqxQ4r2k7lBr, 2937.2
+    MB, Drive MD5=6e0ead36b87aae129da93a00df6d911f (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000003328-0000003328
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=1TmJGPIJlEMkKRI7VgkdWnS-w8UHqd3LC, 2929.0
+    MB, Drive MD5=ce4ca7357a4291d8caf5f1b7abdeedb2 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000003328-0000006656
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=1ItBfgzr-GTQtY68b7heng2KOiIdlWc5E, 2439.4
+    MB, Drive MD5=bed2fe046b7524cefb810b16a05f6e4a (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000006656-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=1CqyjuLTnWjk0H4c4uR_yb4T7qJlvgAuo, 2630.6
+    MB, Drive MD5=97ff639b2b8eeeac44237b396e8b17dd (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000006656-0000003328
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=1825JBxxmlHv9EltsqjsFRoULn69-SNyF, 2655.8
+    MB, Drive MD5=c94b31054ee2a00c7af2607024772e9b (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_landtrendr_segmentation-0000006656-0000006656
+  source: Google Earth Engine batch export (antar.io.gee_export.export_landtrendr_segmentation)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'LandTrendr (Kennedy et al. 2010) temporal segmentation of the annual kNDVI
+    series above. Tiled. Not stored locally (cloud-first by design) -- lives in Google
+    Drive folder antar_gee_exports, file id=1O2EDKLFEo6rlo_aCKa9vo2G9ya5C-5yS, 2258.8
+    MB, Drive MD5=e2538482d839bef410f0fc1d5ccaa216 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_snow-0000000000-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_snow)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual MODIS MOD10A1 snow-cover fraction and duration, 2000-2024. Tiled.
+    Not stored locally (cloud-first by design) -- lives in Google Drive folder antar_gee_exports,
+    file id=1AmzegC5G7j4Q9B6_Dzw_dq7g4UfQRdFK, 1689.5 MB, Drive MD5=0e9a4787f34511ed0b89255d229fdc94
+    (recorded instead of a SHA-256: hashing would mean downloading a multi-GB file
+    for no integrity benefit Drive doesn''t already provide).'
+- variable: antar_snow-0000000000-0000004864
+  source: Google Earth Engine batch export (antar.io.gee_export.export_snow)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual MODIS MOD10A1 snow-cover fraction and duration, 2000-2024. Tiled.
+    Not stored locally (cloud-first by design) -- lives in Google Drive folder antar_gee_exports,
+    file id=1EMc1O4SyEkeV1cMqi5tJ0KX_KvG7Aq66, 1212.3 MB, Drive MD5=940d62782732bb6512bf0e795df690ee
+    (recorded instead of a SHA-256: hashing would mean downloading a multi-GB file
+    for no integrity benefit Drive doesn''t already provide).'
+- variable: antar_snow-0000004864-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_snow)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual MODIS MOD10A1 snow-cover fraction and duration, 2000-2024. Tiled.
+    Not stored locally (cloud-first by design) -- lives in Google Drive folder antar_gee_exports,
+    file id=1bMhOTY2D3nyG8mVaTNuCkYNqSTu8wVe4, 1614.5 MB, Drive MD5=2d92313eb06c43daa980005faa9bbc44
+    (recorded instead of a SHA-256: hashing would mean downloading a multi-GB file
+    for no integrity benefit Drive doesn''t already provide).'
+- variable: antar_snow-0000004864-0000004864
+  source: Google Earth Engine batch export (antar.io.gee_export.export_snow)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Annual MODIS MOD10A1 snow-cover fraction and duration, 2000-2024. Tiled.
+    Not stored locally (cloud-first by design) -- lives in Google Drive folder antar_gee_exports,
+    file id=1PuoTTi5gxMeVxeVs_J1lDh4SaJfaN3fr, 1556.6 MB, Drive MD5=ea206fa878d23d2cfe1070d4958d3b59
+    (recorded instead of a SHA-256: hashing would mean downloading a multi-GB file
+    for no integrity benefit Drive doesn''t already provide).'
+- variable: antar_soils
+  source: Google Earth Engine batch export (antar.io.gee_export.export_soils)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'SoilGrids 2.0 clay/sand/silt fraction and organic carbon, 0-30cm mean, for
+    Saxton & Rawls (2006) pedotransfer functions. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=18LRnI4Nsnlj6ks1UClGDe4BdufqUG24n,
+    416.2 MB, Drive MD5=78f37fb7ac59afbedc0873821e9f5adb (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_structure
+  source: Google Earth Engine batch export (antar.io.gee_export.export_structure)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'GEDI L2A RH98 (quality-filtered) canopy-top height plus Lang et al. (2023)
+    global 10m canopy height -- training data for MERISTEM''s attainable-height model.
+    Not stored locally (cloud-first by design) -- lives in Google Drive folder antar_gee_exports,
+    file id=1YKp4qsUmTfgY8OwNPGLuUn1AYVB4IF9t, 96.1 MB, Drive MD5=774d804ba19526b35cecb192c840dc9e
+    (recorded instead of a SHA-256: hashing would mean downloading a multi-GB file
+    for no integrity benefit Drive doesn''t already provide).'
+- variable: antar_terrain
+  source: Google Earth Engine batch export (antar.io.gee_export.export_terrain)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'SRTM 30 m DEM, slope, aspect (Copernicus GLO-30 substitute -- see IMPLEMENTATION_LOG.md
+    for the confirmed Armenia coverage gap in EE''s GLO-30 copy). Not stored locally
+    (cloud-first by design) -- lives in Google Drive folder antar_gee_exports, file
+    id=17zOkIKhKZiDQaRtF2SwPhk3XOa37hpbe, 421.9 MB, Drive MD5=a60dd46d29b2291585263b5b5deb7416
+    (recorded instead of a SHA-256: hashing would mean downloading a multi-GB file
+    for no integrity benefit Drive doesn''t already provide).'
+- variable: antar_vitality_composites-0000000000-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_vitality_composites)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Yearly growing-season (Jul-Aug) median kNDVI (Camps-Valls et al. 2021) from
+    merged HLS v2.0 / Landsat C2 SR, plus per-pixel valid-observation count. Input
+    to antar.hazard.observation.dieback_event. Tiled. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1X5VF3X8k9DvJzpxVbO6Ccjfhq9tSvHLW,
+    3333.6 MB, Drive MD5=459e6c46b4be0106b725e3efbf08a329 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_vitality_composites-0000000000-0000004864
+  source: Google Earth Engine batch export (antar.io.gee_export.export_vitality_composites)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Yearly growing-season (Jul-Aug) median kNDVI (Camps-Valls et al. 2021) from
+    merged HLS v2.0 / Landsat C2 SR, plus per-pixel valid-observation count. Input
+    to antar.hazard.observation.dieback_event. Tiled. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1iC4l1_UoG-2ZpAKP90CeM3e-1wbpZUYA,
+    3247.4 MB, Drive MD5=1e35d81a2f863e887fadebaa1d5c6730 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_vitality_composites-0000004864-0000000000
+  source: Google Earth Engine batch export (antar.io.gee_export.export_vitality_composites)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Yearly growing-season (Jul-Aug) median kNDVI (Camps-Valls et al. 2021) from
+    merged HLS v2.0 / Landsat C2 SR, plus per-pixel valid-observation count. Input
+    to antar.hazard.observation.dieback_event. Tiled. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1CVhnSKyGkMuLQUgA4mKNoLNPvzZypZvj,
+    3390.2 MB, Drive MD5=3c232c563d4b9349ca3477be1e7d37a3 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_vitality_composites-0000004864-0000004864
+  source: Google Earth Engine batch export (antar.io.gee_export.export_vitality_composites)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
+    -- see gee_export.py docstrings); not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Yearly growing-season (Jul-Aug) median kNDVI (Camps-Valls et al. 2021) from
+    merged HLS v2.0 / Landsat C2 SR, plus per-pixel valid-observation count. Input
+    to antar.hazard.observation.dieback_event. Tiled. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1JyNnH34ZEGSYcB4qMrthliOd35ThOSEP,
+    3221.4 MB, Drive MD5=896d00a7d05139d384ca0636a0032394 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'

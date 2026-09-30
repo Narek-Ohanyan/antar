@@ -608,3 +608,53 @@ nor servname provided`) -- confirms it is only reachable from the office network
 public internet. The CORDEX future-projection extraction (`tasrange`/`tasskew` for
 MOHC-HadGEM2-ES/rcp26, plus the other 7 of 8 GCM x RCP combinations) stays blocked until that
 access is available again; not attempted from outside it.
+
+## 2026-09-30 — real GCP project ID found; six-plus GEE exports checked and registered; GHCN-Daily pulled
+
+**The Earth Engine project-ID blocker (flagged since 2026-09-24) is resolved.** Reconstructing
+OAuth credentials from the stored refresh token (same pattern as the earlier Drive-access work)
+and calling the Cloud Resource Manager API with no project produced a 403 naming project number
+`517222506229` -- this looked like a real discovery but was a red herring: it's literally
+hardcoded in the `earthengine-api` package's own source (`ee/__init__.py`, `oauth_project =
+'517222506229'`) as the SDK's own default/shared quota project, which `oauth.is_sdk_project()`
+explicitly rejects as a valid EE project. The user supplied the real project id directly
+(`pure-highlander-495708-a9`, number `270993636879`); `ee.Initialize()` with it works. **Real
+constraint surfaced on first use**: this project has exceeded its Earth Engine noncommercial
+compute quota and is now in *restricted mode* -- batch exports still submit but may queue
+(`READY`) rather than run immediately; something to watch for every future EE task, not a one-off.
+
+**Six-plus exports submitted in an earlier session (2026-09-24 through 09-27) were checked
+against `ee.data.getTaskList()` rather than assumed finished**: `terrain`, `soils`,
+`era5land_forcing`, `snow`, `land_tenure`, `vitality_composites`, `landtrendr_segmentation`,
+`structure`, and `disturbance_ancillary` all show COMPLETED, with real Drive destination URIs
+(all in the `antar_gee_exports` folder, ~85 GB across 38 files, none downloaded locally --
+registered in `configs/manifests/gee_exports.yaml` with Drive's own MD5 in `notes` rather than a
+freshly computed SHA-256, since hashing multi-GB files just to duplicate a check Drive already
+does would cost real bandwidth/storage for no integrity benefit).
+
+**`vegetation_state` had genuinely failed**, not just gone unchecked: `Image.select: Parameter
+'input' is required and may not be null`. Root cause: `MCD12Q2` (MODIS land-surface phenology)
+only has data from 2001 onward (confirmed directly against the collection: first image
+2001-01-01, last 2025-01-01, 25 images) -- the export's year loop started at 2000 to match the
+other yearly exports, so `.filterDate(...).select(...).first()` returned null for 2000 and the
+whole batch crashed on it. Fixed in `src/antar/io/gee_export.py`: phenology bands are now
+genuinely omitted for years before 2001 rather than filled with a fabricated masked value (LAI,
+which has its own longer coverage, is unaffected). Resubmitted; queued under restricted mode as
+of this writing, not yet actually run -- check again once cleared, don't assume it completed.
+
+**GHCN-Daily Armenia pull** (`scripts/pull_ghcnd_armenia.py`, new): all 53 real Armenia-country-code
+stations, PRCP/TMAX/TMIN/TAVG/SNOW/SNWD, parsed directly from the classic fixed-width `.dly`
+format (the `by_station/*.csv` path some documentation suggests returned 404 for the one station
+tried -- not real for this dataset, or differently named; not pursued further once `.dly`
+confirmed working). Units converted per GHCN's documented convention (PRCP/TMAX/TMIN/TAVG are
+tenths of their stated unit; SNOW/SNWD are not) -- verified before trusting the full pull, the
+same discipline as the CHELSA date-order bug: Yerevan July 2000 reads 26-30 degC, January 2000
+reads 0.7-6 degC, both correct for the location; nonzero precipitation values are plausible daily
+mm magnitudes. Only QFLAG-blank (NOAA-QC-passed) values kept; flagged values dropped rather than
+included. 1,325,996 observations, 5.0 MB compressed. Storage-minimal by design end to end: parsed
+one station at a time (never all 53 in memory together), written directly to gzip, uploaded to
+the same `antar_gee_exports` Drive folder, local staging deleted immediately after upload --
+nothing but a small JSON summary remains on local disk. Registered in
+`configs/manifests/ghcnd_armenia.yaml`. This closes the "Armhydromet stations are
+institution-only" item from the earlier manual-data assessment -- they were not; that assessment
+was wrong, corrected here rather than left standing.
