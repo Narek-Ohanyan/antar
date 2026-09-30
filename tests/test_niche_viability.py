@@ -101,6 +101,22 @@ def test_boyce_index_informative_vs_random():
     assert abs(adult.boyce_index(presences_random, pa)) < 0.6
 
 
+def test_fit_presence_background_recovers_separation():
+    # Presence points drawn from a shifted, tighter climate envelope than the (wider) background
+    # -- the fitted model should assign higher suitability to presence-like predictor values and
+    # score well under the Boyce index against a background spanning both regimes.
+    rng = np.random.default_rng(2)
+    x_presence = rng.normal(loc=[2.0, -1.0], scale=0.5, size=(150, 2))
+    x_background = rng.normal(loc=[0.0, 0.0], scale=2.0, size=(1500, 2))
+    model = adult.fit_presence_background(x_presence, x_background)
+    pred_presence = model.predict_proba(x_presence)[:, 1]
+    pred_all = model.predict_proba(np.vstack([x_presence, x_background]))[:, 1]
+    assert adult.boyce_index(pred_presence, pred_all) > 0.7
+    # A held-out point squarely inside the presence envelope should score higher than one
+    # squarely inside the background-only region -- the model learned the right direction.
+    assert model.predict_proba([[2.0, -1.0]])[0, 1] > model.predict_proba([[-3.0, 3.0]])[0, 1]
+
+
 def test_establishment_survival_product():
     h = regeneration.establishment_hazard(-2.0, [0.5], np.array([[0.0], [1.0], [2.0]]))
     assert np.all(np.diff(h) > 0)

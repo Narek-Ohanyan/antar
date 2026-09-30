@@ -1,0 +1,170 @@
+fit_date: '2026-09-30'
+method: Per-species penalised (L2) presence-background logistic regression (antar.niche.adult.fit_presence_background),
+  spatial-block CV (5-fold, 0.25deg blocks), scored with the continuous Boyce index.
+background_type: GBIF target-group (Plantae, Armenia, excluding target species) --
+  not uniform random, shared across all species' fits.
+n_background_total: 3000
+features:
+- bio06_winter_min_C
+- gdd5
+- vpdmean_Pa
+- cwd_approx_mm
+- clay_0_30cm_mean
+- sand_0_30cm_mean
+- silt_0_30cm_mean
+- soc_0_30cm_mean
+cwd_caveat: cwd_approx_mm = petmean - bio12 (annual, CHELSA-BIOCLIM+), a simplified
+  proxy -- not the real AET-based CWD, which needs TOPOHYDRO's full water balance
+  (not yet run against real data). Replace once that exists.
+pooling_note: An earlier version of this fit pooled all 7 species into one presence
+  class and got a weak, unstable result (mean Boyce 0.25, one fold negative) -- diagnosed
+  as pooling ecologically disparate species (beech/oak/pine/juniper have very different
+  niches), not noise; refit per species to match the concept note's actual specification.
+species:
+  Fagus orientalis:
+    status: fitted
+    n_presence_after_nan_drop: 69
+    n_background_after_nan_drop: 2672
+    spatial_block_cv:
+      block_size_deg: 0.25
+      k: 5
+      boyce_index_per_fold:
+      - 0.448
+      - 0.354
+      - 0.496
+      boyce_index_mean: 0.433
+    coefficients:
+      bio06_winter_min_C: 1.12422
+      gdd5: -0.00079
+      vpdmean_Pa: -0.01833
+      cwd_approx_mm: -0.00162
+      clay_0_30cm_mean: 0.01255
+      sand_0_30cm_mean: 0.00596
+      silt_0_30cm_mean: 0.01872
+      soc_0_30cm_mean: 0.01496
+    intercept: 0.00034
+  Carpinus betulus:
+    status: fitted
+    n_presence_after_nan_drop: 66
+    n_background_after_nan_drop: 2672
+    spatial_block_cv:
+      block_size_deg: 0.25
+      k: 5
+      boyce_index_per_fold:
+      - 0.293
+      - 0.771
+      - 0.272
+      - 0.52
+      - -0.586
+      boyce_index_mean: 0.254
+    coefficients:
+      bio06_winter_min_C: 0.28673
+      gdd5: 0.00114
+      vpdmean_Pa: -0.01718
+      cwd_approx_mm: -0.00018
+      clay_0_30cm_mean: 0.02105
+      sand_0_30cm_mean: 0.0057
+      silt_0_30cm_mean: 0.00382
+      soc_0_30cm_mean: -0.00486
+    intercept: -2.0e-05
+  Quercus macranthera:
+    status: fitted
+    n_presence_after_nan_drop: 111
+    n_background_after_nan_drop: 2672
+    spatial_block_cv:
+      block_size_deg: 0.25
+      k: 5
+      boyce_index_per_fold:
+      - 0.368
+      - 0.413
+      - 0.321
+      - 0.075
+      - -0.457
+      boyce_index_mean: 0.144
+    coefficients:
+      bio06_winter_min_C: 0.11229
+      gdd5: -0.0007
+      vpdmean_Pa: -0.00785
+      cwd_approx_mm: 0.00574
+      clay_0_30cm_mean: 0.00926
+      sand_0_30cm_mean: 0.01606
+      silt_0_30cm_mean: 0.00655
+      soc_0_30cm_mean: -0.00168
+    intercept: 5.0e-05
+  Quercus iberica:
+    status: fitted
+    n_presence_after_nan_drop: 31
+    n_background_after_nan_drop: 2672
+    spatial_block_cv:
+      block_size_deg: 0.25
+      k: 5
+      boyce_index_per_fold:
+      - -0.458
+      - 0.241
+      - 0.346
+      - -0.398
+      boyce_index_mean: -0.067
+    coefficients:
+      bio06_winter_min_C: 0.2088
+      gdd5: 0.00266
+      vpdmean_Pa: -0.02464
+      cwd_approx_mm: 0.01195
+      clay_0_30cm_mean: 0.00604
+      sand_0_30cm_mean: 0.02141
+      silt_0_30cm_mean: 0.01892
+      soc_0_30cm_mean: 0.00145
+    intercept: -1.0e-05
+  Pinus kochiana:
+    status: skipped_insufficient_data
+    n_presence_after_nan_drop: 8
+    reason: fewer than 25 valid presence points -- an 8-feature penalised fit would
+      not be reliable (risk of near-perfect separation / unstable coefficients), not
+      forced.
+  Juniperus polycarpos:
+    status: fitted
+    n_presence_after_nan_drop: 99
+    n_background_after_nan_drop: 2672
+    spatial_block_cv:
+      block_size_deg: 0.25
+      k: 5
+      boyce_index_per_fold:
+      - 0.033
+      - 0.542
+      - 0.405
+      - 0.528
+      - 0.215
+      boyce_index_mean: 0.345
+    coefficients:
+      bio06_winter_min_C: 0.16058
+      gdd5: -0.00243
+      vpdmean_Pa: -0.00705
+      cwd_approx_mm: 0.01357
+      clay_0_30cm_mean: 0.01349
+      sand_0_30cm_mean: 0.01871
+      silt_0_30cm_mean: 0.02656
+      soc_0_30cm_mean: -0.00767
+    intercept: 8.0e-05
+  Juniperus excelsa:
+    status: fitted
+    n_presence_after_nan_drop: 101
+    n_background_after_nan_drop: 2672
+    spatial_block_cv:
+      block_size_deg: 0.25
+      k: 5
+      boyce_index_per_fold:
+      - 0.048
+      - 0.493
+      - 0.415
+      - 0.54
+      - 0.209
+      boyce_index_mean: 0.341
+    coefficients:
+      bio06_winter_min_C: 0.13051
+      gdd5: -0.00213
+      vpdmean_Pa: -0.00774
+      cwd_approx_mm: 0.01376
+      clay_0_30cm_mean: 0.01336
+      sand_0_30cm_mean: 0.01905
+      silt_0_30cm_mean: 0.02534
+      soc_0_30cm_mean: -0.00774
+    intercept: 8.0e-05

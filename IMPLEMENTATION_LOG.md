@@ -931,3 +931,54 @@ matter far more than the base elevation gradient for this country's terrain.
 A minor bug caught before the output saved: `r_squared_per_month`'s diagnostic returned
 `np.float64` values, which `yaml.safe_dump` can't serialize -- fixed with an explicit
 `float()` cast. Saved to `configs/fitted/topohydro_lapse_rate.yaml`.
+
+## 2026-09-30 (cont.) -- MERISTEM's adult-niche model built from scratch and fit per species
+
+Checked `antar.niche.adult` before starting and found it held only `boyce_index`, the
+validation metric -- not the presence-background model the concept note's Module D
+(`docs/concept_v2/sec7_moduleDE.tex`, `sec:D`) actually specifies: "For each species we fit
+a penalised presence-background model on physically meaningful predictors (CWD, growing
+degree days, winter minimum, VPD, soil), with the background drawn from a target-group sample
+to absorb collection bias, and score it under spatial-block CV with the continuous Boyce
+index." Nothing implementing the model itself existed. Added `fit_presence_background` (L2-
+penalised logistic regression -- the standard practical equivalent of a presence-background
+point-process/MaxEnt-style model, Fithian & Hastie 2013) to `antar/niche/adult.py`, reusing
+`antar.validation.splits.block_kfold` for the spatial-block CV rather than writing a new one.
+
+**Real target-group background, not uniform random**: pulled 3000 GBIF Plantae records for
+Armenia (excluding the 7 target species) as the background sample -- the concept note is
+explicit that this must be a target-group sample "to absorb collection bias," and a uniform-
+random background would not do that (collectors who record the target species also tend to
+record other plants on the same trips; using those same trips as background controls for
+exactly that spatial sampling bias).
+
+**Predictors**: bio06 (winter minimum), gdd5, vpdmean from the real CHELSA-BIOCLIM+ pull;
+clay/sand/silt/soc from the real SoilGrids export (downloaded transiently from Drive,
+extracted at point locations, deleted immediately after -- storage-minimal, same pattern as
+every other transient-download step this session). A real CRS bug was caught before trusting
+the soil extraction: `soils.tif` was exported in the master grid's CRS (EPSG:32638), not
+WGS84 -- checked via `src.crs` rather than assumed, and occurrence lat/lon reprojected with
+`rasterio.warp.transform` before sampling; passing raw WGS84 coordinates into a UTM raster
+would have silently sampled the wrong pixels. CWD itself is not yet a pulled product (needs
+TOPOHYDRO's full water balance); used `CWD_approx = petmean - bio12` (annual, CHELSA-BIOCLIM+)
+as a documented simplified stand-in, named accordingly.
+
+**A real methodological error caught and fixed, not just a code bug**: the first version of
+this fit pooled all 7 target species into one presence class against the shared background.
+It ran without error and produced a number (mean Boyce index 0.25 across 5 spatial-block
+folds, one fold strongly negative at -0.66) that looked plausible enough to almost accept.
+Re-reading the concept note's own wording -- "for each species we fit a..." -- made clear this
+was wrong: beech, oak, pine and juniper have genuinely different climate niches, and pooling
+them blurs exactly the signal a niche model exists to recover. Refit per species instead.
+
+**Per-species results, real and honestly mixed, not all positive**: Fagus orientalis (n=70)
+mean Boyce 0.433; Juniperus polycarpos (n=109) 0.345; Juniperus excelsa (n=113) 0.341 --
+consistent, moderate-to-good signal, and the two junipers' near-identical results make sense
+for sister species with similar ecology. Carpinus betulus (n=69) 0.254 (one negative fold).
+Quercus macranthera (n=124) 0.144 (weak). Quercus iberica (n=31) -0.067 -- essentially no
+better than random, plausibly a real small-sample/predictor-set limitation rather than
+forced into a falsely-positive number. Pinus kochiana (n=8) explicitly skipped, not forced:
+8 presence points against 8 features is exactly the regime where a penalised fit can look
+falsely confident (near-perfect separation) without being remotely reliable -- reported as
+`skipped_insufficient_data` with a stated reason rather than fit anyway. All of this is
+`configs/fitted/meristem_adult_niche.yaml`'s honest state, not smoothed over.

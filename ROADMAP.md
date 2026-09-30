@@ -237,11 +237,25 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
 - [ ] **MNEME**: build the real person-period panel from the vitality/disturbance exports (§2);
       fit the cloglog GLM + monotone GBM + NNLS stack against real dieback labels; run the actual
       nested blocked-CV validation designed in `configs/cv.yaml`.
-- [ ] **MERISTEM**: fit the adult-niche Boyce index against real GBIF occurrence data (§1.4,
-      genus-filtered) and the attainable-height quantile model against real GEDI/canopy-height
-      data (once §2's structure export is confirmed); calibrate growth modifiers against whatever
-      real growth-climate data ends up available (§1.6's tree-ring email outreach, or the
-      prior-project plantation survey data if obtained).
+- [x] **MERISTEM adult-niche model — built and fit per species, done (2026-09-30).**
+      `antar.niche.adult` held only the Boyce index (a validation metric) before this — the
+      presence-background model it validates didn't exist. Added `fit_presence_background`
+      (penalised logistic regression) and fit it per species (not pooled — a first pooled
+      attempt gave a weak, unstable result and was diagnosed as a real methodological error
+      against the concept note's own "for each species" wording, not noise) against real GBIF
+      presences, a real GBIF target-group background (not uniform-random), real CHELSA-
+      BIOCLIM+ climate predictors, and real SoilGrids soil fractions. Results are honestly
+      mixed: good signal for Fagus orientalis (Boyce 0.43) and both junipers (~0.34 each,
+      consistent across folds); weak for the oaks (0.14, -0.07); Pinus kochiana (n=8)
+      explicitly skipped as too sparse for a reliable fit rather than forced. See
+      `configs/fitted/meristem_adult_niche.yaml` and IMPLEMENTATION_LOG.md for full detail,
+      including a real CRS bug caught before trusting the soil extraction (soils.tif is in
+      EPSG:32638, not WGS84).
+  - [ ] **Still needed**: replace `CWD_approx = petmean - bio12` with TOPOHYDRO's real AET-
+        based CWD once that water balance is run against real data. The attainable-height
+        quantile model (real GEDI/canopy-height data, §2's structure export is registered but
+        not yet loaded/processed) and growth-modifier calibration (needs tree-ring or
+        plantation-survey growth-climate data, neither obtained) are both still open.
 - [ ] **REFUGIUM**: run the full robust-refugium criteria against real MERISTEM/hazard outputs
       once both feed it real fits, not placeholders.
 - [ ] **AEGIS**: run the CVaR portfolio optimisation and efficient frontier against a real
@@ -249,9 +263,11 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
 - [ ] **Pipeline wiring**: `workflow/Snakefile` is still 100% placeholder `echo` commands for
       every rule — replace each with the real `antar.*` entry point once its inputs are real,
       so the pipeline can actually run end-to-end rather than existing only as tested library code.
-- [ ] **Dev environment**: no `.venv` with the full `.[dev]` extras currently exists in this
-      checkout (only the narrow `.venv_chelsa_pull`) — recreate it (`pip install -e ".[dev]"`)
-      and re-run the full test suite to confirm it's still green before real fitting starts.
+- [x] **Dev environment — installed (2026-09-30).** `pip install -e ".[dev]"` run against
+      system Python (plus `scipy`/`scikit-learn`/`rasterio`/`netCDF4`/`isimip-client` installed
+      separately as this session needed them for real pulls/fits). Full suite re-run: **143
+      passed**, 0 failures — includes the new `fit_presence_background` test, everything else
+      still green after today's real-data changes.
 - [ ] **CO2 physiological effects**: once §1.5's CO2 pathway table is in hand, wire it into
       whatever growth/water-use-efficiency term in MERISTEM/XYLEM is meant to use it (check the
       concept note for where CO2 fertilisation or WUE scaling is specified, if at all — flagged
