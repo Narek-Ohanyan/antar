@@ -1,0 +1,32 @@
+run_date: '2026-10-01'
+panel_years:
+- 2010
+- 2011
+- 2012
+- 2013
+- 2014
+- 2015
+- 2016
+- 2017
+- 2018
+- 2019
+n_points: 80
+n_points_valid_kndvi: 44
+n_person_years: 778
+n_events: 0
+n_spatial_blocks: 12
+design_columns:
+- cwd_mm_dev
+- vpd24_mean_kpa_dev
+- gdd_annual_dev
+- t_mean_c_annual_dev
+- cwd_mm_bar
+- vpd24_mean_kpa_bar
+- gdd_annual_bar
+- t_mean_c_annual_bar
+scope_note: Climate-only Mundlak design (cwd_mm, vpd24_mean_kpa, gdd_annual, t_mean_c_annual,
+  each split within/between by place) -- no real stand-age, DLNM drought-legacy or
+  stand-structure data exists yet, so Eq. 7.3's age spline/cross-basis/stand terms
+  are not included (see module docstring). Misclassification correction (Se/Sp) also
+  not applied -- no stratified ground-truth sample exists.
+status: insufficient_real_events_or_blocks_for_a_meaningful_fit
