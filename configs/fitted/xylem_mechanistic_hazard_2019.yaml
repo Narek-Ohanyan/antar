@@ -1,0 +1,1694 @@
+run_date: '2026-09-30'
+year: 2019
+pet_formulation: pm_fao56
+outer_draws: 50
+inner_draws: 200
+individual_sd_fraction_of_hyper_sd_placeholder: 0.5
+refill_fraction: 1.0
+groups:
+  mesic_diffuse_porous_broadleaf:
+    status: ok
+    example_taxa: Fagus orientalis; Carpinus betulus
+    hyper_sd:
+      p50: 0.84
+      slope: 16.5
+    individual_sd:
+      p50: 0.42
+      slope: 8.25
+    hyper_sd_source_n:
+      p50: 81
+      slope: 44
+    n_cells: 78
+    h_mech_mean_across_cells: 0.014235897435897434
+    cells:
+    - lat: 41.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 1738.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 41.39583333333333
+      lon: 43.7375
+      elevation_m: 2125.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 1449.0
+      h_mech_mean: 0.0003
+      h_mech_min: 0.0
+      h_mech_max: 0.015
+      h_mech_outer_spread_sd: 0.0021
+    - lat: 41.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 736.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.39583333333333
+      lon: 44.7375
+      elevation_m: 456.0
+      h_mech_mean: 0.0004
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0019595917942265427
+    - lat: 41.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 288.0
+      h_mech_mean: 0.0462
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.19574360781389516
+    - lat: 41.39583333333333
+      lon: 45.40416666666667
+      elevation_m: 484.0
+      h_mech_mean: 0.0275
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14142577558564068
+    - lat: 41.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 370.0
+      h_mech_mean: 0.0022
+      h_mech_min: 0.0
+      h_mech_max: 0.06
+      h_mech_outer_spread_sd: 0.008784076502399098
+    - lat: 41.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 641.0
+      h_mech_mean: 0.0073
+      h_mech_min: 0.0
+      h_mech_max: 0.23
+      h_mech_outer_spread_sd: 0.034325063729001286
+    - lat: 41.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 633.0
+      h_mech_mean: 0.0003
+      h_mech_min: 0.0
+      h_mech_max: 0.015
+      h_mech_outer_spread_sd: 0.0021000000000000003
+    - lat: 41.0625
+      lon: 43.40416666666667
+      elevation_m: 2786.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.0625
+      lon: 43.7375
+      elevation_m: 2004.0
+      h_mech_mean: 0.014100000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.545
+      h_mech_outer_spread_sd: 0.07742538343463337
+    - lat: 41.0625
+      lon: 44.07083333333333
+      elevation_m: 2228.0
+      h_mech_mean: 0.0026
+      h_mech_min: 0.0
+      h_mech_max: 0.075
+      h_mech_outer_spread_sd: 0.012893409169028956
+    - lat: 41.0625
+      lon: 44.40416666666667
+      elevation_m: 1555.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 41.0625
+      lon: 44.7375
+      elevation_m: 1593.0
+      h_mech_mean: 0.0005
+      h_mech_min: 0.0
+      h_mech_max: 0.025
+      h_mech_outer_spread_sd: 0.003500000000000001
+    - lat: 41.0625
+      lon: 45.07083333333333
+      elevation_m: 841.0
+      h_mech_mean: 0.006999999999999999
+      h_mech_min: 0.0
+      h_mech_max: 0.235
+      h_mech_outer_spread_sd: 0.03446737587922817
+    - lat: 41.0625
+      lon: 45.40416666666667
+      elevation_m: 578.0
+      h_mech_mean: 0.0034999999999999996
+      h_mech_min: 0.0
+      h_mech_max: 0.075
+      h_mech_outer_spread_sd: 0.01425657742938325
+    - lat: 41.0625
+      lon: 45.737500000000004
+      elevation_m: 263.0
+      h_mech_mean: 0.015600000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.435
+      h_mech_outer_spread_sd: 0.06325851721309945
+    - lat: 41.0625
+      lon: 46.07083333333333
+      elevation_m: 309.0
+      h_mech_mean: 0.0479
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.19098714616434267
+    - lat: 41.0625
+      lon: 46.40416666666667
+      elevation_m: 135.0
+      h_mech_mean: 0.08809999999999998
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.23834615583222651
+    - lat: 40.729166666666664
+      lon: 43.40416666666667
+      elevation_m: 1663.0
+      h_mech_mean: 0.0009000000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.035
+      h_mech_outer_spread_sd: 0.005068530358989675
+    - lat: 40.729166666666664
+      lon: 43.7375
+      elevation_m: 1484.0
+      h_mech_mean: 0.0042
+      h_mech_min: 0.0
+      h_mech_max: 0.15
+      h_mech_outer_spread_sd: 0.021245234759823196
+    - lat: 40.729166666666664
+      lon: 44.07083333333333
+      elevation_m: 2128.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 40.729166666666664
+      lon: 44.40416666666667
+      elevation_m: 2250.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.005
+      h_mech_outer_spread_sd: 0.0009797958971132714
+    - lat: 40.729166666666664
+      lon: 44.7375
+      elevation_m: 1974.0
+      h_mech_mean: 0.0041
+      h_mech_min: 0.0
+      h_mech_max: 0.16
+      h_mech_outer_spread_sd: 0.022818632737304837
+    - lat: 40.729166666666664
+      lon: 45.07083333333333
+      elevation_m: 1208.0
+      h_mech_mean: 0.006500000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.08
+      h_mech_outer_spread_sd: 0.019678668654154425
+    - lat: 40.729166666666664
+      lon: 45.40416666666667
+      elevation_m: 1911.0
+      h_mech_mean: 0.0004
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0016852299546352716
+    - lat: 40.729166666666664
+      lon: 45.737500000000004
+      elevation_m: 1681.0
+      h_mech_mean: 0.022400000000000003
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14018288055251255
+    - lat: 40.729166666666664
+      lon: 46.07083333333333
+      elevation_m: 611.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 40.729166666666664
+      lon: 46.40416666666667
+      elevation_m: 300.0
+      h_mech_mean: 0.042800000000000005
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.16242586001003656
+    - lat: 40.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 1804.0
+      h_mech_mean: 0.0015
+      h_mech_min: 0.0
+      h_mech_max: 0.04
+      h_mech_outer_spread_sd: 0.006946221994724902
+    - lat: 40.39583333333333
+      lon: 43.7375
+      elevation_m: 1480.0
+      h_mech_mean: 0.0108
+      h_mech_min: 0.0
+      h_mech_max: 0.435
+      h_mech_outer_spread_sd: 0.06121568426473725
+    - lat: 40.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 2240.0
+      h_mech_mean: 0.028599999999999993
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14167935629441575
+    - lat: 40.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 1681.0
+      h_mech_mean: 0.0075
+      h_mech_min: 0.0
+      h_mech_max: 0.25
+      h_mech_outer_spread_sd: 0.03644516428828384
+    - lat: 40.39583333333333
+      lon: 44.7375
+      elevation_m: 1950.0
+      h_mech_mean: 0.0003
+      h_mech_min: 0.0
+      h_mech_max: 0.015
+      h_mech_outer_spread_sd: 0.0021
+    - lat: 40.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 2106.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 40.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 2247.0
+      h_mech_mean: 0.0018
+      h_mech_min: 0.0
+      h_mech_max: 0.06
+      h_mech_outer_spread_sd: 0.008818163074019439
+    - lat: 40.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 2080.0
+      h_mech_mean: 0.0263
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14391250814296858
+    - lat: 40.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 1803.0
+      h_mech_mean: 0.0005
+      h_mech_min: 0.0
+      h_mech_max: 0.015
+      h_mech_outer_spread_sd: 0.0024999999999999996
+    - lat: 40.0625
+      lon: 43.40416666666667
+      elevation_m: 2072.0
+      h_mech_mean: 0.0062
+      h_mech_min: 0.0
+      h_mech_max: 0.31
+      h_mech_outer_spread_sd: 0.0434
+    - lat: 40.0625
+      lon: 43.7375
+      elevation_m: 998.0
+      h_mech_mean: 0.0336
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.15375317882892697
+    - lat: 40.0625
+      lon: 44.07083333333333
+      elevation_m: 858.0
+      h_mech_mean: 0.018099999999999998
+      h_mech_min: 0.0
+      h_mech_max: 0.31
+      h_mech_outer_spread_sd: 0.0588378279680683
+    - lat: 40.0625
+      lon: 44.7375
+      elevation_m: 1449.0
+      h_mech_mean: 0.0138
+      h_mech_min: 0.0
+      h_mech_max: 0.21
+      h_mech_outer_spread_sd: 0.03847804568841822
+    - lat: 40.0625
+      lon: 45.07083333333333
+      elevation_m: 2665.0
+      h_mech_mean: 0.012
+      h_mech_min: 0.0
+      h_mech_max: 0.33
+      h_mech_outer_spread_sd: 0.04848711168960264
+    - lat: 40.0625
+      lon: 45.40416666666667
+      elevation_m: 2569.0
+      h_mech_mean: 0.0019
+      h_mech_min: 0.0
+      h_mech_max: 0.095
+      h_mech_outer_spread_sd: 0.0133
+    - lat: 40.0625
+      lon: 45.737500000000004
+      elevation_m: 2696.0
+      h_mech_mean: 0.0005
+      h_mech_min: 0.0
+      h_mech_max: 0.025
+      h_mech_outer_spread_sd: 0.0035000000000000005
+    - lat: 40.0625
+      lon: 46.07083333333333
+      elevation_m: 2554.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.005
+      h_mech_outer_spread_sd: 0.0009797958971132714
+    - lat: 40.0625
+      lon: 46.40416666666667
+      elevation_m: 1814.0
+      h_mech_mean: 0.0021000000000000003
+      h_mech_min: 0.0
+      h_mech_max: 0.1
+      h_mech_outer_spread_sd: 0.014003213916812097
+    - lat: 39.729166666666664
+      lon: 43.40416666666667
+      elevation_m: 2316.0
+      h_mech_mean: 0.0005
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0020615528128088306
+    - lat: 39.729166666666664
+      lon: 43.7375
+      elevation_m: 1919.0
+      h_mech_mean: 0.0004
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0016852299546352716
+    - lat: 39.729166666666664
+      lon: 44.07083333333333
+      elevation_m: 2305.0
+      h_mech_mean: 0.0375
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14907464573159313
+    - lat: 39.729166666666664
+      lon: 44.40416666666667
+      elevation_m: 2152.0
+      h_mech_mean: 0.015300000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.39
+      h_mech_outer_spread_sd: 0.06429160131774601
+    - lat: 39.729166666666664
+      lon: 44.7375
+      elevation_m: 800.0
+      h_mech_mean: 0.028999999999999998
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.1416827441857335
+    - lat: 39.729166666666664
+      lon: 45.07083333333333
+      elevation_m: 1616.0
+      h_mech_mean: 0.043
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.15469647701224484
+    - lat: 39.729166666666664
+      lon: 45.40416666666667
+      elevation_m: 1179.0
+      h_mech_mean: 0.0123
+      h_mech_min: 0.0
+      h_mech_max: 0.345
+      h_mech_outer_spread_sd: 0.05067750980464608
+    - lat: 39.729166666666664
+      lon: 45.737500000000004
+      elevation_m: 2448.0
+      h_mech_mean: 0.0015
+      h_mech_min: 0.0
+      h_mech_max: 0.06
+      h_mech_outer_spread_sd: 0.008499999999999999
+    - lat: 39.729166666666664
+      lon: 46.07083333333333
+      elevation_m: 3189.0
+      h_mech_mean: 0.0011
+      h_mech_min: 0.0
+      h_mech_max: 0.04
+      h_mech_outer_spread_sd: 0.005940538696111658
+    - lat: 39.729166666666664
+      lon: 46.40416666666667
+      elevation_m: 1442.0
+      h_mech_mean: 0.0006999999999999999
+      h_mech_min: 0.0
+      h_mech_max: 0.02
+      h_mech_outer_spread_sd: 0.0031638584039112754
+    - lat: 39.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 2708.0
+      h_mech_mean: 0.026099999999999998
+      h_mech_min: 0.0
+      h_mech_max: 0.99
+      h_mech_outer_spread_sd: 0.14158139002001638
+    - lat: 39.39583333333333
+      lon: 43.7375
+      elevation_m: 2678.0
+      h_mech_mean: 0.011600000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.255
+      h_mech_outer_spread_sd: 0.04847102227104355
+    - lat: 39.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 2208.0
+      h_mech_mean: 0.0053
+      h_mech_min: 0.0
+      h_mech_max: 0.115
+      h_mech_outer_spread_sd: 0.0188257801963159
+    - lat: 39.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 1403.0
+      h_mech_mean: 0.0359
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.15033193273553028
+    - lat: 39.39583333333333
+      lon: 44.7375
+      elevation_m: 1704.0
+      h_mech_mean: 0.0337
+      h_mech_min: 0.0
+      h_mech_max: 0.495
+      h_mech_outer_spread_sd: 0.10006902617693447
+    - lat: 39.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 846.0
+      h_mech_mean: 0.03830000000000001
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.15131295384070725
+    - lat: 39.39583333333333
+      lon: 45.40416666666667
+      elevation_m: 1188.0
+      h_mech_mean: 0.009800000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.27
+      h_mech_outer_spread_sd: 0.043794520205158095
+    - lat: 39.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 2346.0
+      h_mech_mean: 0.020900000000000002
+      h_mech_min: 0.0
+      h_mech_max: 0.475
+      h_mech_outer_spread_sd: 0.08925071428285603
+    - lat: 39.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 2671.0
+      h_mech_mean: 0.0008
+      h_mech_min: 0.0
+      h_mech_max: 0.035
+      h_mech_outer_spread_sd: 0.004935585071701228
+    - lat: 39.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 1499.0
+      h_mech_mean: 0.015600000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.37
+      h_mech_outer_spread_sd: 0.05936025606413773
+    - lat: 39.0625
+      lon: 43.40416666666667
+      elevation_m: 1845.0
+      h_mech_mean: 0.016100000000000003
+      h_mech_min: 0.0
+      h_mech_max: 0.405
+      h_mech_outer_spread_sd: 0.06192971822961898
+    - lat: 39.0625
+      lon: 43.7375
+      elevation_m: 1996.0
+      h_mech_mean: 0.0129
+      h_mech_min: 0.0
+      h_mech_max: 0.21
+      h_mech_outer_spread_sd: 0.03686583784481237
+    - lat: 39.0625
+      lon: 44.07083333333333
+      elevation_m: 2237.0
+      h_mech_mean: 0.020300000000000002
+      h_mech_min: 0.0
+      h_mech_max: 0.585
+      h_mech_outer_spread_sd: 0.08614760588664085
+    - lat: 39.0625
+      lon: 44.40416666666667
+      elevation_m: 1877.0
+      h_mech_mean: 0.0034000000000000002
+      h_mech_min: 0.0
+      h_mech_max: 0.08
+      h_mech_outer_spread_sd: 0.013207573584879246
+    - lat: 39.0625
+      lon: 44.7375
+      elevation_m: 2604.0
+      h_mech_mean: 0.0492
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.19591671699985175
+    - lat: 39.0625
+      lon: 45.07083333333333
+      elevation_m: 1025.0
+      h_mech_mean: 0.07029999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.21049800474113764
+    - lat: 39.0625
+      lon: 45.40416666666667
+      elevation_m: 877.0
+      h_mech_mean: 0.0274
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14209236432687014
+    - lat: 39.0625
+      lon: 45.737500000000004
+      elevation_m: 977.0
+      h_mech_mean: 0.03269999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.1495433382000014
+    - lat: 39.0625
+      lon: 46.07083333333333
+      elevation_m: 3630.0
+      h_mech_mean: 0.0044
+      h_mech_min: 0.0
+      h_mech_max: 0.115
+      h_mech_outer_spread_sd: 0.01891137224000416
+    - lat: 39.0625
+      lon: 46.40416666666667
+      elevation_m: 1384.0
+      h_mech_mean: 0.022699999999999994
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14019703991169
+  ring_porous_oak:
+    status: ok
+    example_taxa: Quercus macranthera; Q. iberica
+    hyper_sd:
+      p50: 1.1
+      slope: 20.3
+    individual_sd:
+      p50: 0.55
+      slope: 10.15
+    hyper_sd_source_n:
+      p50: 37
+      slope: 16
+    n_cells: 78
+    h_mech_mean_across_cells: 0.07015897435897436
+    cells:
+    - lat: 41.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 1738.0
+      h_mech_mean: 0.010700000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.35
+      h_mech_outer_spread_sd: 0.05037866611969792
+    - lat: 41.39583333333333
+      lon: 43.7375
+      elevation_m: 2125.0
+      h_mech_mean: 0.003
+      h_mech_min: 0.0
+      h_mech_max: 0.07
+      h_mech_outer_spread_sd: 0.012369316876852983
+    - lat: 41.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 1449.0
+      h_mech_mean: 0.028300000000000002
+      h_mech_min: 0.0
+      h_mech_max: 0.99
+      h_mech_outer_spread_sd: 0.13931119840127715
+    - lat: 41.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 736.0
+      h_mech_mean: 0.0132
+      h_mech_min: 0.0
+      h_mech_max: 0.19
+      h_mech_outer_spread_sd: 0.04131295196424483
+    - lat: 41.39583333333333
+      lon: 44.7375
+      elevation_m: 456.0
+      h_mech_mean: 0.0203
+      h_mech_min: 0.0
+      h_mech_max: 0.375
+      h_mech_outer_spread_sd: 0.06917665791291164
+    - lat: 41.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 288.0
+      h_mech_mean: 0.1168
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.2611967840537092
+    - lat: 41.39583333333333
+      lon: 45.40416666666667
+      elevation_m: 484.0
+      h_mech_mean: 0.09539999999999998
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.24836835547227026
+    - lat: 41.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 370.0
+      h_mech_mean: 0.0655
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.1553198313159012
+    - lat: 41.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 641.0
+      h_mech_mean: 0.06139999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.20264264111978011
+    - lat: 41.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 633.0
+      h_mech_mean: 0.0194
+      h_mech_min: 0.0
+      h_mech_max: 0.575
+      h_mech_outer_spread_sd: 0.08592229047226338
+    - lat: 41.0625
+      lon: 43.40416666666667
+      elevation_m: 2786.0
+      h_mech_mean: 0.0009
+      h_mech_min: 0.0
+      h_mech_max: 0.04
+      h_mech_outer_spread_sd: 0.0056293871780150285
+    - lat: 41.0625
+      lon: 43.7375
+      elevation_m: 2004.0
+      h_mech_mean: 0.06559999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.22944855632581346
+    - lat: 41.0625
+      lon: 44.07083333333333
+      elevation_m: 2228.0
+      h_mech_mean: 0.049
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.194
+    - lat: 41.0625
+      lon: 44.40416666666667
+      elevation_m: 1555.0
+      h_mech_mean: 0.011800000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.37
+      h_mech_outer_spread_sd: 0.05413649416059376
+    - lat: 41.0625
+      lon: 44.7375
+      elevation_m: 1593.0
+      h_mech_mean: 0.0285
+      h_mech_min: 0.0
+      h_mech_max: 0.975
+      h_mech_outer_spread_sd: 0.13888574440884852
+    - lat: 41.0625
+      lon: 45.07083333333333
+      elevation_m: 841.0
+      h_mech_mean: 0.0631
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.21748997678054036
+    - lat: 41.0625
+      lon: 45.40416666666667
+      elevation_m: 578.0
+      h_mech_mean: 0.0725
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.20371855585586696
+    - lat: 41.0625
+      lon: 45.737500000000004
+      elevation_m: 263.0
+      h_mech_mean: 0.0975
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.22473373133555183
+    - lat: 41.0625
+      lon: 46.07083333333333
+      elevation_m: 309.0
+      h_mech_mean: 0.14930000000000002
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.3133704038354611
+    - lat: 41.0625
+      lon: 46.40416666666667
+      elevation_m: 135.0
+      h_mech_mean: 0.2547
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.3899761659383814
+    - lat: 40.729166666666664
+      lon: 43.40416666666667
+      elevation_m: 1663.0
+      h_mech_mean: 0.024900000000000002
+      h_mech_min: 0.0
+      h_mech_max: 0.475
+      h_mech_outer_spread_sd: 0.07751445026574078
+    - lat: 40.729166666666664
+      lon: 43.7375
+      elevation_m: 1484.0
+      h_mech_mean: 0.051800000000000006
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.15853315110726843
+    - lat: 40.729166666666664
+      lon: 44.07083333333333
+      elevation_m: 2128.0
+      h_mech_mean: 0.0189
+      h_mech_min: 0.0
+      h_mech_max: 0.375
+      h_mech_outer_spread_sd: 0.0682370134164736
+    - lat: 40.729166666666664
+      lon: 44.40416666666667
+      elevation_m: 2250.0
+      h_mech_mean: 0.004700000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.085
+      h_mech_outer_spread_sd: 0.016260688792299055
+    - lat: 40.729166666666664
+      lon: 44.7375
+      elevation_m: 1974.0
+      h_mech_mean: 0.053599999999999995
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.16896757085310776
+    - lat: 40.729166666666664
+      lon: 45.07083333333333
+      elevation_m: 1208.0
+      h_mech_mean: 0.09749999999999998
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.26738969688452846
+    - lat: 40.729166666666664
+      lon: 45.40416666666667
+      elevation_m: 1911.0
+      h_mech_mean: 0.014000000000000002
+      h_mech_min: 0.0
+      h_mech_max: 0.275
+      h_mech_outer_spread_sd: 0.04883646178829912
+    - lat: 40.729166666666664
+      lon: 45.737500000000004
+      elevation_m: 1681.0
+      h_mech_mean: 0.08070000000000001
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.24567460186189372
+    - lat: 40.729166666666664
+      lon: 46.07083333333333
+      elevation_m: 611.0
+      h_mech_mean: 0.014199999999999999
+      h_mech_min: 0.0
+      h_mech_max: 0.285
+      h_mech_outer_spread_sd: 0.04863496684485351
+    - lat: 40.729166666666664
+      lon: 46.40416666666667
+      elevation_m: 300.0
+      h_mech_mean: 0.10379999999999998
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.2719348451375807
+    - lat: 40.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 1804.0
+      h_mech_mean: 0.026099999999999998
+      h_mech_min: 0.0
+      h_mech_max: 0.485
+      h_mech_outer_spread_sd: 0.08086587661059513
+    - lat: 40.39583333333333
+      lon: 43.7375
+      elevation_m: 1480.0
+      h_mech_mean: 0.0638
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.16960412730827043
+    - lat: 40.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 2240.0
+      h_mech_mean: 0.1144
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.2614472030831464
+    - lat: 40.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 1681.0
+      h_mech_mean: 0.0693
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.1972485994880572
+    - lat: 40.39583333333333
+      lon: 44.7375
+      elevation_m: 1950.0
+      h_mech_mean: 0.0132
+      h_mech_min: 0.0
+      h_mech_max: 0.395
+      h_mech_outer_spread_sd: 0.058341751773494085
+    - lat: 40.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 2106.0
+      h_mech_mean: 0.025699999999999997
+      h_mech_min: 0.0
+      h_mech_max: 0.815
+      h_mech_outer_spread_sd: 0.1159483074477588
+    - lat: 40.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 2247.0
+      h_mech_mean: 0.0345
+      h_mech_min: 0.0
+      h_mech_max: 0.865
+      h_mech_outer_spread_sd: 0.13368339463074685
+    - lat: 40.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 2080.0
+      h_mech_mean: 0.0666
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.2347689076517587
+    - lat: 40.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 1803.0
+      h_mech_mean: 0.0348
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14694202938574114
+    - lat: 40.0625
+      lon: 43.40416666666667
+      elevation_m: 2072.0
+      h_mech_mean: 0.0301
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.14163152897571926
+    - lat: 40.0625
+      lon: 43.7375
+      elevation_m: 998.0
+      h_mech_mean: 0.10190000000000002
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.2656875796871205
+    - lat: 40.0625
+      lon: 44.07083333333333
+      elevation_m: 858.0
+      h_mech_mean: 0.11889999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.27905248610252514
+    - lat: 40.0625
+      lon: 44.7375
+      elevation_m: 1449.0
+      h_mech_mean: 0.1376
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.28925808545311227
+    - lat: 40.0625
+      lon: 45.07083333333333
+      elevation_m: 2665.0
+      h_mech_mean: 0.1174
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.30535756090196947
+    - lat: 40.0625
+      lon: 45.40416666666667
+      elevation_m: 2569.0
+      h_mech_mean: 0.028300000000000002
+      h_mech_min: 0.0
+      h_mech_max: 0.925
+      h_mech_outer_spread_sd: 0.13148996159403195
+    - lat: 40.0625
+      lon: 45.737500000000004
+      elevation_m: 2696.0
+      h_mech_mean: 0.03640000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.875
+      h_mech_outer_spread_sd: 0.12594459099143562
+    - lat: 40.0625
+      lon: 46.07083333333333
+      elevation_m: 2554.0
+      h_mech_mean: 0.0164
+      h_mech_min: 0.0
+      h_mech_max: 0.26
+      h_mech_outer_spread_sd: 0.04856994955731373
+    - lat: 40.0625
+      lon: 46.40416666666667
+      elevation_m: 1814.0
+      h_mech_mean: 0.0361
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.157414389431208
+    - lat: 39.729166666666664
+      lon: 43.40416666666667
+      elevation_m: 2316.0
+      h_mech_mean: 0.0233
+      h_mech_min: 0.0
+      h_mech_max: 0.375
+      h_mech_outer_spread_sd: 0.07482385983093896
+    - lat: 39.729166666666664
+      lon: 43.7375
+      elevation_m: 1919.0
+      h_mech_mean: 0.0216
+      h_mech_min: 0.0
+      h_mech_max: 0.28
+      h_mech_outer_spread_sd: 0.05902067434382633
+    - lat: 39.729166666666664
+      lon: 44.07083333333333
+      elevation_m: 2305.0
+      h_mech_mean: 0.1365
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.30182486643747564
+    - lat: 39.729166666666664
+      lon: 44.40416666666667
+      elevation_m: 2152.0
+      h_mech_mean: 0.08289999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.22487349777152485
+    - lat: 39.729166666666664
+      lon: 44.7375
+      elevation_m: 800.0
+      h_mech_mean: 0.12279999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.256903016720318
+    - lat: 39.729166666666664
+      lon: 45.07083333333333
+      elevation_m: 1616.0
+      h_mech_mean: 0.15170000000000003
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.2629441195387339
+    - lat: 39.729166666666664
+      lon: 45.40416666666667
+      elevation_m: 1179.0
+      h_mech_mean: 0.11030000000000001
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.26755636789282367
+    - lat: 39.729166666666664
+      lon: 45.737500000000004
+      elevation_m: 2448.0
+      h_mech_mean: 0.043199999999999995
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.15890173063878188
+    - lat: 39.729166666666664
+      lon: 46.07083333333333
+      elevation_m: 3189.0
+      h_mech_mean: 0.026000000000000002
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.142
+    - lat: 39.729166666666664
+      lon: 46.40416666666667
+      elevation_m: 1442.0
+      h_mech_mean: 0.036500000000000005
+      h_mech_min: 0.0
+      h_mech_max: 0.545
+      h_mech_outer_spread_sd: 0.1034081718240875
+    - lat: 39.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 2708.0
+      h_mech_mean: 0.07799999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.23928434967627948
+    - lat: 39.39583333333333
+      lon: 43.7375
+      elevation_m: 2678.0
+      h_mech_mean: 0.07959999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.21329519450751816
+    - lat: 39.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 2208.0
+      h_mech_mean: 0.05900000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.505
+      h_mech_outer_spread_sd: 0.12158536096093148
+    - lat: 39.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 1403.0
+      h_mech_mean: 0.1096
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.27035317641929046
+    - lat: 39.39583333333333
+      lon: 44.7375
+      elevation_m: 1704.0
+      h_mech_mean: 0.166
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.3213331604425538
+    - lat: 39.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 846.0
+      h_mech_mean: 0.1192
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.26789057467555666
+    - lat: 39.39583333333333
+      lon: 45.40416666666667
+      elevation_m: 1188.0
+      h_mech_mean: 0.07050000000000001
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.20006561423692976
+    - lat: 39.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 2346.0
+      h_mech_mean: 0.0951
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.24186254360690085
+    - lat: 39.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 2671.0
+      h_mech_mean: 0.040299999999999996
+      h_mech_min: 0.0
+      h_mech_max: 0.825
+      h_mech_outer_spread_sd: 0.13360168412112175
+    - lat: 39.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 1499.0
+      h_mech_mean: 0.10309999999999998
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.24593879319863307
+    - lat: 39.0625
+      lon: 43.40416666666667
+      elevation_m: 1845.0
+      h_mech_mean: 0.1174
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.24718665012496124
+    - lat: 39.0625
+      lon: 43.7375
+      elevation_m: 1996.0
+      h_mech_mean: 0.1359
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.31388483556871616
+    - lat: 39.0625
+      lon: 44.07083333333333
+      elevation_m: 2237.0
+      h_mech_mean: 0.0951
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.22162014800103355
+    - lat: 39.0625
+      lon: 44.40416666666667
+      elevation_m: 1877.0
+      h_mech_mean: 0.048600000000000004
+      h_mech_min: 0.0
+      h_mech_max: 0.995
+      h_mech_outer_spread_sd: 0.1610435965817952
+    - lat: 39.0625
+      lon: 44.7375
+      elevation_m: 2604.0
+      h_mech_mean: 0.12260000000000001
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.29219897330415107
+    - lat: 39.0625
+      lon: 45.07083333333333
+      elevation_m: 1025.0
+      h_mech_mean: 0.18859999999999996
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.3428819621969053
+    - lat: 39.0625
+      lon: 45.40416666666667
+      elevation_m: 877.0
+      h_mech_mean: 0.08529999999999999
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.23515826585514701
+    - lat: 39.0625
+      lon: 45.737500000000004
+      elevation_m: 977.0
+      h_mech_mean: 0.1158
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.26620924101165233
+    - lat: 39.0625
+      lon: 46.07083333333333
+      elevation_m: 3630.0
+      h_mech_mean: 0.0529
+      h_mech_min: 0.0
+      h_mech_max: 0.945
+      h_mech_outer_spread_sd: 0.19675388179144015
+    - lat: 39.0625
+      lon: 46.40416666666667
+      elevation_m: 1384.0
+      h_mech_mean: 0.07250000000000001
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.19672379113874355
+  pine:
+    status: ok
+    example_taxa: Pinus kochiana
+    hyper_sd:
+      p50: 0.61
+      slope: 38.3
+    individual_sd:
+      p50: 0.305
+      slope: 19.15
+    hyper_sd_source_n:
+      p50: 51
+      slope: 31
+    n_cells: 78
+    h_mech_mean_across_cells: 0.001791025641025641
+    cells:
+    - lat: 41.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 1738.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.39583333333333
+      lon: 43.7375
+      elevation_m: 2125.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 1449.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 736.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.39583333333333
+      lon: 44.7375
+      elevation_m: 456.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 288.0
+      h_mech_mean: 0.0127
+      h_mech_min: 0.0
+      h_mech_max: 0.49
+      h_mech_outer_spread_sd: 0.07114218158026923
+    - lat: 41.39583333333333
+      lon: 45.40416666666667
+      elevation_m: 484.0
+      h_mech_mean: 0.0015000000000000002
+      h_mech_min: 0.0
+      h_mech_max: 0.07
+      h_mech_outer_spread_sd: 0.00981070843517429
+    - lat: 41.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 370.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 641.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 41.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 633.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.0625
+      lon: 43.40416666666667
+      elevation_m: 2786.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.0625
+      lon: 43.7375
+      elevation_m: 2004.0
+      h_mech_mean: 0.0009
+      h_mech_min: 0.0
+      h_mech_max: 0.045
+      h_mech_outer_spread_sd: 0.006299999999999999
+    - lat: 41.0625
+      lon: 44.07083333333333
+      elevation_m: 2228.0
+      h_mech_mean: 0.0009
+      h_mech_min: 0.0
+      h_mech_max: 0.025
+      h_mech_outer_spread_sd: 0.004437341546466757
+    - lat: 41.0625
+      lon: 44.40416666666667
+      elevation_m: 1555.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.0625
+      lon: 44.7375
+      elevation_m: 1593.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.0625
+      lon: 45.07083333333333
+      elevation_m: 841.0
+      h_mech_mean: 0.0004
+      h_mech_min: 0.0
+      h_mech_max: 0.02
+      h_mech_outer_spread_sd: 0.0028000000000000004
+    - lat: 41.0625
+      lon: 45.40416666666667
+      elevation_m: 578.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 41.0625
+      lon: 45.737500000000004
+      elevation_m: 263.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 41.0625
+      lon: 46.07083333333333
+      elevation_m: 309.0
+      h_mech_mean: 0.0011
+      h_mech_min: 0.0
+      h_mech_max: 0.04
+      h_mech_outer_spread_sd: 0.005940538696111659
+    - lat: 41.0625
+      lon: 46.40416666666667
+      elevation_m: 135.0
+      h_mech_mean: 0.0013999999999999998
+      h_mech_min: 0.0
+      h_mech_max: 0.04
+      h_mech_outer_spread_sd: 0.0060033324079214545
+    - lat: 40.729166666666664
+      lon: 43.40416666666667
+      elevation_m: 1663.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.729166666666664
+      lon: 43.7375
+      elevation_m: 1484.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.729166666666664
+      lon: 44.07083333333333
+      elevation_m: 2128.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.729166666666664
+      lon: 44.40416666666667
+      elevation_m: 2250.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.005
+      h_mech_outer_spread_sd: 0.0009797958971132714
+    - lat: 40.729166666666664
+      lon: 44.7375
+      elevation_m: 1974.0
+      h_mech_mean: 0.001
+      h_mech_min: 0.0
+      h_mech_max: 0.04
+      h_mech_outer_spread_sd: 0.005656854249492379
+    - lat: 40.729166666666664
+      lon: 45.07083333333333
+      elevation_m: 1208.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.729166666666664
+      lon: 45.40416666666667
+      elevation_m: 1911.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.729166666666664
+      lon: 45.737500000000004
+      elevation_m: 1681.0
+      h_mech_mean: 0.0077
+      h_mech_min: 0.0
+      h_mech_max: 0.38
+      h_mech_outer_spread_sd: 0.05319031866796814
+    - lat: 40.729166666666664
+      lon: 46.07083333333333
+      elevation_m: 611.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.729166666666664
+      lon: 46.40416666666667
+      elevation_m: 300.0
+      h_mech_mean: 0.0041
+      h_mech_min: 0.0
+      h_mech_max: 0.16
+      h_mech_outer_spread_sd: 0.022708808863522546
+    - lat: 40.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 1804.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.39583333333333
+      lon: 43.7375
+      elevation_m: 1480.0
+      h_mech_mean: 0.0007000000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.035
+      h_mech_outer_spread_sd: 0.0049
+    - lat: 40.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 2240.0
+      h_mech_mean: 0.008700000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.395
+      h_mech_outer_spread_sd: 0.05529746829647809
+    - lat: 40.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 1681.0
+      h_mech_mean: 0.0001
+      h_mech_min: 0.0
+      h_mech_max: 0.005
+      h_mech_outer_spread_sd: 0.0007000000000000001
+    - lat: 40.39583333333333
+      lon: 44.7375
+      elevation_m: 1950.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 2106.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 2247.0
+      h_mech_mean: 0.0007000000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.025
+      h_mech_outer_spread_sd: 0.0036069377593742876
+    - lat: 40.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 2080.0
+      h_mech_mean: 0.0131
+      h_mech_min: 0.0
+      h_mech_max: 0.525
+      h_mech_outer_spread_sd: 0.07535841028047234
+    - lat: 40.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 1803.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.0625
+      lon: 43.40416666666667
+      elevation_m: 2072.0
+      h_mech_mean: 0.0004
+      h_mech_min: 0.0
+      h_mech_max: 0.02
+      h_mech_outer_spread_sd: 0.0028000000000000004
+    - lat: 40.0625
+      lon: 43.7375
+      elevation_m: 998.0
+      h_mech_mean: 0.0049
+      h_mech_min: 0.0
+      h_mech_max: 0.2
+      h_mech_outer_spread_sd: 0.028574289142514114
+    - lat: 40.0625
+      lon: 44.07083333333333
+      elevation_m: 858.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 40.0625
+      lon: 44.7375
+      elevation_m: 1449.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.0625
+      lon: 45.07083333333333
+      elevation_m: 2665.0
+      h_mech_mean: 0.004600000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.17
+      h_mech_outer_spread_sd: 0.02424541193710678
+    - lat: 40.0625
+      lon: 45.40416666666667
+      elevation_m: 2569.0
+      h_mech_mean: 0.0009
+      h_mech_min: 0.0
+      h_mech_max: 0.045
+      h_mech_outer_spread_sd: 0.006299999999999999
+    - lat: 40.0625
+      lon: 45.737500000000004
+      elevation_m: 2696.0
+      h_mech_mean: 0.0003
+      h_mech_min: 0.0
+      h_mech_max: 0.015
+      h_mech_outer_spread_sd: 0.0021
+    - lat: 40.0625
+      lon: 46.07083333333333
+      elevation_m: 2554.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 40.0625
+      lon: 46.40416666666667
+      elevation_m: 1814.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 39.729166666666664
+      lon: 43.40416666666667
+      elevation_m: 2316.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 39.729166666666664
+      lon: 43.7375
+      elevation_m: 1919.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 39.729166666666664
+      lon: 44.07083333333333
+      elevation_m: 2305.0
+      h_mech_mean: 0.0119
+      h_mech_min: 0.0
+      h_mech_max: 0.515
+      h_mech_outer_spread_sd: 0.07226956482503544
+    - lat: 39.729166666666664
+      lon: 44.40416666666667
+      elevation_m: 2152.0
+      h_mech_mean: 0.002
+      h_mech_min: 0.0
+      h_mech_max: 0.08
+      h_mech_outer_spread_sd: 0.011313708498984758
+    - lat: 39.729166666666664
+      lon: 44.7375
+      elevation_m: 800.0
+      h_mech_mean: 0.02
+      h_mech_min: 0.0
+      h_mech_max: 1.0
+      h_mech_outer_spread_sd: 0.13999999999999999
+    - lat: 39.729166666666664
+      lon: 45.07083333333333
+      elevation_m: 1616.0
+      h_mech_mean: 0.0013
+      h_mech_min: 0.0
+      h_mech_max: 0.045
+      h_mech_outer_spread_sd: 0.006841783393238929
+    - lat: 39.729166666666664
+      lon: 45.40416666666667
+      elevation_m: 1179.0
+      h_mech_mean: 0.0004
+      h_mech_min: 0.0
+      h_mech_max: 0.015
+      h_mech_outer_spread_sd: 0.0021999999999999997
+    - lat: 39.729166666666664
+      lon: 45.737500000000004
+      elevation_m: 2448.0
+      h_mech_mean: 0.0006
+      h_mech_min: 0.0
+      h_mech_max: 0.03
+      h_mech_outer_spread_sd: 0.0042
+    - lat: 39.729166666666664
+      lon: 46.07083333333333
+      elevation_m: 3189.0
+      h_mech_mean: 0.0007000000000000001
+      h_mech_min: 0.0
+      h_mech_max: 0.025
+      h_mech_outer_spread_sd: 0.003742993454442581
+    - lat: 39.729166666666664
+      lon: 46.40416666666667
+      elevation_m: 1442.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 39.39583333333333
+      lon: 43.40416666666667
+      elevation_m: 2708.0
+      h_mech_mean: 0.010899999999999998
+      h_mech_min: 0.0
+      h_mech_max: 0.425
+      h_mech_outer_spread_sd: 0.06113665021899711
+    - lat: 39.39583333333333
+      lon: 43.7375
+      elevation_m: 2678.0
+      h_mech_mean: 0.0015
+      h_mech_min: 0.0
+      h_mech_max: 0.045
+      h_mech_outer_spread_sd: 0.007158910531638176
+    - lat: 39.39583333333333
+      lon: 44.07083333333333
+      elevation_m: 2208.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 39.39583333333333
+      lon: 44.40416666666667
+      elevation_m: 1403.0
+      h_mech_mean: 0.0011
+      h_mech_min: 0.0
+      h_mech_max: 0.035
+      h_mech_outer_spread_sd: 0.005223983154643591
+    - lat: 39.39583333333333
+      lon: 44.7375
+      elevation_m: 1704.0
+      h_mech_mean: 0.0006
+      h_mech_min: 0.0
+      h_mech_max: 0.02
+      h_mech_outer_spread_sd: 0.003104834939252005
+    - lat: 39.39583333333333
+      lon: 45.07083333333333
+      elevation_m: 846.0
+      h_mech_mean: 0.0013
+      h_mech_min: 0.0
+      h_mech_max: 0.055
+      h_mech_outer_spread_sd: 0.007798076685952761
+    - lat: 39.39583333333333
+      lon: 45.40416666666667
+      elevation_m: 1188.0
+      h_mech_mean: 0.0001
+      h_mech_min: 0.0
+      h_mech_max: 0.005
+      h_mech_outer_spread_sd: 0.0007000000000000001
+    - lat: 39.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 2346.0
+      h_mech_mean: 0.0011
+      h_mech_min: 0.0
+      h_mech_max: 0.05
+      h_mech_outer_spread_sd: 0.007020683727387243
+    - lat: 39.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 2671.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 39.39583333333333
+      lon: 46.40416666666667
+      elevation_m: 1499.0
+      h_mech_mean: 0.0001
+      h_mech_min: 0.0
+      h_mech_max: 0.005
+      h_mech_outer_spread_sd: 0.0007000000000000001
+    - lat: 39.0625
+      lon: 43.40416666666667
+      elevation_m: 1845.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.01
+      h_mech_outer_spread_sd: 0.0014000000000000002
+    - lat: 39.0625
+      lon: 43.7375
+      elevation_m: 1996.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 39.0625
+      lon: 44.07083333333333
+      elevation_m: 2237.0
+      h_mech_mean: 0.0002
+      h_mech_min: 0.0
+      h_mech_max: 0.005
+      h_mech_outer_spread_sd: 0.0009797958971132714
+    - lat: 39.0625
+      lon: 44.40416666666667
+      elevation_m: 1877.0
+      h_mech_mean: 0.0
+      h_mech_min: 0.0
+      h_mech_max: 0.0
+      h_mech_outer_spread_sd: 0.0
+    - lat: 39.0625
+      lon: 44.7375
+      elevation_m: 2604.0
+      h_mech_mean: 0.0118
+      h_mech_min: 0.0
+      h_mech_max: 0.42
+      h_mech_outer_spread_sd: 0.06090779917219141
+    - lat: 39.0625
+      lon: 45.07083333333333
+      elevation_m: 1025.0
+      h_mech_mean: 0.0023
+      h_mech_min: 0.0
+      h_mech_max: 0.035
+      h_mech_outer_spread_sd: 0.007629547824084991
+    - lat: 39.0625
+      lon: 45.40416666666667
+      elevation_m: 877.0
+      h_mech_mean: 0.0005
+      h_mech_min: 0.0
+      h_mech_max: 0.025
+      h_mech_outer_spread_sd: 0.003500000000000001
+    - lat: 39.0625
+      lon: 45.737500000000004
+      elevation_m: 977.0
+      h_mech_mean: 0.0023
+      h_mech_min: 0.0
+      h_mech_max: 0.115
+      h_mech_outer_spread_sd: 0.0161
+    - lat: 39.0625
+      lon: 46.07083333333333
+      elevation_m: 3630.0
+      h_mech_mean: 0.001
+      h_mech_min: 0.0
+      h_mech_max: 0.035
+      h_mech_outer_spread_sd: 0.005291502622129181
+    - lat: 39.0625
+      lon: 46.40416666666667
+      elevation_m: 1384.0
+      h_mech_mean: 0.0009
+      h_mech_min: 0.0
+      h_mech_max: 0.045
+      h_mech_outer_spread_sd: 0.006299999999999999
+  juniper_arid_conifer:
+    status: skipped_no_real_trait_variance_estimate
+    example_taxa: Juniperus polycarpos; J. excelsa
