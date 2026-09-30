@@ -18,6 +18,13 @@
 # See IMPLEMENTATION_LOG.md for both reconnaissance passes and a real bug caught in the CHELSA
 # pull (filenames are DD_MM_YYYY, not MM_DD_YYYY -- verified empirically via the actual seasonal
 # temperature signal before trusting the naive guess).
+#
+# 2026-09-30: future-projection ensemble decision (user's explicit choice, ROADMAP.md S1.1) --
+# run CORDEX/CMIP5 (hyperion) AND NASA/GDDP-CMIP6 + ISIMIP3b (both confirmed directly accessible,
+# no institutional gate) as two SEPARATE, LABELLED ensembles rather than picking one or silently
+# merging them. See future_ensembles: below. This is the most scientifically thorough option
+# (captures structural uncertainty across CMIP generations) at the cost of roughly double the
+# future-projection workload -- accepted deliberately, not a default.
 
 reference_period: [1991, 2020]      # fixed reference for SPEI / anomalies (future is standardised against it);
                                      # now actually covered by the CHELSA-daily pull (1979-2024/2019)
@@ -41,36 +48,74 @@ historical_source:
     file confirmed.
 
 scenarios:
-  primary: [rcp26, rcp85]           # the only RCPs found, present for every GCM below; no RCP4.5/RCP6.0 seen
-  overshoot_where_available: []     # CMIP5/RCP has no ScenarioMIP-style overshoot pathway; Sec. 10.1's overshoot
-                                     # stress test (SSP5-3.4-OS) has no CMIP5 equivalent and is dropped, not substituted
+  primary: [rcp26, rcp85, ssp126, ssp370, ssp585]   # union across both ensembles -- see future_ensembles: below
+                                                      # for which scenarios exist in which ensemble
+  overshoot_where_available: []     # neither CMIP5/RCP nor the CMIP6/SSP sources pulled here include a
+                                     # ScenarioMIP-style overshoot pathway for this bbox; Sec. 10.1's overshoot
+                                     # stress test (SSP5-3.4-OS) is dropped, not substituted
   storyline_note: >
-    RCP8.5 is treated as a high-end stress test, not a forecast (as SSP5-8.5 was in the concept note;
-    Hausfather & Peters 2020's caution about "business as usual" framing applies equally to RCP8.5).
+    RCP8.5/SSP5-8.5 are treated as high-end stress tests, not forecasts (Hausfather & Peters 2020's caution
+    about "business as usual" framing applies to both).
+  rcp_ssp_correspondence: >
+    RCPs (CMIP5) and SSPs (CMIP6) are related but NOT interchangeable by matching number -- see
+    configs/co2_concentration_pathways.csv for the real forcing numbers: rcp26 and ssp126 both stay low but
+    diverge (~421 vs ~446 ppm CO2 by 2100), rcp85 and ssp585 diverge much more sharply (~936 vs ~1135 ppm).
+    Never plot or average an RCP-sourced and an SSP-sourced ensemble member together under a shared "low/high"
+    label without checking this table first.
 
-gcms:
+future_ensembles:
   role: "future projections only (2025 onward) -- the historical/reference period is served by CHELSA-daily above"
-  primary_source: "CORDEX WAS-22 regional climate models, bias-adjusted; hyperion.wsl.ch:/storage/zilker/chelsaV2/output/FORACCA/Armenia/"
-  primary_models: [MOHC-HadGEM2-ES, MPI-M-MPI-ESM-LR, MPI-M-MPI-ESM-MR, NCC-NorESM1-M]   # CMIP5; confirmed present on hyperion
-  regional_models: [GERICS-REMO2015, ORNL-RegCM4-7]   # both seen on hyperion; which RCM backs which GCM x RCP
-                                                        # combination varies (e.g. NCC-NorESM1-M carries both for
-                                                        # some RCPs) and must be enumerated exactly in the data
-                                                        # manifest before any pull, not assumed from this listing
-  secondary_source: null            # NEX-GDDP-CMIP6 was the concept note's secondary source; not found on hyperion,
-                                     # not substituted with anything
-  hot_model_policy: >
-    Not yet restated for CMIP5: the concept note's ECS-based screening (Zelinka et al. 2020; Hausfather et al.
-    2022) is CMIP6-specific and its numbers do not carry over to these CMIP5 models. Needs its own
-    literature-sourced ECS values per model before an equivalent policy can be written here -- flagged rather
-    than guessed at.
-  members: "use all available realisations per model to sample internal variability"
-  bias_adjustment_note: >
-    Filenames on hyperion (*_sim_hist_ba.nc, weights_pr.nc, *_qm_transfer_plot.png) indicate this RCM output is
-    already empirical-quantile-mapping bias-adjusted upstream, most likely against CHELSA itself as the
-    observational reference -- not confirmed. This differs from Sec. 5.1's assumption that raw ISIMIP3b arrives
-    already trend-preserving and only needs QDM against ERA5-Land: antar.climate.bias.quantile_delta_mapping
-    applied to this data would be correcting an already-adjusted product, not a raw GCM field. Confirm the exact
-    upstream reference before wiring this data through TOPOHYDRO's bias-adjustment step.
+  decision_note: >
+    2026-09-30, user's explicit choice (ROADMAP.md S1.1): run both ensembles below as separate, labelled
+    members rather than picking one -- the most scientifically thorough option, accepted at the cost of
+    roughly double the future-projection workload.
+
+  cordex_cmip5:
+    source: "CORDEX WAS-22 regional climate models, bias-adjusted; hyperion.wsl.ch:/storage/zilker/chelsaV2/output/Armenia/"
+    scenarios: [rcp26, rcp85]         # the only RCPs found, present for every GCM below; no RCP4.5/RCP6.0 seen
+    models: [MOHC-HadGEM2-ES, MPI-M-MPI-ESM-LR, MPI-M-MPI-ESM-MR, NCC-NorESM1-M]   # CMIP5; confirmed present on hyperion
+    regional_models: [GERICS-REMO2015, ORNL-RegCM4-7]   # both seen on hyperion; which RCM backs which GCM x RCP
+                                                          # combination varies (e.g. NCC-NorESM1-M carries both for
+                                                          # some RCPs) and must be enumerated exactly in the data
+                                                          # manifest before any pull, not assumed from this listing
+    status: "2 of 4 variables (pr, tas) done for 1 of 8 GCM x RCP combinations (MOHC-HadGEM2-ES/rcp26); tasrange/
+      tasskew for that combination plus the other 7 combinations still pending -- blocked on hyperion
+      office-network/VPN access (confirmed DNS-unreachable from outside it, IMPLEMENTATION_LOG.md 2026-09-28)."
+    hot_model_policy: >
+      Not yet restated for CMIP5: the concept note's ECS-based screening (Zelinka et al. 2020; Hausfather et al.
+      2022) is CMIP6-specific and its numbers do not carry over to these CMIP5 models. Needs its own
+      literature-sourced ECS values per model before an equivalent policy can be written here -- flagged rather
+      than guessed at.
+    members: "use all available realisations per model to sample internal variability"
+    bias_adjustment_note: >
+      Filenames on hyperion (*_sim_hist_ba.nc, weights_pr.nc, *_qm_transfer_plot.png) indicate this RCM output is
+      already empirical-quantile-mapping bias-adjusted upstream, most likely against CHELSA itself as the
+      observational reference -- not confirmed. This differs from Sec. 5.1's assumption that raw ISIMIP3b arrives
+      already trend-preserving and only needs QDM against ERA5-Land: antar.climate.bias.quantile_delta_mapping
+      applied to this data would be correcting an already-adjusted product, not a raw GCM field. Confirm the exact
+      upstream reference before wiring this data through TOPOHYDRO's bias-adjustment step.
+
+  cmip6:
+    source_primary: "NASA/GDDP-CMIP6 on Google Earth Engine (ee.ImageCollection('NASA/GDDP-CMIP6'); note the
+      asset id is NASA/GDDP-CMIP6, not NEX-GDDP-CMIP6). Confirmed directly against the Earth Engine Data
+      Catalog, 2026-09-30 (ROADMAP.md S1.1)."
+    source_fallback: "AWS Open Data s3://nex-gddp-cmip6 (NetCDF, --no-sign-request, full 35-model x 4-SSP
+      archive) if the EE ingestion turns out not to carry ssp126/ssp370 (only historical/ssp245/ssp585 are
+      documented on the EE catalog page as of the check date -- not yet independently verified in the Code
+      Editor)."
+    source_isimip3b: "data.isimip.org via the official isimip-client Python package (cutout_bbox), for the
+      concept note's original 5-GCM ensemble specifically. The portal sits behind an anti-bot gate (\"Anubis\")
+      that blocked a direct scripted fetch during research -- a live isimip-client test is still needed before
+      this path is trusted at scale, not yet done."
+    scenarios: [ssp126, ssp245, ssp370, ssp585]
+    models_isimip3b: [GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0, UKESM1-0-LL]   # the concept note's
+                                                                                            # original 5 ISIMIP3b models
+    resolution: "0.25 deg (NASA/GDDP-CMIP6) or 0.5 deg (ISIMIP3b) -- coarser than CORDEX's WAS-22 regional
+      downscaling; needs its own regridding-to-master-grid step, not assumed equivalent."
+    bias_adjustment_note: "NASA/GDDP-CMIP6 is already bias-corrected (BCSD method). ISIMIP3b is bias-adjusted
+      against W5E5 v1.0. Neither needs antar.climate.bias.quantile_delta_mapping re-applied as a raw-GCM
+      correction step -- same caution as the CORDEX note above, for a different reason."
+    status: "Access confirmed 2026-09-30; no pull attempted yet."
 
 structural_ensemble:
   pet_formulations: [pm_fao56, canopy_pm_co2, priestley_taylor, energy_only]
@@ -90,6 +135,13 @@ primary_variable_status:              # Table 4's "pr, tas, tasmax, tasmin"
   # For the future period, tasmax/tasmin have no direct CORDEX source on hyperion and must be
   # derived from tas + tasrange (min/max around the mean, tasskew informing the asymmetry) --
   # not yet implemented; a real follow-up, not a silent gap.
+  future_cmip6:
+    pr: present
+    tas: present
+    tasmax: present                   # NASA/GDDP-CMIP6 carries tasmax/tasmin directly -- CORDEX's
+    tasmin: present                   # gap above does not apply to this ensemble at all
+  # Access confirmed 2026-09-30 (NASA/GDDP-CMIP6 EE catalog, ISIMIP3b via isimip-client); no
+  # actual pull run yet, so "present" here means "confirmed available to pull", not "pulled".
 
 legacy_data_note: >
   A version1/ subtree under the same Armenia/ directory holds derived indices (tmean/pr seasonal and annual
