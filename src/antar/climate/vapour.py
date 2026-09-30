@@ -92,3 +92,14 @@ def pressure_from_elevation(z_m):
 
 def psychrometric_constant(pressure_kpa):
     return 0.000665 * np.asarray(pressure_kpa, dtype=float)
+
+
+def wind_speed_2m(u_z_m_s, z_m: float = 10.0):
+    """Log-wind-profile height correction to the FAO-56 reference height of 2 m
+    (Allen et al. 1998, FAO-56, Eq. 47) -- ERA5-Land's wind is reported at 10 m,
+    not 2 m, and ``antar.climate.pet.pm_fao56``'s ``u2`` argument is specifically
+    the 2 m value; using the 10 m value unconverted would overstate the
+    aerodynamic term everywhere.
+    """
+    u_z = np.asarray(u_z_m_s, dtype=float)
+    return u_z * 4.87 / np.log(67.8 * z_m - 5.42)

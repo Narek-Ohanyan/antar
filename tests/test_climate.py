@@ -37,6 +37,23 @@ def test_pressure_fao56_example():
     assert vapour.pressure_from_elevation(1800.0) == pytest.approx(81.8, abs=0.1)
 
 
+def test_wind_speed_2m_reduces_10m_wind_by_known_factor():
+    # The FAO-56 Eq. 47 form (u2 = uz * 4.87/ln(67.8z-5.42)) is standard and widely
+    # reproduced; at z=10m this factor is well-known to be close to 0.75 -- checked
+    # against that ballpark rather than a specific textbook worked example, since
+    # the exact example number wasn't independently confirmed this session.
+    u2 = vapour.wind_speed_2m(4.0, z_m=10.0)
+    assert 2.9 < u2 < 3.1  # ~0.75 reduction factor
+    assert u2 < 4.0  # 2m wind must always be lower than 10m wind, not just numerically close
+
+
+def test_net_radiation_from_era5_seasonal_ordering():
+    summer = radiation.net_radiation_from_era5(ssrd_j_m2=22e6, strd_j_m2=27e6, t_mean_c=25.0)
+    winter = radiation.net_radiation_from_era5(ssrd_j_m2=8e6, strd_j_m2=20e6, t_mean_c=2.0)
+    assert summer > winter
+    assert 3.0 < summer < 18.0  # plausible MJ/m2/day range for vegetated summer conditions
+
+
 def test_v1_vpd_formula_understates_afternoon_vpd():
     """Worked example: Tmax 30, Tmean 22, daily-mean RH 50 %. Physical e_a = RH * es(Tmean)."""
     ea = vapour.actual_vapour_pressure_from_rh(50.0, 22.0)

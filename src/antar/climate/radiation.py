@@ -92,3 +92,32 @@ def sky_view_factor_from_horizon(horizon_elev_rad):
 def sky_view_factor_planar_slope(slope_rad):
     """Isotropic sky-view factor of an unobstructed planar slope, (1 + cos b)/2."""
     return 0.5 * (1.0 + np.cos(slope_rad))
+
+
+def net_radiation_from_era5(ssrd_j_m2, strd_j_m2, t_mean_c, albedo: float = 0.15,
+                             emissivity: float = 0.97):
+    """Net radiation (MJ m-2 day-1) from ERA5-Land's downward shortwave
+    (``surface_solar_radiation_downwards_sum``) and downward longwave
+    (``surface_thermal_radiation_downwards_sum``), both J m-2, plus emitted
+    longwave via Stefan-Boltzmann:
+
+        Rn = (1 - albedo) * Rs_down + Rl_down - emissivity * sigma * T^4
+
+    Deliberately not the FAO-56 Eq. 39 net-longwave parameterisation (which
+    estimates downward longwave from humidity/cloudiness proxies): ERA5-Land
+    already provides the real reanalysis downward longwave directly, so using
+    it is more direct than approximating what it already measures.
+
+    ``albedo`` (0.15) and ``emissivity`` (0.97) are literature-typical values
+    for a mixed forest/vegetated surface (FAO-56 Table 11-ish range for forest
+    is ~0.12-0.18; emissivity for vegetated/soil surfaces is commonly taken as
+    0.95-0.98) -- assumed constants, not measured for this site, and flagged
+    as such rather than presented as calibrated.
+    """
+    from ..constants import STEFAN_BOLTZMANN
+
+    rs_down_mj = np.asarray(ssrd_j_m2, dtype=float) / 1.0e6
+    rl_down_mj = np.asarray(strd_j_m2, dtype=float) / 1.0e6
+    t_k = np.asarray(t_mean_c, dtype=float) + 273.15
+    rl_up_mj = emissivity * STEFAN_BOLTZMANN * t_k ** 4
+    return (1.0 - albedo) * rs_down_mj + rl_down_mj - rl_up_mj
