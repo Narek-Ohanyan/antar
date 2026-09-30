@@ -83,14 +83,17 @@ aren't.
       (2-3 stations) — not pulled, supplementary only if ever needed.
 
 ### 1.3 Terrain and accessibility
-- [ ] **Copernicus GLO-30 full Armenia coverage** — the earlier Earth-Engine gap (only ~3/14
-      tiles) is very likely because Armenia/Azerbaijan/Moldova were licensing-excluded from the
-      public GLO-30 release until version 2023_1 (~Dec 2023) — EE's static ingestion predates
-      that. **UNVERIFIED but high-confidence**: check whether EE now has a newer
-      `COPERNICUS/DEM/GLO30/2024_1` asset with full coverage before switching away from SRTM.
-      Confirmed live alternatives regardless: AWS `s3://copernicus-dem-30m` (no account,
-      `--no-sign-request`, 1°×1° COG tiles), OpenTopography REST API (free account+key), or
-      Copernicus Data Space Ecosystem (free account, S3/STAC API).
+- [x] **Copernicus GLO-30 Armenia gap — resolved definitively (2026-09-30), SRTM confirmed
+      correct.** The "licensing exclusion lifted ~Dec 2023" theory was checked directly against
+      the authoritative source itself (Copernicus Data Space Ecosystem's own STAC API,
+      `stac.dataspace.copernicus.eu`, collection `cop-dem-glo-30-dged-cog`) and against the AWS
+      Open Data mirror (`copernicus-dem-30m`, tile-by-tile listing) — both return the exact same
+      3 tiles as Earth Engine's copy (`N38/E043`, `N38/E044`, `N39/E043`), covering only the
+      southwest corner. This is not a stale-mirror artifact: **Armenia genuinely has zero
+      Copernicus GLO-30 coverage anywhere in the Copernicus system as of today.** The earlier
+      "should have full coverage now" note (from the initial research pass) was wrong — corrected
+      here after checking the primary source directly rather than trusting it. SRTM 30 m stays
+      the right substitute; no further action needed on this item.
 - [ ] **Road network / accessibility** — **CONFIRMED**, two real options: OpenStreetMap via
       Geofabrik (`download.geofabrik.de/asia/armenia.html`, full national coverage, ODbL, zero
       registration — the simplest path) or the Malaria Atlas Project's global travel-time-to-

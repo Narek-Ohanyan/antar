@@ -658,3 +658,14 @@ nothing but a small JSON summary remains on local disk. Registered in
 `configs/manifests/ghcnd_armenia.yaml`. This closes the "Armhydromet stations are
 institution-only" item from the earlier manual-data assessment -- they were not; that assessment
 was wrong, corrected here rather than left standing.
+
+**Copernicus GLO-30's Armenia gap re-checked against the primary source, not the earlier
+research pass's guess.** That guess (licensing exclusion lifted ~Dec 2023, so AWS/CDSE should
+have full coverage now) was wrong. Checked directly: AWS `copernicus-dem-30m` bucket listing
+(`?list-type=2&prefix=...` against all 16 tiles the study bbox needs) and Copernicus Data Space
+Ecosystem's own STAC API (`stac.dataspace.copernicus.eu`, collection `cop-dem-glo-30-dged-cog`,
+bbox search) both return exactly the same 3 tiles as Earth Engine's `COPERNICUS/DEM/GLO30`
+(`N38/E043`, `N38/E044`, `N39/E043`). Armenia has no Copernicus GLO-30 coverage anywhere in the
+Copernicus system right now, confirmed from the authoritative catalog itself -- not a stale-copy
+problem. SRTM 30 m (`USGS/SRTMGL1_003`, already in `export_terrain`) remains the correct choice;
+this closes the question rather than leaving a plausible-sounding but unverified claim standing.
