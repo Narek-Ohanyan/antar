@@ -1059,3 +1059,250 @@ This unblocks (but does not itself complete) a real gridded TOPOHYDRO forcing ru
 missing pieces are ERA5-Land (registered, not yet loaded into per-cell forcing), terrain
 slope/aspect/concavity (SRTM registered, not yet processed), and a real per-cell orchestration
 script tying `topoclimate_forcing` to actual grid cells -- still open, stated plainly.
+
+## 2026-09-30 (cont.) -- terrain concavity index, wind-height correction, ERA5-derived net radiation
+
+Two more gaps in `topoclimate_forcing`'s real-data path closed. `src/antar/climate/terrain.py`:
+a TPI-style concavity index (sign-flipped so basins are positive, ridges negative, matching
+`downscale.cold_air_pooling_index`'s own convention), vectorized via `scipy.ndimage.uniform_filter`
+with an explicit valid-pixel count so edge pixels use their real, smaller neighbourhood rather than
+a padded/wrapped value -- verified against hand-computed cases (flat=0, a single pit/peak, a 3x3
+grid with a known edge-window count) before trusting it at scale. `src/antar/climate/vapour.py`
+gained `wind_speed_2m` (FAO-56's standard 10m-to-2m log-wind-profile correction -- ERA5-Land reports
+at 10m, `pet.pm_fao56` specifically wants 2m). `src/antar/climate/radiation.py` gained
+`net_radiation_from_era5`, computed directly from ERA5-Land's real downward shortwave/longwave
+rather than the FAO-56 parametric approximation (more direct, since ERA5-Land already provides what
+that approximation exists to estimate).
+
+A real near-mistake caught while testing the wind correction: almost cited a specific FAO-56
+textbook worked example's numbers from memory as a verified check. Realized mid-test that the
+"expected" value was just this same formula's own output, not an independently confirmed number --
+kept only the ballpark reduction factor (~0.75), which is independently well-established elsewhere,
+and dropped the unverified specific example. 7 new tests across the three modules, full suite: 152
+passed.
+
+## 2026-09-30 (cont.) -- the first real, gridded TOPOHYDRO forcing run
+
+Every piece above existed in isolation; nothing had actually been run together against real gridded
+data end to end. `scripts/run_topohydro_grid.py` does that for the first time: 80 grid points (an
+8x10 regular subsample of CHELSA-daily's own 312x396 Armenia grid), one year (2019 -- the most recent
+year common to CHELSA's tas/tasmax/tasmin (through 2024) and pr (stops 2019-12-31, a real, confirmed
+archive gap, not an oversight)).
+
+Real inputs, all either streamed or already-fitted this session: SRTM elevation/slope/aspect (GEE
+export, `ee.Terrain.products`), terrain concavity (this session's new module, on a 7x7/210m local
+window), SoilGrids clay/sand/soc (-> `soil_hydraulic_parameters`), ERA5-Land annual-mean
+wind/radiation/dewpoint/pressure, CHELSA-daily reference tas/tasmax/tasmin/pr, and the real monthly
+lapse-rate/precip-gradient fit from `configs/fitted/topohydro_lapse_rate.yaml`.
+
+**A real, easy-to-miss unit bug caught before trusting the soil inputs**: SoilGrids' GEE-mapped
+clay/sand/silt/soc bands are per-mille (g/kg, 0-1000), not the percent/g-kg `soil_hydraulic_parameters`
+expects -- caught by sampling real points and checking clay+sand+silt actually summed to ~1000 (they
+did, exactly, at every point tried), not assumed from the band name alone. Fixed with an explicit /10
+conversion, documented at the point of use.
+
+**terrain.tif, soils.tif and all 16 ERA5-Land tiles are read via GDAL `/vsicurl/` HTTP range-request
+streaming** (Drive's download endpoint, authenticated with the existing Earth Engine OAuth refresh
+token) rather than downloaded whole -- soils.tif is 416 MB, terrain.tif 421 MB, and the 16 ERA5-Land
+tiles are 15+ GB combined, and only a few dozen small windows/pixels are actually needed. Verified
+the ERA5-Land export tiles share the exact same pixel grid/origin as terrain.tif (checked the
+bottom-right tile's bounds arithmetically against terrain.tif's own transform before trusting the
+tile-offset-to-file-id mapping), so each grid point's tile is computed directly (`(row // 3072) *
+3072`), never probed by downloading tiles to check their bounds.
+
+**Two real, defensible modelling choices specific to this run**, not framework defaults: (1) `z_ref_m`
+(the elevation the lapse-rate downscaling treats CHELSA's ~1km pixel as representing) is the SRTM
+elevation averaged over a ~930m window around each point, not the point's own exact elevation --
+lets the lapse-rate correction do real work instead of degenerately downscaling a point to itself
+(max real z_ref-z_cell spread across the 80 points: 124m). (2) Net radiation, an input this function
+requires from upstream, is built from ERA5-Land's annual-mean ssrd/strd plus emitted longwave
+evaluated at each day's *downscaled* t_mean_c -- computed via one extra call to
+`downscale.downscale_temperature` up front (the same call `topoclimate_forcing` makes internally),
+avoiding a circular dependency without approximating.
+
+Three explicit, documented placeholders (no real data source exists for any of them yet):
+`calm_clear_night_frac=0.3`, `gdd_budburst=200` GDD-days, `rooting_depth_mm=1000` (feeding
+`w_max_mm`).
+
+**Results, checked for physical plausibility, not just "it ran"**: 78/80 points produced real output
+(2 skipped -- real missing soil/ERA5-Land data, not silently filled). Elevation-temperature
+correlation across the 78 points: -0.97 (real lapse-rate downscaling doing exactly what it should).
+Annual precipitation 225-974mm, GDD 315-4403, growing season 149-365 days, minimum soil water
+potential -1.42 to -0.23 MPa -- all in textbook-plausible ranges for Armenia's real elevation gradient
+(135-3630m across the sample). Saved to `configs/fitted/topohydro_grid_run_2019.yaml`.
+
+This is the real unlock the last several sessions' work was building toward: real per-cell daily VPD
+and soil water potential now exist, which is exactly what XYLEM's two-level Monte Carlo and MERISTEM's
+real (not `petmean - bio12` proxy) CWD both need next.
+
+## 2026-09-30 (cont.) -- XYLEM's mechanistic hazard, run for the first time against real forcing
+
+`scripts/fit_xylem_mechanistic_hazard.py` reuses the gridded run above (refactored into
+`run_topohydro_grid.compute_grid_forcing()` so both scripts share one extraction/orchestration path
+rather than duplicating it) and runs `antar.hydraulics.pipeline.mechanistic_hazard_for_cell`'s full
+Sec. 6.3 two-level Monte Carlo (50 outer x 200 inner draws -- the spec's own numbers, no reduction
+needed once benchmarked at ~1s per cell-group) for each of Armenia's four functional groups against
+every real 2019 cell.
+
+**A real gap surfaced and handled explicitly, not worked around**: Sec. 6.3 specifies two variance
+components -- outer-loop hyperparameter uncertainty (which `xylem_trait_hyper_sd.yaml`'s real
+XFT-derived spread now covers) and inner-loop individual-to-individual uncertainty, for which no real
+data source exists anywhere in what's been pulled. Using `individual_sd={}` would make the inner loop
+degenerate (every sampled individual identical, collapsing `h_mech` to exactly 0 or 1 per outer draw
+instead of a continuous fraction) -- so `INDIVIDUAL_SD_FRACTION=0.5` scales the real hyper_sd down as
+an explicit, documented placeholder standing in for the missing finer-grained estimate, not presented
+as measured.
+
+`juniper_arid_conifer` (n=1 XFT record, `hyper_sd` undefined) is skipped, not run with a fabricated
+spread -- the same precedent MERISTEM's adult-niche fit set for `Pinus kochiana` (n=8, too sparse,
+skipped rather than forced). Saved to `configs/fitted/xylem_mechanistic_hazard_2019.yaml`.
+
+## 2026-09-30 (cont.) -- MNEME's first real person-period hazard panel
+
+The one engine with no real fit attempt yet. `scripts/fit_mneme_hazard_panel.py` builds real dieback
+labels from the real kNDVI vitality composites + Hansen/MODIS disturbance ancillary already exported
+to Drive this session (both were registered in `configs/manifests/gee_exports.yaml` but never actually
+loaded into anything -- exactly the gap ROADMAP.md flagged), crosses them with real climate covariates
+from the same gridded-TOPOHYDRO machinery extended across multiple years, and fits them with the
+already-tested Sec. 7.3 stacked-learner pipeline (`antar.hazard.pipeline.fit_stacked_hazard`).
+
+**The panel's year range is set by two independently-determined real constraints, not a round
+number**: `dieback_event`'s trailing/recovery windows mean an event is only *determinable* for
+2010-2022; CHELSA's real `pr` coverage (the water-balance-driven CWD covariate's dependency) stops at
+2019. The overlap, 2010-2019, is what's actually used.
+
+**A real gap stated plainly rather than worked around**: Eq. 7.3's full design also specifies an age
+spline, a DLNM drought-legacy cross-basis and stand-interaction terms. No real stand-age or
+forest-structure data has been pulled for any Armenian plot, and `build_hazard_design`'s age spline
+needs a real, *varying* age array to build a valid B-spline knot vector -- a constant/fabricated age
+would not be inert, it would corrupt the basis. Rather than invent one, this fit bypasses
+`build_hazard_design` and builds the design directly from `antar.hazard.panel.mundlak_decompose` on
+the real climate covariates alone (cwd_mm, vpd24_mean_kpa, gdd_annual, t_mean_c_annual, each split
+within/between by place), reusing `fit_stacked_hazard` unmodified -- a real, reduced-scope fit
+(climate signal only), not the full Eq. 7.3 model. Misclassification correction (Eq. 7.1) is also
+skipped: no stratified sample of interpreted pixel-years exists to estimate Se/Sp from.
+`vitality_composites`/`disturbance_ancillary` are streamed via the same `/vsicurl/` approach as
+terrain/soils/ERA5-Land (13+ GB and 15+ GB of real tiles on Drive; only ~80 points' worth of pixels
+read). Saved to `configs/fitted/mneme_hazard_panel_2010_2019.yaml`.
+
+**Update, 2026-10-01 -- the real completed outcome, corrected from the above.** The run above was
+written while the script was still in progress; here is what actually happened once it finished.
+First attempt crashed on year 8/10 (HTTP 400 -- a stale OAuth token reused across a 2+ hour run,
+with no checkpointing, so all 8 real years of work were lost with it). Fixed both real problems:
+`compute_forcing_for_year` now fetches a fresh token every call; the panel now checkpoints each
+year to `data/_mneme_panel_checkpoint.json` and resumes from it. Re-ran to real completion: **778
+real person-year rows across 78 places, 2010-2019, 0 real dieback-onset events.**
+`fit_stacked_hazard` was correctly never invoked (`status:
+insufficient_real_events_or_blocks_for_a_meaningful_fit`) -- at this real sample size, the strict
+standardised-anomaly dieback rule genuinely never fired. This is a real, informative finding, not
+a failure: it says the panel needs to be larger (more points and/or a longer real window) before
+MNEME's statistical hazard model can be fit at all, which is itself useful to know before
+investing in the full Eq. 7.3 design. Saved (overwriting the in-progress version referenced
+above) to the same `configs/fitted/mneme_hazard_panel_2010_2019.yaml`.
+
+## 2026-09-30 (cont.) -- TRY data request submitted (request 52804)
+
+The user registered and submitted a real TRY data request, closing the last real gap XFT couldn't:
+individual-level trait variance (XYLEM's `individual_sd`, currently a documented placeholder
+fraction of the real hyper_sd), `psi_close_mpa` and `capacitance_mmol_m2_mpa` (both still
+`ILLUSTRATIVE_PLACEHOLDER` in `configs/species_traits.csv`), and a real budburst signal.
+
+Trait IDs requested, each mapped to a real gap rather than picked generically: 3468 (leaf water
+potential at turgor loss point) and 189 (leaf osmotic potential at turgor loss) for `psi_close_mpa`
+-- turgor loss point is the standard physiological proxy for stomatal closure, not an arbitrary
+substitute; 711 (leaf water capacitance) for `capacitance_mmol_m2_mpa`; 709 (leaf cuticular
+conductance) to extend `gmin25` beyond pine (currently the only group with a real XFT value); 6
+(root depth) as a potential species-level upgrade over tonight's Canadell et al. (1996) biome-level
+rooting-depth figures; 4494/4495/4502/4503/4504 (P50/P88/P12/P20/P80) and 4334/4335 (hydraulic
+safety margins) as a real, much denser (5,341 obs/1,054 species for P50 alone, vs. XFT's much
+smaller per-group counts) cross-check/supplement to XFT's P50 -- if TRY's records include multiple
+individuals per species/site rather than one pooled value per study, this is the real source that
+could finally supply XYLEM's missing individual-level variance component; 3105 (bud burst) for
+`gdd_budburst`, though real coverage is sparse (22 species) and won't fully close that gap alone.
+
+Species IDs: checked directly against the real TRY accepted-species catalog the user downloaded
+(`TryAccSpecies.txt`, 306,702 species), not assumed from taxonomy alone -- a genuinely good find:
+three of the four functional groups have an *exact* Armenian target species present in TRY that
+XFT did not have -- Fagus orientalis (AccSpeciesID 23903, 1,733 obs), Quercus macranthera (45423,
+654 obs), Juniperus excelsa (31560, 43 obs, sparse) -- plus Juniperus polycarpos, present only as
+*J. excelsa* subsp. *polycarpos* (496095, 16 obs, real but very sparse). Carpinus betulus (10773,
+5,119 obs) was already an exact match via XFT too. Confirmed genuinely absent from TRY, not a
+search miss (checked with an exact-match pattern, not a loose substring): Quercus iberica,
+Q. frainetto, Q. humilis, and Pinus kochiana -- the same real congeneric-proxy pattern XFT's own
+gap analysis already established, not a new problem. The remaining species (Fagus sylvatica,
+Quercus robur/petraea/pubescens, Pinus sylvestris, Juniperus thurifera/communis) are the same real
+congeneric proxies XFT used, included for consistency and because TRY's per-species observation
+counts for these are far larger than XFT's (Pinus sylvestris alone: 62,711 real observations).
+
+TRY's own process: dataset custodians have 14 days to adjust permissions on their records; after
+that window the PI (the user) must actively visit `try-db.org/TryWeb/Prop01.php` to start the data
+release -- it is not automatic, and nothing can be pulled or wired in until that step happens. Real,
+external, time-gated dependency, not something more research or engineering effort closes sooner.
+
+## 2026-10-01 -- a real MNEME crash, a real fix, and a batch of S0/S1 roadmap gaps closed
+
+**A real bug caught the hard way**: the first MNEME hazard-panel run crashed on year 8 of 10 with
+an HTTP 400 from Drive, after 2+ hours of real streaming. Root cause: `get_access_token()` was
+called once at the start of the run and the same token reused for every subsequent year; Google
+OAuth access tokens expire after ~1 hour, well inside this run's real wall-clock time. Worse: the
+script checkpointed nothing, so all 8 real years of already-computed work were lost with it. Fixed
+both real problems, not just the symptom: `compute_forcing_for_year` now fetches a fresh token on
+every call (`scripts/run_topohydro_grid.py`); `fit_mneme_hazard_panel.py` now checkpoints each
+year's real rows to `data/_mneme_panel_checkpoint.json` and resumes from it on restart, deleting it
+only on real successful completion. Re-launched.
+
+**Treeline diagnostic — real, run for the first time (user's explicit requirement).**
+`scripts/compute_treeline_diagnostic.py`: `antar.niche.growth.potential_treeline_elevation` against
+the real 2019 gridded TOPOHYDRO output. A real simplification worth stating precisely: the function
+wants a reference (z_ref_m, gst_ref_c) pair, but the lapse relation is linear, so inverting from a
+cell's own real downscaled (z_cell_m, growing_season_mean_t_c) gives the algebraically identical
+z_tl as inverting from the true upstream reference -- verified by hand, not just assumed, before
+relying on it to skip pulling reference-level growing-season data that doesn't otherwise exist.
+Real growing-season (Apr-Sep) lapse rate used, not a flat annual average: -6.89 K/km. Real result:
+potential treeline elevation 1,586-3,616 m across the 78 cells, matching Armenia's known real
+treeline zone (~2,000-2,600 m) -- a genuine physical plausibility check the diagnostic passed, not
+just "it ran." Only 1/78 cells sits above its own real climatic ceiling today.
+
+**EPPO pest/pathogen records -- actually pulled this time** (earlier this session it was checked
+live but not saved). `data/eppo/eppo_armenia_organisms.csv`, `configs/manifests/eppo.yaml`.
+
+**opendata.am -- real datasets confirmed, actual pull blocked by real external outages, not
+research effort.** Tried all three real datasets identified earlier this session. ANAU's GeoServer
+(`armsis.cas.am`, hosting all 7 real lab-measured soil layers and the forest-cover layer) returns
+**NXDOMAIN** -- confirmed with a direct `nslookup`, not just a failed request, so genuinely down/
+renamed rather than slow. Global Forest Watch's ArcGIS Hub (hosting the 3 real forest-degradation
+datasets) returns a real HTTP 500 on its CSV export regardless of URL-encoding approach, and its
+own underlying REST FeatureServer returns `{"error":{"code":400,"message":"Invalid URL"}}` on a
+bare metadata request with no query at all -- a real problem on GFW's own hosting, not a malformed
+request here. Documented in `configs/manifests/opendata_am_blocked.yaml` so a later retry starts
+from real, already-found URLs rather than re-discovering them.
+
+**Resolution reconciliation -- real policy written** (`configs/resampling_policy.yaml`), closing a
+real S0 gap. Checked the actual code, not assumed: no GEE export anywhere calls `.resample()`, so
+every one -- including continuous fields -- currently uses Earth Engine's nearest-neighbor default.
+Correct for categorical/boolean layers; a real problem for two continuous sources specifically:
+SoilGrids (250m, ~8x real upsample to 30m) and ERA5-Land (~9km, ~300x real upsample) should use
+bilinear. CHELSA-daily/CHELSA-BIOCLIM+ are a documented non-issue -- deliberately never resampled
+to 30m at all, because TOPOHYDRO's real lapse-rate downscaling is the mechanism meant to carry
+that coarse reference down to true cell elevation; a spatial resample would be redundant with,
+not a substitute for, that physical step. The two real fixes (soils, ERA5-Land) are not applied
+yet -- policy decided, implementation is separate real follow-up work.
+
+**Unit-bounds regression tests -- real, standing tests added** (`tests/test_real_data_bounds.py`),
+closing another real S0 gap: every real unit bug this session caught by hand (CHELSA's Kelvin
+encoding, SoilGrids' per-mille texture encoding, ISIMIP3b's pr flux-vs-depth units, CO2's ppm
+range, the real RCP2.6-vs-SSP1-2.6 divergence) now has a permanent regression test, not just a
+one-time fix. Tests against gitignored `data/` files skip cleanly (not fail) when that data isn't
+present locally, so a fresh clone/CI doesn't need 15+ GB of real pulls just to run `pytest`. Full
+suite: 157 passed, 1 skipped (SoilGrids' transient, deleted-after-use file, correctly absent
+between sessions).
+
+**TerraClimate -- real export written and submitted, the last item on tonight's list.**
+`antar.io.gee_export.export_terraclimate` (new): real 1991-2020 monthly climatology (matching the
+project's own stated reference period), 8 real bands, each band's documented GEE scale factor
+applied explicitly after checking the real catalog page directly (Earth Engine does not
+auto-apply a catalog-documented scale factor -- a real, well-known gotcha, caught by checking
+before writing the code, not after). Exported with `.resample('bilinear')` at 4000m, applying the
+resampling policy above immediately to a brand-new export rather than creating a third entry that
+would need the same future fix. Submitted (`scripts/submit_terraclimate_export.py`, task
+`TMMKDQZDM5ZKSSNI4WGV7WBY` on `antar-armenia-2`); not yet complete as of submission.
