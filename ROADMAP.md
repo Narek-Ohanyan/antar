@@ -4,6 +4,11 @@ A living checklist, not a log (see `IMPLEMENTATION_LOG.md` for the append-only h
 decisions and bugs). Update items in place as they close; don't duplicate them into the log
 unless something non-obvious was learned closing them.
 
+**User's explicit decision (2026-10-01): delete this file from the repo once the framework is
+fully ready** (REFUGIUM, AEGIS and the UI all land, per the README rewrite noted in S5 below).
+At that point this checklist has nothing left to track and `IMPLEMENTATION_LOG.md` already holds
+the permanent record -- don't recreate or repopulate this file after that point without asking.
+
 Every entry below marked **CONFIRMED** was checked directly against the provider's own
 catalog/API/documentation this session. Everything marked **UNVERIFIED** was found by search
 but not independently confirmed (a tool outage cut several checks short) — verify before
