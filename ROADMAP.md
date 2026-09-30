@@ -136,20 +136,42 @@ aren't.
       numbers confirm RCP2.6 and SSP1-2.6 are close but not identical by 2100 (~421 vs. ~446 ppm)
       — the §0 correspondence risk is real, not hypothetical.
 
-### 1.6 Confirmed genuinely not obtainable as open data
-- [ ] Tree-ring chronologies for Armenia — **CONFIRMED absent from ITRDB**; the two real, recent
-      papers found (Opała-Owczarek et al. 2021, *Atmosphere*; Stepanyan et al. 2026, *Ecologies*)
-      both state their raw data is available "on request from the corresponding author" only.
-      This is now a concrete task, not a vague one: **email the corresponding authors of both
-      papers** if the raw ring-width series matter for growth-climate calibration. ("Voss
-      dendrochronology Armenia," referenced earlier as a citation, could not be located — recheck
-      the author name/spelling against the concept note's own bibliography.)
-  - [ ] National Forest Monitoring/Inventory plots, provenance/genetic trial locations,
-        insect/pathogen outbreak records, treeline field-survey transects, and prior-project
-        plantation survey data (survival/height by planting year and method) — still
-        institution/field-survey-only, unchanged from the earlier assessment.
-  - [ ] TRY and XFT trait databases — real, but each needs your own free registration; not an
-        access-method problem, just needs doing.
+### 1.6 Ground-truth and traits — real findings, not a blanket "institution-only"
+
+A dedicated search (2026-09-30, not done in the original research pass) overturned part of the
+earlier "institution-only" assessment. Checked live, not from search snippets alone:
+
+- [x] **Skipped by user decision**: tree-ring chronologies. Confirmed absent from ITRDB; the two
+      real papers found (Opała-Owczarek et al. 2021, *Atmosphere*; Stepanyan et al. 2026,
+      *Ecologies*) both say "on request from the corresponding author" only. User chose not to
+      pursue the outreach.
+- [ ] **Real, pullable, previously missed: `data.opendata.am` (Data Catalog Armenia)**, a genuine
+      CKAN open-data portal, no account needed, 173 forest-related datasets. Most useful for
+      ANTAR: **forest degradation by forestry branch (Artsvaberd, Ijevan, Eghegnut), 2016-2020**
+      (REC Caucasus, 6 resources each) — a real disturbance-label complement to Hansen GFC/MODIS
+      burned area for MNEME; a general forest-cover layer already in **EPSG:32638** (matches the
+      master grid exactly); and Armenian National Agrarian University soil property layers
+      (clay/silt/sand/bulk density/CEC/pH) as a possible SoilGrids cross-check. Not yet pulled —
+      next concrete task.
+- [ ] **Real, pullable: EPPO pest/pathogen occurrence records** for Armenia — confirmed live,
+      `gd.eppo.int/country/AM/organisms`, CSV/Excel export, no login. Not yet pulled.
+- [x] **Confirmed genuinely absent, not a search failure**: EUFGIS provenance/genetic
+      conservation units — Armenia has zero registered units (checked live at eufgis.org).
+- [ ] **Treeline field-survey transects**: no direct public download found. Closest match is the
+      Transcaucasian Vegetation Database (2,882 Braun-Blanquet plots, Zenodo record 10412100) but
+      only descriptive metadata is there — raw plot access would need contacting the database's
+      custodians directly, a real but manual next step if this matters enough to pursue.
+  - [ ] National Forest Inventory plots specifically (not the degradation/cover layers above) and
+        prior-project plantation survey data (survival/height by planting year and method) —
+        confirmed still institution/field-survey-only: Armenia has had no full NFI since the
+        1980s, a new FAO-supported one is mid-first-cycle with data not yet released, and the
+        Ministry of Environment's ArcGIS Hub requires sign-in despite search results suggesting
+        otherwise (checked live, not assumed from a snippet).
+- [ ] **TRY and XFT trait databases — registration process confirmed, still needs you to do it.**
+      TRY: `try-db.org/TryWeb/RegStart.php`, free account (institution field is optional), no
+      approval wait; published trait data is CC BY/open access since v5. XFT: real standalone site
+      at `xylemfunctionaltraits.org` (the Choat et al. 2012 hydraulic trait dataset), no
+      registration barrier found, also cross-hosted inside TRY's archive.
 
 ## 2. Data — already submitted but never verified/finished
 
