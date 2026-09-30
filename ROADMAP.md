@@ -460,3 +460,11 @@ Not started by design (explicitly deferred pending real model fits — see
       attribution, to be filled in by hand.
 - [ ] Stack decision (not yet made): what serves the map/API — needs the real gridded outputs to
       exist first (§3) before this can be scoped concretely rather than guessed at.
+- [ ] **README.md rewrite — deliberately held (2026-10-01, user's explicit decision), not
+      forgotten.** The current README (title, opening paragraph, `species_traits.csv`
+      description) is already partly stale as of tonight's real work -- "data access... declared
+      but not implemented" and "nothing produced from them is a result" are both now false (real
+      TOPOHYDRO/XYLEM/MNEME/treeline/TerraClimate results exist). User chose not to patch this
+      incrementally: hold it until REFUGIUM, AEGIS and the UI all land, then rewrite the whole
+      top-level description in one pass rather than multiple partial edits. Do this rewrite when
+      those three are done, not before, even though the text is known-inaccurate in the meantime.
