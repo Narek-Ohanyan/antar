@@ -113,10 +113,17 @@ def fetch_one(var, period, gcm, ssp):
 
 def _checkpoint(var, done, missing_404, failed_read, out_path, progress_path):
     keys = sorted(done.keys())
-    stacked = np.stack([done[k] for k in keys]).astype(np.float32)
-    tmp_path = out_path.with_name(out_path.stem + ".tmp.npz")
-    np.savez_compressed(tmp_path, data=stacked)
-    os.replace(tmp_path, out_path)
+    # A checkpoint can legitimately fire with done still empty -- e.g. a variable with no
+    # future projections at all (confirmed for vpdmean: only 1981-2010 exists in the archive)
+    # has 45 fast 404s racing ahead of the one slow historical-file read across 8 threads, so
+    # the first checkpoint boundary can land before that single success has arrived. np.stack
+    # needs at least one array; write the progress JSON either way, but only touch the .npz
+    # once there is something real to stack.
+    if keys:
+        stacked = np.stack([done[k] for k in keys]).astype(np.float32)
+        tmp_path = out_path.with_name(out_path.stem + ".tmp.npz")
+        np.savez_compressed(tmp_path, data=stacked)
+        os.replace(tmp_path, out_path)
     progress_path.write_text(json.dumps(
         {"keys": keys, "missing_404": missing_404, "failed_read": failed_read}
     ))
@@ -178,12 +185,12 @@ def main():
         out_path = OUT_DIR / f"CHELSA_BIOCLIM_{var}_armenia.npz"
         keys, missing_404, failed_read = pull_variable(var)
         import hashlib
-        checksum = hashlib.sha256(out_path.read_bytes()).hexdigest()
+        checksum = hashlib.sha256(out_path.read_bytes()).hexdigest() if out_path.exists() else None
         manifest_rows.append({
             "variable": var, "n_scenarios": len(keys),
             "n_missing_404": len(missing_404), "missing_404": missing_404,
             "n_failed_read": len(failed_read),
-            "local_path": str(out_path.relative_to(OUT_DIR.parent.parent)),
+            "local_path": str(out_path.relative_to(OUT_DIR.parent.parent)) if out_path.exists() else None,
             "sha256": checksum,
         })
     Path(OUT_DIR / "chelsa_bioclim_manifest_rows.json").write_text(json.dumps(manifest_rows, indent=2))
