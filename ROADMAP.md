@@ -207,10 +207,21 @@ Nothing below has been fit against real data yet; every engine is implemented an
 synthetic/placeholder data only (`configs/species_traits.csv` is entirely
 `ILLUSTRATIVE_PLACEHOLDER`, no fit/calibration script exists in the repo yet).
 
-- [ ] **TOPOHYDRO**: fit the monthly lapse rate (`fit_monthly_lapse_rate`) and cold-air-pooling
-      coefficient against real station data (now unblocked — GHCN-Daily, §1.2) and CHELSA-daily;
-      fit the precipitation-elevation gradient the same way; run the PET ensemble and QDM against
-      real ERA5-Land once §2's export is confirmed.
+- [x] **TOPOHYDRO monthly lapse rate + precip gradient — real fit, done (2026-09-30).** The
+      first real fit anywhere in ANTAR: `scripts/fit_topohydro_lapse_rate.py`, real GHCN-Daily
+      station data (41 of 53 stations with observations in the 1991-2020 reference period),
+      45,665 station-days of temperature, 50,607 of precipitation. Results physically checked,
+      not just "the fit ran": lapse rate -4.9 to -7.6 K/km with the correct seasonal pattern
+      (steeper in summer, shallower in winter), R²=0.32-0.70. Precipitation's elevation gradient
+      came back with R²≈0 every month — a real, informative finding (Armenia's precipitation
+      isn't elevation-driven the way temperature is), not a bug; confirms the `exposure_factor`
+      correction term will matter more than the base gradient. Saved to
+      `configs/fitted/topohydro_lapse_rate.yaml`.
+  - [ ] **Still needed**: the cold-air-pooling coefficient (`k_cap`) — needs a terrain concavity
+        index that isn't computed yet (flagged since `export_terrain`: needs neighbourhood/flow-
+        routing operations on the downloaded SRTM DEM, not a per-pixel Earth Engine operation).
+        Also: run the PET ensemble and QDM against real ERA5-Land once that export (§2, already
+        registered) is actually loaded and checked.
 - [x] **XYLEM P50/slope/gmin — real XFT data, done (2026-09-30).** `configs/species_traits.csv`'s
       p50_mpa and slope_pct_per_mpa are now real values from the XFT database (congeneric
       proxies for all four groups — no exact-species match exists for any target taxon; see

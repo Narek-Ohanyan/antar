@@ -1,0 +1,64 @@
+fit_date: '2026-09-30'
+reference_period:
+- 1991
+- 2020
+source: configs/manifests/ghcnd_armenia.yaml (53 real GHCN-Daily Armenian stations)
+n_stations_with_obs: 41
+temperature:
+  n_station_days: 45665
+  n_tavg_direct: 37152
+  n_tavg_derived_from_tmax_tmin: 8513
+  gamma_k_per_m_by_month:
+    Jan: -0.005451
+    Feb: -0.00638
+    Mar: -0.00707
+    Apr: -0.00682
+    May: -0.00721
+    Jun: -0.0076
+    Jul: -0.007191
+    Aug: -0.006435
+    Sep: -0.006102
+    Oct: -0.005161
+    Nov: -0.004865
+    Dec: -0.005348
+  r_squared_by_month:
+    Jan: 0.348
+    Feb: 0.368
+    Mar: 0.48
+    Apr: 0.501
+    May: 0.656
+    Jun: 0.695
+    Jul: 0.667
+    Aug: 0.588
+    Sep: 0.53
+    Oct: 0.442
+    Nov: 0.332
+    Dec: 0.319
+precipitation:
+  n_station_days: 50607
+  gradient_per_m_by_month:
+    Jan: 0.00071239
+    Feb: 0.00039051
+    Mar: 6.135e-05
+    Apr: -7.219e-05
+    May: 0.00015746
+    Jun: 0.00088789
+    Jul: 0.00129718
+    Aug: 0.00075262
+    Sep: 0.00014614
+    Oct: 4.595e-05
+    Nov: -0.00012291
+    Dec: 0.00036982
+  r_squared_log_by_month:
+    Jan: 0.003
+    Feb: 0.001
+    Mar: 0.0
+    Apr: 0.0
+    May: 0.0
+    Jun: 0.004
+    Jul: 0.011
+    Aug: 0.004
+    Sep: 0.0
+    Oct: 0.0
+    Nov: 0.0
+    Dec: 0.001

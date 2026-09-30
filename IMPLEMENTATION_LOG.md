@@ -898,3 +898,36 @@ real vs. still placeholder and the real fields' sample sizes and source species 
 code currently branches on this column's exact string (only `stand_defaults.yaml`'s separate
 placeholder guard does that), so changing its format broke nothing. Registered the source XFT
 file in `configs/manifests/xft.yaml`.
+
+## 2026-09-30 (cont.) -- TOPOHYDRO's first real fit: monthly lapse rate and precip gradient
+
+User's decision (asked as an explicit interactive choice): pivot to real model fitting now
+rather than pulling more data first (TerraClimate/opendata.am/EPPO deferred until a specific
+engine's fit actually needs them).
+
+`scripts/fit_topohydro_lapse_rate.py` (new): the first real fit anywhere in ANTAR, using
+`antar.climate.downscale.fit_monthly_lapse_rate` / `fit_precip_elevation_gradient` (both already
+implemented and presumably unit-tested against synthetic data since TOPOHYDRO's original build)
+against real GHCN-Daily station observations for the first time. Re-downloaded the station data
+from Drive (it was deleted locally after the original pull, by design) and verified its checksum
+against `configs/manifests/ghcnd_armenia.yaml` before trusting it. Fit window: the concept note's
+own `reference_period` (1991-2020), not the stations' full record -- consistent with every other
+anomaly/index in this project being standardised against that one period. TAVG used directly
+where GHCN reports it (37152 station-days); where only TMAX/TMIN exist, TAVG = (TMAX+TMIN)/2 is
+used as a standard meteorological convention, not an invented value, and reported separately
+(8513 station-days) so it's never hidden which numbers came from which source.
+
+**Results are physically valid, checked against real-world expectation, not just "the fit ran":**
+monthly lapse rate ranges -0.00486 to -0.00760 K/m (-4.9 to -7.6 K/km) with exactly the expected
+seasonal pattern -- steeper (more negative) in summer (June: -7.6 K/km) from stronger convective
+mixing, shallower in winter (November: -4.9 K/km) from temperature inversions. R-squared 0.32-0.70
+across months, reasonable for station-based climate regression with real microclimate noise.
+Precipitation's elevation gradient is a genuine, informative near-null result: R-squared
+essentially 0 (0.000-0.011) every month -- elevation alone barely predicts Armenia's
+precipitation pattern, which is itself a real scientific finding (not a bug) and confirms
+`downscale_precipitation`'s `exposure_factor` correction term (wind exposure, rain-shadow) will
+matter far more than the base elevation gradient for this country's terrain.
+
+A minor bug caught before the output saved: `r_squared_per_month`'s diagnostic returned
+`np.float64` values, which `yaml.safe_dump` can't serialize -- fixed with an explicit
+`float()` cast. Saved to `configs/fitted/topohydro_lapse_rate.yaml`.
