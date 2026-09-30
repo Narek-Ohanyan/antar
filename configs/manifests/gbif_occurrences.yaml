@@ -1,0 +1,26 @@
+- variable: gbif_occurrences_armenia
+  source: GBIF (Global Biodiversity Information Facility) occurrence search API
+  version: n/a
+  url: https://api.gbif.org/v1/occurrence/search
+  citation: GBIF.org. GBIF Occurrence Search API. https://www.gbif.org/developer/occurrence
+  license: Per-record; GBIF aggregates many providers under CC0/CC-BY/CC-BY-NC -- not
+    uniform, not restated here. Cite via datasetKey per record for a proper derived-
+    dataset citation if this is used in a publication.
+  access_date: '2026-09-30'
+  local_path: configs/gbif_occurrences_armenia.csv
+  checksum_sha256: d0193316f7fb0b6881b6087f381854fd531c5c964a84d05d638aa52c2b6111f0
+  spatial_extent: Armenia (bbox-filtered, see notes)
+  notes: >-
+    524 real occurrence records with coordinates for the 7 target species named in
+    configs/species_traits.csv's example_taxa (Fagus orientalis, Carpinus betulus,
+    Quercus macranthera, Quercus iberica, Pinus kochiana, Juniperus polycarpos,
+    Juniperus excelsa) -- input for MERISTEM's adult-niche Boyce index
+    (concept note Sec. 8.1). Pulled via scripts/pull_gbif_occurrences.py, no
+    registration needed. A real data-quality issue was caught and fixed before
+    trusting this data: GBIF's country=AM filter does not guarantee correct
+    coordinates -- 4 records had (0,0) "null island" bad georeferencing and were
+    dropped by an explicit bbox filter (43.4-46.7 E, 38.8-41.4 N, matching
+    configs/study_area.yaml), not silently included. Presence-only, spatially
+    biased (per the concept note's own caveat on this data group) -- not a
+    substitute for a design-based survey, only the adult-niche presence input
+    Sec. 8.1 actually calls for.
