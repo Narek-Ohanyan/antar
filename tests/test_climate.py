@@ -12,6 +12,7 @@ from antar.climate import (
     snow,
     soil_pedotransfer,
     stand_coupling,
+    terrain,
     vapour,
     waterbalance,
 )
@@ -162,6 +163,34 @@ def test_saxton_rawls_broadcasts_over_arrays():
     r = soil_pedotransfer.soil_hydraulic_parameters(sand, clay, soc)
     assert r["theta_sat"].shape == (3,)
     assert np.all(r["theta_sat"] > r["theta_fc"])
+
+
+# ---------------------------------------------------------------- terrain concavity
+def test_concavity_index_zero_on_flat_terrain():
+    flat = np.full((5, 5), 100.0)
+    assert np.max(np.abs(terrain.concavity_index(flat))) < 1e-10
+
+
+def test_concavity_index_sign_convention():
+    # A pit (basin) must be positive; a peak (ridge) must be negative -- the exact
+    # convention antar.climate.downscale.cold_air_pooling_index expects.
+    pit = np.full((5, 5), 100.0)
+    pit[2, 2] = 50.0
+    assert terrain.concavity_index(pit)[2, 2] > 0
+
+    peak = np.full((5, 5), 100.0)
+    peak[2, 2] = 200.0
+    assert terrain.concavity_index(peak)[2, 2] < 0
+
+
+def test_concavity_index_matches_hand_computed_3x3():
+    # center surrounded by 8 neighbours at 10.0, itself 0.0 -> mean(neighbours)=10.0,
+    # concavity = 10.0 - 0.0 = 10.0 exactly.
+    grid = np.array([[10.0, 10.0, 10.0], [10.0, 0.0, 10.0], [10.0, 10.0, 10.0]])
+    assert terrain.concavity_index(grid)[1, 1] == pytest.approx(10.0)
+    # corner has only 3 valid neighbours (two edge cells + the diagonal), not 8 --
+    # mean(10,10,0)=6.667, concavity = 6.667 - 10.0 = -3.333.
+    assert terrain.concavity_index(grid)[0, 0] == pytest.approx(-10.0 / 3.0)
 
 
 # ---------------------------------------------------------------- SPEI / indices
