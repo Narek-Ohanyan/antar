@@ -101,21 +101,27 @@ aren't.
       alternative confirmed working. Used the Malaria Atlas Project's global travel-time-to-
       cities layer instead: confirmed real, asset id `Oxford/MAP/accessibility_to_cities_2015_v1_0`
       (verified directly, single `accessibility` band, minutes-to-nearest-city), Armenia bbox
-      values 0-517 minutes (physically sensible for the terrain). Exported to Drive
-      (`antar_accessibility_to_cities`, task `3GOANAHUA6I5AINU42GBPF6M`, queued under restricted
-      mode as of this writing — register in `configs/manifests/` once it actually completes).
+      values 0-517 minutes (physically sensible for the terrain). Original export queued
+      indefinitely under the first GCP project's restricted mode; cancelled and resubmitted on
+      the second project (`antar-armenia-2`, set up specifically for this), completed and
+      registered in `configs/manifests/gee_exports.yaml`.
       OSM via Geofabrik remains a real fallback if finer road-network detail (vs. travel-time)
       is ever needed — retry from a different network/environment, or use the Overpass API
       instead of the static mirror.
 
 ### 1.4 Bioclimate and occurrence
-- [x] **CHELSA-BIOCLIM+ — access confirmed (2026-09-30), not yet pulled.** `bioclim/` is a real
-      sibling directory to `daily/` on the same server (`os.unil.cloud.switch.ch/chelsa02/chelsa/
-      global/bioclim/`), same `/vsicurl/` access pattern, listed directly: bio01-19, cltmax/mean/
-      min/range, cmimax/mean/min/range, fcf, fgd, gdd0/5/10 and more. This is a properly scoped
-      pull job on its own (many variables x historical + 5 GCMs x SSP126/370/585 x 3 future
-      windows) — deliberately not rushed alongside the smaller items in this batch; next real
-      data-pull task once scoped.
+- [x] **CHELSA-BIOCLIM+ — pulled (2026-09-30).** 37 of the archive's 74 real variables (confirmed
+      by listing the bucket), scoped to what an ANTAR engine actually uses — bio01-19 (MERISTEM
+      niche), gdd0/5/10 + gddlgd0/5/10 (MERISTEM GDD modifier), gsl/gsp/gst (MERISTEM treeline,
+      TREELIM methodology), fcf/fgd/lgd (MERISTEM late-frost modifier), vpdmean/max (XYLEM),
+      petmean/max (TOPOHYDRO), sfcWindmean, rsdsmean (ERA5-Land/radiation cross-checks) —
+      historical (1981-2010) + 3 future windows x 5 GCMs x 3 SSPs where available. A real nodata
+      bug (int32 sentinel leaking through unmasked) was caught on the first smoke test and fixed
+      before the full pull ran; see IMPLEMENTATION_LOG.md. 6 of the 37 variables (vpdmean, vpdmax,
+      petmean, petmax, sfcWindmean, rsdsmean) turned out historical-only in the archive itself —
+      confirmed by directory listing, not a pull failure. Registered in `configs/manifests/
+      chelsa_bioclim.yaml`, 223 MB, kept local (small enough that the cloud-first convention
+      doesn't apply the way it does to the multi-GB GEE rasters).
 - [x] **GBIF occurrence data — pulled (2026-09-30).** 524 real presence records for the 7 target
       species (`configs/species_traits.csv`'s example taxa), `configs/manifests/
       gbif_occurrences.yaml`. A real data-quality bug was caught: `country=AM` alone let through
@@ -156,9 +162,15 @@ aren't.
       Parameter 'input' is required and may not be null`) — real bug: MCD12Q2 land-surface
       phenology only covers 2001 onward, and the export loop's 2000 start hit `.first()` on an
       empty collection. Fixed (`src/antar/io/gee_export.py`: phenology bands genuinely omitted
-      for years outside real coverage, not fabricated) and resubmitted — **your GCP project is
-      in Earth-Engine restricted mode (noncommercial compute quota exceeded)**, so the resubmit
-      is queued (`READY`), not yet run; check `ee.data.getTaskList()` again once it clears.
+      for years outside real coverage, not fabricated), resubmitted on the second GCP project
+      (`antar-armenia-2`) after the first project's restricted mode left it queued indefinitely,
+      completed, and registered.
+- [x] **Second GCP project (`antar-armenia-2`) set up for fresh Earth Engine quota (2026-09-30)**:
+      the first project (`pure-highlander-495708-a9`) hit its noncommercial compute quota and
+      entered restricted mode, throttling exports to indefinite `READY` queueing. Rather than
+      wait it out, created and registered a second project — both stuck exports (`vegetation_
+      state`, `accessibility_to_cities`) moved there and completed within minutes. Use this
+      project for future EE work; fall back to creating a third if this one also fills up.
 - [x] **GHCN-Daily Armenian stations pulled and registered (2026-09-30)** — see §1.2 above;
       `configs/manifests/ghcnd_armenia.yaml`, Drive-hosted, 5 MB.
 - [ ] **CORDEX future extraction on hyperion**: only 2 of 4 variables (`pr`, `tas`) done for 1 of

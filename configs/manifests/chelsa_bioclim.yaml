@@ -1,0 +1,525 @@
+- variable: chelsa_bioclim_bio01
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio01_armenia.npz
+  checksum_sha256: d9e4ee4519aaeae6ac3673d93b935dbc0a44ad1aac233d79c7de680c061d3520
+  spatial_extent: Armenia (clipped)
+  notes: Annual mean temperature (degC). Standard bioclim predictor -- MERISTEM adult-niche
+    Boyce index. 46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio02
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio02_armenia.npz
+  checksum_sha256: 7efb0594e35d6987e747377b11012ccb360f15fd8a9bab0ada1c7fa66b5e6563
+  spatial_extent: Armenia (clipped)
+  notes: Mean diurnal range (degC). MERISTEM niche predictor. 46/46 scenarios present,
+    0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio03
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio03_armenia.npz
+  checksum_sha256: aee45d96dfeb3b96e3995f4681eba359cd4c8ced2de0ec20854012d6d682de5e
+  spatial_extent: Armenia (clipped)
+  notes: Isothermality (bio02/bio07 x 100). MERISTEM niche predictor. 46/46 scenarios
+    present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio04
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio04_armenia.npz
+  checksum_sha256: dad5357f742ea32e7d8116f1bff14a57d7ca2532b04c00aec7397d541a23ec4b
+  spatial_extent: Armenia (clipped)
+  notes: Temperature seasonality (std dev x 100). MERISTEM niche predictor. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio05
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio05_armenia.npz
+  checksum_sha256: 643aaa84c7e40bab8650457fab542dec99f64b7f40e77967e7642ba9911793a0
+  spatial_extent: Armenia (clipped)
+  notes: Max temperature of warmest month (degC). MERISTEM niche predictor. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio06
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio06_armenia.npz
+  checksum_sha256: f04b38fba2c9485971d77e033bdddfba47a31d25781593bac61587d6c34ced15
+  spatial_extent: Armenia (clipped)
+  notes: Min temperature of coldest month (degC). MERISTEM niche predictor. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio07
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio07_armenia.npz
+  checksum_sha256: 391c2478cf5df97cb377386b14e2b06f42f022891aeaba935d6f3aa4f581b40e
+  spatial_extent: Armenia (clipped)
+  notes: Temperature annual range (bio05-bio06, degC). MERISTEM niche predictor. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio08
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio08_armenia.npz
+  checksum_sha256: a334fef0922a238c3689c33514def18c2fd45e2a3a886b96f06db67966d80c98
+  spatial_extent: Armenia (clipped)
+  notes: Mean temperature of wettest quarter (degC). MERISTEM niche predictor. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio09
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio09_armenia.npz
+  checksum_sha256: 62f4d45c8b48ad12998d446a03c424b433f6886d6d678ad45de3057486b874cf
+  spatial_extent: Armenia (clipped)
+  notes: Mean temperature of driest quarter (degC). MERISTEM niche predictor. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio10
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio10_armenia.npz
+  checksum_sha256: 91ecbc763610043638e4fef04836b51ea2eb9116fb277aff2f3783000998a14f
+  spatial_extent: Armenia (clipped)
+  notes: Mean temperature of warmest quarter (degC). MERISTEM niche predictor. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio11
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio11_armenia.npz
+  checksum_sha256: c6cede031263cf48a017e15a869d7ec0471cfb09ee0d789000fa605261edd492
+  spatial_extent: Armenia (clipped)
+  notes: Mean temperature of coldest quarter (degC). MERISTEM niche predictor. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio12
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio12_armenia.npz
+  checksum_sha256: 8cb05f608fa252316689f588ee39b3378b78cf66cbf11ceba719c7e31d5f36c8
+  spatial_extent: Armenia (clipped)
+  notes: Annual precipitation (mm). MERISTEM niche predictor. 46/46 scenarios present,
+    0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio13
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio13_armenia.npz
+  checksum_sha256: 41253cddbff1e58e1889a11d357bac4c19beb26d74f91244023e0b3a08979bad
+  spatial_extent: Armenia (clipped)
+  notes: Precipitation of wettest month (mm). MERISTEM niche predictor. 46/46 scenarios
+    present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio14
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio14_armenia.npz
+  checksum_sha256: 68847440f35440788097904ca1d7526db7cda8ed99877a707fab253518a6bb44
+  spatial_extent: Armenia (clipped)
+  notes: Precipitation of driest month (mm). MERISTEM niche predictor. 46/46 scenarios
+    present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio15
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio15_armenia.npz
+  checksum_sha256: ddbf7cdf4641d80750cc4d90c4585df120b82455881b146c15cd2672abe4f899
+  spatial_extent: Armenia (clipped)
+  notes: Precipitation seasonality (coefficient of variation). MERISTEM niche predictor.
+    46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio16
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio16_armenia.npz
+  checksum_sha256: 9306afd7060ec894b3af110171901800e822c39f896ba802c63f2d2d1a72010d
+  spatial_extent: Armenia (clipped)
+  notes: Precipitation of wettest quarter (mm). MERISTEM niche predictor. 46/46 scenarios
+    present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio17
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio17_armenia.npz
+  checksum_sha256: 3c2a43bbd4f9fb6388d7891055aa464044ddd07e57385b387dd810a52eccdde4
+  spatial_extent: Armenia (clipped)
+  notes: Precipitation of driest quarter (mm). MERISTEM niche predictor. 46/46 scenarios
+    present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio18
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio18_armenia.npz
+  checksum_sha256: a44f9c868c0f72fb892666d07ab6f23f57ddd1ae3f415098f468106ab64070ed
+  spatial_extent: Armenia (clipped)
+  notes: Precipitation of warmest quarter (mm). MERISTEM niche predictor. 46/46 scenarios
+    present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_bio19
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_bio19_armenia.npz
+  checksum_sha256: 56a8760f6e392f81a983fb1984e7cdbdca59cc1f72a38bbe592512700090d47b
+  spatial_extent: Armenia (clipped)
+  notes: Precipitation of coldest quarter (mm). MERISTEM niche predictor. 46/46 scenarios
+    present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gdd0
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gdd0_armenia.npz
+  checksum_sha256: ac74039f35e6fe14ee1087a1d2ac94108aa8066cfac5bff74183f069e67aebb3
+  spatial_extent: Armenia (clipped)
+  notes: Growing degree days above 0 degC. MERISTEM's GDD modifier cross-check (gdd_modifier).
+    46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gdd5
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gdd5_armenia.npz
+  checksum_sha256: 8ea720445e94194f34d5bc407cb52dcefc1599ca34142649f846c08871127661
+  spatial_extent: Armenia (clipped)
+  notes: Growing degree days above 5 degC. MERISTEM's GDD modifier cross-check. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gdd10
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gdd10_armenia.npz
+  checksum_sha256: c40fde8c11b73e3e9e8d39ccbf75154a43edcd5a9d529330284e170f54b9811b
+  spatial_extent: Armenia (clipped)
+  notes: Growing degree days above 10 degC. MERISTEM's GDD modifier cross-check. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gddlgd0
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gddlgd0_armenia.npz
+  checksum_sha256: 8c9b936409cd1fce3bc817ad91d5d71729bea020fe1c8493c79680efa411a0e4
+  spatial_extent: Armenia (clipped)
+  notes: GDD to last growing degree day, 0 degC base. Growing-season timing for MERISTEM.
+    46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gddlgd5
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gddlgd5_armenia.npz
+  checksum_sha256: 438330d6dd397303aee4035665b141e849315a4b7f52f7b8aa1542a82515c694
+  spatial_extent: Armenia (clipped)
+  notes: GDD to last growing degree day, 5 degC base. Growing-season timing for MERISTEM.
+    46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gddlgd10
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gddlgd10_armenia.npz
+  checksum_sha256: d5304c66261110bc68d942ce21d13dfcaddb28c438ccf79bfcccf9705459a2b9
+  spatial_extent: Armenia (clipped)
+  notes: GDD to last growing degree day, 10 degC base. Growing-season timing for MERISTEM.
+    46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gsl
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gsl_armenia.npz
+  checksum_sha256: 2c89d32a19135a3798878c8029f5e194ff1ecc3e9e14a2b2d4f93f450fe57936
+  spatial_extent: Armenia (clipped)
+  notes: Growing season length (days), TREELIM methodology. MERISTEM's thermal_treeline_modifier
+    cross-check. 46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gsp
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gsp_armenia.npz
+  checksum_sha256: 5579c05b5fd3da4df6c2016b5c2f947174502efe3308e5e94353d0311dd2dcb7
+  spatial_extent: Armenia (clipped)
+  notes: Growing season precipitation (mm), TREELIM methodology. MERISTEM treeline
+    cross-check. 46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_gst
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_gst_armenia.npz
+  checksum_sha256: 56e2eb2ec58206f6e4291ac7bf591c2a906b81f8459808724790d126847bd739
+  spatial_extent: Armenia (clipped)
+  notes: Growing season mean temperature (degC), TREELIM methodology. MERISTEM treeline
+    cross-check. 46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_fcf
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_fcf_armenia.npz
+  checksum_sha256: 69a85eeeeb18017ffbef25198c133b2b2d21d43f6c00ef5dbd1aa0c3fc4613bd
+  spatial_extent: Armenia (clipped)
+  notes: Frost change frequency. MERISTEM's late_frost_modifier cross-check. 46/46
+    scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_fgd
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_fgd_armenia.npz
+  checksum_sha256: 86a9bedbc02b895c1d95ec142f72475a20498f687192206f57a25ed657354ecf
+  spatial_extent: Armenia (clipped)
+  notes: First growing degree day (day of year). Frost/growing-season timing for MERISTEM.
+    46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_lgd
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_lgd_armenia.npz
+  checksum_sha256: 683e7caad38296b8856069f377fdd0952c061c7f496ffd2beb88352ccd21ffd4
+  spatial_extent: Armenia (clipped)
+  notes: Last growing degree day (day of year). Frost/growing-season timing for MERISTEM.
+    46/46 scenarios present, 0 confirmed-missing (404), 0 failed-read.
+- variable: chelsa_bioclim_vpdmean
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_vpdmean_armenia.npz
+  checksum_sha256: 9e053bd729d83bc038a1b44e27df8c13c728a3c20374057f92982dee53600e87
+  spatial_extent: Armenia (clipped)
+  notes: Mean vapour pressure deficit (Pa). XYLEM water-stress terms. Historical only
+    -- no future projections exist in this archive (confirmed by directory listing,
+    not a pull failure). 1/46 scenarios present, 45 confirmed-missing (404), 0 failed-read.
+    Historical (1981-2010) only; all 45 future GCM x SSP combinations genuinely absent.
+- variable: chelsa_bioclim_vpdmax
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_vpdmax_armenia.npz
+  checksum_sha256: b96c34ff670d8fa38437135250d376979dd999d9408683816ac8cc9d7b50edd1
+  spatial_extent: Armenia (clipped)
+  notes: Max vapour pressure deficit (Pa). XYLEM water-stress terms. Historical only
+    -- same as vpdmean. 1/46 scenarios present, 45 confirmed-missing (404), 0 failed-read.
+    Historical (1981-2010) only; all 45 future GCM x SSP combinations genuinely absent.
+- variable: chelsa_bioclim_petmean
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_petmean_armenia.npz
+  checksum_sha256: 90b6c6a7b007718b1fdde51f7c0dac2a55258d4b3ffd89eaea0d76e9663ede29
+  spatial_extent: Armenia (clipped)
+  notes: Mean potential evapotranspiration. TOPOHYDRO water-balance cross-check. Historical
+    only. 1/46 scenarios present, 45 confirmed-missing (404), 0 failed-read. Historical
+    (1981-2010) only; all 45 future GCM x SSP combinations genuinely absent.
+- variable: chelsa_bioclim_petmax
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_petmax_armenia.npz
+  checksum_sha256: ddf0148d1fd994fa41cb5f2297ae145ecf2f9a737d1cae3fcb1e5f0df1c8b18c
+  spatial_extent: Armenia (clipped)
+  notes: Max potential evapotranspiration. TOPOHYDRO water-balance cross-check. Historical
+    only. 1/46 scenarios present, 45 confirmed-missing (404), 0 failed-read. Historical
+    (1981-2010) only; all 45 future GCM x SSP combinations genuinely absent.
+- variable: chelsa_bioclim_sfcWindmean
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_sfcWindmean_armenia.npz
+  checksum_sha256: a357d2731bd558798ab0865a62c0a144d5f69443d8a04ee0219386092e370873
+  spatial_extent: Armenia (clipped)
+  notes: Mean surface wind speed. ERA5-Land cross-check. Historical only. 1/46 scenarios
+    present, 45 confirmed-missing (404), 0 failed-read. Historical (1981-2010) only;
+    all 45 future GCM x SSP combinations genuinely absent.
+- variable: chelsa_bioclim_rsdsmean
+  source: CHELSA-BIOCLIM+
+  version: '1.0'
+  url: https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/bioclim/
+  citation: Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza,
+    R.W., Zimmermann, N.E., Linder, H.P., Kessler, M. (2022). Global downscaled projections
+    for climate impacts studies. Earth System Science Data, 14, 5573-5603. https://doi.org/10.5194/essd-14-5573-2022
+  license: CC0 1.0
+  access_date: '2026-09-30'
+  local_path: data/chelsa_bioclim/CHELSA_BIOCLIM_rsdsmean_armenia.npz
+  checksum_sha256: fb286a629724e102dec96829a09351c7ab24dd3758b1b2a0782ee9835ed5c8b6
+  spatial_extent: Armenia (clipped)
+  notes: Mean shortwave radiation. Slope-radiation energy term cross-check. Historical
+    only. 1/46 scenarios present, 45 confirmed-missing (404), 0 failed-read. Historical
+    (1981-2010) only; all 45 future GCM x SSP combinations genuinely absent.

@@ -698,3 +698,49 @@
     3221.4 MB, Drive MD5=896d00a7d05139d384ca0636a0032394 (recorded instead of a SHA-256:
     hashing would mean downloading a multi-GB file for no integrity benefit Drive
     doesn''t already provide).'
+- variable: antar_vegetation_state
+  source: Google Earth Engine batch export (antar.io.gee_export.export_vegetation_state)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: See per-source citations in docs/concept_v2/sec3_data.tex (Table tab:data)
+    and antar/io/gee_export.py docstrings.
+  license: Per underlying source (MODIS/ESA WorldCover -- see gee_export.py docstrings);
+    not uniform, not restated here.
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Growing-season-mean MODIS LAI (2000-2024), annual land-surface phenology
+    (2001-2024 only -- MCD12Q2 has no earlier data), ESA WorldCover tree-cover class.
+    Re-submitted after fixing a real null-image bug for 2000 (see IMPLEMENTATION_LOG.md
+    2026-09-30): phenology bands are genuinely omitted for years before MCD12Q2''s
+    real coverage rather than fabricated. Also re-submitted on a second GCP project
+    (antar-armenia-2) after the first project''s Earth Engine restricted-mode quota
+    left the original submission queued indefinitely. Not stored locally (cloud-first
+    by design) -- lives in Google Drive folder antar_gee_exports, file id=1uI4JoZN6gYiA9QBghDhtMtTHoPIDaFbd,
+    919.2 MB, Drive MD5=4d8b796c76ea52e44b1a60ac7c8a6d46 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'
+- variable: antar_accessibility_to_cities
+  source: Google Earth Engine batch export (Oxford/MAP/accessibility_to_cities_2015_v1_0)
+  version: v1.0
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: 'Weiss, D.J., Nelson, A., Gibson, H.S. et al. (2018). A global map of
+    travel time to cities to assess inequalities in accessibility in 2015. Nature
+    553, 333-336. https://doi.org/10.1038/nature25181'
+  license: See Malaria Atlas Project / Oxford data terms (developers.google.com/earth-engine/datasets/publisher/malariaatlasproject).
+  access_date: '2026-09-30'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped)
+  notes: 'Travel time to nearest city of >50,000 population, minutes, 2015 baseline,
+    1 km native resolution resampled to the master grid. Armenia bbox values 0-517
+    minutes (verified plausible before exporting). Substituted for OSM road-network
+    data after Geofabrik''s binary downloads proved unreachable from this environment
+    (persistent redirect loop, not a data problem -- see IMPLEMENTATION_LOG.md
+    2026-09-30). Road-network detail (vs. travel-time) remains a real fallback via
+    Overpass API if ever specifically needed. Not stored locally (cloud-first by
+    design) -- lives in Google Drive folder antar_gee_exports, file id=1ww6Juf-ofcZWis4kjRpm71rDZ3zfhteh,
+    5.7 MB, Drive MD5=36bf249ecc69e026a1691fb6b1ad3299 (recorded instead of a SHA-256:
+    hashing would mean downloading a multi-GB file for no integrity benefit Drive
+    doesn''t already provide).'

@@ -766,3 +766,35 @@ of variables already covered by mean/max -- a deliberate scope decision against 
 storage," not an oversight. Historical (1981-2010) is one file per variable; future
 (2011-2040/2041-2070/2071-2100 x 5 GCMs x 3 SSPs) adds 45 more per variable -- reused the
 CHELSA-daily pull's proven checkpointing/atomic-write pattern directly.
+
+## 2026-09-30 (cont.) -- CHELSA-BIOCLIM+ pull completed; a second checkpoint bug caught; both stuck GEE exports finished
+
+**Second real bug in the same pull, caught the same way -- by watching it actually run, not just
+checking it started.** After 24 of 37 variables completed cleanly, the pull crashed on `vpdmean`
+with `ValueError: need at least one array to stack`. Root cause: `vpdmean` (and, it turned out,
+`vpdmax`, `petmean`, `petmax`, `sfcWindmean`, `rsdsmean`) has ONLY historical data in the real
+archive -- confirmed by listing the bucket directly (`chelsa/global/bioclim/vpdmean/` has just
+`1981-2010/`, no future-period subdirectories at all). All 45 future-scenario fetches for these
+variables correctly 404. Because 404s resolve faster than the one slow historical-file read
+across 8 parallel threads, the *first* checkpoint boundary (20 completions) could be reached with
+zero successes collected yet, and `np.stack([])` doesn't accept an empty list. Fixed
+`_checkpoint` in `scripts/pull_chelsa_bioclim.py` to write progress either way but only touch the
+`.npz` once there is real data to stack; smoke-tested both the empty- and non-empty-`done` paths
+standalone before relaunching. Also hardened `main()`'s checksum step against a variable that
+might end up with zero scenarios at all (not currently triggered, but now correct if it ever is).
+
+**Full pull completed after the fix**: 30 of 37 variables with full historical+future coverage
+(46/46 scenarios each), 6 confirmed historical-only as above, 0 failed-reads anywhere. Spot-check
+values are physically sensible -- bio01 (annual mean temp) ranges -14.0 to 24.6 degC across
+Armenia's historical+future scenarios, gdd0 0.5-9007.6 (2 genuinely-nodata pixels, matching the
+smoke test). 223 MB total, kept local rather than moved to Drive -- small enough that the
+cloud-first convention doesn't buy anything here the way it does for the multi-GB GEE rasters.
+Registered as 37 entries in `configs/manifests/chelsa_bioclim.yaml`
+(`scripts/register_chelsa_bioclim.py`, reads the pull's own manifest_rows.json rather than
+re-deriving anything), all 37 verify_entry-confirmed.
+
+**Both exports stuck under the first GCP project's restricted mode finished within minutes of
+being moved to the second project**: `antar_vegetation_state` (919 MB) and
+`antar_accessibility_to_cities` (5.7 MB), both COMPLETED, both registered in
+`configs/manifests/gee_exports.yaml` (now 40 entries total). Confirms the second-project
+workaround actually solves the throttling problem, not just theoretically.
