@@ -63,7 +63,7 @@ audit). Figures 3 and 4 use placeholder traits and synthetic data by design.
 
 ## Status
 
-Version 2.0.0-alpha. Licence and authorship statement to be finalised before any public release.
+Version 2.0.0-alpha. MIT licensed (see `LICENSE`).
 
 ## Acknowledgments
 
