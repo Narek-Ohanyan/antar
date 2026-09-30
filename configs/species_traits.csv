@@ -1,8 +1,12 @@
 group,example_taxa,p50_mpa,slope_pct_per_mpa,psi_close_mpa,gmin25_mmol_m2_s,tp_c,lethal_plc,capacitance_mmol_m2_mpa,status
-mesic_diffuse_porous_broadleaf,"Fagus orientalis; Carpinus betulus",-3.0,40,-2.2,3.0,38,88,30000,ILLUSTRATIVE_PLACEHOLDER
-ring_porous_oak,"Quercus macranthera; Q. iberica",-2.8,35,-2.4,3.5,38,88,30000,ILLUSTRATIVE_PLACEHOLDER
-pine,"Pinus kochiana",-3.6,30,-2.6,1.5,40,50,20000,ILLUSTRATIVE_PLACEHOLDER
-juniper_arid_conifer,"Juniperus polycarpos; J. excelsa",-9.0,25,-5.0,1.0,42,50,15000,ILLUSTRATIVE_PLACEHOLDER
-# IMPORTANT: every numeric value above is an order-of-magnitude placeholder used only to exercise the code.
-# Replace with posteriors built from XFT (Choat et al. 2012), TRY (Kattge et al. 2020), Duursma et al. (2019)
-# for g_min, and local measurements (ANAU and prior field campaigns) before any result is interpreted.
+mesic_diffuse_porous_broadleaf,Fagus orientalis; Carpinus betulus,-2.99,50.3,-2.2,3.0,38,88,30000,"P50_SLOPE_REAL_XFT_CONGENERIC_2026-09-30 (n=81 P50, n=44 slope, from Fagus sylvatica (n=73), Carpinus betulus (n=8)); gmin25 still ILLUSTRATIVE_PLACEHOLDER; psi_close/tp_c/lethal_plc/capacitance still ILLUSTRATIVE_PLACEHOLDER"
+ring_porous_oak,Quercus macranthera; Q. iberica,-2.7,44.6,-2.4,3.5,38,88,30000,"P50_SLOPE_REAL_XFT_CONGENERIC_2026-09-30 (n=37 P50, n=16 slope, from Quercus petraea (n=10), Quercus robur (n=5), Quercus pubescens (n=6), Quercus frainetto (n=1), Quercus humilis (n=15)); gmin25 still ILLUSTRATIVE_PLACEHOLDER; psi_close/tp_c/lethal_plc/capacitance still ILLUSTRATIVE_PLACEHOLDER"
+pine,Pinus kochiana,-3.2,31.3,-2.6,3.5,40,50,20000,"P50_SLOPE_REAL_XFT_CONGENERIC_2026-09-30 (n=51 P50, n=31 slope, from Pinus sylvestris (n=51)); gmin25 REAL_XFT; psi_close/tp_c/lethal_plc/capacitance still ILLUSTRATIVE_PLACEHOLDER"
+juniper_arid_conifer,Juniperus polycarpos; J. excelsa,-9.27,17.2,-5.0,1.0,42,50,15000,"P50_SLOPE_REAL_XFT_CONGENERIC_2026-09-30 (n=1 P50, n=1 slope, from Juniperus thurifera (n=1)); gmin25 still ILLUSTRATIVE_PLACEHOLDER; psi_close/tp_c/lethal_plc/capacitance still ILLUSTRATIVE_PLACEHOLDER"
+# psi_close_mpa, tp_c, lethal_plc, capacitance_mmol_m2_mpa remain order-of-magnitude
+# placeholders -- no clean, unit-compatible XFT field exists for any of them (see
+# scripts/build_species_traits_from_xft.py's module docstring). p50_mpa, slope_pct_per_mpa,
+# and gmin25_mmol_m2_s are real values computed from the XFT database (Choat et al. 2012 and
+# later contributions; xylemfunctionaltraits.org), congeneric proxies where the exact Armenian
+# species has no XFT records -- see IMPLEMENTATION_LOG.md 2026-09-30 for full per-group
+# provenance (which species, how many records, why each was chosen).

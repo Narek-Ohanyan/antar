@@ -1,0 +1,25 @@
+- variable: xft_full_database
+  source: XFT (Xylem Functional Traits database)
+  version: n/a
+  url: https://xylemfunctionaltraits.org
+  citation: Choat, B., Jansen, S., Brodribb, T.J. et al. (2012). Global convergence in
+    the vulnerability of forests to drought. Nature 491, 752-755.
+    https://doi.org/10.1038/nature11688
+  license: See xylemfunctionaltraits.org for terms; downloaded directly by the user
+    (nar.ohanyan.eco@gmail.com) through the site's own interface, no scraping.
+  access_date: '2026-09-30'
+  local_path: data/xft/XFT_full_database_download_20260930-151542.csv
+  checksum_sha256: 4d238b068d4d87ed584f0fb5fd9202c1962dc9b12f13cf65924014286564e6ca
+  spatial_extent: Global (source database; used here filtered to specific genera/species)
+  notes: >-
+    Full XFT export, 4015 records. No exact-species matches exist for any of Armenia's
+    four target taxa (Fagus orientalis, Carpinus betulus, Quercus macranthera, Q. iberica,
+    Pinus kochiana, Juniperus polycarpos, J. excelsa) -- used via congeneric proxies
+    instead, real records for real related species, not invented values. See
+    scripts/build_species_traits_from_xft.py (which reads this file directly) and
+    IMPLEMENTATION_LOG.md 2026-09-30 for the full per-group species selection and
+    reasoning, including a real correction made during processing: an initial
+    juniper_arid_conifer estimate blended in Juniperus communis (mesic, n=11) alongside
+    the ecologically closer J. thurifera (arid-adapted analog, n=1) and pulled the
+    group median toward the wrong end of the genus's P50 range; corrected to use
+    J. thurifera alone once checked against a full-genus P50 survey.

@@ -211,10 +211,18 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       coefficient against real station data (now unblocked — GHCN-Daily, §1.2) and CHELSA-daily;
       fit the precipitation-elevation gradient the same way; run the PET ensemble and QDM against
       real ERA5-Land once §2's export is confirmed.
-- [ ] **XYLEM**: replace `species_traits.csv` placeholders with real trait priors (TRY/XFT once
-      registered, §1.6) for the four functional groups; re-run the Monte Carlo failure engine and
-      re-fit the monotone emulator against real trait draws; re-run the emulator's held-out
-      release gate with real data, not synthetic.
+- [x] **XYLEM P50/slope/gmin — real XFT data, done (2026-09-30).** `configs/species_traits.csv`'s
+      p50_mpa and slope_pct_per_mpa are now real values from the XFT database (congeneric
+      proxies for all four groups — no exact-species match exists for any target taxon; see
+      IMPLEMENTATION_LOG.md for the full per-group species/sample-size provenance, including a
+      real mid-analysis correction on the juniper group). gmin25 updated from real data only
+      where XFT had it (pine). psi_close_mpa, tp_c, lethal_plc, capacitance_mmol_m2_mpa remain
+      placeholders — no clean, unit-compatible XFT field exists for any of them.
+  - [ ] **Still needed**: re-run the Monte Carlo failure engine and re-fit the monotone emulator
+        against these real trait draws (was run against the old placeholders); re-run the
+        emulator's held-out release gate with real data, not synthetic. TRY registration
+        (§1.6) could still supplement psi_close_mpa/capacitance if it has trait data mapping
+        cleanly to those two fields — not checked yet.
 - [ ] **MNEME**: build the real person-period panel from the vitality/disturbance exports (§2);
       fit the cloglog GLM + monotone GBM + NNLS stack against real dieback labels; run the actual
       nested blocked-CV validation designed in `configs/cv.yaml`.

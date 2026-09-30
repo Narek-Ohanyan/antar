@@ -843,3 +843,58 @@ records (EPPO), and treeline transect data -- the "institution-only" label on th
 actually been checked against a live search in this session, only carried over from the very
 first pre-research assessment. Also checking TRY and XFT trait database registration processes
 live rather than from prior recall.
+
+## 2026-09-30 (cont.) -- real XFT trait data replaces the species_traits.csv placeholders
+
+User registered on xylemfunctionaltraits.org themselves and downloaded the full XFT export
+(4015 records, `data/xft/XFT_full_database_download_20260930-151542.csv`). **A password was
+pasted into chat during this exchange -- not used, not stored, not referenced anywhere in the
+repo; the user was told directly to change it.** No credential handling was needed for this step
+in any case: the user downloaded the file themselves through the site's own interface.
+
+No exact-species XFT records exist for any of the four target taxa (Fagus orientalis, Carpinus
+betulus, Quercus macranthera, Q. iberica, Pinus kochiana, Juniperus polycarpos, J. excelsa) --
+expected, XFT skews toward well-studied European/American species. Used real congeneric proxies
+instead, chosen and reported explicitly rather than picked by convenience:
+
+* **mesic_diffuse_porous_broadleaf**: Fagus sylvatica (n=73, the closest relative of the target
+  F. orientalis) + Carpinus betulus (n=8, an exact match for one of the two target species).
+* **ring_porous_oak**: five European white-oak-group deciduous oaks (Q. petraea, robur,
+  pubescens, frainetto, humilis; n=37 combined) -- same taxonomic section and similar
+  submediterranean climate niche as the targets.
+* **pine**: Pinus sylvestris alone (n=51) -- P. kochiana is taxonomically very close to (at times
+  treated as a variety of) P. sylvestris, the single best available analog.
+* **juniper_arid_conifer**: real course-correction caught mid-analysis, not just a clean lookup.
+  First pass included both J. thurifera (n=1) and J. communis (n=11) for a larger sample; the
+  blended median came out to -5.96 MPa P50, well short of the -9 MPa the placeholder had
+  guessed for an arid-zone Irano-Turanian juniper. Pulled the full genus's P50 distribution
+  across 24 species (-1.67 to -14.2 MPa) before accepting either number: J. communis sits at the
+  mesic/widespread end of that range, while J. thurifera -- a high-elevation Mediterranean-
+  mountain juniper -- sits in the ecologically appropriate arid/cold niche for the real target
+  species. Corrected to use J. thurifera alone (P50 -9.27 MPa, slope 17.2 %/MPa from its own
+  P12/P88) despite n=1, on the reasoning that ecological similarity outweighs raw sample count
+  for a single congeneric proxy -- diluting it with a poorly-matched but larger sample would
+  have been worse, not better. This is the same class of judgment call as the earlier tas/tasmax
+  variable-scope decisions, made explicit rather than left implicit in a script.
+
+Slope (% MPa-1) computed via `antar.hydraulics.vulnerability.slope_from_p12_p88` -- the project's
+own existing Pammenter & Van der Willigen (1998) formula, reused directly rather than
+re-derived, from real P12/P88 pairs (n=44/16/31/1 respectively). gmin25 updated from XFT's
+Gsmin field (mol->mmol conversion) only where real data existed (pine, n=4); the other three
+groups keep their original placeholder gmin, explicitly labelled as such in the `status` column
+rather than silently left ambiguous. psi_close_mpa, tp_c, lethal_plc and capacitance_mmol_m2_mpa
+are unchanged from the original placeholders -- no clean, unit-compatible XFT field exists for
+any of them (capacitance in particular is reported per sapwood volume in XFT, not the per-leaf-
+area molar basis this project's schema uses, and converting would need wood density and
+sapwood:leaf-area ratio XFT doesn't reliably give per record -- not attempted rather than guessed).
+
+A real bug was caught and fixed before committing: the first version of the extraction script
+fell back to a blank cell (not the original placeholder) for `gmin25_mmol_m2_s` whenever a group
+had no real XFT Gsmin data -- would have written empty cells into a CSV real code will eventually
+load. Fixed by giving the fallback dict its own gmin value per group.
+
+`configs/species_traits.csv`'s `status` column now records, per group, exactly which fields are
+real vs. still placeholder and the real fields' sample sizes and source species -- confirmed no
+code currently branches on this column's exact string (only `stand_defaults.yaml`'s separate
+placeholder guard does that), so changing its format broke nothing. Registered the source XFT
+file in `configs/manifests/xft.yaml`.
