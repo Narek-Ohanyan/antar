@@ -1010,3 +1010,52 @@ Also installed pytest and the project's dev environment properly (`pip install -
 had not been run in this checkout before) to actually execute the test suite rather than only
 syntax-check new code -- re-ran the full suite after every change in this batch, 143 passed
 throughout.
+
+## 2026-09-30 (cont.) -- Saxton & Rawls (2006) pedotransfer functions built, coefficients verified against the real paper
+
+`antar.climate.waterbalance` has always consumed `theta_sat`/`theta_fc`/`theta_lim`/
+`psi_sat_mpa`/`b_clapp_hornberger` (used throughout `topoclimate_forcing`, referenced in
+`export_soils`'s docstring and the README's TOPOHYDRO row) but nothing in the codebase ever
+derived them from soil texture -- the Saxton & Rawls (2006) pedotransfer step itself was never
+implemented, a real gap this session's earlier MERISTEM work exposed (the niche model needed
+real clay/sand/soc values from SoilGrids but had no path from those to anything
+`topoclimate_forcing` could use).
+
+**Would not write the coefficients from memory.** This is exactly the kind of formula where a
+misremembered constant produces a plausible-looking but wrong number, silently, downstream, in
+every cell's water balance -- worse than not implementing it. The primary source
+(`atmos.illinois.edu/~sshu3/model/saxton2006.pdf`) returned a real 503 (server down, not an
+access-control issue -- confirmed via direct `curl -I`). A first WebFetch on a "saxton2006.pdf"
+link actually resolved to the *1986* Saxton et al. paper (a different, earlier, organic-matter-
+free formulation) -- caught by noticing the received-date footer ("Received 10 June 1985") and
+the absence of the OM terms the 2006 paper is specifically known for, not assumed correct just
+because a URL had "2006" in its name. A WebSearch-synthesized summary of the real 2006 equations
+came back with an uncertain constant (a correction term that could have been either -0.15 or
+-0.015, a 10x difference that matters a great deal). Resolved by finding and reading a
+peer-reviewed-track preprint (Aliku & Oshunsaya 2016, GMD Discuss., doi:10.5194/gmd-2016-165)
+that reproduces Saxton & Rawls's own Table 1 and Table 2 verbatim with explicit source
+attribution -- read directly as a PDF (not OCR'd through a lossy web-text extractor), every
+coefficient and the units convention transcribed from that table.
+
+**A real, easy-to-miss unit trap the table caught**: sand and clay are decimal fractions *by
+weight* (0-1), but organic matter is a decimal fraction *by volume* (0-1) -- different bases for
+different inputs to the same equation, stated explicitly in the paper's own Table 2 footnote.
+Implemented the conversion from SoilGrids' native units (sand/clay in %, SOC in g/kg) explicitly
+in `soil_hydraulic_parameters`, including the organic-matter mass-to-volume conversion (van
+Bemmelen factor 1.724, an assumed 1.3 Mg/m3 bulk density since no measured bulk density is
+pulled -- flagged as an assumption in the docstring, not hidden).
+
+**Verified against independent physical checks before trusting it, not just "it ran"**: for a
+representative loam (40% sand, 20% clay, 15 g/kg SOC), the fitted Clapp-Hornberger b=5.23,
+matching Clapp & Hornberger's own 1978 table value for loam (~5.39) to within the expected
+fitting difference between two independently-derived pedotransfer relationships -- a real
+cross-check against a different, independent source, not just internal self-consistency.
+theta_sat > theta_fc > theta_lim holds for every texture tried, and sandy vs. clayey soils order
+correctly (sandy: FC=0.074, WP=0.023; clayey: FC=0.431, WP=0.294 -- both in textbook-plausible
+ranges). New module `src/antar/climate/soil_pedotransfer.py`, 4 new tests in
+`tests/test_climate.py`, full suite re-run: 147 passed.
+
+This unblocks (but does not itself complete) a real gridded TOPOHYDRO forcing run: the other
+missing pieces are ERA5-Land (registered, not yet loaded into per-cell forcing), terrain
+slope/aspect/concavity (SRTM registered, not yet processed), and a real per-cell orchestration
+script tying `topoclimate_forcing` to actual grid cells -- still open, stated plainly.

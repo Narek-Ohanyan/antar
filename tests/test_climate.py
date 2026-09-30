@@ -10,6 +10,7 @@ from antar.climate import (
     pet,
     radiation,
     snow,
+    soil_pedotransfer,
     stand_coupling,
     vapour,
     waterbalance,
@@ -126,6 +127,41 @@ def test_stress_integral_zero_when_wet():
 
 def test_clapp_hornberger_at_saturation():
     assert waterbalance.psi_clapp_hornberger(0.45, 0.45, -0.0005, 6.0) == pytest.approx(-0.0005)
+
+
+# ---------------------------------------------------------------- Saxton & Rawls pedotransfer
+def test_saxton_rawls_orders_moisture_points_correctly():
+    # theta_sat > theta_fc > theta_lim must hold for any physically valid soil --
+    # saturation holds more water than field capacity holds more than wilting point.
+    for sand, clay, soc in [(40, 20, 15), (85, 5, 10), (10, 50, 10), (60, 15, 5)]:
+        r = soil_pedotransfer.soil_hydraulic_parameters(sand, clay, soc)
+        assert r["theta_sat"] > r["theta_fc"] > r["theta_lim"] > 0
+        assert r["psi_sat_mpa"] < 0  # matric potential at saturation is negative, not positive
+        assert r["b_clapp_hornberger"] > 0
+
+
+def test_saxton_rawls_sandy_holds_less_water_than_clayey():
+    sandy = soil_pedotransfer.soil_hydraulic_parameters(sand_pct=85, clay_pct=5, soc_g_kg=10)
+    clayey = soil_pedotransfer.soil_hydraulic_parameters(sand_pct=10, clay_pct=50, soc_g_kg=10)
+    assert sandy["theta_fc"] < clayey["theta_fc"]
+    assert sandy["theta_lim"] < clayey["theta_lim"]
+
+
+def test_saxton_rawls_loam_matches_published_clapp_hornberger_b():
+    # Clapp & Hornberger (1978)'s own table gives b~5.39 for loam -- an independent
+    # cross-check that the transcribed Saxton & Rawls coefficients are right, not
+    # just internally self-consistent.
+    r = soil_pedotransfer.soil_hydraulic_parameters(sand_pct=40, clay_pct=20, soc_g_kg=15)
+    assert r["b_clapp_hornberger"] == pytest.approx(5.39, abs=0.5)
+
+
+def test_saxton_rawls_broadcasts_over_arrays():
+    sand = np.array([40.0, 85.0, 10.0])
+    clay = np.array([20.0, 5.0, 50.0])
+    soc = np.array([15.0, 10.0, 10.0])
+    r = soil_pedotransfer.soil_hydraulic_parameters(sand, clay, soc)
+    assert r["theta_sat"].shape == (3,)
+    assert np.all(r["theta_sat"] > r["theta_fc"])
 
 
 # ---------------------------------------------------------------- SPEI / indices

@@ -217,11 +217,23 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       isn't elevation-driven the way temperature is), not a bug; confirms the `exposure_factor`
       correction term will matter more than the base gradient. Saved to
       `configs/fitted/topohydro_lapse_rate.yaml`.
+  - [x] **Saxton & Rawls (2006) soil pedotransfer — built, done (2026-09-30).**
+        `src/antar/climate/soil_pedotransfer.py`: SoilGrids clay/sand/SOC -> theta_sat/
+        theta_fc/theta_lim/psi_sat_mpa/b_clapp_hornberger, the parameters
+        `topoclimate_forcing` needs and nothing previously computed. Coefficients read
+        directly from a source reproducing Saxton & Rawls's own Table 1 (the primary PDF
+        was down; a wrong "2006" link was caught resolving to the different 1986 paper
+        before being trusted) rather than recalled from memory — a wrong pedotransfer
+        constant would silently corrupt every cell's water balance. Cross-checked against
+        Clapp & Hornberger's own 1978 b-value table for loam (5.23 fit vs. 5.39 published),
+        not just internal self-consistency. 4 new tests, full suite 147 passed.
   - [ ] **Still needed**: the cold-air-pooling coefficient (`k_cap`) — needs a terrain concavity
         index that isn't computed yet (flagged since `export_terrain`: needs neighbourhood/flow-
         routing operations on the downloaded SRTM DEM, not a per-pixel Earth Engine operation).
         Also: run the PET ensemble and QDM against real ERA5-Land once that export (§2, already
-        registered) is actually loaded and checked.
+        registered) is actually loaded and checked. A real gridded `topoclimate_forcing` run
+        still needs ERA5-Land loaded, terrain slope/aspect/concavity computed, and a per-cell
+        orchestration script — the pedotransfer piece above unblocks but doesn't complete this.
 - [x] **XYLEM P50/slope/gmin — real XFT data, done (2026-09-30).** `configs/species_traits.csv`'s
       p50_mpa and slope_pct_per_mpa are now real values from the XFT database (congeneric
       proxies for all four groups — no exact-species match exists for any target taxon; see
