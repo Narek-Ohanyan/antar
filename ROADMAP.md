@@ -229,11 +229,17 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       real mid-analysis correction on the juniper group). gmin25 updated from real data only
       where XFT had it (pine). psi_close_mpa, tp_c, lethal_plc, capacitance_mmol_m2_mpa remain
       placeholders — no clean, unit-compatible XFT field exists for any of them.
-  - [ ] **Still needed**: re-run the Monte Carlo failure engine and re-fit the monotone emulator
-        against these real trait draws (was run against the old placeholders); re-run the
-        emulator's held-out release gate with real data, not synthetic. TRY registration
-        (§1.6) could still supplement psi_close_mpa/capacitance if it has trait data mapping
-        cleanly to those two fields — not checked yet.
+  - [x] **hyper_sd (trait uncertainty) — real, computed from XFT's actual spread (2026-09-30).**
+        `configs/fitted/xylem_trait_hyper_sd.yaml`: real between-record P50/slope standard
+        deviations per group (broadleaf 0.84 MPa, oak 1.10, pine 0.61; juniper undefined,
+        n=1). Previously every call site only ever used an illustrative guessed value.
+  - [ ] **Still blocked**: actually re-running the two-level Monte Carlo needs a `simulate`
+        callable driven by real per-cell daily climate forcing (VPD, soil water) — that needs
+        TOPOHYDRO's `topoclimate_forcing` run against real gridded CHELSA-daily data using
+        today's newly-fit lapse rate, not yet done (today's TOPOHYDRO fit produced the
+        monthly coefficients, not a gridded forcing run). Re-fitting the monotone emulator and
+        its held-out release gate both wait on that. TRY registration (§1.6) could still
+        supplement psi_close_mpa/capacitance if it has compatible data — not checked yet.
 - [ ] **MNEME**: build the real person-period panel from the vitality/disturbance exports (§2);
       fit the cloglog GLM + monotone GBM + NNLS stack against real dieback labels; run the actual
       nested blocked-CV validation designed in `configs/cv.yaml`.

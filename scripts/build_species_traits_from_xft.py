@@ -93,6 +93,7 @@ def main():
 
     provenance = []
     out_rows = []
+    hyper_sd_rows = {}  # real, XFT-derived group-level trait spread -- Sec 6.3's "posteriors built on XFT"
     for group, species_list in GROUP_SPECIES.items():
         matched = [r for r in rows if (r.get("Genus", "").strip(), r.get("Species", "").strip()) in species_list]
         p50s = [to_float(r["P50"]) for r in matched if to_float(r["P50"]) is not None]
@@ -106,6 +107,18 @@ def main():
         p50_median = round(statistics.median(p50s), 2) if p50s else None
         slope_median = round(statistics.median(slopes), 1) if slopes else None
         gmin_mmol = round(statistics.median(gsmins) * 1000, 2) if gsmins else None  # mol -> mmol m-2 s-1
+
+        # Real between-record spread within each group, for antar.hydraulics.monte_carlo's
+        # outer-loop hyper_sd -- previously always a caller-supplied guess (see tests/
+        # test_hydraulics.py), now real numbers where the sample supports them. n=1 groups
+        # (juniper_arid_conifer's P50/slope) have no defined sample SD -- left null rather
+        # than a fabricated spread, not silently defaulted to 0 or some guessed value.
+        hyper_sd_rows[group] = {
+            "p50_sd": round(statistics.stdev(p50s), 2) if len(p50s) >= 2 else None,
+            "p50_n": len(p50s),
+            "slope_sd": round(statistics.stdev(slopes), 1) if len(slopes) >= 2 else None,
+            "slope_n": len(slopes),
+        }
 
         species_str = ", ".join(f"{g} {s} (n={sum(1 for r in matched if r['Genus'].strip()==g and r['Species'].strip()==s)})"
                                  for g, s in species_list)
@@ -146,6 +159,21 @@ def main():
             "# species has no XFT records -- see IMPLEMENTATION_LOG.md 2026-09-30 for full per-group\n"
             "# provenance (which species, how many records, why each was chosen).\n"
         )
+
+    hyper_sd_out = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "xylem_trait_hyper_sd.yaml"
+    import yaml
+    hyper_sd_out.parent.mkdir(parents=True, exist_ok=True)
+    hyper_sd_out.write_text(yaml.safe_dump({
+        "fit_date": "2026-09-30",
+        "source": "data/xft/XFT_full_database_download_20260930-151542.csv (configs/manifests/xft.yaml)",
+        "note": "Real between-record P50/slope spread within each functional group -- for "
+                "antar.hydraulics.monte_carlo.two_level_failure_probability's outer-loop "
+                "hyper_sd, previously always a caller-supplied illustrative guess (see "
+                "tests/test_hydraulics.py). n<2 groups have no defined sample SD -- null, "
+                "not a fabricated or defaulted value.",
+        "groups": hyper_sd_rows,
+    }, sort_keys=False))
+    print(f"Wrote {hyper_sd_out}")
 
     print("\n".join(provenance))
     print(f"\nWrote {OUT_PATH}")

@@ -982,3 +982,31 @@ forced into a falsely-positive number. Pinus kochiana (n=8) explicitly skipped, 
 falsely confident (near-perfect separation) without being remotely reliable -- reported as
 `skipped_insufficient_data` with a stated reason rather than fit anyway. All of this is
 `configs/fitted/meristem_adult_niche.yaml`'s honest state, not smoothed over.
+
+## 2026-09-30 (cont.) -- real trait-uncertainty (hyper_sd) computed from XFT's actual spread
+
+`antar.hydraulics.monte_carlo.two_level_failure_probability`'s outer loop needs `hyper_sd` --
+group-level trait uncertainty, described in Sec. 6.3 as coming "from posteriors built on XFT,
+TRY and the g_min compilation." Every existing call site (`tests/test_hydraulics.py`) only ever
+supplied illustrative guessed values (e.g. `hyper_sd={"p50": 0.3}`), since no real posterior
+existed. Extended `scripts/build_species_traits_from_xft.py` (already reading the real XFT
+records for point-estimate P50/slope/gmin) to also compute each group's real between-record
+standard deviation: mesic_diffuse_porous_broadleaf P50 SD=0.84 MPa (n=81), ring_porous_oak
+SD=1.10 (n=37, widest -- pools 5 taxonomically real but ecologically varied oak species),
+pine SD=0.61 (n=51, narrowest -- single-species Pinus sylvestris sample). juniper_arid_conifer
+has no defined sample SD (n=1, J. thurifera only) -- left `null`, not fabricated or defaulted
+to a guessed number. Saved to `configs/fitted/xylem_trait_hyper_sd.yaml`.
+
+**What's still blocked, stated plainly rather than glossed over**: actually re-running
+`two_level_failure_probability` end-to-end needs a `simulate` callable driven by real per-cell
+daily climate forcing (VPD, soil water) -- that requires TOPOHYDRO's `topoclimate_forcing`
+orchestration to be run against real gridded CHELSA-daily data using today's newly-fit lapse
+rate/precip gradient, which hasn't happened yet (today's TOPOHYDRO fit produced the monthly
+coefficients, not a full gridded forcing run). The real hyper_sd values are ready for that
+run whenever the forcing pipeline is wired; not claiming the full Monte Carlo re-fit is done
+when only its input uncertainty is.
+
+Also installed pytest and the project's dev environment properly (`pip install -e ".[dev]"`
+had not been run in this checkout before) to actually execute the test suite rather than only
+syntax-check new code -- re-ran the full suite after every change in this batch, 143 passed
+throughout.

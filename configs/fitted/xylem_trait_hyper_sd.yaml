@@ -1,0 +1,27 @@
+fit_date: '2026-09-30'
+source: data/xft/XFT_full_database_download_20260930-151542.csv (configs/manifests/xft.yaml)
+note: Real between-record P50/slope spread within each functional group -- for antar.hydraulics.monte_carlo.two_level_failure_probability's
+  outer-loop hyper_sd, previously always a caller-supplied illustrative guess (see
+  tests/test_hydraulics.py). n<2 groups have no defined sample SD -- null, not a fabricated
+  or defaulted value.
+groups:
+  mesic_diffuse_porous_broadleaf:
+    p50_sd: 0.84
+    p50_n: 81
+    slope_sd: 16.5
+    slope_n: 44
+  ring_porous_oak:
+    p50_sd: 1.1
+    p50_n: 37
+    slope_sd: 20.3
+    slope_n: 16
+  pine:
+    p50_sd: 0.61
+    p50_n: 51
+    slope_sd: 38.3
+    slope_n: 31
+  juniper_arid_conifer:
+    p50_sd: null
+    p50_n: 1
+    slope_sd: null
+    slope_n: 1
