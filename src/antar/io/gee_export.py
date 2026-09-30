@@ -399,6 +399,56 @@ def export_snow(bbox_wgs84, year_start: int, year_end: int, crs: str, scale_m: f
     return task
 
 
+def export_terraclimate(bbox_wgs84, crs: str, scale_m: float = 4000.0, drive_folder: str = "antar_gee_exports",
+                         year_start: int = 1991, year_end: int = 2020):
+    """TerraClimate (Abatzoglou et al. 2018), the real independent water-balance benchmark named
+    in the concept note (sec3_data.tex) but never pulled this session -- ROADMAP.md S1.2. Returns
+    the started task.
+
+    Real monthly climatology (mean of each calendar month across ``year_start``-``year_end``,
+    the project's own stated ``reference_period``), not the full 30-year monthly series -- this
+    is meant as a historical cross-check against CHELSA-daily's own climatology, not a forcing
+    input (CHELSA-daily already serves that role), so a compact climatology is the right real
+    product, not a redundant full time series.
+
+    8 real bands: pr, tmmn, tmmx, pet, aet, soil (moisture), ro (runoff), pdsi, vpd. Each band's
+    documented scale factor (checked directly against the real GEE catalog page, not assumed --
+    Earth Engine does NOT auto-apply a catalog-documented scale factor, the raw digital numbers
+    must be multiplied explicitly) is applied before averaging: pr/ro scale=1 (already real
+    units); tmmn/tmmx/pet/aet/soil scale=0.1; pdsi scale=0.01; vpd scale=0.01.
+
+    Exported at 4000m with explicit ``.resample('bilinear')`` (TerraClimate's real native pixel
+    is ~4638m; exporting to the 30m master grid with the GEE-default nearest-neighbor, the way
+    every export before this session's resampling-policy review did, would 1) be a ~150x
+    meaningless oversample and 2) repeat the exact real problem
+    ``configs/resampling_policy.yaml`` just flagged for soils/ERA5-Land -- applying that policy
+    here immediately rather than creating a third entry needing the same future fix.
+    """
+    aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
+    coll = ee.ImageCollection("IDAHO_EPSCOR/TERRACLIMATE").filterBounds(aoi).filterDate(
+        f"{year_start}-01-01", f"{year_end + 1}-01-01"
+    )
+    scale_factors = {
+        "pr": 1.0, "ro": 1.0, "tmmn": 0.1, "tmmx": 0.1, "pet": 0.1, "aet": 0.1, "soil": 0.1,
+        "pdsi": 0.01, "vpd": 0.01,
+    }
+
+    bands = {}
+    for var, factor in scale_factors.items():
+        for month in range(1, 13):
+            monthly = coll.filter(ee.Filter.calendarRange(month, month, "month")).select(var)
+            climatology = monthly.mean().multiply(factor).rename(f"{var}_month{month:02d}")
+            bands[f"{var}_month{month:02d}"] = climatology
+
+    image = ee.Image.cat(list(bands.values())).toFloat().resample("bilinear")
+    task = ee.batch.Export.image.toDrive(
+        image=image, description="antar_terraclimate", folder=drive_folder,
+        region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
+    )
+    task.start()
+    return task
+
+
 def export_land_tenure(bbox_wgs84, crs: str, scale_m: float, drive_folder: str = "antar_gee_exports"):
     """WDPA protected-area boundaries (Table 4), rasterised to a boolean "protected" band
     on the master grid -- feeds ``configs/study_area.yaml``'s eligibility-mask exclusions

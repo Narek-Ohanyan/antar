@@ -1,0 +1,122 @@
+# Explicit regridding/resampling policy per source, closing ROADMAP.md S0's "Resolution
+# reconciliation" item: "every source needs an explicit regridding/aggregation method to the
+# master grid, stated in configs/, not left implicit in whatever a script happens to do."
+#
+# CURRENT REAL STATE (checked directly against src/antar/io/gee_export.py, 2026-09-30, not
+# assumed): no export function anywhere in this project calls .resample() on its image before
+# ee.batch.Export.image.toDrive(...). Earth Engine's own documented default for that export
+# call is NEAREST-NEIGHBOR resampling. This means every export -- including continuous fields
+# like elevation, soils and climate, not just categorical ones -- is currently regridded to the
+# master grid (30m, EPSG:32638) with nearest-neighbor, whether or not that is the right choice
+# for that variable. This file states, per source, whether that current real behaviour is
+# already correct or is a real, specific thing to fix, and the reasoning either way -- nothing
+# here has been changed in gee_export.py yet, this is the policy decision, not its
+# implementation.
+#
+# General rule adopted (not a GEE-specific convention, standard GIS/remote-sensing practice):
+# * Categorical/class/boolean layers (land cover class, protected-area boolean, disturbance
+#   flags, rot type, etc.): nearest-neighbor is CORRECT, not just tolerated -- interpolating
+#   between class codes (e.g. bilinear-averaging "forest"=1 and "water"=2 to get 1.4) produces
+#   a meaningless value. Never change these to bilinear/cubic.
+# * Continuous fields being upsampled (source resolution coarser than 30m, e.g. SoilGrids 250m,
+#   ERA5-Land ~9km, CHELSA-BIOCLIM+ 1km): nearest-neighbor introduces real blockiness/aliasing
+#   at the 30m target that bilinear (or cubic for smoother fields like elevation-derived terrain)
+#   would reduce. This is the real, specific case to fix.
+# * Continuous fields at or finer than 30m already (SRTM 30m terrain itself): resampling method
+#   barely matters since there's little to no coarse-to-fine interpolation actually happening;
+#   nearest-neighbor's current default is harmless here, not worth the engineering effort to
+#   change.
+
+sources:
+  - export: export_terrain
+    variables: [elevation, slope, aspect]
+    native_resolution: "SRTM 30m (already matches the master grid's own 30m -- no real
+      up/downsampling occurs)"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "correct as-is -- no fix needed, same-resolution reprojection"
+
+  - export: export_soils
+    variables: [clay, sand, silt, soc]
+    native_resolution: "SoilGrids 2.0, 250m"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "REAL FIX NEEDED -- 250m to 30m is a real ~8x upsample; nearest-neighbor produces
+      visible 250m blockiness in every derived TOPOHYDRO cell (theta_sat, psi_sat_mpa,
+      b_clapp_hornberger all inherit whatever block the cell's nearest SoilGrids pixel happens
+      to fall in). Should be .resample('bilinear') before export."
+
+  - export: export_era5land_forcing
+    variables: [wind_speed, ssrd, strd, dewpoint, surface_pressure]
+    native_resolution: "ERA5-Land, ~9km (0.1 degree)"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "REAL FIX NEEDED, same reasoning as soils but more severe (~300x upsample from 9km
+      to 30m) -- every real gridded-TOPOHYDRO run this session (78 cells) is, in effect, reading
+      off of whichever coarse 9km ERA5-Land cell each 30m point happens to land nearest to,
+      not a smoothly-varying surface. Should be .resample('bilinear')."
+
+  - export: export_vegetation_state
+    variables: [modis_lai_growing_season_mean, phenology_bands]
+    native_resolution: "MODIS, 500m"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "REAL FIX NEEDED, same reasoning -- bilinear."
+
+  - export: export_vegetation_state
+    variables: [esa_worldcover_tree_cover_class]
+    native_resolution: "ESA WorldCover, 10m"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "correct as-is -- this is a CATEGORICAL class layer, nearest-neighbor is the right
+      choice regardless of resolution ratio, and it's already finer than the 30m target anyway
+      (downsampling a class layer should still use nearest/mode, never bilinear)."
+
+  - export: export_land_tenure
+    variables: [protected_boolean]
+    native_resolution: "WDPA vector, rasterised"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "correct as-is -- boolean/categorical."
+
+  - export: export_disturbance_ancillary
+    variables: [no_disturbance_boolean]
+    native_resolution: "Hansen GFC 30m loss-year + MODIS MCD64A1 burned-area 500m, combined"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "correct as-is -- boolean/categorical, and this project's own real MNEME run this
+      session already relies on this being a hard 0/1 flag, not an interpolated one."
+
+  - export: export_vitality_composites
+    variables: [kndvi_annual, valid_count]
+    native_resolution: "HLS/Landsat, 30m (already matches the master grid)"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "correct as-is -- same-resolution, and kNDVI is a continuous field but at parity
+      resolution there's effectively nothing to interpolate."
+
+  - export: export_structure
+    variables: [gedi_rh98_median, eth_chm_2020]
+    native_resolution: "GEDI (sparse point footprints, not a raster to resample) + ETH global
+      canopy height 10m"
+    current_behaviour: nearest-neighbor (GEE default, unchanged)
+    verdict: "the ETH 10m layer is a REAL, SMALLER candidate for the bilinear fix (10m to 30m is
+      a mild ~3x upsample, real but much less severe than soils/ERA5-Land) -- lower priority
+      than those two, but a real, specific improvement if revisited."
+
+non_gee_sources:
+  - source: CHELSA-daily (pull_chelsa_daily.py)
+    native_resolution: "~1km (0.0083 degree)"
+    current_behaviour: "direct rasterio window read at CHELSA's own native grid (no
+      reprojection/resampling performed at all -- values are used at CHELSA's own resolution,
+      matched to grid cells by nearest-pixel indexing in scripts/run_topohydro_grid.py's
+      grid_latlon()/chelsa_row/chelsa_col, not resampled to the 30m master grid)"
+    verdict: "documented choice, not an oversight: TOPOHYDRO's lapse-rate downscaling is exactly
+      the mechanism meant to carry CHELSA's ~1km reference value down to the true 30m cell
+      elevation (see z_ref_m's own real 'coarse window' documentation in
+      scripts/run_topohydro_grid.py) -- a spatial resample of the ~1km field itself would be
+      redundant with, not a replacement for, that physical downscaling step."
+
+  - source: CHELSA-BIOCLIM+ (pull_chelsa_bioclim.py)
+    native_resolution: "~1km"
+    current_behaviour: "point-sampled via latlon_to_rc() at CHELSA-BIOCLIM+'s own native grid
+      (scripts/fit_meristem_adult_niche.py), same pattern as CHELSA-daily above"
+    verdict: "same reasoning as CHELSA-daily -- not resampled by design, used as the coarse
+      reference a downstream mechanism (here, MERISTEM's niche features directly, not a
+      lapse-rate correction) is built on."
+
+status: "Policy written (2026-09-30); the two real, specific fixes (SoilGrids, ERA5-Land
+  .resample('bilinear')) are NOT yet applied to gee_export.py or re-exported -- this document
+  is the decision, implementing and re-running the exports is separate, real follow-up work."

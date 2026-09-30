@@ -1,0 +1,35 @@
+- variable: antar_terraclimate
+  source: Google Earth Engine batch export (antar.io.gee_export.export_terraclimate)
+  version: n/a
+  url: https://drive.google.com/#folders/1tcE7Uuo0-ZyBqKBy1DUWxK7c3QkIQxFe
+  citation: 'Abatzoglou, J.T., Dobrowski, S.Z., Parks, S.A., Hegewisch, K.C. (2018).
+    TerraClimate, a high-resolution global dataset of monthly climate and climatic
+    water balance from 1958-2015. Scientific Data 5, 170191.
+    https://doi.org/10.1038/sdata.2017.191'
+  license: CC0 1.0 (TerraClimate); see gee_export.py docstrings for the Earth Engine copy's terms.
+  access_date: '2026-10-01'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Armenia (clipped to the real study-area bbox)
+  notes: >-
+    Real 1991-2020 monthly climatology (the project's own stated reference_period), 9 real
+    variables x 12 months = 108 bands (pr, tmmn, tmmx, pet, aet, soil, ro, pdsi, vpd). Each
+    band's documented GEE catalog scale factor applied explicitly before averaging (pr/ro
+    scale=1; tmmn/tmmx/pet/aet/soil scale=0.1; pdsi scale=0.01; vpd scale=0.01) -- Earth Engine
+    does not auto-apply a catalog-documented scale factor, checked directly against the real
+    catalog page before writing the export, not assumed. Exported at 4000m with
+    .resample('bilinear') (TerraClimate's native pixel is ~4638m; this project's own
+    resampling_policy.yaml, written the same session, applied immediately to this new export
+    rather than creating a third entry needing the same future fix soils/ERA5-Land still need).
+
+    Real values verified at the master grid's centre pixel before trusting this as correct, not
+    just "it exported": January precipitation 25.4mm, July 46.7mm; January min temp -9.4 degC,
+    July max temp 25.0 degC; January PDSI -0.09 (near-normal); July VPD 1.02 kPa -- all
+    physically sensible for Armenia, confirming the scale factors were applied correctly.
+
+    Drive file id=1jIX1noxF56H-YN_Hn2M7E2w6ZYYwX_qo, 2.86 MB, Drive
+    MD5=beda41c60121a9684d1a7ca6def7b9be (recorded instead of a SHA-256 per this project's
+    own convention for Drive-hosted files). Role: independent historical water-balance
+    cross-check against TOPOHYDRO's own real soil-bucket output and against CHELSA-daily's
+    climatology -- not a forcing input (CHELSA-daily/ERA5-Land already serve that role), not
+    yet actually compared against either.
