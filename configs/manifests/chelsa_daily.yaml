@@ -51,7 +51,14 @@
   local_path: data/chelsa/CHELSA_pr_2000_2019_armenia_daily.npz
   checksum_sha256: 9221a0f8a21d8edd3d00c08b8db0f9b8f47feb41b7ee44faf0aceff2ccb5470c
   spatial_extent: Armenia (clipped)
-  notes: Daily precipitation, 1979-01-01 to 2019-12-31 (14975 days) -- the source
+  notes: >-
+    Daily precipitation, 1979-01-01 to 2019-12-31 (14975 days) -- the source
     archive's own coverage ends 2019; 2020-2024 is a genuine gap in CHELSA-daily
     itself, not a pull failure. Complete over its available range -- 0 confirmed-missing,
-    0 failed-read.
+    0 failed-read. Caveat (2026-09-30): 7810 pixel-days (about 0.0004% of ~1.85 billion)
+    exceed 1000 mm/day, scattered across roughly 6700 distinct pixel locations
+    clustered in complex mountain terrain -- checked against the source raster's
+    nodata sentinel (which would scale to exactly 6553.5) and ruled out as that; reads
+    as a known CHELSA artifact in orographically complex terrain, not a pull bug.
+    Not filtered out here -- downstream users of daily pr should be aware before
+    treating every value as equally reliable.
