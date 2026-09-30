@@ -96,17 +96,24 @@ future_ensembles:
       upstream reference before wiring this data through TOPOHYDRO's bias-adjustment step.
 
   cmip6:
-    source_primary: "NASA/GDDP-CMIP6 on Google Earth Engine (ee.ImageCollection('NASA/GDDP-CMIP6'); note the
-      asset id is NASA/GDDP-CMIP6, not NEX-GDDP-CMIP6). Confirmed directly against the Earth Engine Data
-      Catalog, 2026-09-30 (ROADMAP.md S1.1)."
-    source_fallback: "AWS Open Data s3://nex-gddp-cmip6 (NetCDF, --no-sign-request, full 35-model x 4-SSP
-      archive) if the EE ingestion turns out not to carry ssp126/ssp370 (only historical/ssp245/ssp585 are
-      documented on the EE catalog page as of the check date -- not yet independently verified in the Code
-      Editor)."
-    source_isimip3b: "data.isimip.org via the official isimip-client Python package (cutout_bbox), for the
-      concept note's original 5-GCM ensemble specifically. The portal sits behind an anti-bot gate (\"Anubis\")
-      that blocked a direct scripted fetch during research -- a live isimip-client test is still needed before
-      this path is trusted at scale, not yet done."
+    source_primary: "ISIMIP3b via data.isimip.org's Files API v2 (NOT the outdated cutout_bbox() wrapper in
+      the isimip-client pip package, which sends a request shape the live API rejects -- the correct payload
+      is {'paths': [...], 'operations': [{'operation': 'cutout_bbox', 'bbox': [lon_min, lon_max, lat_min,
+      lat_max]}]} posted to files.isimip.org/api/v2, built directly). CONFIRMED WORKING END TO END
+      2026-09-30: submitted a real job, polled to completion, downloaded and opened the resulting NetCDF --
+      correct coordinates (lat 39.25-41.25, lon 43.75-46.25) and physically plausible daily tas
+      (-30.7 to 32.1 degC, GFDL-ESM4/ssp126/2015-2020). The bbox axis order is [lon_min, lon_max, lat_min,
+      lat_max], not the [south, north, west, east]-style order first assumed -- caught by checking the
+      output file's actual coordinates against Armenia's known extent, not trusted from the job succeeding
+      alone (the wrong order also 'succeeds', just for the wrong region -- northern Georgia/southern Russia
+      in the first attempt). Has exactly the concept note's intended scenario set (ssp126/370/585) and the
+      original 5-GCM ensemble -- no substitution needed."
+    source_secondary: "NASA/GDDP-CMIP6 on Google Earth Engine (ee.ImageCollection('NASA/GDDP-CMIP6')).
+      CONFIRMED (2026-09-30, queried the collection directly): only historical/ssp245/ssp585 actually exist
+      in this EE ingestion -- ssp126 and ssp370 are absent (0 images), despite NASA's own archive having all
+      four. Kept as a secondary, broader-GCM (34 models) cross-check restricted to ssp245/ssp585, not as the
+      primary CMIP6 source. Full 4-SSP archive exists at AWS s3://nex-gddp-cmip6 if ever needed instead of EE.
+      asset id is NASA/GDDP-CMIP6, not NEX-GDDP-CMIP6, if a fresh EE query is written."
     scenarios: [ssp126, ssp245, ssp370, ssp585]
     models_isimip3b: [GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0, UKESM1-0-LL]   # the concept note's
                                                                                             # original 5 ISIMIP3b models
@@ -115,7 +122,7 @@ future_ensembles:
     bias_adjustment_note: "NASA/GDDP-CMIP6 is already bias-corrected (BCSD method). ISIMIP3b is bias-adjusted
       against W5E5 v1.0. Neither needs antar.climate.bias.quantile_delta_mapping re-applied as a raw-GCM
       correction step -- same caution as the CORDEX note above, for a different reason."
-    status: "Access confirmed 2026-09-30; no pull attempted yet."
+    status: "Access confirmed working end to end 2026-09-30; full pull not yet run."
 
 structural_ensemble:
   pet_formulations: [pm_fao56, canopy_pm_co2, priestley_taylor, energy_only]

@@ -798,3 +798,48 @@ being moved to the second project**: `antar_vegetation_state` (919 MB) and
 `antar_accessibility_to_cities` (5.7 MB), both COMPLETED, both registered in
 `configs/manifests/gee_exports.yaml` (now 40 entries total). Confirms the second-project
 workaround actually solves the throttling problem, not just theoretically.
+
+## 2026-09-30 (cont.) -- hyperion deprioritised; ISIMIP3b access confirmed working end to end
+
+User's direction: hyperion is currently unreachable and stays deprioritised -- proceed with
+CHELSA and other already-available sources now, treat CORDEX/hyperion as a later addition once
+office-network access is available again.
+
+**ISIMIP3b confirmed genuinely working, not just "probably works"** -- the earlier research
+pass's `isimip-client` recommendation had two real problems, both found and fixed by actually
+running it rather than trusting the package name:
+
+1. The pip-installed `isimip-client` (v2.0.2)'s own `cutout()` method builds a request shape
+   (`{'task': 'cutout_bbox', 'bbox': ..., 'paths': ...}`) that the *live* Files API v2 rejects
+   outright (`400: 'operations' field required`) -- the client library is out of sync with
+   ISIMIP's current API. Fixed by reading the API's own root endpoint
+   (`files.isimip.org/api/v2/`, which lists its real `operations` schema) and posting the
+   correct shape directly via the client's lower-level `post_job()`: `{'paths': [...],
+   'operations': [{'operation': 'cutout_bbox', 'bbox': [...]}]}`.
+2. **A real bbox-axis-order bug, caught by checking the actual output coordinates, not the job's
+   success status.** First attempt used `bbox=[38.8, 41.4, 43.4, 46.7]` (a [south, north, west,
+   east]-style guess) -- the job "succeeded" and produced a file, but opening it with netCDF4
+   showed lat 43.75-46.25, lon 39.25-41.25: northern Georgia/southern Russia, not Armenia. The
+   real order is `[lon_min, lon_max, lat_min, lat_max]`. Corrected to `[43.4, 46.7, 38.8, 41.4]`,
+   re-verified: lat 39.25-41.25, lon 43.75-46.25 (genuinely Armenia), daily tas -30.7 to 32.1
+   degC over 2015-2020 (GFDL-ESM4/ssp126) -- physically plausible, not just "a number came back."
+   This is exactly the class of error ("the code ran without error" != "the output is right")
+   this project has been burned by twice before (CHELSA's date-field order, the wind-speed
+   averaging-order bug) -- caught the same way, by checking the real numbers before trusting
+   the mechanism at scale.
+
+**Consequence for the ensemble design**: ISIMIP3b is now the confirmed PRIMARY CMIP6 source
+(exactly the concept note's 5 GCMs and ssp126/370/585), not NASA/GDDP-CMIP6 -- separately
+confirmed (queried the EE collection directly) that NASA/GDDP-CMIP6's EE ingestion only has
+historical/ssp245/ssp585, missing ssp126 and ssp370 entirely. NASA/GDDP-CMIP6 is now documented
+as a secondary, broader-GCM (34 models) cross-check restricted to the two scenarios it actually
+has, not the primary. `configs/scenarios.yaml` updated accordingly. Full ISIMIP3b pull (4
+variables x 5 GCMs x 3 SSPs x 9 decade-chunks = 540 cutout jobs) not yet run -- the next real
+data-pull task, needs a proper checkpointed script given the scale.
+
+Also launched a research pass (delegated, not yet returned) specifically checking Armenia's
+National Forest Inventory/Hayantar, provenance trial networks (EUFORGEN), pest/pathogen outbreak
+records (EPPO), and treeline transect data -- the "institution-only" label on these had never
+actually been checked against a live search in this session, only carried over from the very
+first pre-research assessment. Also checking TRY and XFT trait database registration processes
+live rather than from prior recall.
