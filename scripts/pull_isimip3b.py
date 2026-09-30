@@ -108,6 +108,7 @@ def process_combo(var, gcm, scenario):
             import netCDF4 as nc
             nc_files = sorted(work_dir.glob("*.nc"))
             all_dates, all_values = [], []
+            units_seen = set()
             for ncf in nc_files:
                 ds = nc.Dataset(ncf)
                 time_var = ds.variables["time"]
@@ -116,11 +117,21 @@ def process_combo(var, gcm, scenario):
                 fill = getattr(ds.variables[var], "_FillValue", None)
                 if fill is not None:
                     arr[arr == fill] = np.nan
+                units_seen.add(getattr(ds.variables[var], "units", "unknown"))
                 all_dates.extend(d.isoformat()[:10] for d in dates)
                 all_values.append(arr)
                 ds.close()
 
             values = np.concatenate(all_values, axis=0)
+            # ISIMIP3b's pr is a flux (kg m-2 s-1), not an accumulated depth -- CHELSA-daily's pr
+            # (this project's historical reference) is mm/day. Converting to match rather than
+            # leaving a silent unit mismatch between the two pr sources: caught on the very first
+            # smoke test at scale, where the raw values (~1e-4) printed as "0.00" at 2 decimal
+            # places and looked like a bug before the units were actually checked.
+            if units_seen == {"kg m-2 s-1"}:
+                values = values * 86400.0  # kg m-2 s-1 -> mm/day (1 kg/m2 water = 1 mm depth)
+            elif "kg m-2 s-1" in units_seen:
+                raise ValueError(f"{key}: mixed pr units across decade files: {units_seen}")
             shutil.rmtree(work_dir)  # storage-minimal: raw NetCDFs discarded immediately after reading
             return key, (all_dates, values), None
         except Exception as e:
@@ -160,7 +171,7 @@ def main():
                 np.savez_compressed(tmp_path, data=values, dates=np.array(dates))
                 os.replace(tmp_path, out_path)
                 print(f"[{i}/{len(todo)}] {key}: DONE, shape={values.shape}, "
-                      f"range=[{np.nanmin(values):.2f}, {np.nanmax(values):.2f}]", flush=True)
+                      f"range=[{np.nanmin(values):.4g}, {np.nanmax(values):.4g}]", flush=True)
                 done[key] = {"status": "done", "local_path": str(out_path.relative_to(OUT_DIR.parent.parent)),
                              "n_days": len(dates)}
             progress_path.write_text(json.dumps(done, indent=2))
