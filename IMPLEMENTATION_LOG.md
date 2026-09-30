@@ -711,3 +711,58 @@ re-submitted `vegetation_state` export (see above) sat in `READY` (queued, not r
 duration of this session after submission -- the noncommercial-quota restriction is throttling
 throughput, not just a one-line warning. Worth checking task state again before assuming any
 future EE export has actually run.
+
+## 2026-09-30 (cont.) -- decisions applied; CHELSA-BIOCLIM+ nodata bug caught before the pull; new GCP project
+
+User's four decisions from the interactive question round: (1) run CORDEX/CMIP5 and CMIP6/
+ISIMIP3b as two separate labelled future ensembles, not one -- applied in `configs/scenarios.yaml`
+(see the commit "Run CORDEX and CMIP6/ISIMIP3b as two separate labelled future ensembles"); (2)
+pull CHELSA-BIOCLIM+ now; (3) skip the tree-ring author outreach; (4) create a second GCP project
+for fresh Earth Engine quota rather than wait out the first project's restricted mode.
+
+**Second GCP project (`antar-armenia-2`) set up and verified working.** Registration for Earth
+Engine noncommercial use is a separate step from just creating the project and enabling the API
+-- hit both intermediate states in order (API-not-enabled, then registered-but-quota-check still
+pending) before `ee.Initialize()` succeeded cleanly with 0 existing tasks (fresh quota, confirmed
+via `ee.data.getTaskList()`). The two exports stuck in `READY` under the first project's
+restricted mode (`vegetation_state`, `accessibility_to_cities`) were cancelled there and
+resubmitted on the new project (`PWUJYIVOR4T4BLZYDO46N4H3`, `USCD5PM5QOL75D3Y7OZIIRUE`) rather
+than left to potentially never run.
+
+**Real nodata bug caught before trusting the CHELSA-BIOCLIM+ pull at scale, not after.** First
+smoke-test fetch (gdd0, historical) returned a maximum of 214748364.7 -- exactly
+2147483647 (INT32_MAX) x 0.1, i.e. the source raster's own declared nodata sentinel leaking
+through unmasked because `fetch_one` scaled the raw value without checking for nodata first.
+Confirmed via the raster's own metadata (`dtype=int32, nodata=2147483647, scale=0.1`) before
+fixing, not guessed. Fixed in `scripts/pull_chelsa_bioclim.py`: mask nodata to NaN before scaling.
+Re-tested the same fetch afterward: max 5955.9, mean 3302, 2 genuinely-nodata pixels (plausible
+values for annual growing-degree-days in Armenia) -- confirmed fixed by checking the actual
+numbers again, not just that it no longer errored.
+
+**Checked whether the already-completed CHELSA-daily pull has the same latent bug -- it does not,
+verified, not assumed.** CHELSA-daily's uint16 nodata sentinel (65535) would scale to exactly
+6553.5; scanned all four pulled variables' full arrays (tas, tasmax, tasmin: ~2.08 billion pixels
+each; pr: ~1.85 billion) for that exact value: zero matches in all four. Armenia's bbox is fully
+inland with no missing-data pixels in this product, so the same unmasked-nodata code path in
+`pull_chelsa_daily.py` never actually fired. The already-pulled data does not need to be re-pulled.
+Added the same defensive nodata mask to `pull_chelsa_daily.py` anyway, for correctness if the bbox
+ever changes -- not because it fixed an observed problem there.
+
+**Separately, a real but different data characteristic was found while investigating, not a code
+bug**: `pr`'s already-pulled data has 7810 pixel-days (out of ~1.85 billion, ~0.0004%) exceeding
+1000 mm/day, scattered across ~6700 distinct pixel locations, clustered in complex mountain
+terrain. None of these match the nodata-sentinel value (6553.5), ruling out the same bug. This
+reads as a known CHELSA artifact in orographically complex terrain rather than corruption --
+documented as a caveat on the `pr` manifest entry, not silently left unmentioned, and not
+"fixed" since these may be genuine (if unusually extreme) modelled values rather than clearly
+wrong ones.
+
+**CHELSA-BIOCLIM+ pull scoped to ~37 of the archive's 74 real variables** (confirmed by listing
+the bucket): bio01-19, gdd0/5/10, gddlgd0/5/10, gsl/gsp/gst, fcf/fgd/lgd, vpdmean/max, petmean/max,
+sfcWindmean, rsdsmean -- the ones that map to something an ANTAR engine actually uses (MERISTEM's
+niche/treeline/frost terms, XYLEM's water-stress terms, TOPOHYDRO's water-balance and
+ERA5-Land cross-checks). Dropped the Koppen-Geiger bins, npp/swe/swb, and the min/range variants
+of variables already covered by mean/max -- a deliberate scope decision against "minimize
+storage," not an oversight. Historical (1981-2010) is one file per variable; future
+(2011-2040/2041-2070/2071-2100 x 5 GCMs x 3 SSPs) adds 45 more per variable -- reused the
+CHELSA-daily pull's proven checkpointing/atomic-write pattern directly.

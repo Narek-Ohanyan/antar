@@ -63,7 +63,18 @@ def fetch_one(var, d):
                     data = src.read(1, window=window)
                     scale = src.scales[0] or 1.0
                     offset = src.offsets[0] or 0.0
-                    return d, data.astype(np.float32) * scale + offset, None
+                    # Defensive: mask the source's declared nodata sentinel before scaling, the
+                    # same fix applied to pull_chelsa_bioclim.py after its int32 nodata sentinel
+                    # (2147483647) leaked through as a bogus 2.1e8 value there. Verified this
+                    # never actually fired for the pulled CHELSA-daily data (Armenia's bbox is
+                    # fully inland; zero pixels hit the uint16 sentinel 65535 across all four
+                    # variables' full pulls) -- kept anyway for correctness if the bbox ever
+                    # changes, not because it fixed an observed problem here.
+                    nodata = src.nodatavals[0]
+                    arr = data.astype(np.float32)
+                    if nodata is not None:
+                        arr[data == nodata] = np.nan
+                    return d, arr * scale + offset, None
         except RasterioIOError as e:
             if "404" in str(e):
                 return d, None, "404"  # genuinely missing day, not a transient error
