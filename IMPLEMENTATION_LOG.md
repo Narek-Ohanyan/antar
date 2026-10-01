@@ -1382,3 +1382,54 @@ identified gap: `.resample('bilinear')` added to `export_soils` and `export_era5
 everything run tonight (gridded TOPOHYDRO, XYLEM, MNEME, REFUGIUM, the future-projections run in
 progress) used the real *uncorrected* nearest-neighbor rasters -- the corrected ones take real
 server-side time and aren't registered or re-consumed by anything yet.
+
+## 2026-10-01 (cont.) -- future projections finished; a real hung-connection bug found and fixed;
+## AEGIS re-run against the real 45-member ensemble
+
+**Future projections completed**: all 45 real (5 GCM x 3 SSP x 3 horizon) members x 3 functional
+groups x 78 real cells finished cleanly, checkpointed throughout, ~2h20m total real wall-clock
+time (started 10:52, finished 13:18). Saved to `configs/fitted/future_projections.yaml`.
+
+Real, honest, somewhat surprising finding, stated as found rather than massaged toward an
+expected trend: mean viability is nearly flat across every one of the 9 real scenario x horizon
+combinations and all 5 real GCMs -- broadleaf 0.983-0.989, oak 0.921-0.941, pine 0.998-0.999 --
+with tight real ensemble spread (sigma 0.001-0.014) and no clear monotonic decline even under
+ssp585/2100 relative to ssp126/2050. Cross-checked against the method, not just accepted at face
+value: the real delta-method pipeline only perturbs temperature and precipitation (ISIMIP3b's
+real monthly anomalies); wind/radiation/dewpoint/pressure stay fixed at real 2019 ERA5-Land
+values (stated in the script's own module docstring and in `future_projections.yaml`'s `method`
+field). XYLEM's mechanistic hazard model evidently derives most of its real sensitivity from the
+variables this method holds fixed, so CMIP6's real temperature/precipitation deltas alone move
+viability only a little at this 78-cell sample. A real modeling limitation to flag for anyone
+reading the results, not a finding to oversell as "climate-proof forests."
+
+**A real bug, separate from the OAuth-expiry and band-description bugs found earlier tonight**:
+re-running `scripts/compute_real_cwd_for_meristem.py` (MERISTEM's real CWD extraction, parallel
+track) with the retry-on-exception fix from the previous session turn still weren't enough --
+the actual failure streaming an ERA5-Land tile over `/vsicurl/` was a **connection that stalled
+without ever raising an exception** (confirmed via `ps`: the python process sat at ~0% CPU for
+19+ minutes on one tile, not actively retrying, no error in the log despite `flush=True`
+throughout). Root cause: none of the `rasterio.Env()` calls in `scripts/run_topohydro_grid.py` or
+`scripts/compute_real_cwd_for_meristem.py` set `GDAL_HTTP_TIMEOUT`/`GDAL_HTTP_CONNECTTIMEOUT`,
+even though that exact convention already exists elsewhere in this repo
+(`scripts/pull_chelsa_bioclim.py:89`, `scripts/pull_chelsa_daily.py:60`, both
+`GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10`) -- it just never got carried over when the
+gridded TOPOHYDRO streaming code was written. Applied the same two settings to all 6 vsicurl call
+sites across both files, killed the hung process, relaunched. A real, defensible fix: without a
+timeout, GDAL's own curl layer has no bound on how long it waits for a stalled server, so my
+Python-level retry-on-exception from the prior fix could never fire -- there was never an
+exception to catch.
+
+**AEGIS re-run against the real multi-scenario ensemble**: `scripts/fit_aegis_portfolio.py`
+re-run once `configs/fitted/future_projections.yaml` existed; auto-detected it (confirmed via
+`scenario_source: future_projections` and `n_scenarios: 45` in the real output, rather than
+assuming the auto-detect branch fired). MILP solves correctly at all 5 real budget levels
+($9.3M-$663M), efficient frontier computes correctly at the representative $45M budget. **Real,
+honest finding, internally consistent with future-projections' own flat-viability result above**:
+CVaR (25390.4) is nearly identical to expected value (25406.7), and price of robustness is again
+0.00 -- this time not a validation-scale artifact (unlike the single-scenario 2019 fallback run,
+where C=1 made it mathematically trivial), but the real consequence of viability barely varying
+across the 45 real scenarios, so CVaR has little real downside tail left to hedge against. Same
+61/78 eligible units planted at every real budget level -- budget remains non-binding at this
+78-cell site-sample scale, a genuine property of the real result, not a bug reintroduced from the
+earlier validation run. Saved to `configs/fitted/aegis_portfolio.yaml`.

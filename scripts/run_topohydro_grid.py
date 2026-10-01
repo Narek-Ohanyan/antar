@@ -139,7 +139,7 @@ def drive_vsicurl_url(file_id: str) -> str:
 
 def extract_terrain(token, lats, lons):
     url = drive_vsicurl_url(TERRAIN_DRIVE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
+    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
         with rasterio.open(url) as src:
             xs, ys = warp_transform("EPSG:4326", src.crs, lons.tolist(), lats.tolist())
             n = len(xs)
@@ -171,7 +171,7 @@ def extract_terrain(token, lats, lons):
 
 def extract_soils(token, lats, lons):
     url = drive_vsicurl_url(SOILS_DRIVE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
+    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
         with rasterio.open(url) as src:
             band_names = list(src.descriptions)
             xs, ys = warp_transform("EPSG:4326", src.crs, lons.tolist(), lats.tolist())
@@ -196,7 +196,7 @@ def extract_era5land(token, row_px, col_px, year=YEAR):
         file_id = ERA5LAND_TILE_IDS[tile_key]
         sel = (tile_row == tile_key[0]) & (tile_col == tile_key[1])
         url = drive_vsicurl_url(file_id)
-        with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
+        with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
             with rasterio.open(url) as src:
                 bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
                 for i in np.where(sel)[0]:

@@ -396,36 +396,40 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
         need a dense raster/fitted domain this sparse 78-point sample doesn't provide. Real
         future-horizon viability (not just 2019) is the next concrete step, now running
         separately (see the future-projections item below).
-- [ ] **Future projections — real run in progress (2026-10-01), started once ISIMIP3b's real
-      60/60 completion made it possible.** `scripts/run_future_projections.py`: real delta/
-      change-factor downscaling (real monthly ISIMIP3b anomaly applied to the real 2019 CHELSA
-      reference series, through the unchanged real `topoclimate_forcing` pipeline) for all 15
-      real GCM x SSP members x 3 horizons (2050/2080/2100, single representative year each, real
-      5-year-window monthly deltas to damp weather noise out of the signal) x 3 real functional
-      groups. wind/radiation/dewpoint/pressure held at real 2019 ERA5-Land values -- no real
-      future projection exists for these, stated not hidden. Checkpointed per (member, horizon).
-      Real validation before the full run: ssp585's real projected warming grows from a mixed
-      ~-1 to +2.5K at 2050 to a clear +2.6 to +6.5K by 2100 -- exactly the expected real pattern
-      for a high-emissions scenario. Full real result not in yet (long-running, ~3h estimated).
-- [ ] **AEGIS — script written and validated (2026-10-01), real meaningful run waiting on
-      future projections.** `scripts/fit_aegis_portfolio.py`: real viability (REFUGIUM), real
-      cost/value (World Bank/government source, all 4 user scope decisions applied -- species x
-      method options, budget swept across the real $9.3M-$663M range, real water figures
-      extracted but intentionally not wired in since no real per-option water-use number exists),
-      real WDPA eligibility (streamed, 61/78 units eligible). A real, stated gap: benefit varies
-      only by functional group (no viability-by-method model exists), cost varies only by method
-      -- independent by construction, not an oversight. Validated end to end against the real
-      2019 single-scenario REFUGIUM fallback: MILP solves correctly at all 5 real budget levels,
-      efficient frontier computes correctly (price of robustness = 0.00, mathematically correct
-      with only one real scenario -- nothing to be robust against yet). Real, honest finding at
-      this validation-grid scale: all 5 budget levels give identical results, since even the most
-      expensive real option (windbreaks, $13,260/ha) across all 78 units costs well under even
-      the smallest real budget -- budget isn't the binding constraint at 78 points, a genuine
-      consequence of running at validation scale, not a bug. Script automatically switches to
-      the real multi-scenario ensemble once `configs/fitted/future_projections.yaml` exists
-      (checked first, falls back to 2019 only if absent) -- the real, meaningful AEGIS run
-      (actual CVaR robustness across 45 real GCM x SSP x horizon members) is a re-run away once
-      that finishes, not a rewrite.
+- [x] **Future projections — real run complete (2026-10-01).** `scripts/run_future_projections.py`:
+      real delta/change-factor downscaling (real monthly ISIMIP3b anomaly applied to the real 2019
+      CHELSA reference series, through the unchanged real `topoclimate_forcing` pipeline) for all 45
+      real (5 GCM x 3 SSP x 3 horizon) members (2050/2080/2100, real 5-year-window monthly deltas to
+      damp weather noise out of the signal) x 3 real functional groups x 78 real cells. wind/
+      radiation/dewpoint/pressure held at real 2019 ERA5-Land values -- no real future projection
+      exists for these, stated not hidden. Ran via one real bug fix mid-flight (see
+      IMPLEMENTATION_LOG.md) then completed cleanly, checkpointed per (member, horizon), ~2h20m
+      total. Saved to `configs/fitted/future_projections.yaml` (45 members x 3 groups x 78 cells).
+      **Real, honest, somewhat surprising finding**: mean viability is nearly flat across all 9
+      scenario x horizon combinations and all 5 GCMs -- broadleaf 0.983-0.989, oak 0.921-0.941, pine
+      0.998-0.999 -- with tight ensemble spread (sigma 0.001-0.014) and no clear monotonic decline even
+      under ssp585/2100. Not massaged to show a trend: the mechanistic hazard model (XYLEM) is most
+      sensitive to variables this delta method holds fixed at 2019 ERA5-Land values (wind, radiation,
+      humidity), so CMIP6's real temperature/precipitation deltas alone don't move it much at this
+      site sample. A real limitation to flag, not a result to oversell.
+- [x] **AEGIS — real meaningful multi-scenario run complete (2026-10-01).**
+      `scripts/fit_aegis_portfolio.py`: real viability (REFUGIUM/the real future-projections
+      ensemble), real cost/value (World Bank/government source, all 4 user scope decisions
+      applied -- species x method options, budget swept across the real $9.3M-$663M range, real
+      water figures extracted but intentionally not wired in since no real per-option water-use
+      number exists), real WDPA eligibility (streamed, 61/78 units eligible). A real, stated gap:
+      benefit varies only by functional group (no viability-by-method model exists), cost varies
+      only by method -- independent by construction, not an oversight. Re-run against the real
+      45-member (5 GCM x 3 SSP x 3 horizon) ensemble once `configs/fitted/future_projections.yaml`
+      existed (script auto-detects it, confirmed via `scenario_source: future_projections` in the
+      output): MILP solves correctly at all 5 real budget levels, efficient frontier computes
+      correctly. **Real, honest finding, consistent with future-projections' own flat-viability
+      result above**: CVaR (25390.4) is nearly identical to expected value (25406.7) and price of
+      robustness is again 0.00 -- not a validation-scale artifact this time, but the real
+      consequence of viability barely varying across the 45 real scenarios, so there is little
+      real downside tail for CVaR to hedge against. Budget still isn't binding at 78 units (same
+      61 units planted at every real budget level, $9.3M-$663M) -- a genuine property of running
+      at this site-sample scale, not a bug. Saved to `configs/fitted/aegis_portfolio.yaml`.
 - [ ] **Pipeline wiring**: `workflow/Snakefile` is still 100% placeholder `echo` commands for
       every rule — replace each with the real `antar.*` entry point once its inputs are real,
       so the pipeline can actually run end-to-end rather than existing only as tested library code.

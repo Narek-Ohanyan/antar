@@ -18,6 +18,7 @@ optional at 44x the point count.
 import datetime
 import json
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -68,7 +69,7 @@ def extract_terrain_soils_local(lats, lons, token):
 
     print("  downloading terrain.tif (transient, full)...", flush=True)
     url = drive_vsicurl_url(TERRAIN_DRIVE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
+    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
         with rasterio.open(url) as src:
             data = src.read()
             profile = src.profile
@@ -78,7 +79,7 @@ def extract_terrain_soils_local(lats, lons, token):
 
     print("  downloading soils.tif (transient, full)...", flush=True)
     url = drive_vsicurl_url(SOILS_DRIVE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
+    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
         with rasterio.open(url) as src:
             data = src.read()
             profile = src.profile
@@ -133,24 +134,50 @@ def extract_era5land_vectorized(token, row_px, col_px, year=YEAR):
     tile_row = (row_px // ERA5LAND_TILE_SIZE_PX) * ERA5LAND_TILE_SIZE_PX
     tile_col = (col_px // ERA5LAND_TILE_SIZE_PX) * ERA5LAND_TILE_SIZE_PX
 
+    failed_tiles = []
     for tile_key in sorted(set(zip(tile_row.tolist(), tile_col.tolist()))):
         if tile_key not in ERA5LAND_TILE_IDS:
             continue
         file_id = ERA5LAND_TILE_IDS[tile_key]
         sel = np.where((tile_row == tile_key[0]) & (tile_col == tile_key[1]))[0]
-        url = drive_vsicurl_url(file_id)
-        with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
-            with rasterio.open(url) as src:
-                bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
-                local_rows = row_px[sel] - tile_key[0]
-                local_cols = col_px[sel] - tile_key[1]
-                xs_geo, ys_geo = src.xy(local_rows, local_cols)
-                coords = list(zip(xs_geo, ys_geo))
+        local_rows = row_px[sel] - tile_key[0]
+        local_cols = col_px[sel] - tile_key[1]
+
+        # Streaming individual Drive-hosted tiles over vsicurl occasionally hits a transient
+        # read failure under sustained multi-tile load (real fault hit mid-run: TIFFReadEncodedTile
+        # "got 0 bytes, expected N" on one tile after 3 others streamed fine). Retry with a fresh
+        # token rather than letting one flaky tile abort all 16; only skip (leave NaN) after 3
+        # failures, which the existing valid_era5 mask already handles honestly downstream.
+        last_err = None
+        for attempt in range(3):
+            try:
+                fresh_token = get_access_token()
+                url = drive_vsicurl_url(file_id)
+                with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
+                    with rasterio.open(url) as src:
+                        bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
+                        xs_geo, ys_geo = src.xy(local_rows, local_cols)
+                        coords = list(zip(xs_geo, ys_geo))
+                        tile_vals = {}
+                        for bandname in ["wind_speed", "ssrd", "strd", "dewpoint", "surface_pressure"]:
+                            vals = np.array(list(src.sample(coords, indexes=bidx[f"{bandname}_{year}"])))[:, 0]
+                            tile_vals[bandname] = vals
                 for bandname, out in [("wind_speed", wind10), ("ssrd", ssrd), ("strd", strd),
                                        ("dewpoint", dewpoint_k), ("surface_pressure", pressure_pa)]:
-                    vals = np.array(list(src.sample(coords, indexes=bidx[f"{bandname}_{year}"])))[:, 0]
-                    out[sel] = vals
+                    out[sel] = tile_vals[bandname]
+                last_err = None
+                break
+            except rasterio.errors.RasterioIOError as e:
+                last_err = e
+                print(f"  era5land tile {tile_key}: read failed (attempt {attempt + 1}/3): {e}", flush=True)
+                time.sleep(5)
+        if last_err is not None:
+            print(f"  era5land tile {tile_key}: FAILED after 3 attempts, {len(sel)} points left NaN", flush=True)
+            failed_tiles.append(tile_key)
+            continue
         print(f"  era5land tile {tile_key}: {len(sel)} points", flush=True)
+    if failed_tiles:
+        print(f"  === {len(failed_tiles)} tile(s) failed all retries: {failed_tiles} ===", flush=True)
     return wind10, ssrd, strd, dewpoint_k, pressure_pa
 
 

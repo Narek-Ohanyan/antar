@@ -1,8 +1,52 @@
 run_date: '2026-10-01'
-scenario_source: refugium_2019_fallback
-n_scenarios: 1
+scenario_source: future_projections
+n_scenarios: 45
 scenario_names:
-- 2019_single_scenario
+- gfdl-esm4__ssp126__2050
+- gfdl-esm4__ssp126__2080
+- gfdl-esm4__ssp126__2100
+- gfdl-esm4__ssp370__2050
+- gfdl-esm4__ssp370__2080
+- gfdl-esm4__ssp370__2100
+- gfdl-esm4__ssp585__2050
+- gfdl-esm4__ssp585__2080
+- gfdl-esm4__ssp585__2100
+- ipsl-cm6a-lr__ssp126__2050
+- ipsl-cm6a-lr__ssp126__2080
+- ipsl-cm6a-lr__ssp126__2100
+- ipsl-cm6a-lr__ssp370__2050
+- ipsl-cm6a-lr__ssp370__2080
+- ipsl-cm6a-lr__ssp370__2100
+- ipsl-cm6a-lr__ssp585__2050
+- ipsl-cm6a-lr__ssp585__2080
+- ipsl-cm6a-lr__ssp585__2100
+- mpi-esm1-2-hr__ssp126__2050
+- mpi-esm1-2-hr__ssp126__2080
+- mpi-esm1-2-hr__ssp126__2100
+- mpi-esm1-2-hr__ssp370__2050
+- mpi-esm1-2-hr__ssp370__2080
+- mpi-esm1-2-hr__ssp370__2100
+- mpi-esm1-2-hr__ssp585__2050
+- mpi-esm1-2-hr__ssp585__2080
+- mpi-esm1-2-hr__ssp585__2100
+- mri-esm2-0__ssp126__2050
+- mri-esm2-0__ssp126__2080
+- mri-esm2-0__ssp126__2100
+- mri-esm2-0__ssp370__2050
+- mri-esm2-0__ssp370__2080
+- mri-esm2-0__ssp370__2100
+- mri-esm2-0__ssp585__2050
+- mri-esm2-0__ssp585__2080
+- mri-esm2-0__ssp585__2100
+- ukesm1-0-ll__ssp126__2050
+- ukesm1-0-ll__ssp126__2080
+- ukesm1-0-ll__ssp126__2100
+- ukesm1-0-ll__ssp370__2050
+- ukesm1-0-ll__ssp370__2080
+- ukesm1-0-ll__ssp370__2100
+- ukesm1-0-ll__ssp585__2050
+- ukesm1-0-ll__ssp585__2080
+- ukesm1-0-ll__ssp585__2100
 n_units: 78
 value_per_ha_year_usd: 417.0
 option_labels:
@@ -86,24 +130,24 @@ scope_note: Benefit varies only by functional group (real, REFUGIUM); cost varie
   -- no real figure exists for any planting option's water use.
 budget_sweep:
   $9,300,000:
-    expected: 25390.129200000003
-    cvar: 25390.129200000003
+    expected: 25406.712826666662
+    cvar: 25390.430366666664
     n_units_planted: 61
   $45,000,000:
-    expected: 25390.129200000003
-    cvar: 25390.129200000003
+    expected: 25406.712826666662
+    cvar: 25390.430366666664
     n_units_planted: 61
   $100,000,000:
-    expected: 25390.129200000003
-    cvar: 25390.129200000003
+    expected: 25406.712826666662
+    cvar: 25390.430366666664
     n_units_planted: 61
   $300,000,000:
-    expected: 25390.129200000003
-    cvar: 25390.129200000003
+    expected: 25406.712826666662
+    cvar: 25390.430366666664
     n_units_planted: 61
   $663,000,000:
-    expected: 25390.129200000003
-    cvar: 25390.129200000003
+    expected: 25406.712826666662
+    cvar: 25390.430366666664
     n_units_planted: 61
 lambda_frontier_at_representative_budget:
   lambdas:
@@ -114,17 +158,17 @@ lambda_frontier_at_representative_budget:
   - 0.8
   - 1.0
   expected:
-  - 25390.129200000003
-  - 25390.129200000003
-  - 25390.129200000003
-  - 25390.129200000003
-  - 25390.129200000003
-  - 25390.129200000003
+  - 25406.712826666662
+  - 25406.712826666662
+  - 25406.712826666662
+  - 25406.712826666662
+  - 25406.712826666662
+  - 25406.712826666662
   cvar:
-  - 25390.129200000003
-  - 25390.129200000003
-  - 25390.129200000003
-  - 25390.129200000003
-  - 25390.129200000003
-  - 25390.129200000003
+  - 25390.430366666664
+  - 25390.430366666664
+  - 25390.430366666664
+  - 25390.430366666664
+  - 25390.430366666664
+  - 25390.430366666664
   price_of_robustness: 0.0
