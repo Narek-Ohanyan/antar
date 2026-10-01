@@ -43,3 +43,11 @@
     the GFW layer, try the Hub's own web UI (a real browser session, not a raw request) since
     ArcGIS Hub's download buttons sometimes route through a different, JS-driven path than the
     REST endpoints tried here.
+
+    **Re-checked 2026-10-01: both still genuinely down, same real failures.** `armsis.cas.am`
+    still returns NXDOMAIN (same `nslookup` check). The GFW FeatureServer now returns a real
+    HTTP 200 instead of 400 at the transport level -- looked like a fix at first, but the
+    response *body* is the identical `{"error":{"code":400,"message":"Invalid URL"}}` ArcGIS's
+    REST API wraps in a 200 by convention. Caught by reading the actual response content, not
+    just the HTTP status code -- a real methodological reminder, not just a data finding: a 200
+    status alone is not confirmation of success for this API.
