@@ -44,6 +44,7 @@ corrected -- stated, not hidden.
 """
 import json
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -58,6 +59,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
     DATA_DIR, drive_vsicurl_url, extract_static_grid_inputs, compute_forcing_for_year,
+    get_access_token, GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
 )
 
 from antar.hazard.observation import dieback_event  # noqa: E402
@@ -67,6 +69,10 @@ from antar.validation.splits import spatial_block_ids  # noqa: E402
 
 OUT_PATH = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "mneme_hazard_panel_2010_2019.yaml"
 CHECKPOINT_PATH = Path(__file__).resolve().parent.parent / "data" / "_mneme_panel_checkpoint.json"
+# Real 2026-10-01 densification: --dense runs against the 1044-point DENSE_GRID, with its own
+# output/checkpoint paths so the original 80-point validation-grid result stays intact.
+OUT_PATH_DENSE = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "mneme_hazard_panel_2010_2019_dense.yaml"
+CHECKPOINT_PATH_DENSE = Path(__file__).resolve().parent.parent / "data" / "_mneme_panel_checkpoint_dense.json"
 
 VITALITY_TILE_SIZE_PX = 4864
 VITALITY_TILE_IDS = {
@@ -81,40 +87,90 @@ SPATIAL_BLOCK_SIZE_DEG = 1.0  # coarse blocks over ~80 points spanning ~3.3x2.6 
 
 
 def extract_vitality_and_disturbance(token, row_px, col_px):
+    """Real kNDVI (per tile) + real no_disturbance (single file), vectorized via rasterio
+    .sample() across all points per band and retried with a fresh token on failure -- the
+    original per-point-per-year Window-read loop (25 read() calls per point per source) was fine
+    at 78 points but genuinely impractical at the real 1044-point dense grid (tens of thousands
+    of serial small reads), and tonight's real network conditions have shown repeated transient
+    vsicurl failures that need a retry, not just a timeout bound. Same pattern already proven in
+    compute_real_cwd_for_meristem.py's extract_era5land_vectorized."""
     n = len(row_px)
     kndvi = np.full((n, len(VITALITY_YEARS)), np.nan)
     tile_row = (row_px // VITALITY_TILE_SIZE_PX) * VITALITY_TILE_SIZE_PX
     tile_col = (col_px // VITALITY_TILE_SIZE_PX) * VITALITY_TILE_SIZE_PX
+
+    failed_tiles = []
     for tile_key in sorted(set(zip(tile_row.tolist(), tile_col.tolist()))):
         file_id = VITALITY_TILE_IDS[tile_key]
-        sel = (tile_row == tile_key[0]) & (tile_col == tile_key[1])
-        url = drive_vsicurl_url(file_id)
-        with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
-            with rasterio.open(url) as src:
-                bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
-                for i in np.where(sel)[0]:
-                    lr, lc = int(row_px[i] - tile_key[0]), int(col_px[i] - tile_key[1])
-                    w = Window(lc, lr, 1, 1)
-                    for yi, y in enumerate(VITALITY_YEARS):
-                        kndvi[i, yi] = src.read(bidx[f"kndvi_{y}"], window=w)[0, 0]
-        print(f"  vitality tile {tile_key}: {sel.sum()} points", flush=True)
+        sel = np.where((tile_row == tile_key[0]) & (tile_col == tile_key[1]))[0]
+        local_rows = row_px[sel] - tile_key[0]
+        local_cols = col_px[sel] - tile_key[1]
+
+        last_err = None
+        for attempt in range(3):
+            try:
+                fresh_token = get_access_token()
+                url = drive_vsicurl_url(file_id)
+                with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
+                    with rasterio.open(url) as src:
+                        bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
+                        xs_geo, ys_geo = src.xy(local_rows, local_cols)
+                        coords = list(zip(xs_geo, ys_geo))
+                        tile_vals = np.full((len(sel), len(VITALITY_YEARS)), np.nan)
+                        for yi, y in enumerate(VITALITY_YEARS):
+                            vals = np.array(list(src.sample(coords, indexes=bidx[f"kndvi_{y}"])))[:, 0]
+                            tile_vals[:, yi] = vals
+                kndvi[sel] = tile_vals
+                last_err = None
+                break
+            except rasterio.errors.RasterioIOError as e:
+                last_err = e
+                print(f"  vitality tile {tile_key}: read failed (attempt {attempt + 1}/3): {e}", flush=True)
+                time.sleep(5)
+        if last_err is not None:
+            print(f"  vitality tile {tile_key}: FAILED after 3 attempts, {len(sel)} points left NaN", flush=True)
+            failed_tiles.append(tile_key)
+            continue
+        print(f"  vitality tile {tile_key}: {len(sel)} points", flush=True)
+    if failed_tiles:
+        print(f"  === {len(failed_tiles)} vitality tile(s) failed all retries: {failed_tiles} ===", flush=True)
 
     no_disturbance = np.full((n, len(VITALITY_YEARS)), True)
-    url = drive_vsicurl_url(DISTURBANCE_FILE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
-        with rasterio.open(url) as src:
-            bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
-            for i in range(n):
-                w = Window(int(col_px[i]), int(row_px[i]), 1, 1)
-                for yi, y in enumerate(VITALITY_YEARS):
-                    no_disturbance[i, yi] = bool(src.read(bidx[f"no_disturbance_{y}"], window=w)[0, 0])
-    print(f"  disturbance ancillary: {n} points", flush=True)
+    last_err = None
+    for attempt in range(3):
+        try:
+            fresh_token = get_access_token()
+            url = drive_vsicurl_url(DISTURBANCE_FILE_ID)
+            with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
+                with rasterio.open(url) as src:
+                    bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
+                    xs_geo, ys_geo = src.xy(row_px, col_px)
+                    coords = list(zip(xs_geo, ys_geo))
+                    for yi, y in enumerate(VITALITY_YEARS):
+                        vals = np.array(list(src.sample(coords, indexes=bidx[f"no_disturbance_{y}"])))[:, 0]
+                        no_disturbance[:, yi] = vals.astype(bool)
+            last_err = None
+            break
+        except rasterio.errors.RasterioIOError as e:
+            last_err = e
+            print(f"  disturbance ancillary: read failed (attempt {attempt + 1}/3): {e}", flush=True)
+            time.sleep(5)
+    if last_err is not None:
+        print(f"  disturbance ancillary: FAILED after 3 attempts, no_disturbance left at default True", flush=True)
+    else:
+        print(f"  disturbance ancillary: {n} points", flush=True)
     return kndvi, no_disturbance
 
 
 def main():
-    print("=== Static grid inputs (terrain/soil, streamed, reused across years) ===", flush=True)
-    static = extract_static_grid_inputs()
+    dense = "--dense" in sys.argv
+    grid_rows, grid_cols = (DENSE_GRID_ROWS, DENSE_GRID_COLS) if dense else (GRID_ROWS, GRID_COLS)
+    out_path = OUT_PATH_DENSE if dense else OUT_PATH
+    checkpoint_path = CHECKPOINT_PATH_DENSE if dense else CHECKPOINT_PATH
+
+    print(f"=== Static grid inputs ({'DENSE 1044-point' if dense else '80-point validation'} grid, "
+          f"terrain/soil streamed, reused across years) ===", flush=True)
+    static = extract_static_grid_inputs(grid_rows=grid_rows, grid_cols=grid_cols)
     lats, lons = static["lats"], static["lons"]
     row_px, col_px, token = static["row_px"], static["col_px"], static["token"]
     n = len(lats)
@@ -134,8 +190,8 @@ def main():
     print(f"=== Real climate covariates, {PANEL_YEARS[0]}-{PANEL_YEARS[-1]} (gridded TOPOHYDRO, per year) ===", flush=True)
     rows = []
     years_done = set()
-    if CHECKPOINT_PATH.exists():
-        rows = json.loads(CHECKPOINT_PATH.read_text())
+    if checkpoint_path.exists():
+        rows = json.loads(checkpoint_path.read_text())
         years_done = {r["year"] for r in rows}
         print(f"  resuming from checkpoint: {len(rows)} rows already computed for years {sorted(years_done)}",
               flush=True)
@@ -158,8 +214,8 @@ def main():
                 "gdd_annual": float(c.gdd_cumulative[-1]),
                 "t_mean_c_annual": float(np.mean(c.t_mean_c)),
             })
-        CHECKPOINT_PATH.parent.mkdir(parents=True, exist_ok=True)
-        CHECKPOINT_PATH.write_text(json.dumps(rows))
+        checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        checkpoint_path.write_text(json.dumps(rows))
         print(f"  {year}: checkpointed ({len(rows)} rows total)", flush=True)
 
     panel = pd.DataFrame(rows)
@@ -177,6 +233,7 @@ def main():
 
     result = {
         "run_date": __import__("datetime").date.today().isoformat(),
+        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
         "panel_years": PANEL_YEARS,
         "n_points": int(n), "n_points_valid_kndvi": n_valid_kndvi,
         "n_person_years": int(len(panel)), "n_events": int(panel["event"].sum()),
@@ -208,12 +265,12 @@ def main():
         print(f"=== Fitted. OOF AUC (stacked): {result.get('oof_auc_stacked', 'n/a')} ===", flush=True)
         print(f"=== GLM coefficients: {result['glm_coefficients']} ===", flush=True)
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(yaml.dump(result, sort_keys=False, default_flow_style=False))
-    print(f"=== Wrote {OUT_PATH} ===", flush=True)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(yaml.dump(result, sort_keys=False, default_flow_style=False))
+    print(f"=== Wrote {out_path} ===", flush=True)
 
-    if CHECKPOINT_PATH.exists():
-        CHECKPOINT_PATH.unlink()
+    if checkpoint_path.exists():
+        checkpoint_path.unlink()
 
 
 if __name__ == "__main__":
