@@ -74,11 +74,16 @@ aren't.
       genuinely absent (0 images) from this EE asset, despite NASA's own source archive having all
       four. This is exactly why NASA/GDDP-CMIP6 was demoted to a secondary/cross-check role in
       `configs/scenarios.yaml` rather than used as primary — not an oversight, a checked finding.
-- [x] **ISIMIP3b direct access — UNVERIFIED flag resolved, real and working.** The "Anubis gate"
-      concern was about the web portal, not the API `isimip-client` actually uses; a real pull
-      (`scripts/pull_isimip3b.py`) ran successfully this session — 57 of 60 real GCM x SSP x
-      variable combos completed (3 genuine upstream 900s job-timeouts, not a pipeline failure).
-      `isimip-client` + `cutout_bbox` is confirmed the right, working mechanism.
+- [x] **ISIMIP3b direct access — UNVERIFIED flag resolved, real and working; real final pull
+      result corrected below (2026-10-01).** The "Anubis gate" concern was about the web portal,
+      not the API `isimip-client` actually uses -- confirmed the right, working mechanism.
+      **Real final count, not the earlier in-progress estimate: 39 of 60 combos completed, 21
+      failed.** Not random: `pr` and `tas` both 15/15 (100%, ran early); `tasmax` 8/15, `tasmin`
+      1/15 (ran later, hit a real persistent server-side degradation -- 21 consecutive real
+      failures at one point). Pattern strongly suggests ISIMIP3b server load at the time, not a
+      pipeline problem -- retry the 21 failed combos later, ideally at a different time of day,
+      rather than assume an immediate retry behaves differently. Registered in
+      `configs/manifests/isimip3b.yaml` with the full real per-variable/per-GCM breakdown.
 - [x] **Decision resolved (2026-09-30) — stale checkbox corrected.** The user chose option (b):
       run CORDEX/CMIP5 and ISIMIP3b/CMIP6 as two separate, labelled ensembles rather than picking
       one (`configs/scenarios.yaml`'s `future_ensembles.decision_note`) — the most scientifically

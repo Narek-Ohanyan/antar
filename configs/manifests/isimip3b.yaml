@@ -1,0 +1,46 @@
+# ISIMIP3b bias-adjusted atmospheric climate input data -- the real, confirmed primary CMIP6
+# source for this project's future ensemble (configs/scenarios.yaml's future_ensembles decision).
+# Pulled via scripts/pull_isimip3b.py (isimip-client, real Files API v2, not the broken
+# isimip-client.cutout() wrapper -- see IMPLEMENTATION_LOG.md for that earlier bug).
+
+- variable: isimip3b_armenia_bbox
+  source: ISIMIP3b (Inter-Sectoral Impact Model Intercomparison Project, round 3b)
+  version: "3b"
+  url: https://data.isimip.org
+  citation: 'Lange, S., Mengel, M., Treu, S., Buechner, M. (2021). ISIMIP3b bias-adjusted
+    atmospheric climate input data. ISIMIP Repository.
+    https://doi.org/10.48364/ISIMIP.842396.1'
+  license: See data.isimip.org per-dataset terms; public downloads, no account required (the
+    confirmed path -- institutional accounts are for DKRZ HPC/protocol participants only, not
+    needed here).
+  access_date: '2026-10-01'
+  local_path: data/isimip3b/
+  checksum_sha256: null
+  spatial_extent: "Armenia bbox cutout (43.4, 38.8, 46.7, 41.4), server-side via cutout_bbox --
+    confirmed real axis order [lon_min, lon_max, lat_min, lat_max] after an earlier wrong-order
+    attempt silently returned northern Georgia instead (see IMPLEMENTATION_LOG.md)."
+  notes: >-
+    Real, final result: 39 of 60 combos (5 GCMs x 3 SSPs x 4 variables) completed; 21 failed.
+    Not evenly spread -- a real, informative pattern, not random noise: pr 15/15 (100%), tas
+    15/15 (100%), tasmax 8/15 (53%), tasmin 1/15 (7%). pr and tas both ran early in the pull;
+    tasmax/tasmin ran later and hit a real, persistent server-side degradation (21 consecutive
+    real failures at one point, a mix of "job did not finish within 900s" and one genuine
+    connection reset) -- strongly suggests a time-of-day/server-load issue on ISIMIP3b's own job
+    queue, not a per-variable technical problem with this pipeline. Worth retrying the 21 failed
+    combos at a different time of day rather than assuming the same immediate retry would behave
+    differently. 90 MB total, kept locally (small enough that the cloud-first convention doesn't
+    apply the way it does to the multi-GB GEE rasters).
+
+    Real combos completed (GCM x SSP, all 5 real GCMs x all 3 real SSPs for pr and tas):
+    GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0, UKESM1-0-LL x ssp126/ssp370/ssp585.
+    tasmax: GFDL-ESM4 (all 3 SSPs), IPSL-CM6A-LR (all 3), MPI-ESM1-2-HR (ssp126/ssp370 only).
+    tasmin: UKESM1-0-LL/ssp585 only.
+
+    pr converted from ISIMIP3b's native flux units (kg m-2 s-1) to mm/day (x86400) to match
+    CHELSA-daily's convention -- a real unit bug caught and fixed this session before the full
+    pull ran (see IMPLEMENTATION_LOG.md), not assumed compatible.
+
+    Real, stated next step, not done here: retry the 21 failed combos (a second
+    scripts/pull_isimip3b.py run already skips completed combos via pull_progress.json and would
+    only attempt these 21), ideally at a different time than this run to test the server-load
+    hypothesis above.

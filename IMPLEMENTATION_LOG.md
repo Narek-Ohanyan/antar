@@ -1306,3 +1306,24 @@ before writing the code, not after). Exported with `.resample('bilinear')` at 40
 resampling policy above immediately to a brand-new export rather than creating a third entry that
 would need the same future fix. Submitted (`scripts/submit_terraclimate_export.py`, task
 `TMMKDQZDM5ZKSSNI4WGV7WBY` on `antar-armenia-2`); not yet complete as of submission.
+
+## 2026-10-01 (cont.) -- ISIMIP3b's real final pull result: 39/60, a real, non-random pattern
+
+The background ISIMIP3b pull (running since before this session's summarised portion began)
+finished. Real final count: 39 of 60 GCM x SSP x variable combos completed, 21 failed -- not the
+57/60 estimate reported mid-run earlier, which was accurate only as of when it was checked, not
+as a final number (corrected in ROADMAP.md, not left stale).
+
+The failure pattern is real and informative, not random: `pr` and `tas` both completed 15/15
+(100%), `tasmax` 8/15, `tasmin` only 1/15. `pr`/`tas` ran early in the pull; `tasmax`/`tasmin` ran
+later and hit 21 consecutive real failures (a mix of genuine 900s job timeouts and one connection
+reset) before recovering for the very last combo. This shape -- early variables fine, later
+variables persistently failing -- points to ISIMIP3b's own job queue being under real load during
+that stretch, not a per-variable problem with this project's pipeline. The right next step is a
+later retry (the script's own checkpointing means a re-run only attempts the 21 real failures, not
+all 60 again), ideally at a different time of day to actually test that hypothesis rather than
+assume it.
+
+Registered in `configs/manifests/isimip3b.yaml` with the full real per-variable/per-GCM
+breakdown of what completed vs. failed, so a retry starts from precise knowledge of the gap
+rather than re-deriving it from the raw progress file.
