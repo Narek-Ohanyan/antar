@@ -82,8 +82,13 @@ def extract_terrain_soils_local(lats, lons, token):
         with rasterio.open(url) as src:
             data = src.read()
             profile = src.profile
+            band_descriptions = src.descriptions
+    # .profile does NOT include band descriptions (names) -- a real bug this hit: soils needs
+    # band names (clay_0_30cm_mean etc.) for extraction, unlike terrain which reads by index.
+    # Copy descriptions onto the local copy explicitly, don't assume .profile carries them.
     with rasterio.open(soils_path, "w", **profile) as dst:
         dst.write(data)
+        dst.descriptions = band_descriptions
     del data
 
     elevation, slope, aspect, concavity, z_ref = (np.zeros(n) for _ in range(5))
