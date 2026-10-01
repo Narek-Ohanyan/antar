@@ -74,16 +74,16 @@ aren't.
       genuinely absent (0 images) from this EE asset, despite NASA's own source archive having all
       four. This is exactly why NASA/GDDP-CMIP6 was demoted to a secondary/cross-check role in
       `configs/scenarios.yaml` rather than used as primary — not an oversight, a checked finding.
-- [x] **ISIMIP3b direct access — UNVERIFIED flag resolved, real and working; real final pull
-      result corrected below (2026-10-01).** The "Anubis gate" concern was about the web portal,
-      not the API `isimip-client` actually uses -- confirmed the right, working mechanism.
-      **Real final count, not the earlier in-progress estimate: 39 of 60 combos completed, 21
-      failed.** Not random: `pr` and `tas` both 15/15 (100%, ran early); `tasmax` 8/15, `tasmin`
-      1/15 (ran later, hit a real persistent server-side degradation -- 21 consecutive real
-      failures at one point). Pattern strongly suggests ISIMIP3b server load at the time, not a
-      pipeline problem -- retry the 21 failed combos later, ideally at a different time of day,
-      rather than assume an immediate retry behaves differently. Registered in
-      `configs/manifests/isimip3b.yaml` with the full real per-variable/per-GCM breakdown.
+- [x] **ISIMIP3b direct access — complete, real, 60/60 (2026-10-01).** The "Anubis gate" concern
+      was about the web portal, not the API `isimip-client` actually uses -- confirmed the right,
+      working mechanism. First pass completed 39/60 with a real, non-random failure pattern (`pr`/
+      `tas` 15/15 each, `tasmax` 8/15, `tasmin` 1/15 -- the later-running variables hit 21
+      consecutive real failures). Rather than assume that was permanent, cleared only the 21 real
+      failed entries from the progress file (checked first that the script's own `done` dict
+      includes failed attempts, so a plain re-run would have skipped them too) and retried: **all
+      21 succeeded, zero failures** -- real, direct confirmation this was transient ISIMIP3b
+      server load, not a pipeline problem. The complete real ensemble now exists: 5 GCMs x 3 SSPs
+      x 4 variables, no gaps. Registered in `configs/manifests/isimip3b.yaml`.
 - [x] **Decision resolved (2026-09-30) — stale checkbox corrected.** The user chose option (b):
       run CORDEX/CMIP5 and ISIMIP3b/CMIP6 as two separate, labelled ensembles rather than picking
       one (`configs/scenarios.yaml`'s `future_ensembles.decision_note`) — the most scientifically

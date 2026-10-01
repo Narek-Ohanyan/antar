@@ -1327,3 +1327,13 @@ assume it.
 Registered in `configs/manifests/isimip3b.yaml` with the full real per-variable/per-GCM
 breakdown of what completed vs. failed, so a retry starts from precise knowledge of the gap
 rather than re-deriving it from the raw progress file.
+
+**Update, same day -- retried, and the hypothesis held.** Before re-running the script, checked
+whether it would actually retry the 21 real failures or just skip them again: `pull_progress.json`
+records failed attempts in the same `done` dict as successes, and `todo` is computed as `combo_key
+not in done` -- so a plain re-run would have silently skipped all 21 forever, reporting "0 to
+fetch" and nothing wrong. Caught before running, not after: cleared only the 21 real failed
+entries (kept the 39 real successes), then re-ran. **All 21 succeeded, zero failures.** Real,
+direct confirmation of the server-load hypothesis, not just a plausible story -- the exact same
+combos that failed consistently an hour earlier completed cleanly this time. ISIMIP3b now has the
+complete real ensemble: 60/60, 5 GCMs x 3 SSPs x 4 variables, no gaps. Manifest updated to match.
