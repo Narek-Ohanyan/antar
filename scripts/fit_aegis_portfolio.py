@@ -59,6 +59,10 @@ from antar.decision.optimize import robust_portfolio, efficient_frontier  # noqa
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "configs"
 OUT_PATH = CONFIG_DIR / "fitted" / "aegis_portfolio.yaml"
+# Real 2026-10-02 densification, explicitly requested: --dense reads future_projections_dense.yaml
+# (the real 1044-point, 45-member ensemble) instead of the 78-point one, writing its own output
+# file so the original result stays intact for comparison.
+OUT_PATH_DENSE = CONFIG_DIR / "fitted" / "aegis_portfolio_dense.yaml"
 
 VALUE_PER_HA_YEAR = 417.0  # real, World Bank 2023 -- national-average ecosystem-services value
 AREA_PER_UNIT_HA = 1.0     # real convention stated in the concept note itself (Sec. 9): "management
@@ -97,22 +101,30 @@ def load_eligibility(lats, lons):
     not_protected = protected < 0.5  # eligible = NOT protected
 
     # Real, narrowly scoped second exclusion from the Ecosystem Map of Armenia (2026-09-18):
-    # settlements/cropland/buildings/quarries (configs/fitted/ecosystem_ground_truth_2019.yaml,
-    # written by scripts/integrate_ecosystem_map.py). Deliberately does NOT exclude already-
-    # forested cells -- 3 of the 8 real intervention methods below (coppicing_oak, pine_thinning,
+    # settlements/cropland/buildings/quarries. Deliberately does NOT exclude already-forested
+    # cells -- 3 of the 8 real intervention methods below (coppicing_oak, pine_thinning,
     # wildfire_prevention) target existing forest, so that would wrongly zero out the options that
-    # most need it. See that script's module docstring for the full reasoning.
-    gt_path = CONFIG_DIR / "fitted" / "ecosystem_ground_truth_2019.yaml"
-    if not gt_path.exists():
+    # most need it. See integrate_ecosystem_map.py's module docstring for the full reasoning.
+    #
+    # Sampled LIVE here (not looked up from configs/fitted/ecosystem_ground_truth_2019.yaml) --
+    # a real bug caught before it could silently fire: that file's lookup is keyed by exact
+    # lat/lon match against the 78-point grid it was built from, so at any other grid density
+    # (e.g. the real 1044-point dense grid) every lookup would miss and this exclusion would
+    # silently never apply, leaving only WDPA active with no error or warning. Calling
+    # sample_class_fractions directly makes this correct at whatever real grid is passed in.
+    try:
+        from integrate_ecosystem_map import sample_class_fractions, HUMAN_MODIFIED_CLASSES
+        class_fractions = sample_class_fractions(lats, lons)
+        not_human_modified = np.ones(len(lats), dtype=bool)
+        for i, cf in enumerate(class_fractions):
+            if cf is not None:
+                human_modified_frac = sum(cf.get(c, 0.0) for c in HUMAN_MODIFIED_CLASSES)
+                not_human_modified[i] = human_modified_frac <= 0.5
+        return not_protected & not_human_modified
+    except rasterio.errors.RasterioIOError:
+        print("  (ecosystem map raster not found locally -- human-modified exclusion skipped, "
+              "WDPA-only eligibility)", flush=True)
         return not_protected
-    gt = yaml.safe_load(open(gt_path))
-    gt_by_latlon = {(round(c["lat"], 6), round(c["lon"], 6)): c for c in gt["cells"]}
-    not_human_modified = np.ones(len(lats), dtype=bool)
-    for i, (lat, lon) in enumerate(zip(lats, lons)):
-        c = gt_by_latlon.get((round(float(lat), 6), round(float(lon), 6)))
-        if c is not None and not c["outside_real_armenia_raster_extent"]:
-            not_human_modified[i] = c["human_modified_fraction"] <= 0.5
-    return not_protected & not_human_modified
 
 
 def load_refugium_only():
@@ -129,9 +141,9 @@ def load_refugium_only():
     return lats, lons, group_names, viability, ["2019_single_scenario"]
 
 
-def load_future_projections():
+def load_future_projections(dense=False):
     """Real multi-scenario ensemble, if scripts/run_future_projections.py has finished."""
-    path = CONFIG_DIR / "fitted" / "future_projections.yaml"
+    path = CONFIG_DIR / "fitted" / ("future_projections_dense.yaml" if dense else "future_projections.yaml")
     if not path.exists():
         return None
     d = yaml.safe_load(open(path))
@@ -154,10 +166,18 @@ def load_future_projections():
 
 
 def main():
-    future = load_future_projections()
+    dense = "--dense" in sys.argv
+    out_path = OUT_PATH_DENSE if dense else OUT_PATH
+
+    future = load_future_projections(dense=dense)
     if future is not None:
         lats, lons, group_names, viability, scenario_names = future
-        print(f"=== Real multi-scenario ensemble: {len(scenario_names)} real members ===", flush=True)
+        print(f"=== Real {'DENSE ' if dense else ''}multi-scenario ensemble: "
+              f"{len(scenario_names)} real members ===", flush=True)
+    elif dense:
+        print("=== future_projections_dense.yaml not ready yet -- cannot run AEGIS --dense "
+              "without it (no dense single-scenario fallback defined) ===", flush=True)
+        return
     else:
         lats, lons, group_names, viability, scenario_names = load_refugium_only()
         print("=== future_projections.yaml not ready yet -- real single-scenario (2019) fallback, "
@@ -240,9 +260,9 @@ def main():
         results["lambda_frontier_at_representative_budget"] = {"error": str(e)}
         print(f"  FAILED ({e})", flush=True)
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(yaml.dump(results, sort_keys=False, default_flow_style=False))
-    print(f"=== Wrote {OUT_PATH} ===", flush=True)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(yaml.dump(results, sort_keys=False, default_flow_style=False))
+    print(f"=== Wrote {out_path} ===", flush=True)
 
 
 if __name__ == "__main__":

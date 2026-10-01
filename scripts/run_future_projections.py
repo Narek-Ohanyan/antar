@@ -51,6 +51,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
     DATA_DIR, extract_static_grid_inputs, extract_era5land, _load_chelsa_arrays,
     saturation_vapour_pressure, wind_speed_2m, ROOTING_DEPTH_MM_BY_GROUP,
+    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
 )
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
 
@@ -64,6 +65,13 @@ from antar.viability.refugia import refugium_score, robust_refugium  # noqa: E40
 
 OUT_PATH = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "future_projections.yaml"
 CHECKPOINT_PATH = DATA_DIR / "_future_projections_checkpoint.json"
+# Real 2026-10-02 densification, explicitly requested (user: "re-run even if it will take a day
+# or two... I want real and solid outputs"): --dense runs the full real 45-member ensemble against
+# the 1044-point DENSE_GRID instead of 78, with its own output/checkpoint paths. A real, large
+# cost -- 45 members x 1044 points x 3 groups x the same real Monte Carlo that already ran 45x78x3
+# times before -- deliberately accepted, not cut down, per that explicit instruction.
+OUT_PATH_DENSE = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "future_projections_dense.yaml"
+CHECKPOINT_PATH_DENSE = DATA_DIR / "_future_projections_checkpoint_dense.json"
 
 ISIMIP_DIR = DATA_DIR / "isimip3b"
 GCMS = ["gfdl-esm4", "ipsl-cm6a-lr", "mpi-esm1-2-hr", "mri-esm2-0", "ukesm1-0-ll"]
@@ -171,8 +179,14 @@ def build_future_cell(static, deltas, horizon, i, elevation, z_ref_m, slope, asp
 
 
 def main():
-    print("=== Static grid inputs (terrain/soil, streamed once) ===", flush=True)
-    static = extract_static_grid_inputs()
+    dense = "--dense" in sys.argv
+    grid_rows, grid_cols = (DENSE_GRID_ROWS, DENSE_GRID_COLS) if dense else (GRID_ROWS, GRID_COLS)
+    out_path = OUT_PATH_DENSE if dense else OUT_PATH
+    checkpoint_path = CHECKPOINT_PATH_DENSE if dense else CHECKPOINT_PATH
+
+    print(f"=== Static grid inputs ({'DENSE 1044-point' if dense else '80-point validation'} grid, "
+          f"terrain/soil streamed once) ===", flush=True)
+    static = extract_static_grid_inputs(grid_rows=grid_rows, grid_cols=grid_cols)
     lats, lons = static["lats"], static["lons"]
     elevation, z_ref_m = static["elevation"], static["z_ref_m"]
     slope, aspect, concavity = static["slope"], static["aspect"], static["concavity"]
@@ -219,8 +233,8 @@ def main():
     members = [(gcm, scenario) for gcm in GCMS for scenario in SCENARIOS]
 
     results = {}
-    if CHECKPOINT_PATH.exists():
-        results = json.loads(CHECKPOINT_PATH.read_text())
+    if checkpoint_path.exists():
+        results = json.loads(checkpoint_path.read_text())
         print(f"  resuming from checkpoint: {len(results)} (member,horizon) entries already done", flush=True)
 
     for gcm, scenario in members:
@@ -279,8 +293,8 @@ def main():
                     "cells": rows,
                 }
             results[mkey] = {"gcm": gcm, "scenario": scenario, "horizon": horizon, "groups": group_summary}
-            CHECKPOINT_PATH.parent.mkdir(parents=True, exist_ok=True)
-            CHECKPOINT_PATH.write_text(json.dumps(results))
+            checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+            checkpoint_path.write_text(json.dumps(results))
             print(f"  {mkey}: checkpointed", flush=True)
 
     final = {
@@ -297,11 +311,11 @@ def main():
                   "2019 ERA5-Land values -- no real future projection exists for these.",
         "members": results,
     }
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(yaml.dump(final, sort_keys=False, default_flow_style=False))
-    print(f"=== Wrote {OUT_PATH} ===", flush=True)
-    if CHECKPOINT_PATH.exists():
-        CHECKPOINT_PATH.unlink()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(yaml.dump(final, sort_keys=False, default_flow_style=False))
+    print(f"=== Wrote {out_path} ===", flush=True)
+    if checkpoint_path.exists():
+        checkpoint_path.unlink()
 
 
 if __name__ == "__main__":
