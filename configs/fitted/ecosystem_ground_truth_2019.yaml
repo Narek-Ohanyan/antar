@@ -1,0 +1,667 @@
+run_date: '2026-10-01'
+source: Ecosystem Map of Armenia (BCC Armenia / Institute of Botany NAS RA / IOER,
+  2026-09-18)
+window_radius_m: 500.0
+scope_note: Local 500m-radius class-fraction sample at the real 78-cell grid, NOT
+  a representation of the full ~30km grid-cell spacing. Validation correlates REFUGIUM's
+  predicted viability against real observed nearby forest-class cover -- an honest
+  check, not a retraining; juniper has no real REFUGIUM viability to correlate against
+  (XYLEM/REFUGIUM both skipped it for lack of real trait variance) so only its real
+  observed cover is reported. 17/78 real cells fall outside Armenia's real national
+  border (the project's rectangular BBOX extends past it) and have no coverage here
+  -- left unset, not zero-filled.
+n_cells_total: 78
+n_cells_outside_armenia_border: 17
+validation_viability_vs_observed_forest_cover:
+  mesic_diffuse_porous_broadleaf:
+    spearman_rho: 0.32620442740352423
+    p_value: 0.010298877597418881
+    n: 61
+    mean_observed_forest_cover_fraction: 0.015715270601885704
+  ring_porous_oak:
+    spearman_rho: 0.26380952709010924
+    p_value: 0.039942733574997204
+    n: 61
+    mean_observed_forest_cover_fraction: 0.0294008462686879
+  pine:
+    spearman_rho: .nan
+    p_value: .nan
+    n: 61
+    mean_observed_forest_cover_fraction: 0.0
+human_modified_fraction_threshold_for_aegis: 0.5
+n_cells_human_modified: 4
+cells:
+- lat: 41.39583333333333
+  lon: 43.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 43.7375
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 44.07083333333333
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 44.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 44.7375
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 45.07083333333333
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 45.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 45.737500000000004
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 46.07083333333333
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.39583333333333
+  lon: 46.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.0625
+  lon: 43.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 41.0625
+  lon: 43.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.7842368395255368
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 41.0625
+  lon: 44.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 41.0625
+  lon: 44.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.002254680913635918
+    ring_porous_oak: 0.0012743848642289971
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 41.0625
+  lon: 44.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 9.802960494069208e-05
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.5286736594451524
+    ring_porous_oak: 0.3828056072934026
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 41.0625
+  lon: 45.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.005293598666797373
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.05156357219880404
+    ring_porous_oak: 9.802960494069208e-05
+    pine: 0.0
+    juniper_arid_conifer: 0.0007842368395255367
+- lat: 41.0625
+  lon: 45.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 41.0625
+  lon: 45.737500000000004
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 41.0625
+  lon: 46.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 41.0625
+  lon: 46.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 43.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 40.729166666666664
+  lon: 43.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 44.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.9443191843936869
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 44.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.07665915106362121
+    ring_porous_oak: 0.00039211841976276833
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 44.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.17655131849818645
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 45.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.005489657876678758
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.09469659837270855
+    ring_porous_oak: 0.38613861386138615
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 45.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.20478384472110578
+    ring_porous_oak: 0.15292618370747968
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 45.737500000000004
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 46.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.729166666666664
+  lon: 46.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.39583333333333
+  lon: 43.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 40.39583333333333
+  lon: 43.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.2961474365258308
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.39583333333333
+  lon: 44.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.39583333333333
+  lon: 44.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.48936378786393486
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.008822664444662289
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.39583333333333
+  lon: 44.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.7840407803156553
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.39583333333333
+  lon: 45.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.1139104009410842
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.39583333333333
+  lon: 45.737500000000004
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.39583333333333
+  lon: 46.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.39583333333333
+  lon: 46.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.0625
+  lon: 43.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 40.0625
+  lon: 43.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.0625
+  lon: 44.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.46564062346828744
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.0625
+  lon: 44.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0016665032839917656
+- lat: 40.0625
+  lon: 45.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.0625
+  lon: 45.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.0625
+  lon: 45.737500000000004
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.0625
+  lon: 46.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 40.0625
+  lon: 46.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 43.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 39.729166666666664
+  lon: 43.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 44.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 44.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 44.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 45.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 45.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.689246152338006
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 45.737500000000004
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 46.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.729166666666664
+  lon: 46.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 43.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 39.39583333333333
+  lon: 43.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 44.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 44.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 44.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 45.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 45.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 45.737500000000004
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 46.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.39583333333333
+  lon: 46.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 43.40416666666667
+  outside_real_armenia_raster_extent: true
+  human_modified_fraction: null
+  forest_cover_fraction_by_group: null
+- lat: 39.0625
+  lon: 43.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 44.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 44.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 44.7375
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 45.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 45.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 45.737500000000004
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 46.07083333333333
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.0
+    pine: 0.0
+    juniper_arid_conifer: 0.0
+- lat: 39.0625
+  lon: 46.40416666666667
+  outside_real_armenia_raster_extent: false
+  human_modified_fraction: 0.0
+  forest_cover_fraction_by_group:
+    mesic_diffuse_porous_broadleaf: 0.0
+    ring_porous_oak: 0.8609940201940987
+    pine: 0.0
+    juniper_arid_conifer: 9.802960494069208e-05

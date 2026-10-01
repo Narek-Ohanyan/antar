@@ -94,7 +94,25 @@ def load_eligibility(lats, lons):
         with rasterio.open(url) as src:
             xs, ys = warp_transform("EPSG:4326", src.crs, lons.tolist(), lats.tolist())
             protected = np.array(list(src.sample(zip(xs, ys))))[:, 0]
-    return protected < 0.5  # eligible = NOT protected
+    not_protected = protected < 0.5  # eligible = NOT protected
+
+    # Real, narrowly scoped second exclusion from the Ecosystem Map of Armenia (2026-09-18):
+    # settlements/cropland/buildings/quarries (configs/fitted/ecosystem_ground_truth_2019.yaml,
+    # written by scripts/integrate_ecosystem_map.py). Deliberately does NOT exclude already-
+    # forested cells -- 3 of the 8 real intervention methods below (coppicing_oak, pine_thinning,
+    # wildfire_prevention) target existing forest, so that would wrongly zero out the options that
+    # most need it. See that script's module docstring for the full reasoning.
+    gt_path = CONFIG_DIR / "fitted" / "ecosystem_ground_truth_2019.yaml"
+    if not gt_path.exists():
+        return not_protected
+    gt = yaml.safe_load(open(gt_path))
+    gt_by_latlon = {(round(c["lat"], 6), round(c["lon"], 6)): c for c in gt["cells"]}
+    not_human_modified = np.ones(len(lats), dtype=bool)
+    for i, (lat, lon) in enumerate(zip(lats, lons)):
+        c = gt_by_latlon.get((round(float(lat), 6), round(float(lon), 6)))
+        if c is not None and not c["outside_real_armenia_raster_extent"]:
+            not_human_modified[i] = c["human_modified_fraction"] <= 0.5
+    return not_protected & not_human_modified
 
 
 def load_refugium_only():
@@ -151,9 +169,10 @@ def main():
     print(f"=== {n} real units, {J} options ({len(group_names)} groups x {len(INTERVENTIONS)} methods), "
           f"{C} scenarios ===", flush=True)
 
-    print("=== Real WDPA eligibility (streamed) ===", flush=True)
-    not_protected = load_eligibility(lats, lons)
-    print(f"  {not_protected.sum()}/{n} real units eligible (not protected)", flush=True)
+    print("=== Real eligibility: WDPA (streamed) + Ecosystem Map of Armenia human-modified "
+          "exclusion ===", flush=True)
+    eligible_mask = load_eligibility(lats, lons)
+    print(f"  {eligible_mask.sum()}/{n} real units eligible (not protected, not human-modified)", flush=True)
 
     benefit = np.zeros((n, J, C))
     cost = np.zeros((n, J))
@@ -164,7 +183,7 @@ def main():
         for interv in INTERVENTIONS:
             benefit[:, j, :] = viability[g] * VALUE_PER_HA_YEAR
             cost[:, j] = interv["cost_per_ha"]
-            eligible[:, j] = not_protected
+            eligible[:, j] = eligible_mask
             option_labels.append({"group": g, "intervention": interv["name"], "cost_basis": interv["cost_basis"]})
             j += 1
 
@@ -184,7 +203,12 @@ def main():
                         "method to viability. 4 of 8 methods use a blended real average cost "
                         "(not individually sourced) -- see option_labels' cost_basis per entry. "
                         "water_use/water_caps/basin intentionally omitted -- no real figure "
-                        "exists for any planting option's water use."),
+                        "exists for any planting option's water use. Eligibility = real WDPA "
+                        "(not protected) AND real Ecosystem Map of Armenia human-modified exclusion "
+                        "(not >50% settlements/cropland/buildings/quarries in a local 500m window) "
+                        "-- deliberately does NOT exclude already-forested cells, since 3 of the 8 "
+                        "real methods (coppicing_oak, pine_thinning, wildfire_prevention) target "
+                        "existing forest."),
         "budget_sweep": {}, "lambda_frontier_at_representative_budget": {},
     }
 

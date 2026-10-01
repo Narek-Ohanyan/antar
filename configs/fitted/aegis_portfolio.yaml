@@ -127,28 +127,32 @@ scope_note: Benefit varies only by functional group (real, REFUGIUM); cost varie
   independent by construction since no real data or model connects method to viability.
   4 of 8 methods use a blended real average cost (not individually sourced) -- see
   option_labels' cost_basis per entry. water_use/water_caps/basin intentionally omitted
-  -- no real figure exists for any planting option's water use.
+  -- no real figure exists for any planting option's water use. Eligibility = real
+  WDPA (not protected) AND real Ecosystem Map of Armenia human-modified exclusion
+  (not >50% settlements/cropland/buildings/quarries in a local 500m window) -- deliberately
+  does NOT exclude already-forested cells, since 3 of the 8 real methods (coppicing_oak,
+  pine_thinning, wildfire_prevention) target existing forest.
 budget_sweep:
   $9,300,000:
-    expected: 25406.712826666662
-    cvar: 25390.430366666664
-    n_units_planted: 61
+    expected: 24155.76379333333
+    cvar: 24139.60643333333
+    n_units_planted: 58
   $45,000,000:
-    expected: 25406.712826666662
-    cvar: 25390.430366666664
-    n_units_planted: 61
+    expected: 24155.76379333333
+    cvar: 24139.60643333333
+    n_units_planted: 58
   $100,000,000:
-    expected: 25406.712826666662
-    cvar: 25390.430366666664
-    n_units_planted: 61
+    expected: 24155.76379333333
+    cvar: 24139.60643333333
+    n_units_planted: 58
   $300,000,000:
-    expected: 25406.712826666662
-    cvar: 25390.430366666664
-    n_units_planted: 61
+    expected: 24155.76379333333
+    cvar: 24139.60643333333
+    n_units_planted: 58
   $663,000,000:
-    expected: 25406.712826666662
-    cvar: 25390.430366666664
-    n_units_planted: 61
+    expected: 24155.76379333333
+    cvar: 24139.60643333333
+    n_units_planted: 58
 lambda_frontier_at_representative_budget:
   lambdas:
   - 0.0
@@ -158,17 +162,17 @@ lambda_frontier_at_representative_budget:
   - 0.8
   - 1.0
   expected:
-  - 25406.712826666662
-  - 25406.712826666662
-  - 25406.712826666662
-  - 25406.712826666662
-  - 25406.712826666662
-  - 25406.712826666662
+  - 24155.76379333333
+  - 24155.76379333333
+  - 24155.76379333333
+  - 24155.76379333333
+  - 24155.76379333333
+  - 24155.76379333333
   cvar:
-  - 25390.430366666664
-  - 25390.430366666664
-  - 25390.430366666664
-  - 25390.430366666664
-  - 25390.430366666664
-  - 25390.430366666664
+  - 24139.60643333333
+  - 24139.60643333333
+  - 24139.60643333333
+  - 24139.60643333333
+  - 24139.60643333333
+  - 24139.60643333333
   price_of_robustness: 0.0

@@ -1433,3 +1433,87 @@ across the 45 real scenarios, so CVaR has little real downside tail left to hedg
 61/78 eligible units planted at every real budget level -- budget remains non-binding at this
 78-cell site-sample scale, a genuine property of the real result, not a bug reintroduced from the
 earlier validation run. Saved to `configs/fitted/aegis_portfolio.yaml`.
+
+## 2026-10-01 (cont.) -- a real external data source found and integrated: the Ecosystem Map of
+## Armenia, for both a real validation check and a real AEGIS eligibility refinement
+
+The user shared two URLs to review for relevance: the real interactive Earth Engine app
+`armenia-woodlands.projects.earthengine.app/view/ecosystem-map-of-armenia`, and
+`github.com/opendataam`. Checked both with the browser before doing anything else, rather than
+assuming either was useful. `github.com/opendataam`'s real repositories (budget parser,
+Armenian-keyword dataset, art-exhibit data, a TerriaJS national-map framework, a statbank parser)
+are not forestry/ecology-specific -- nothing from it used in this project. The EE app is real and
+substantively useful: "Ecosystem Map of Armenia. 2026" from BCC Armenia / Institute of Botany
+after A. Takhtajyan NAS RA / Leibniz IOER, published within the Armenian-German project "Ecosystem
+Accounting in Armenia: Setting the Scene." Two real downloadable GeoTIFFs linked directly from the
+app page, confirmed via HEAD request before downloading anything (filenames/sizes/dates stated to
+the user, per this session's own download-permission convention): `Ecosystem_Map_of_Armenia.zip`
+(40.8MB, national classification) and `IUCN_GET_Map_of_Armenia.zip` (28.4MB, IUCN GET variant),
+both server-dated 2026-09-18/19.
+
+**A real licence discrepancy caught, not silently picked around**: the EE app page states
+"Licensed under CC BY 4.0" in plain text. The zip's own `Ecosystem_Map_of_Armenia_README.txt`
+instead ships an unfilled placeholder -- `LICENCE: [Insert confirmed licence and attribution
+statement before public distribution.]` -- i.e. the README was written before the licence was
+finalised and never updated before the zip was published. Used under the app page's stated CC BY
+4.0 (the more authoritative, more recently user-facing statement); the discrepancy itself recorded
+in `configs/manifests/ecosystem_map_armenia.yaml` so it isn't lost.
+
+**Real raster specs, checked not assumed**: both rasters are EPSG:32638 (UTM 38N), 10m resolution,
+tiled (256x256) + LZW-compressed + overview-pyramided GeoTIFFs -- confirmed via `rasterio` before
+writing any extraction code, since tiled+compressed matters for whether windowed point sampling
+stays cheap (it does; no need for vsicurl streaming here, a full local download was already the
+right call at this file size, same convention as MERISTEM's terrain/soils). The national
+classification's legend (`Ecosystem_Map_of_Armenia_Legend.csv`) gives 31 real classes; cross-
+checked against `configs/species_traits.csv` and found a direct, essentially exact match to
+ANTAR's 4 real XYLEM/REFUGIUM functional groups: class 31 (Fagus orientalis and other deciduous)
+-> `mesic_diffuse_porous_broadleaf`; classes 32-35 (Quercus macranthera / iberica, +co-occurring
+deciduous) -> `ring_porous_oak`; class 36 (**Pinus kochiana** specifically) -> `pine`, confirming
+the species choice already baked into XYLEM's trait fitting; class 44 (juniper woodlands) ->
+`juniper_arid_conifer`, the one group skipped everywhere upstream (XYLEM, REFUGIUM) for lacking
+real trait variance -- this map at least gives it a real spatial extent even without hydraulic
+data.
+
+**`scripts/integrate_ecosystem_map.py`** (new): samples both the real 78-cell grid (same points
+as every other gridded run tonight) at a real 500m local window (documented as a local-context
+sample, not a representation of the ~30km grid-cell spacing) via `rasterio.windows.Window`, same
+mechanism already used for terrain's concavity index. A real bug hit immediately and fixed before
+it could silently corrupt anything: **17 of the 78 real grid cells fall outside the Armenia
+raster's real extent entirely** -- `src.index()` returned negative row/col for the project's
+northernmost row and westernmost column, because the project's rectangular BBOX `(43.4, 38.8,
+46.7, 41.4)` extends past Armenia's real (non-rectangular) national border at the NW corner and
+western edge (likely over Georgia / the border zone). First version of the script crashed on this
+(`ValueError: Number of columns or rows must be non-negative` from a negative `Window`); fixed by
+checking real raster bounds before windowing and recording those 17 cells as
+`outside_real_armenia_raster_extent: true` with their class-fraction fields left unset -- not
+zero-filled, not silently dropped from the cell count, genuinely absent data stated as such.
+
+**Real validation result** (61 real in-bounds cells): REFUGIUM's predicted `viability_ensemble_mean`
+correlated (Spearman) against real observed nearby forest-class cover fraction, per group --
+broadleaf rho=0.326 (p=0.010), oak rho=0.264 (p=0.040), both real and statistically significant at
+the 5% level: genuine external validation that the mechanistic hazard model's spatial pattern
+tracks real independently-mapped forest presence, not an artifact of the model validating itself.
+Pine's correlation came back `nan` (`ConstantInputWarning` from scipy) because real observed pine
+cover is exactly 0.0 across all 61 in-bounds windows -- not a bug in the sampling, a real property
+of this particular systematic 8x10 grid: Armenia's actual *Pinus kochiana* stands are
+geographically concentrated (Dilijan/Tavush, Zangezur) and this grid's spacing evidently missed
+all of them. Stated as a real limitation of the validation grid, not glossed over as "pine passed
+too."
+
+**Real, narrowly scoped AEGIS eligibility refinement**: added a human-modified-landscape exclusion
+to `scripts/fit_aegis_portfolio.py`'s `load_eligibility()` -- real classes 12/13/14/15/16/18
+(agricultural/cropland/settlements/tree-crops/buildings/quarries) at >50% of the same real 500m
+window, layered onto (AND'd with) the existing real WDPA mask. Deliberately does **not** exclude
+already-forested cells, even though that might look like an obvious additionality fix: 3 of
+AEGIS's 8 real intervention methods (`coppicing_oak`, `pine_thinning`, `wildfire_prevention`)
+target *existing* forest, not open land -- a blanket "already forested -> ineligible" rule would
+have wrongly zeroed out exactly the options that need existing forest to operate on. Real effect
+on AEGIS, re-run end to end: eligible units 61/78 -> 58/78; same qualitative result otherwise
+(budget still non-binding at every real level, price of robustness still 0.00, consistent with
+the flat multi-scenario viability already documented above) -- a real, modest, correctly-scoped
+refinement, not a result that flipped the finding.
+
+Both real rasters kept locally under `data/ecosystem_map/` (gitignored, per this project's
+raw-data convention). `configs/manifests/ecosystem_map_armenia.yaml` records the full source,
+licence note, raster specs, class-code mapping and real known gap (the 17 out-of-bounds cells) for
+anyone picking this up later.

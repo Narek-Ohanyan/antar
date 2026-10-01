@@ -424,12 +424,42 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       existed (script auto-detects it, confirmed via `scenario_source: future_projections` in the
       output): MILP solves correctly at all 5 real budget levels, efficient frontier computes
       correctly. **Real, honest finding, consistent with future-projections' own flat-viability
-      result above**: CVaR (25390.4) is nearly identical to expected value (25406.7) and price of
+      result above**: CVaR (24139.6) is nearly identical to expected value (24155.8) and price of
       robustness is again 0.00 -- not a validation-scale artifact this time, but the real
       consequence of viability barely varying across the 45 real scenarios, so there is little
       real downside tail for CVaR to hedge against. Budget still isn't binding at 78 units (same
-      61 units planted at every real budget level, $9.3M-$663M) -- a genuine property of running
-      at this site-sample scale, not a bug. Saved to `configs/fitted/aegis_portfolio.yaml`.
+      58 units planted at every real budget level, $9.3M-$663M) -- a genuine property of running
+      at this site-sample scale, not a bug. Saved to `configs/fitted/aegis_portfolio.yaml`. (Numbers
+      updated 2026-10-01 after the Ecosystem Map eligibility refinement below dropped eligible
+      units from 61 to 58; re-run, same qualitative result.)
+- [x] **Ecosystem Map of Armenia — found, downloaded and integrated (2026-10-01).** The user
+      shared two URLs for review: the real interactive EE app
+      (`armenia-woodlands.../ecosystem-map-of-armenia`) and `github.com/opendataam` (checked --
+      not forestry/ecology-specific, nothing used from it). The EE app's map is real and
+      genuinely useful: a 10m-resolution, species-resolved national ecosystem classification
+      (BCC Armenia/Institute of Botany NAS RA/IOER, published 2026-09-18, CC BY 4.0 per the app
+      page -- see `configs/manifests/ecosystem_map_armenia.yaml` for the one real discrepancy
+      worth flagging, an unfilled licence placeholder in the zip's own README). Its forest classes
+      (31 Fagus orientalis, 32-35 Quercus macranthera/iberica, 36 Pinus kochiana, 44 juniper
+      woodlands) are a direct, confirmed match to ANTAR's 4 XYLEM/REFUGIUM functional groups.
+      Downloaded both real rasters (national classification + IUCN GET variant, 69MB total,
+      gitignored under `data/ecosystem_map/`) and integrated via `scripts/integrate_ecosystem_map.py`
+      two ways: (1) **real validation** -- REFUGIUM's predicted viability vs. real observed nearby
+      forest-class cover (500m window) at the 78-cell grid: broadleaf rho=0.326 (p=0.010), oak
+      rho=0.264 (p=0.040) -- real, statistically significant positive correlation, genuine external
+      validation of the mechanistic hazard model's predictions. Pine's correlation is undefined
+      (zero real pine cover in any of the 61 in-bounds windows -- a real limitation of the
+      systematic sampling grid under-sampling Armenia's actual concentrated Pinus kochiana stands,
+      flagged not hidden). Juniper has no real REFUGIUM viability to correlate against (already
+      skipped upstream for lack of trait variance), descriptive cover only. (2) **real AEGIS
+      eligibility refinement** -- a human-modified-landscape exclusion (settlements/cropland/
+      buildings/quarries, real classes 12-16/18) layered onto the existing WDPA mask, deliberately
+      NOT excluding already-forested cells since 3 of AEGIS's 8 real methods target existing
+      forest. Real effect: 61/78 -> 58/78 eligible units; AEGIS re-run, result saved. A real,
+      stated known gap: 17/78 real grid cells fall outside Armenia's actual national border (the
+      project's rectangular BBOX extends past it at the NW corner/western edge) and have no real
+      ecosystem-map coverage -- left unset, not zero-filled. Saved to
+      `configs/fitted/ecosystem_ground_truth_2019.yaml`.
 - [ ] **Pipeline wiring**: `workflow/Snakefile` is still 100% placeholder `echo` commands for
       every rule — replace each with the real `antar.*` entry point once its inputs are real,
       so the pipeline can actually run end-to-end rather than existing only as tested library code.

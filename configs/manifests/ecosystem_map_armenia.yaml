@@ -1,0 +1,105 @@
+# Real source manifest: Ecosystem Map of Armenia, found and approved for integration 2026-10-01.
+#
+# Discovered via two URLs the user shared directly:
+#   - https://armenia-woodlands.projects.earthengine.app/view/ecosystem-map-of-armenia (the real
+#     interactive Earth Engine app; the map's actual home)
+#   - https://github.com/opendataam (checked for completeness; not forestry/ecology-specific --
+#     budget parsers, an Armenian-keyword dataset, art-exhibit data, a TerriaJS map framework.
+#     Not used for anything in this project.)
+
+source:
+  title: "Ecosystem Map of Armenia. 2026"
+  publishers:
+    - "Biodiversity conservation center BCC Armenia"
+    - "Institute of Botany after A. Takhtajyan NAS RA"
+    - "Leibniz Institute of Ecological Urban and Regional Development (IOER)"
+  project: >
+    Developed within the Armenian-German project "Ecosystem Accounting in Armenia: Setting the
+    Scene" (stated on the data package's own README.txt).
+  app_url: "https://armenia-woodlands.projects.earthengine.app/view/ecosystem-map-of-armenia"
+  download_urls:
+    national_classification: "https://biodiversity-armenia.am/wp-content/uploads/2026/09/Ecosystem_Map_of_Armenia.zip"
+    iucn_get: "https://biodiversity-armenia.am/wp-content/uploads/2026/09/IUCN_GET_Map_of_Armenia.zip"
+  downloaded: "2026-10-01"
+  file_sizes_bytes:
+    Ecosystem_Map_of_Armenia.zip: 40820154
+    IUCN_GET_Map_of_Armenia.zip: 28360198
+  last_modified_on_server: "2026-09-18/19"
+
+# A real discrepancy worth flagging, not silently resolved: the Earth Engine app page states
+# "Licensed under CC BY 4.0" in plain text next to the download links. The zip's own
+# Ecosystem_Map_of_Armenia_README.txt instead ships an unfilled placeholder: "LICENCE: [Insert
+# confirmed licence and attribution statement before public distribution.]" -- i.e. the README
+# was written before the licence was finalised and never updated. Used here under the app page's
+# stated CC BY 4.0 (the more authoritative, more recent-facing statement), attribution given above.
+# If this project is ever distributed further, re-check biodiversity-armenia.am / the EE app for
+# an updated README before relying on this.
+license_note: >
+  App page states CC BY 4.0. Zip's own README.txt has an unfilled licence placeholder. Treated as
+  CC BY 4.0 per the app page; flagged here rather than silently picking one without saying so.
+
+raster_specs:
+  national_classification:
+    file: "Ecosystem_Map_of_Armenia.tif"
+    crs: "EPSG:32638 (WGS 84 / UTM zone 38N)"
+    resolution_m: 10
+    shape_px: [27252, 27146]
+    dtype: int16
+    n_classes: 31
+    legend_file: "Ecosystem_Map_of_Armenia_Legend.csv"
+  iucn_get:
+    file: "IUCN_GET_Map_of_Armenia.tif"
+    crs: "EPSG:32638 (WGS 84 / UTM zone 38N)"
+    resolution_m: 10
+    dtype: Int32
+    legend_file: "IUCN_GET_Map_of_Armenia_legend.csv"
+    note: "Not used in this integration -- the national classification's species-level forest
+      classes (31-36, 44) are a direct match for ANTAR's functional groups; IUCN GET's classes
+      are coarser (e.g. T2.2 'Deciduous temperate forests' lumps Fagus/Quercus together) and add
+      nothing the national classification doesn't already give more precisely. Downloaded and kept
+      locally (gitignored) in case a future use needs the IUCN-standardised typology specifically."
+
+# Real class codes relevant to ANTAR, from Ecosystem_Map_of_Armenia_Legend.csv. Confirmed a direct,
+# near-exact match to ANTAR's 4 XYLEM/REFUGIUM functional groups (species list in
+# configs/species_traits.csv) -- not assumed, read off the legend.
+relevant_classes:
+  31: "Forests: Fagus orientalis and other deciduous"   # -> mesic_diffuse_porous_broadleaf
+  32: "Forests: Quercus macranthera and other deciduous" # -> ring_porous_oak
+  33: "Forests: Quercus macranthera"                     # -> ring_porous_oak
+  34: "Forests: Quercus iberica and other deciduous"     # -> ring_porous_oak
+  35: "Forests: Quercus iberica"                         # -> ring_porous_oak
+  36: "Forests: Pinus kochiana"                          # -> pine
+  44: "Juniper woodlands"                                # -> juniper_arid_conifer
+  37: "Closed forest plantations"                        # existing plantation, not natural
+  39: "Open woodland plantations"                        # existing plantation, not natural
+  12: "Actively used agricultural landscapes"             # human-modified exclusion (AEGIS)
+  13: "Actively used croplands"                           # human-modified exclusion (AEGIS)
+  14: "Settlements"                                       # human-modified exclusion (AEGIS)
+  15: "Tree, vine and shrub crops"                        # human-modified exclusion (AEGIS)
+  16: "Buildings"                                         # human-modified exclusion (AEGIS)
+  18: "Quarries and landfills"                            # human-modified exclusion (AEGIS)
+
+integration:
+  script: "scripts/integrate_ecosystem_map.py"
+  output: "configs/fitted/ecosystem_ground_truth_2019.yaml"
+  uses:
+    - "Real validation: REFUGIUM's predicted viability (per functional group, at the real 78-cell
+      grid) vs. real observed nearby forest-class cover (500m local window). Real result:
+      broadleaf rho=0.326 (p=0.010), oak rho=0.264 (p=0.040) -- statistically significant positive
+      correlation, genuine external validation. Pine's correlation is undefined: zero real pine
+      cover found in any of the 61 in-bounds sampled windows, a real limitation of the systematic
+      8x10 sampling grid under-sampling Armenia's actual (geographically concentrated) Pinus
+      kochiana stands, not a bug. Juniper has no real REFUGIUM viability to correlate against
+      (skipped upstream in XYLEM/REFUGIUM for lack of real trait variance) -- only its real
+      observed cover is reported."
+    - "Real AEGIS eligibility refinement: human-modified exclusion (classes 12/13/14/15/16/18,
+      >50% of a local 500m window) layered onto the existing real WDPA mask in
+      scripts/fit_aegis_portfolio.py's load_eligibility(). Deliberately does NOT exclude
+      already-forested cells -- see that script's updated module comment for why. Real effect:
+      61/78 WDPA-only-eligible units -> 58/78 once the human-modified exclusion is added."
+  real_known_gap: >
+    17/78 real grid cells fall outside Armenia's real (non-rectangular) national border -- the
+    project's rectangular BBOX (43.4, 38.8, 46.7, 41.4) extends past it at the NW corner and
+    western edge (likely over Georgia / the border zone). No real ecosystem-map coverage exists
+    for those cells; left unset in ecosystem_ground_truth_2019.yaml, not zero-filled or
+    interpolated.
