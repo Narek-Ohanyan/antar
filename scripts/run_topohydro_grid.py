@@ -187,34 +187,60 @@ def drive_vsicurl_url(file_id: str) -> str:
 
 
 def extract_terrain(token, lats, lons):
-    url = drive_vsicurl_url(TERRAIN_DRIVE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
-        with rasterio.open(url) as src:
-            xs, ys = warp_transform("EPSG:4326", src.crs, lons.tolist(), lats.tolist())
-            n = len(xs)
-            elevation, slope, aspect, concavity, z_ref = (np.zeros(n) for _ in range(5))
-            row_px, col_px = np.zeros(n, dtype=int), np.zeros(n, dtype=int)
-            for i, (x, y) in enumerate(zip(xs, ys)):
-                row, col = src.index(x, y)
-                row_px[i], col_px[i] = row, col
+    """Real per-point terrain windows (concavity + coarse z_ref), retried per-point with a fresh
+    connection/token on transient failure. One connection serving all N points was fine at 80
+    points but a real risk at the 1044-point dense grid: any single transient vsicurl failure
+    partway through would previously crash the whole function and lose all prior points' work --
+    a real concern for an unattended multi-hour overnight run. Re-opening per point costs a little
+    overhead but bounds the real damage of one bad point to that point alone (left NaN after 3
+    failed attempts), not a full restart."""
+    xs, ys = None, None
+    n = len(lats)
+    elevation, slope, aspect, concavity, z_ref = (np.full(n, np.nan) for _ in range(5))
+    row_px, col_px = np.zeros(n, dtype=int), np.zeros(n, dtype=int)
+    failed_points = []
 
-                cw = CONCAVITY_WINDOW_PX
-                r0, r1 = max(0, row - cw), min(src.height, row + cw + 1)
-                c0, c1 = max(0, col - cw), min(src.width, col + cw + 1)
-                elev_win = src.read(1, window=Window(c0, r0, c1 - c0, r1 - r0))
-                slope_win = src.read(2, window=Window(c0, r0, c1 - c0, r1 - r0))
-                aspect_win = src.read(3, window=Window(c0, r0, c1 - c0, r1 - r0))
-                lr, lc = row - r0, col - c0
-                elevation[i] = elev_win[lr, lc]
-                slope[i] = slope_win[lr, lc]
-                aspect[i] = aspect_win[lr, lc]
-                concavity[i] = concavity_index(elev_win)[lr, lc]
+    for i in range(n):
+        last_err = None
+        for attempt in range(3):
+            try:
+                fresh_token = get_access_token()
+                url = drive_vsicurl_url(TERRAIN_DRIVE_ID)
+                with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
+                    with rasterio.open(url) as src:
+                        x, y = warp_transform("EPSG:4326", src.crs, [lons[i]], [lats[i]])
+                        x, y = x[0], y[0]
+                        row, col = src.index(x, y)
+                        row_px[i], col_px[i] = row, col
 
-                rw = COARSE_REF_WINDOW_PX
-                r0c, r1c = max(0, row - rw), min(src.height, row + rw + 1)
-                c0c, c1c = max(0, col - rw), min(src.width, col + rw + 1)
-                coarse_win = src.read(1, window=Window(c0c, r0c, c1c - c0c, r1c - r0c))
-                z_ref[i] = float(np.nanmean(coarse_win))
+                        cw = CONCAVITY_WINDOW_PX
+                        r0, r1 = max(0, row - cw), min(src.height, row + cw + 1)
+                        c0, c1 = max(0, col - cw), min(src.width, col + cw + 1)
+                        elev_win = src.read(1, window=Window(c0, r0, c1 - c0, r1 - r0))
+                        slope_win = src.read(2, window=Window(c0, r0, c1 - c0, r1 - r0))
+                        aspect_win = src.read(3, window=Window(c0, r0, c1 - c0, r1 - r0))
+                        lr, lc = row - r0, col - c0
+                        elevation[i] = elev_win[lr, lc]
+                        slope[i] = slope_win[lr, lc]
+                        aspect[i] = aspect_win[lr, lc]
+                        concavity[i] = concavity_index(elev_win)[lr, lc]
+
+                        rw = COARSE_REF_WINDOW_PX
+                        r0c, r1c = max(0, row - rw), min(src.height, row + rw + 1)
+                        c0c, c1c = max(0, col - rw), min(src.width, col + rw + 1)
+                        coarse_win = src.read(1, window=Window(c0c, r0c, c1c - c0c, r1c - r0c))
+                        z_ref[i] = float(np.nanmean(coarse_win))
+                last_err = None
+                break
+            except rasterio.errors.RasterioIOError as e:
+                last_err = e
+                time.sleep(2)
+        if last_err is not None:
+            failed_points.append(i)
+        if (i + 1) % 200 == 0:
+            print(f"    terrain: {i + 1}/{n}", flush=True)
+    if failed_points:
+        print(f"  terrain: {len(failed_points)} point(s) failed all retries, left NaN", flush=True)
     return elevation, slope, aspect, concavity, z_ref, row_px, col_px
 
 
