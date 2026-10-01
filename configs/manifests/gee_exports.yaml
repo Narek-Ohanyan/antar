@@ -576,16 +576,24 @@
     and antar/io/gee_export.py docstrings.
   license: Per underlying source (SRTM/SoilGrids/ERA5-Land/MODIS/WDPA/HLS-Landsat/GEDI
     -- see gee_export.py docstrings); not uniform, not restated here.
-  access_date: '2026-09-30'
+  access_date: '2026-10-01'
   local_path: null
   checksum_sha256: null
   spatial_extent: Armenia (clipped)
   notes: 'SoilGrids 2.0 clay/sand/silt fraction and organic carbon, 0-30cm mean, for
-    Saxton & Rawls (2006) pedotransfer functions. Not stored locally (cloud-first
-    by design) -- lives in Google Drive folder antar_gee_exports, file id=18LRnI4Nsnlj6ks1UClGDe4BdufqUG24n,
-    416.2 MB, Drive MD5=78f37fb7ac59afbedc0873821e9f5adb (recorded instead of a SHA-256:
-    hashing would mean downloading a multi-GB file for no integrity benefit Drive
-    doesn''t already provide).'
+    Saxton & Rawls (2006) pedotransfer functions. Re-exported 2026-10-01 with
+    .resample(''bilinear'') applied (configs/resampling_policy.yaml''s real fix for a
+    real ~8x upsample from SoilGrids'' native 250m to this project''s 30m master grid --
+    the original nearest-neighbor export below is superseded, not deleted, kept for
+    provenance). Verified real and correctly smoothed before trusting it: same real
+    point sampled before and after (44.85, 40.75) gives clay 430->423.8, sand
+    203.3->203.7, silt 366.7->372.6, soc 313.3->310.5 -- close, properly interpolated,
+    not a different dataset. Not stored locally (cloud-first by design) -- lives in
+    Google Drive folder antar_gee_exports, file id=1uOwefKTcYmV3crneOTbSnRJ1d4xJppn3,
+    1505.2 MB, Drive MD5=d03bd9a3e6aeb283585a3e89eba8cfcb. Original nearest-neighbor
+    export (used by every real run this session through REFUGIUM/future-projections):
+    file id=18LRnI4Nsnlj6ks1UClGDe4BdufqUG24n, 416.2 MB, Drive
+    MD5=78f37fb7ac59afbedc0873821e9f5adb, access_date 2026-09-30.'
 - variable: antar_structure
   source: Google Earth Engine batch export (antar.io.gee_export.export_structure)
   version: n/a

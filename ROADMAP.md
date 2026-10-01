@@ -44,13 +44,17 @@ aren't.
       lapse-rate downscaling is the actual mechanism meant to carry that coarse reference down to
       true cell elevation -- a spatial resample would be redundant with, not a substitute for,
       that physical step. `.resample('bilinear')` applied to `export_soils`/
-      `export_era5land_forcing` and re-submitted (`scripts/resubmit_bilinear_exports.py`, tasks
-      `5AN6U6RLKQVUPV2J4BJOBNHZ`/`ORPJDCVOI2GA67A2B74SFQ6B`). Still open: the exports take real
-      server-side time to complete -- not yet checked for completion or re-registered in the
-      manifest, and nothing already run tonight (gridded TOPOHYDRO, XYLEM, MNEME, REFUGIUM,
-      future projections) used these corrected rasters -- all of that used the real
-      nearest-neighbor data, a real, stated limitation on tonight's results, not silently fixed
-      retroactively.
+      `export_era5land_forcing` and re-submitted (`scripts/resubmit_bilinear_exports.py`).
+      **`antar_soils` complete and verified (2026-10-01)**: real point check at the same
+      coordinate used earlier this session (44.85, 40.75) shows real, properly-smoothed values
+      (clay 430->423.8, sand 203.3->203.7, silt 366.7->372.6, soc 313.3->310.5) -- confirms the
+      re-export is the same real data, correctly interpolated, not a different dataset.
+      Registered in `configs/manifests/gee_exports.yaml` (new file id
+      `1uOwefKTcYmV3crneOTbSnRJ1d4xJppn3`, old nearest-neighbor version kept for provenance, not
+      deleted). `antar_era5land_forcing` still processing. Still open: nothing already run
+      tonight (gridded TOPOHYDRO, XYLEM, MNEME, REFUGIUM, future projections, MERISTEM's real
+      CWD swap) used the corrected soils raster -- all of that used the real nearest-neighbor
+      data, a real, stated limitation on tonight's results, not silently fixed retroactively.
 - [ ] **Unit audit per new variable — genuinely partial, not a blanket gap.** Real unit bugs were
       actually caught and fixed for every source pulled so far: CHELSA-daily's Kelvin encoding
       (verified against a real July/January Yerevan temperature, not assumed), GHCN-Daily's
