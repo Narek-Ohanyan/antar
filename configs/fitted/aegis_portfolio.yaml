@@ -1,0 +1,130 @@
+run_date: '2026-10-01'
+scenario_source: refugium_2019_fallback
+n_scenarios: 1
+scenario_names:
+- 2019_single_scenario
+n_units: 78
+value_per_ha_year_usd: 417.0
+option_labels:
+- group: mesic_diffuse_porous_broadleaf
+  intervention: degraded_forest_planting
+  cost_basis: blended
+- group: mesic_diffuse_porous_broadleaf
+  intervention: natural_regeneration
+  cost_basis: sourced_cheapest_mix
+- group: mesic_diffuse_porous_broadleaf
+  intervention: coppicing_oak
+  cost_basis: sourced_cheapest_mix
+- group: mesic_diffuse_porous_broadleaf
+  intervention: pine_thinning
+  cost_basis: blended
+- group: mesic_diffuse_porous_broadleaf
+  intervention: wildfire_prevention
+  cost_basis: sourced_cheapest_mix
+- group: mesic_diffuse_porous_broadleaf
+  intervention: anti_erosion_plantation
+  cost_basis: blended
+- group: mesic_diffuse_porous_broadleaf
+  intervention: windbreaks_hedgerows
+  cost_basis: sourced_most_expensive
+- group: mesic_diffuse_porous_broadleaf
+  intervention: mining_site_reclamation
+  cost_basis: blended
+- group: ring_porous_oak
+  intervention: degraded_forest_planting
+  cost_basis: blended
+- group: ring_porous_oak
+  intervention: natural_regeneration
+  cost_basis: sourced_cheapest_mix
+- group: ring_porous_oak
+  intervention: coppicing_oak
+  cost_basis: sourced_cheapest_mix
+- group: ring_porous_oak
+  intervention: pine_thinning
+  cost_basis: blended
+- group: ring_porous_oak
+  intervention: wildfire_prevention
+  cost_basis: sourced_cheapest_mix
+- group: ring_porous_oak
+  intervention: anti_erosion_plantation
+  cost_basis: blended
+- group: ring_porous_oak
+  intervention: windbreaks_hedgerows
+  cost_basis: sourced_most_expensive
+- group: ring_porous_oak
+  intervention: mining_site_reclamation
+  cost_basis: blended
+- group: pine
+  intervention: degraded_forest_planting
+  cost_basis: blended
+- group: pine
+  intervention: natural_regeneration
+  cost_basis: sourced_cheapest_mix
+- group: pine
+  intervention: coppicing_oak
+  cost_basis: sourced_cheapest_mix
+- group: pine
+  intervention: pine_thinning
+  cost_basis: blended
+- group: pine
+  intervention: wildfire_prevention
+  cost_basis: sourced_cheapest_mix
+- group: pine
+  intervention: anti_erosion_plantation
+  cost_basis: blended
+- group: pine
+  intervention: windbreaks_hedgerows
+  cost_basis: sourced_most_expensive
+- group: pine
+  intervention: mining_site_reclamation
+  cost_basis: blended
+scope_note: Benefit varies only by functional group (real, REFUGIUM); cost varies
+  only by intervention method (real, World Bank/government source) -- the two are
+  independent by construction since no real data or model connects method to viability.
+  4 of 8 methods use a blended real average cost (not individually sourced) -- see
+  option_labels' cost_basis per entry. water_use/water_caps/basin intentionally omitted
+  -- no real figure exists for any planting option's water use.
+budget_sweep:
+  $9,300,000:
+    expected: 25390.129200000003
+    cvar: 25390.129200000003
+    n_units_planted: 61
+  $45,000,000:
+    expected: 25390.129200000003
+    cvar: 25390.129200000003
+    n_units_planted: 61
+  $100,000,000:
+    expected: 25390.129200000003
+    cvar: 25390.129200000003
+    n_units_planted: 61
+  $300,000,000:
+    expected: 25390.129200000003
+    cvar: 25390.129200000003
+    n_units_planted: 61
+  $663,000,000:
+    expected: 25390.129200000003
+    cvar: 25390.129200000003
+    n_units_planted: 61
+lambda_frontier_at_representative_budget:
+  lambdas:
+  - 0.0
+  - 0.2
+  - 0.4
+  - 0.6
+  - 0.8
+  - 1.0
+  expected:
+  - 25390.129200000003
+  - 25390.129200000003
+  - 25390.129200000003
+  - 25390.129200000003
+  - 25390.129200000003
+  - 25390.129200000003
+  cvar:
+  - 25390.129200000003
+  - 25390.129200000003
+  - 25390.129200000003
+  - 25390.129200000003
+  - 25390.129200000003
+  - 25390.129200000003
+  price_of_robustness: 0.0

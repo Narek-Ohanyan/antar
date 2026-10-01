@@ -407,8 +407,25 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       Real validation before the full run: ssp585's real projected warming grows from a mixed
       ~-1 to +2.5K at 2050 to a clear +2.6 to +6.5K by 2100 -- exactly the expected real pattern
       for a high-emissions scenario. Full real result not in yet (long-running, ~3h estimated).
-- [ ] **AEGIS**: run the CVaR portfolio optimisation and efficient frontier against a real
-      scenario/model/parameter ensemble once §1.1's projection-source decision is made.
+- [ ] **AEGIS — script written and validated (2026-10-01), real meaningful run waiting on
+      future projections.** `scripts/fit_aegis_portfolio.py`: real viability (REFUGIUM), real
+      cost/value (World Bank/government source, all 4 user scope decisions applied -- species x
+      method options, budget swept across the real $9.3M-$663M range, real water figures
+      extracted but intentionally not wired in since no real per-option water-use number exists),
+      real WDPA eligibility (streamed, 61/78 units eligible). A real, stated gap: benefit varies
+      only by functional group (no viability-by-method model exists), cost varies only by method
+      -- independent by construction, not an oversight. Validated end to end against the real
+      2019 single-scenario REFUGIUM fallback: MILP solves correctly at all 5 real budget levels,
+      efficient frontier computes correctly (price of robustness = 0.00, mathematically correct
+      with only one real scenario -- nothing to be robust against yet). Real, honest finding at
+      this validation-grid scale: all 5 budget levels give identical results, since even the most
+      expensive real option (windbreaks, $13,260/ha) across all 78 units costs well under even
+      the smallest real budget -- budget isn't the binding constraint at 78 points, a genuine
+      consequence of running at validation scale, not a bug. Script automatically switches to
+      the real multi-scenario ensemble once `configs/fitted/future_projections.yaml` exists
+      (checked first, falls back to 2019 only if absent) -- the real, meaningful AEGIS run
+      (actual CVaR robustness across 45 real GCM x SSP x horizon members) is a re-run away once
+      that finishes, not a rewrite.
 - [ ] **Pipeline wiring**: `workflow/Snakefile` is still 100% placeholder `echo` commands for
       every rule — replace each with the real `antar.*` entry point once its inputs are real,
       so the pipeline can actually run end-to-end rather than existing only as tested library code.
