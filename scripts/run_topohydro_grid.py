@@ -92,8 +92,19 @@ OUT_PATH = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "topo
 
 BBOX = (43.4, 38.8, 46.7, 41.4)  # lon_min, lat_min, lon_max, lat_max
 CHELSA_GRID_SHAPE = (312, 396)
-GRID_ROWS = np.arange(0, 312, 40)   # 8 rows
+GRID_ROWS = np.arange(0, 312, 40)   # 8 rows -- the original 80-point validation grid
 GRID_COLS = np.arange(0, 396, 40)   # 10 cols
+# A real, bounded densification (2026-10-01): stride 11 on the same native CHELSA 312x396 grid
+# gives 29x36 = 1044 points, ~13x denser than the original 78/80. Chosen from a real, measured
+# per-point cost (terrain+soils extraction ~2s/point, XYLEM/REFUGIUM's Monte Carlo ~1.3s per
+# (cell, group) from this session's own observed run times), bounding TOPOHYDRO+XYLEM+REFUGIUM's
+# total real added time to a few hours rather than attempting the full ~92M-cell 30m master grid
+# or even the full native-CHELSA 123,552-cell grid, both genuinely infeasible in one session.
+# Deliberately NOT used by future-projections: its 45-member ensemble re-running XYLEM/REFUGIUM's
+# Monte Carlo at this density would take roughly a day, not a few hours -- future-projections
+# stays on the original 78-point grid, a real, stated scope boundary, not a silent omission.
+DENSE_GRID_ROWS = np.arange(0, 312, 11)   # 29 rows
+DENSE_GRID_COLS = np.arange(0, 396, 11)   # 36 cols
 YEAR = 2019
 
 TERRAIN_DRIVE_ID = "17zOkIKhKZiDQaRtF2SwPhk3XOa37hpbe"
@@ -148,11 +159,11 @@ ERA5LAND_TILE_IDS_NEAREST_NEIGHBOR_ORIGINAL = {
 }
 
 
-def grid_latlon():
-    lats = BBOX[3] - (GRID_ROWS + 0.5) * (BBOX[3] - BBOX[1]) / CHELSA_GRID_SHAPE[0]
-    lons = BBOX[0] + (GRID_COLS + 0.5) * (BBOX[2] - BBOX[0]) / CHELSA_GRID_SHAPE[1]
+def grid_latlon(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
+    lats = BBOX[3] - (grid_rows + 0.5) * (BBOX[3] - BBOX[1]) / CHELSA_GRID_SHAPE[0]
+    lons = BBOX[0] + (grid_cols + 0.5) * (BBOX[2] - BBOX[0]) / CHELSA_GRID_SHAPE[1]
     lon_grid, lat_grid = np.meshgrid(lons, lats)
-    chelsa_row, chelsa_col = np.meshgrid(GRID_ROWS, GRID_COLS, indexing="ij")
+    chelsa_row, chelsa_col = np.meshgrid(grid_rows, grid_cols, indexing="ij")
     return lat_grid.ravel(), lon_grid.ravel(), chelsa_row.ravel(), chelsa_col.ravel()
 
 
@@ -275,7 +286,7 @@ def extract_era5land(token, row_px, col_px, year=YEAR):
     return wind10, ssrd, strd, dewpoint_k, pressure_pa
 
 
-def extract_static_grid_inputs():
+def extract_static_grid_inputs(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
     """Terrain and soils: year-independent AND species-independent, extracted once and reused
     across years and across real functional groups.
 
@@ -286,10 +297,13 @@ def extract_static_grid_inputs():
     group, and that multiply is cheap and local (no network), so it happens in
     :func:`compute_forcing_for_year` instead, where a per-group caller can repeat it 4 times for
     ~free rather than re-streaming terrain/soils/ERA5-Land 4 times for no reason.
+
+    ``grid_rows``/``grid_cols`` default to the original 80-point validation grid; pass
+    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the real 1044-point densified grid.
     """
-    lats, lons, chelsa_row, chelsa_col = grid_latlon()
+    lats, lons, chelsa_row, chelsa_col = grid_latlon(grid_rows, grid_cols)
     n = len(lats)
-    print(f"=== {n} grid points ({len(GRID_ROWS)}x{len(GRID_COLS)}) ===", flush=True)
+    print(f"=== {n} grid points ({len(grid_rows)}x{len(grid_cols)}) ===", flush=True)
 
     token = get_access_token()
 
@@ -468,7 +482,8 @@ def compute_forcing_for_year_multi_group(static, year, rooting_depth_by_group):
     return results_by_group
 
 
-def compute_grid_forcing(year=YEAR, rooting_depth_mm=ROOTING_DEPTH_MM_PLACEHOLDER):
+def compute_grid_forcing(year=YEAR, rooting_depth_mm=ROOTING_DEPTH_MM_PLACEHOLDER,
+                          grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
     """Build the real CellTopoclimate for every valid grid point, for one year, one (generic or
     single real) rooting depth.
 
@@ -479,24 +494,31 @@ def compute_grid_forcing(year=YEAR, rooting_depth_mm=ROOTING_DEPTH_MM_PLACEHOLDE
     expensive streamed extraction across all real functional groups rather than repeating it once
     per group the way calling this function in a loop would.
 
+    ``grid_rows``/``grid_cols`` default to the original 80-point validation grid; pass
+    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the real 1044-point densified grid.
+
     Returns ``(lats, lons, elevation, results)``; ``results[i]`` is a
     :class:`antar.climate.forcing.CellTopoclimate` or ``None`` where soil/
     ERA5-Land/CHELSA-pr data was unavailable.
     """
-    static = extract_static_grid_inputs()
+    static = extract_static_grid_inputs(grid_rows=grid_rows, grid_cols=grid_cols)
     results = compute_forcing_for_year(static, year, rooting_depth_mm=rooting_depth_mm)
     return static["lats"], static["lons"], static["elevation"], results
 
 
-def compute_grid_forcing_multi_group(year=YEAR, rooting_depth_by_group=ROOTING_DEPTH_MM_BY_GROUP):
+def compute_grid_forcing_multi_group(year=YEAR, rooting_depth_by_group=ROOTING_DEPTH_MM_BY_GROUP,
+                                      grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
     """Real per-group counterpart to :func:`compute_grid_forcing`: one real, efficient call gets
     every real functional group's own CellTopoclimate (via its own real rooting depth) while
     streaming terrain/soils/ERA5-Land exactly once, not once per group.
 
+    ``grid_rows``/``grid_cols`` default to the original 80-point validation grid; pass
+    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the real 1044-point densified grid.
+
     Returns ``(lats, lons, elevation, results_by_group)``; ``results_by_group[group][i]`` is a
     :class:`antar.climate.forcing.CellTopoclimate` or ``None``.
     """
-    static = extract_static_grid_inputs()
+    static = extract_static_grid_inputs(grid_rows=grid_rows, grid_cols=grid_cols)
     results_by_group = compute_forcing_for_year_multi_group(static, year, rooting_depth_by_group)
     return static["lats"], static["lons"], static["elevation"], results_by_group
 

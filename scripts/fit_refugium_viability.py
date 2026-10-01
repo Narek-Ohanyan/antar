@@ -45,7 +45,10 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_topohydro_grid import compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP  # noqa: E402
+from run_topohydro_grid import (  # noqa: E402
+    compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP,
+    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
+)
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
 
 from antar.hydraulics.monte_carlo import two_level_failure_probability  # noqa: E402
@@ -54,27 +57,35 @@ from antar.viability.cohort import viability  # noqa: E402
 from antar.viability.refugia import refugium_score, robust_refugium  # noqa: E402
 
 OUT_PATH = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "refugium_viability_2019.yaml"
+# Real 2026-10-01 densification: --dense runs against the 1044-point DENSE_GRID, writing to a
+# separate file so the original validation-grid result (what AEGIS keys off of) stays intact.
+OUT_PATH_DENSE = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "refugium_viability_2019_dense.yaml"
 V_STAR = 0.6   # viability threshold (robust_refugium's own default)
 RHO = 0.8      # required ensemble fraction (robust_refugium's own default)
 LAM = 0.5      # refugium_score's own default risk-aversion weight
 
 
 def main():
+    dense = "--dense" in sys.argv
+    grid_rows, grid_cols = (DENSE_GRID_ROWS, DENSE_GRID_COLS) if dense else (GRID_ROWS, GRID_COLS)
+    out_path = OUT_PATH_DENSE if dense else OUT_PATH
+
     groups = load_functional_groups()
 
     # Real per-group forcing, one efficient call (shared streamed extraction, see
     # run_topohydro_grid.py's module docstring and fit_xylem_mechanistic_hazard.py's same pattern).
-    print(f"=== Building real 2019 gridded TOPOHYDRO forcing per group "
-          f"(rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP}) ===", flush=True)
+    print(f"=== Building real {'DENSE (1044-point)' if dense else '2019'} gridded TOPOHYDRO "
+          f"forcing per group (rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP}) ===", flush=True)
     rooting_depth_for_fit_groups = {g: ROOTING_DEPTH_MM_BY_GROUP[g] for g in groups
                                      if groups[g]["status"] == "ok"}
     lats, lons, elevation, cells_by_group = compute_grid_forcing_multi_group(
-        rooting_depth_by_group=rooting_depth_for_fit_groups)
+        rooting_depth_by_group=rooting_depth_for_fit_groups, grid_rows=grid_rows, grid_cols=grid_cols)
     n = len(lats)
 
     results = {
         "run_date": __import__("datetime").date.today().isoformat(),
         "year": 2019,
+        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
         "v_star": V_STAR, "rho": RHO, "lam": LAM,
         "scope_note": ("Viability = one-year hydraulic survival only (p_height_ok=1.0 -- "
                         "MERISTEM's growth/attainable-height model is not fit against real "
@@ -135,9 +146,9 @@ def main():
         print(f"  {name}: mean viability={v_ensemble.mean():.4f}, "
               f"{n_robust}/{len(valid_idx)} cells meet criterion (a)", flush=True)
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(yaml.dump(results, sort_keys=False, default_flow_style=False))
-    print(f"=== Wrote {OUT_PATH} ===", flush=True)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(yaml.dump(results, sort_keys=False, default_flow_style=False))
+    print(f"=== Wrote {out_path} ===", flush=True)
 
 
 if __name__ == "__main__":

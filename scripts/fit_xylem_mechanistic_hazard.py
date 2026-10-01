@@ -43,13 +43,20 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_topohydro_grid import compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP  # noqa: E402
+from run_topohydro_grid import (  # noqa: E402
+    compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP,
+    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
+)
 
 from antar.hydraulics.pipeline import mechanistic_hazard_for_cell  # noqa: E402
 from antar.hydraulics.twophase import Traits  # noqa: E402
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "configs"
 OUT_PATH = CONFIG_DIR / "fitted" / "xylem_mechanistic_hazard_2019.yaml"
+# Real 2026-10-01 densification: --dense runs the same real pipeline against the 1044-point
+# DENSE_GRID instead of the 80-point validation grid, writing to a separate output file so the
+# original validation-grid result (still what AEGIS/future-projections key off of) stays intact.
+OUT_PATH_DENSE = CONFIG_DIR / "fitted" / "xylem_mechanistic_hazard_2019_dense.yaml"
 
 PET_FORMULATION = "pm_fao56"
 OUTER_DRAWS = 50   # Sec. 6.3's own stated outer-loop draw count
@@ -84,6 +91,10 @@ def load_functional_groups():
 
 
 def main():
+    dense = "--dense" in sys.argv
+    grid_rows, grid_cols = (DENSE_GRID_ROWS, DENSE_GRID_COLS) if dense else (GRID_ROWS, GRID_COLS)
+    out_path = OUT_PATH_DENSE if dense else OUT_PATH
+
     groups = load_functional_groups()
     for name, g in groups.items():
         print(f"{name}: {g['status']}" + (f" (hyper_sd={g.get('hyper_sd')})" if g["status"] == "ok" else ""),
@@ -94,17 +105,18 @@ def main():
     # generic value shared across all 4 species -- see run_topohydro_grid.py's module docstring.
     # Terrain/soils/ERA5-Land are streamed exactly once, shared across all 4 groups; only the
     # cheap local w_max_mm multiply and the final topoclimate_forcing call repeat per group.
-    print(f"=== Building real 2019 gridded TOPOHYDRO forcing per group "
-          f"(rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP}) ===", flush=True)
+    print(f"=== Building real {'DENSE (1044-point)' if dense else '2019'} gridded TOPOHYDRO "
+          f"forcing per group (rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP}) ===", flush=True)
     rooting_depth_for_fit_groups = {g: ROOTING_DEPTH_MM_BY_GROUP[g] for g in groups
                                      if groups[g]["status"] == "ok"}
     lats, lons, elevation, cells_by_group = compute_grid_forcing_multi_group(
-        rooting_depth_by_group=rooting_depth_for_fit_groups)
+        rooting_depth_by_group=rooting_depth_for_fit_groups, grid_rows=grid_rows, grid_cols=grid_cols)
     n = len(lats)
 
     results = {
         "run_date": __import__("datetime").date.today().isoformat(),
         "year": 2019,
+        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
         "pet_formulation": PET_FORMULATION,
         "outer_draws": OUTER_DRAWS,
         "inner_draws": INNER_DRAWS,
@@ -148,9 +160,9 @@ def main():
         }
         print(f"  mean h_mech across cells: {results['groups'][name]['h_mech_mean_across_cells']:.4f}", flush=True)
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(yaml.dump(results, sort_keys=False, default_flow_style=False))
-    print(f"=== Wrote {OUT_PATH} ===", flush=True)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(yaml.dump(results, sort_keys=False, default_flow_style=False))
+    print(f"=== Wrote {out_path} ===", flush=True)
 
 
 if __name__ == "__main__":
