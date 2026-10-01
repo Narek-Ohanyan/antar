@@ -1669,3 +1669,21 @@ sized swings) than this clean, uniformly-explicable shift. ROADMAP.md's REFUGIUM
 AEGIS entries updated in place with the real new numbers (IMPLEMENTATION_LOG.md entries from
 earlier tonight left as the historical record of what was true then, per this file's own
 append-only convention).
+
+**MERISTEM's CWD re-extraction (the chain's last step) finished too, with a real, honest coverage
+regression worth flagging, not hiding**: only 839/3524 points got real per-group CWD this run,
+down from 3157/3524 in the earlier flat-rooting-depth run. Not a logic bug -- real tile failures
+hit harder tonight than before (tile (0,3072)'s 907 points failed all 3 retries outright; tile
+(3072,3072)'s 1128 points took 3+ real hours of retries before this run even got past ERA5-Land
+extraction, apparently losing points along the way too). Network conditions were real and
+specifically worse during this run than the original successful 3157/3524 pass earlier tonight,
+under the same code. `real_cwd_mm__<group>` arrays written to `data/_real_cwd_for_meristem.npz`
+regardless (4 real arrays, one per functional group, 839 real values each) -- a real, usable,
+if smaller-than-hoped-for dataset. Deliberately NOT re-run again immediately: updating
+`fit_meristem_adult_niche.py` to consume this real per-group CWD was never part of tonight's
+explicitly agreed sequence (grid densification -> MNEME -> Snakefile -> README -> UI), and another
+attempt would cost another real ~3.5h for uncertain improvement given tonight's network conditions
+-- deferred as a documented follow-up (re-attempt when conditions are better, or add checkpointing
+to this script the way MNEME's panel build and future-projections already have, so a partial
+failure doesn't force a full from-scratch redo) rather than silently blocking the higher-priority
+queue the user explicitly set.
