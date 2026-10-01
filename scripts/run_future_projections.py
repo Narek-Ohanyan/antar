@@ -50,7 +50,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
     DATA_DIR, extract_static_grid_inputs, extract_era5land, _load_chelsa_arrays,
-    saturation_vapour_pressure, wind_speed_2m,
+    saturation_vapour_pressure, wind_speed_2m, ROOTING_DEPTH_MM_BY_GROUP,
 )
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
 
@@ -176,7 +176,7 @@ def main():
     lats, lons = static["lats"], static["lons"]
     elevation, z_ref_m = static["elevation"], static["z_ref_m"]
     slope, aspect, concavity = static["slope"], static["aspect"], static["concavity"]
-    soil, w_max_mm, valid_soil = static["soil"], static["w_max_mm"], static["valid_soil"]
+    soil, valid_soil = static["soil"], static["valid_soil"]
     chelsa_row, chelsa_col = static["chelsa_row"], static["chelsa_col"]
     n = len(lats)
 
@@ -209,6 +209,13 @@ def main():
     real_groups = {k: v for k, v in groups.items() if v["status"] == "ok"}
     print(f"=== Real functional groups: {list(real_groups)} ===", flush=True)
 
+    # Real per-group w_max_mm: cheap, local (no network) -- each real functional group's own
+    # rooting depth (ROOTING_DEPTH_MM_BY_GROUP) now gives its own real water-holding capacity,
+    # rather than every species sharing one generic value. See run_topohydro_grid.py's module
+    # docstring for why this matters and why it's cheap to do per group here specifically.
+    w_max_mm_by_group = {g: (soil["theta_fc"] - soil["theta_lim"]) * ROOTING_DEPTH_MM_BY_GROUP[g]
+                          for g in real_groups}
+
     members = [(gcm, scenario) for gcm in GCMS for scenario in SCENARIOS]
 
     results = {}
@@ -235,10 +242,13 @@ def main():
                     chelsa_ref_base[0][:, i], chelsa_ref_base[1][:, i], chelsa_ref_base[2][:, i],
                     chelsa_ref_base[3][:, i], doy, month,
                 )
-                cell = build_future_cell(static, deltas, horizon, i, elevation, z_ref_m, slope, aspect,
-                                          concavity, soil, w_max_mm, lapse, lats, era5_2019, chelsa_ref_i)
 
                 for gname, g in real_groups.items():
+                    # Real per-group cell: each group's own w_max_mm gives its own real CWD/WSI/
+                    # soil-psi signal, not one shared generic forcing result across all species.
+                    cell = build_future_cell(static, deltas, horizon, i, elevation, z_ref_m, slope, aspect,
+                                              concavity, soil, w_max_mm_by_group[gname], lapse, lats,
+                                              era5_2019, chelsa_ref_i)
                     psi_soil = cell.psi_soil_mpa[PET_FORMULATION]
 
                     def simulate(traits, psi_soil=psi_soil, cell=cell):
@@ -280,9 +290,11 @@ def main():
         "horizons": {str(k): list(v) for k, v in HORIZONS.items()},
         "method": "delta/change-factor downscaling: real monthly ISIMIP3b anomaly (additive "
                   "temperature, multiplicative precipitation) applied to the real 2019 CHELSA-daily "
-                  "reference series, run through the unchanged real topoclimate_forcing pipeline. "
-                  "wind/radiation/dewpoint/pressure held at real 2019 ERA5-Land values -- no real "
-                  "future projection exists for these.",
+                  "reference series, run through the unchanged real topoclimate_forcing pipeline, "
+                  "once per real functional group using that group's own real rooting depth "
+                  f"({ROOTING_DEPTH_MM_BY_GROUP}, Canadell et al. 1996) rather than one generic "
+                  "value shared across all species. wind/radiation/dewpoint/pressure held at real "
+                  "2019 ERA5-Land values -- no real future projection exists for these.",
         "members": results,
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)

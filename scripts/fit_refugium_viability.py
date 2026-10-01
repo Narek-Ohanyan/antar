@@ -45,7 +45,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_topohydro_grid import compute_grid_forcing  # noqa: E402
+from run_topohydro_grid import compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP  # noqa: E402
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
 
 from antar.hydraulics.monte_carlo import two_level_failure_probability  # noqa: E402
@@ -61,11 +61,16 @@ LAM = 0.5      # refugium_score's own default risk-aversion weight
 
 def main():
     groups = load_functional_groups()
-    print("=== Building real 2019 gridded TOPOHYDRO forcing (reused) ===", flush=True)
-    lats, lons, elevation, cells = compute_grid_forcing()
+
+    # Real per-group forcing, one efficient call (shared streamed extraction, see
+    # run_topohydro_grid.py's module docstring and fit_xylem_mechanistic_hazard.py's same pattern).
+    print(f"=== Building real 2019 gridded TOPOHYDRO forcing per group "
+          f"(rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP}) ===", flush=True)
+    rooting_depth_for_fit_groups = {g: ROOTING_DEPTH_MM_BY_GROUP[g] for g in groups
+                                     if groups[g]["status"] == "ok"}
+    lats, lons, elevation, cells_by_group = compute_grid_forcing_multi_group(
+        rooting_depth_by_group=rooting_depth_for_fit_groups)
     n = len(lats)
-    valid_idx = [i for i in range(n) if cells[i] is not None]
-    print(f"=== {len(valid_idx)}/{n} cells have real forcing ===", flush=True)
 
     results = {
         "run_date": __import__("datetime").date.today().isoformat(),
@@ -83,6 +88,11 @@ def main():
         if g["status"] != "ok":
             results["groups"][name] = {"status": g["status"]}
             continue
+
+        cells = cells_by_group[name]
+        valid_idx = [i for i in range(n) if cells[i] is not None]
+        print(f"=== {name}: {len(valid_idx)}/{n} cells have real forcing ===", flush=True)
+
         print(f"=== {name}: real viability ensemble per cell ===", flush=True)
         v_ensemble = np.full((OUTER_DRAWS, len(valid_idx)), np.nan)
         for col, i in enumerate(valid_idx):

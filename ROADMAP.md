@@ -366,6 +366,20 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
         interpreted-pixel-year sample exists; the full nested (not single-split)
         blocked-CV validation designed in `configs/cv.yaml`, which needs more than 80 points/10
         years to be statistically meaningful.
+        **A concrete, scoped path traced 2026-10-01 (not executed tonight -- real resource
+        contention risk with the rooting-depth re-run chain already in flight, and a real,
+        substantial new compute cost in its own right)**: `scripts/fit_mneme_hazard_panel.py`
+        already calls the real `antar.hazard.observation.dieback_event` against real
+        `antar_vitality_composites`/`antar_disturbance_ancillary` data (2000-2024, Hansen GFC +
+        MODIS burned-area, confirmed real and already proven to work) -- the 0-event result is a
+        sample-density problem, not a missing-data or missing-logic problem. Both source rasters
+        are already exported **full-country, 30m, tiled** (`antar_vitality_composites`: 4 tiles,
+        2x2 at 4864px; `antar_landtrendr_segmentation`: 9 tiles, 3x3 at 3328px -- confirmed via
+        `configs/manifests/gee_exports.yaml`), not just sampled at the 78-point grid. The real,
+        concrete fix is a denser point sample (the same lever as the sample-size item above,
+        sharing the same grid-densification work) fed through the exact same already-working
+        `extract_vitality_and_disturbance`/`dieback_event` pipeline -- no new data pull, no new
+        detection logic, just more points x more years than 778 real person-years.
 - [x] **MERISTEM adult-niche model — built and fit per species, done (2026-09-30).**
       `antar.niche.adult` held only the Boyce index (a validation metric) before this — the
       presence-background model it validates didn't exist. Added `fit_presence_background`
@@ -432,6 +446,18 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       at this site-sample scale, not a bug. Saved to `configs/fitted/aegis_portfolio.yaml`. (Numbers
       updated 2026-10-01 after the Ecosystem Map eligibility refinement below dropped eligible
       units from 61 to 58; re-run, same qualitative result.)
+      **Real research done (2026-10-01) on the benefit/cost independence gap, real negative
+      result**: searched for a real literature-sourced survival multiplier by intervention method
+      to reduce AEGIS's stated independence (benefit by group only, cost by method only).
+      Consistently found the opposite of a usable number: the clearest real finding across every
+      source (Science Advances 2021 meta-analyses; a Mediterranean oak coppicing literature check)
+      is a well-documented **site-selection bias** -- natural-regeneration studies are
+      systematically sited where forest already exists, planting studies cover a broader range of
+      conditions, so cross-study survival comparisons conflate method with where it's used, not a
+      clean method effect. Real conclusion (`configs/manifests/placeholder_corrections_research.yaml`,
+      `aegis_method_survival_multiplier`): importing a confounded multiplier would make AEGIS
+      *less* defensible, not more -- the current stated independence stays the honest choice until
+      genuinely Armenia-specific, method-controlled survival data exists.
 - [x] **Ecosystem Map of Armenia — found, downloaded and integrated (2026-10-01).** The user
       shared two URLs for review: the real interactive EE app
       (`armenia-woodlands.../ecosystem-map-of-armenia`) and `github.com/opendataam` (checked --
@@ -460,6 +486,32 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       project's rectangular BBOX extends past it at the NW corner/western edge) and have no real
       ecosystem-map coverage -- left unset, not zero-filled. Saved to
       `configs/fitted/ecosystem_ground_truth_2019.yaml`.
+- [x] **Rooting depth made real and species-aware (2026-10-01)** -- not just a constant swap, a
+      real architectural fix. Tracing `ROOTING_DEPTH_MM_PLACEHOLDER`'s actual use
+      (`w_max_mm = (theta_fc - theta_lim) * rooting_depth_mm`, feeding `topoclimate_forcing`'s
+      water-balance core) showed every real functional group was getting the exact same CWD/WSI/
+      soil-psi signal, computed once per cell with one shared rooting depth -- species-specific
+      hydraulics were only ever applied on top of an already species-blind water-stress signal.
+      Real fix: `ROOTING_DEPTH_MM_BY_GROUP` (Canadell et al. 1996, 2.9-9.5m by real functional
+      group) now flows through `run_topohydro_grid.py`'s new `compute_grid_forcing_multi_group`/
+      `compute_forcing_for_year_multi_group` (expensive streamed extraction shared once, only the
+      cheap local water-balance math repeats per group) into XYLEM, REFUGIUM, future-projections,
+      and MERISTEM's CWD extraction (which needed its own real species-to-group mapping, since its
+      3524 points carry species-level labels, not the 4 coarse groups). Full real chain re-run
+      launched to propagate this through every real fitted output.
+- [ ] **Sample size (n=78) -- a real variogram-informed estimate exists now, points toward a
+      denser grid, not yet executed.** `scripts/estimate_variogram.py` (new, 2026-10-01): real
+      empirical variogram from the 78-point TOPOHYDRO grid's own CWD output (OLS-detrended
+      against elevation first). Real, somewhat surprising finding: an exponential model fits well
+      (R2=0.96) but so does a plain straight line with NO plateau at all (R2=0.94) -- the real
+      data shows no clear sill within the observed 24-186km lag range, meaning `configs/cv.yaml`'s
+      original flat "default 25km" block-size guess is not supported by real evidence, but the
+      true practical range can't be pinned down with confidence at this sample density either
+      (fitted estimate: ~523km, treated as an upper-bound-ish signal, not a number to design
+      around directly). `configs/cv.yaml` updated with the real finding and its honest caveat.
+      Concrete next step: re-estimate once a denser real grid exists -- the same grid-
+      densification work would also directly feed MNEME's event-panel fix below and tighten the
+      ecosystem-map validation correlations (rho=0.26-0.33 currently, n=61).
 - [ ] **Pipeline wiring**: `workflow/Snakefile` is still 100% placeholder `echo` commands for
       every rule — replace each with the real `antar.*` entry point once its inputs are real,
       so the pipeline can actually run end-to-end rather than existing only as tested library code.

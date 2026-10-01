@@ -1,6 +1,19 @@
 # Validation design (Concept Document, Section 9)
 spatial_cv:
-  block_size_rule: "max(variogram practical range of residuals, NNDM-matched distance); default 25 km until estimated"
+  block_size_rule: "max(variogram practical range of residuals, NNDM-matched distance); real
+    empirical estimate (2026-10-01, scripts/estimate_variogram.py, from the real 78-point
+    TOPOHYDRO grid, CWD detrended against elevation by OLS): exponential-model fit gives
+    range_param=174.5 km, practical range (3x) = 523 km -- but a plain linear fit (no sill at
+    all) explains the binned semivariogram almost as well (R2=0.94 vs 0.96 for the exponential),
+    meaning the real data shows NO clear plateau within the observed 24-186 km lag range. Honest
+    read: at 78 points, semivariance keeps rising roughly linearly out to ~186 km with no visible
+    sill -- either real spatial autocorrelation in detrended CWD genuinely extends across most of
+    Armenia (plausible for a mountain country's region-scale climate controls), or the sample is
+    too sparse to see the sill at all (more likely at this n). Either way, the original flat
+    25 km guess is not supported -- real evidence points to something larger, but the exact
+    practical range cannot be pinned down with confidence until a denser real grid exists (the
+    same sample-size fix needed for the core biophysical fits). Treat 523 km as an upper-bound-ish
+    signal, not a number to block on directly; re-estimate once the grid is densified."
   buffer_km: 2
   folds: 5
 temporal_cv:

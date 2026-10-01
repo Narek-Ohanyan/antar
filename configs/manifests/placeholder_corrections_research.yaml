@@ -1,6 +1,12 @@
 # Real findings for three of tonight's gridded-TOPOHYDRO-run placeholders (rooting_depth_mm,
 # gdd_budburst, calm_clear_night_frac) plus real canopy-height data characterization. Research
 # pass only -- nothing here has been applied to run_topohydro_grid.py or any config yet.
+#
+# 2026-10-01: rooting_depth_by_functional_group below is now APPLIED (see
+# run_topohydro_grid.py's ROOTING_DEPTH_MM_BY_GROUP and IMPLEMENTATION_LOG.md). The other three
+# entries remain real, honest, open research findings -- including two real negative results
+# (gdd_budburst's original claim didn't survive reading the primary source; calm_clear_night_frac's
+# planned fix source doesn't exist) that are just as real and worth keeping as the positive ones.
 
 - variable: rooting_depth_by_functional_group
   source: Canadell, J., Jackson, R.B., Ehleringer, J.R., Mooney, H.A., Sala, O.E., Schulze, E-D.
@@ -42,20 +48,25 @@
   checksum_sha256: null
   spatial_extent: Europe (beech populations along an altitudinal transect)
   notes: >-
-    Real but partial, and NOT yet as solidly verified as the rooting-depth or water-basin
-    figures (read via search summary only, not the primary article text -- flagged explicitly,
-    matching this project's own standard for what counts as "verified"): European beech
-    (Fagus sylvatica, the real XFT congeneric proxy species already used for the broadleaf
-    group's P50/slope) starts its growing season at a 10 degC thermal threshold with >=60 GDD
-    (base 0 degC) as a complementary condition. Two real gaps before this can replace
-    GDD_BUDBURST_PLACEHOLDER=200: (1) this project's topoclimate_forcing uses GDD base 5 degC by
-    default (gdd_base_c=5.0), not base 0 -- the 60-GDD-base-0 figure is not directly the same
-    quantity and would need either a recomputation at base 5 or passing gdd_base_c=0.0
-    specifically for the budburst/late-frost calculation; (2) no equivalent concrete number was
-    found yet for oak, pine, or juniper specifically -- only beech. Read the primary article
-    directly (not just the search summary) and search specifically for Quercus/Pinus sylvestris/
-    Juniperus budburst GDD before treating this as ready to use, the same bar every other real
-    number in this project has been held to.
+    **2026-10-01 follow-up, as instructed by this note's own original caveat ("read the primary
+    article directly ... before treating this as ready to use")**: did exactly that, and the
+    original claim does NOT hold up. The primary Frontiers article actually uses Growing Degree
+    *Hours* (GDH, not GDD-days) with a non-linear chilling/forcing interaction model, base 0 degC
+    -- no standalone "60 GDD" threshold appears anywhere in it; the real quote is "GDH requirement
+    to budburst for European beech increased with increasing forcing temperature" (i.e. the
+    requirement itself varies, it is not a fixed number). The "60 GDD base-0" figure in this
+    note's first pass was a misread of the search summary, not something the primary source
+    actually states -- a real example of why this project's own "read primary text, not just a
+    search snippet" bar exists. Tried two further real sources for a simpler, directly usable
+    beech/oak/Scots-pine GDD threshold (Chuine-style simple thermal-time models,
+    10.1007/s00484-003-0191-1): blocked by a Springer login wall and an Anubis bot-check on the
+    open-access mirror respectively -- both real, both hit, neither a found number. No real,
+    verifiable, species-specific GDD budburst threshold exists in this project as of tonight.
+    GDD_BUDBURST_PLACEHOLDER=200 stays a placeholder. Real, concrete next step instead of
+    continuing to chase an inaccessible citation: a formal sensitivity sweep (perturb
+    GDD_BUDBURST_PLACEHOLDER across a defensible literature-typical range, e.g. 0-300 GDD base-5,
+    re-run the cheap 78-point grid, report how much real viability actually moves) -- see
+    scripts/sensitivity_sweep_placeholders.py.
 
 - variable: calm_clear_night_frac_real_fix
   source: Not a literature number -- the real fix is architectural, not a search result.
@@ -69,16 +80,57 @@
   spatial_extent: n/a
   notes: >-
     A national-average cloud-cover figure (what was searched for) would be the wrong level of
-    specificity for a per-cell, per-day cold-air-pooling term anyway. The real, better fix:
-    ECMWF/ERA5_LAND/DAILY_AGGR (the same Earth Engine collection antar.io.gee_export.
-    export_era5land_forcing already pulls wind/radiation/dewpoint/pressure from) also carries
-    real cloud-cover bands. Extending that existing, already-tested export function with one more
-    band (e.g. total_cloud_cover or low_cloud_cover, annual-mean to match the rest of that
-    export's convention) would give a real, per-cell calm_clear_night_frac proxy (e.g. the
-    fraction of low-cloud-cover below some threshold), replacing the flat 0.3 placeholder with
-    real spatial variation -- not found via a new pull, but via extending a data source this
-    session already uses extensively. This is a code change (gee_export.py + a re-export), not
-    a config/citation update -- flagged here as a plan, not applied.
+    specificity for a per-cell, per-day cold-air-pooling term anyway. **2026-10-01 correction**:
+    this note's original plan (extend ECMWF/ERA5_LAND/DAILY_AGGR with a cloud-cover band) was
+    checked directly against Earth Engine before writing any code -- and was wrong.
+    ECMWF/ERA5_LAND/DAILY_AGGR has 150 real bands and NONE are cloud-related (confirmed via
+    `img.bandNames().getInfo()`, not assumed from the collection's documentation). ERA5-Land is a
+    land-surface-only reanalysis; cloud cover is an atmospheric diagnostic that doesn't appear in
+    it. Also checked and ruled out: ECMWF/ERA5/DAILY and ECMWF/ERA5/MONTHLY (GEE's reduced-band
+    ERA5 aggregates, 9 bands each, no cloud fraction either); MODIS/061/MOD08_D3 and
+    MCD06COSP_D3_MODIS (both real MODIS cloud products) are not available as GEE assets under
+    those ids. A credible real alternative identified but NOT yet implemented (time-boxed out of
+    tonight's pass in favour of MNEME/AEGIS, which had clearer paths forward): a real clear-sky
+    index kt = ssrd_actual / ssrd_clear_sky_theoretical, computable entirely from
+    surface_solar_radiation_downwards_sum (already pulled by export_era5land_forcing) against a
+    real theoretical extraterrestrial/clear-sky radiation formula -- no new GEE export needed.
+    This is a daytime proxy standing in for a specifically nighttime quantity (regional
+    cloudiness regimes correlate day/night, but imperfectly), so it would need to be stated as an
+    approximation, not a direct measurement, if implemented. calm_clear_night_frac remains the
+    flat 0.3 placeholder for now -- a real, still-open gap, not silently resolved.
+
+- variable: aegis_method_survival_multiplier
+  source: Multiple real sources searched (Science Advances 2021 meta-analysis on natural
+    regeneration vs. active restoration; a Costa Rica long-term reforestation trial; Mediterranean
+    oak coppicing/regeneration literature).
+  version: n/a
+  url: "https://www.science.org/doi/10.1126/sciadv.aas9143; https://www.science.org/doi/10.1126/sciadv.1701345"
+  citation: See the two Science Advances DOIs above for the clearest real findings; full citations
+    to be confirmed from the primary articles before any quantitative use.
+  license: n/a
+  access_date: '2026-10-01'
+  local_path: null
+  checksum_sha256: null
+  spatial_extent: Global (meta-analyses), tropical-forest-heavy; one Mediterranean oak-specific
+    search also run, given AEGIS's own species are temperate/semi-arid, not tropical.
+  notes: >-
+    Real research, real negative result -- concluded a method-survival multiplier should NOT be
+    added to AEGIS right now, not that the search failed. The clearest, most robustly real finding
+    across every source checked is a documented **site-selection bias**: natural-regeneration
+    studies are systematically conducted where a secondary forest already exists, while planting
+    studies cover a broader range of site conditions including non-forested land -- so raw
+    cross-study survival comparisons conflate method effect with where each method tends to be
+    used, not a clean causal effect of method itself (Science Advances 2021, directly on this).
+    The Mediterranean oak coppicing search independently confirms the same pattern from a
+    different real angle: coppicing survival is reported as "heavily dependent on management
+    conditions" (grazing pressure, protection), with no source quantifying a clean comparative
+    success rate against planting. Applying any of these numbers as an AEGIS method multiplier
+    would import a real confound into a model that currently, honestly, has none -- worse than
+    the stated independence it would replace. Real conclusion: AEGIS's current benefit/cost
+    independence (viability varies only by species group, cost only by method,
+    `scripts/fit_aegis_portfolio.py`'s own documented gap) stays as the more defensible real
+    choice until genuinely Armenia-specific, method-controlled survival data exists -- not
+    patched over with a borrowed, confounded number for the sake of looking less simplified.
 
 - variable: real_canopy_height_coverage_check
   source: antar_structure (this project's own GEDI L2A RH98 + ETH Global Canopy Height export,

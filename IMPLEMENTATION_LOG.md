@@ -1517,3 +1517,125 @@ Both real rasters kept locally under `data/ecosystem_map/` (gitignored, per this
 raw-data convention). `configs/manifests/ecosystem_map_armenia.yaml` records the full source,
 licence note, raster specs, class-code mapping and real known gap (the 17 out-of-bounds cells) for
 anyone picking this up later.
+
+## 2026-10-01 (cont.) -- a real structural simplification found and fixed: water balance was
+## never actually species-aware, despite rooting_depth_mm looking like "just a placeholder"
+
+Asked directly what it would take to make this project PhD-defensible, not just functional.
+Working through the real answer (sample size, MNEME's null result, unvalidated constants, AEGIS's
+benefit/cost independence, modest validation correlations) surfaced something more fundamental
+than any one fix: `rooting_depth_mm` looked like an ordinary flat placeholder
+(`ROOTING_DEPTH_MM_PLACEHOLDER = 1000.0`) worth swapping for a real sourced number. Tracing where
+it's actually used (`w_max_mm = (theta_fc - theta_lim) * rooting_depth_mm`, feeding straight into
+`topoclimate_forcing`'s water-balance core) showed the real problem was architectural, not just a
+bad constant: **every one of the 4 real functional groups was being handed the exact same CWD/
+WSI/soil-psi signal**, computed once per cell with one shared rooting depth, before XYLEM/REFUGIUM
+ever applied species-specific hydraulic traits on top. Broadleaf, oak, pine and juniper have real,
+very different rooting depths (2.9-9.5m, Canadell et al. 1996) -- by construction, none of that
+real difference could ever reach the water-stress signal those species actually experience. This
+is a bigger finding than "one placeholder was a guess": the whole hydraulic-hazard pipeline was
+silently treating water stress as species-blind.
+
+**Real architectural fix, not a constant swap**, across `scripts/run_topohydro_grid.py` and every
+real consumer:
+
+`ROOTING_DEPTH_MM_BY_GROUP` (real, Canadell et al. 1996, biome-level not genus-level since the
+paper reports by biome/functional-type): mesic_diffuse_porous_broadleaf=2900mm, ring_porous_oak=
+2900mm (same biome class as broadleaf -- temperate deciduous forest covers both Fagus/Carpinus AND
+Quercus macranthera/iberica, not two different real numbers), pine=3900mm, juniper_arid_conifer=
+9500mm (arid-adapted, genuinely much deeper, confirming the research note's own suspicion that the
+flat 1m placeholder badly understated juniper's real rooting depth and therefore overstated its
+real drought stress).
+
+`run_topohydro_grid.py` split into three real tiers instead of two, so the expensive streamed part
+is never repeated per group: `extract_static_grid_inputs` (terrain/soils, genuinely species-
+independent -- theta_fc/theta_lim/etc. don't depend on rooting depth at all, only the final
+w_max_mm multiply does) stays exactly as before, no change; `extract_year_climate_inputs` (NEW --
+ERA5-Land streaming + CHELSA loading, expensive but still species-independent) factored out so
+it's shared across groups too; `compute_forcing_for_year_multi_group` (NEW) calls it once, then
+loops the cheap local w_max_mm multiply + `topoclimate_forcing` call once per real group.
+`compute_grid_forcing_multi_group` (NEW) is the convenience wrapper XYLEM/REFUGIUM now call.
+`compute_forcing_for_year`/`compute_grid_forcing` (existing, single-rooting-depth) stay
+backward-compatible for TOPOHYDRO's own species-agnostic standalone run and MNEME's existing
+single-hazard-panel call -- unchanged signatures from a caller's perspective, same default.
+
+**A real inefficiency caught and fixed before it ran for hours**: the first version of this fix
+(before the architectural split above) had XYLEM and REFUGIUM calling the *combined*
+`compute_grid_forcing(rooting_depth_mm=...)` once per group -- which re-streams terrain/soils/
+ERA5-Land from scratch 4 times for no reason, since none of that extraction actually depends on
+rooting depth. Caught by re-reading what `compute_grid_forcing` actually does end to end before
+trusting the naive per-group loop, not after launching it. The real fix (`extract_year_climate_
+inputs` factored out, shared once) keeps the expensive streamed I/O at its original cost and only
+repeats the cheap local water-balance math 4x -- the real added wall-clock cost is modest, not the
+~4x blow-up (future-projections ~2.3h -> ~9h+) originally estimated to the user before this was
+traced through properly.
+
+`scripts/fit_xylem_mechanistic_hazard.py` and `scripts/fit_refugium_viability.py`: now call
+`compute_grid_forcing_multi_group` once (not `compute_grid_forcing` in a loop), consuming
+`cells_by_group[name]` per real functional group.
+
+`scripts/run_future_projections.py`: `extract_static_grid_inputs()` stays a single real call (as
+before); `w_max_mm_by_group` computed once, locally, from the shared real soil properties; the
+per-cell `build_future_cell` call moved inside the existing per-group loop (it already looped per
+group for the Monte Carlo step -- this just makes the forcing itself group-aware too, at the same
+real call-count the Monte Carlo already used).
+
+`scripts/compute_real_cwd_for_meristem.py`: a real, separate wrinkle here -- MERISTEM's 3524
+points carry real *species*-level labels (`Fagus orientalis`, `Carpinus betulus`, `Quercus
+macranthera`, `Quercus iberica`, `Pinus kochiana`, `Juniperus polycarpos`, `Juniperus excelsa`,
+plus 3000 shared `background` points), not the 4 coarse functional-group labels used elsewhere --
+confirmed by actually loading `data/_cache_niche_features.npz` and reading its real keys, not
+assumed. Added `SPECIES_TO_FUNCTIONAL_GROUP` (from `configs/species_traits.csv`'s own
+`example_taxa` column, not re-derived). Since MERISTEM fits a presence-background model per
+species (not pooled) and reuses the same background points across every species' fit, a background
+point needs CWD computed under *each* real functional group separately, not just whichever species
+happens to be fit first -- so the real fix computes CWD once per real functional group for every
+one of the 3524 points (not per species), saved as `real_cwd_mm__<group>` arrays in the output npz
+rather than one flat `real_cwd_mm` array. The previous run's real output (3157/3524 real CWD
+values, flat rooting depth) is superseded by this one, not merged with it -- the flat-depth numbers
+were a real intermediate result, not a usable final one.
+
+All five scripts re-launched as one real chain (TOPOHYDRO -> XYLEM -> REFUGIUM -> future-
+projections -> AEGIS -> MERISTEM's CWD extraction), superseding the in-flight bilinear-ERA5-Land-
+only re-run from earlier tonight (killed deliberately, low sunk cost, to avoid producing output
+that would immediately be stale once this fix landed). MNEME intentionally excluded from this
+re-run: its real null result (778 person-years, 0 events) is limited by genuine event scarcity, not
+by rooting-depth precision, so re-running it would cost ~2 real hours to almost certainly reproduce
+the same null result -- a documented, deliberate scope decision, not an oversight.
+
+**A real retry-coverage gap, caught by the chain actually crashing on it**: TOPOHYDRO's own
+standalone step succeeded, but XYLEM's independent re-extraction hit the same real transient
+vsicurl tile-read failure seen earlier tonight during MERISTEM's CWD run (same file id,
+`1Osy7hh3XbhDJgOTuXnIKGvMeA1RLIG_H` -- the (0,0) bilinear ERA5-Land tile, now a real repeat
+offender) and crashed the whole chain, because `run_topohydro_grid.py`'s shared `extract_era5land`
+had only ever gotten the GDAL HTTP timeout fix (bounds how long one stalled request hangs) earlier
+tonight, never the retry-on-exception wrapper (handles a request that fails fast and needs a
+retry) -- that pattern existed only in `compute_real_cwd_for_meristem.py`'s separate
+`extract_era5land_vectorized`, never ported back to the shared function every other real script
+actually depends on. Real fix: added the same 3-attempt retry-with-fresh-token pattern to
+`extract_era5land` itself, so every caller (TOPOHYDRO, XYLEM, REFUGIUM, MNEME, future-projections)
+gets it, not just MERISTEM's parallel extraction path. Chain resumed from XYLEM (TOPOHYDRO's real
+output was already safely written before the crash).
+
+**A second, more important real bug found right after**: the real crash above was caught in the
+first place only by reading the log tail directly -- the background task notification itself
+never fired a failure for it. Investigating why turned up a genuine process-control bug affecting
+every chained `&&`-joined command run this entire session: `python3 script.py 2>&1 | tee file.log
+&& next_script.py` chains a *pipeline*, and bash reports a pipeline's exit status as its LAST
+stage's status (`tee`, which always exits 0) unless `set -o pipefail` is active -- which it never
+was, anywhere tonight. So a crash partway through any `cmd | tee file && cmd2 | tee file2 && ...`
+chain was silently swallowed every time: `&&` kept evaluating to true and the chain kept going,
+leaving whichever script crashed with a stale, pre-fix output file while every script after it ran
+on correct fresh inputs (none of tonight's scripts read each other's real output files directly --
+each independently calls `load_functional_groups`/`compute_grid_forcing*` itself -- so this never
+silently corrupted a DOWNSTREAM real result with bad upstream data, but it did mean `fit_xylem_
+mechanistic_hazard.py` silently kept its original nearest-neighbor, flat-rooting-depth output for
+roughly 20 real minutes while REFUGIUM ran on top of it unaware, until this was caught manually).
+Concretely: the real first rooting-depth re-run chain's XYLEM step crashed, but its parent shell
+(pid 39195) silently continued into REFUGIUM (pid 39831) at the same time a freshly relaunched
+second XYLEM-only attempt (pid 39902/39904) was *also* running -- two real chains racing toward
+the same output files. Caught before either could corrupt anything (checked real file mtimes:
+`refugium_viability_2019.yaml` still showed its old pre-fix timestamp, confirming the race had not
+yet produced a write), both killed, relaunched a third time with `set -o pipefail` explicitly set
+so a real crash anywhere in the chain now actually stops it, matching what `&&` was always meant to
+guarantee.

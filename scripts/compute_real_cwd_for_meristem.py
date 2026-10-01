@@ -14,6 +14,17 @@ streamed (16 tiles, 15+ GB combined -- a full download would be a real, unjustif
 regression) but reads are batched per tile via vectorized rasterio .sample() calls, not a
 per-point loop -- the same fix that made the 80-point grid runs fast, now necessary rather than
 optional at 44x the point count.
+
+**Real per-functional-group CWD, not one flat value for all 7 species.** MERISTEM fits a
+presence-background model per species (not pooled), sharing the same 3000 background points across
+every species' fit. w_max_mm (soil water-holding capacity) depends on rooting depth, which is real
+and species-specific (``ROOTING_DEPTH_MM_BY_GROUP``, Canadell et al. 1996) -- so CWD is computed
+once per real functional group, for every point (including background, since a background point
+needs each group's own real CWD when it's used in that group's own fit), not once globally. Only
+the cheap local `topoclimate_forcing` loop repeats per group; the expensive terrain/soils download
+and ERA5-Land streaming above are each done exactly once, shared across all 4 groups -- the same
+efficient split used in run_topohydro_grid.py/fit_xylem_mechanistic_hazard.py/
+fit_refugium_viability.py/run_future_projections.py.
 """
 import datetime
 import json
@@ -33,6 +44,7 @@ from run_topohydro_grid import (  # noqa: E402
     DATA_DIR, get_access_token, drive_vsicurl_url, _load_chelsa_arrays,
     saturation_vapour_pressure, wind_speed_2m, TERRAIN_DRIVE_ID, SOILS_DRIVE_ID,
     ERA5LAND_TILE_IDS, ERA5LAND_TILE_SIZE_PX, CONCAVITY_WINDOW_PX, COARSE_REF_WINDOW_PX,
+    ROOTING_DEPTH_MM_BY_GROUP,
 )
 from antar.climate import downscale  # noqa: E402
 from antar.climate.forcing import topoclimate_forcing  # noqa: E402
@@ -43,10 +55,24 @@ from antar.climate.terrain import concavity_index  # noqa: E402
 CACHE_PATH = DATA_DIR / "_cache_niche_features.npz"
 OUT_PATH = DATA_DIR / "_real_cwd_for_meristem.npz"
 YEAR = 2019
-ROOTING_DEPTH_MM_PLACEHOLDER = 1000.0
 GDD_BUDBURST_PLACEHOLDER = 200.0
 CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER = 0.3
 BBOX = (43.4, 38.8, 46.7, 41.4)
+
+# Real species-to-functional-group mapping, from configs/species_traits.csv's own `example_taxa`
+# column (not re-derived/guessed here). "background" points are shared across every species'
+# presence-background fit (MERISTEM fits per species, not pooled), so for each real functional
+# group a background point needs that group's own CWD too, computed uniformly for every point --
+# see main()'s per-group loop below.
+SPECIES_TO_FUNCTIONAL_GROUP = {
+    "Fagus orientalis": "mesic_diffuse_porous_broadleaf",
+    "Carpinus betulus": "mesic_diffuse_porous_broadleaf",
+    "Quercus macranthera": "ring_porous_oak",
+    "Quercus iberica": "ring_porous_oak",
+    "Pinus kochiana": "pine",
+    "Juniperus polycarpos": "juniper_arid_conifer",
+    "Juniperus excelsa": "juniper_arid_conifer",
+}
 
 
 def load_all_points():
@@ -194,7 +220,10 @@ def main():
     valid_soil = ~np.isnan(clay_pct)
     print(f"  {valid_soil.sum()}/{n} points have real soil data", flush=True)
     soil = soil_hydraulic_parameters(sand_pct, clay_pct, soc_g_kg)
-    w_max_mm = (soil["theta_fc"] - soil["theta_lim"]) * ROOTING_DEPTH_MM_PLACEHOLDER
+    # Real per-group w_max_mm (cheap, local): each real functional group's own rooting depth,
+    # not one flat value shared by every species -- see run_topohydro_grid.py's module docstring.
+    w_max_mm_by_group = {g: (soil["theta_fc"] - soil["theta_lim"]) * rd
+                          for g, rd in ROOTING_DEPTH_MM_BY_GROUP.items()}
 
     print("=== ERA5-Land 2019 (streamed, vectorized per-tile) ===", flush=True)
     token = get_access_token()  # refresh -- the terrain/soils download above can take a while
@@ -227,37 +256,45 @@ def main():
     gamma_k_per_m = np.array([lapse_cfg["temperature"]["gamma_k_per_m_by_month"][m] for m in month_order])
     precip_gradient_per_m = np.array([lapse_cfg["precipitation"]["gradient_per_m_by_month"][m] for m in month_order])
 
-    print("=== Running topoclimate_forcing per point (real CWD) ===", flush=True)
-    real_cwd_mm = np.full(n, np.nan)
+    print("=== Running topoclimate_forcing per point, once per real functional group (real CWD) ===", flush=True)
     valid_mask = valid_soil & valid_era5
-    for i in range(n):
-        if not valid_mask[i]:
-            continue
-        gamma_of_day = gamma_k_per_m[month - 1]
-        t_mean_c_for_rn = downscale.downscale_temperature(t_mean_ref_all[:, i], elevation[i], z_ref_m[i], gamma_of_day)
-        rn_mj_m2 = net_radiation_from_era5(np.full(len(doy), ssrd[i]), np.full(len(doy), strd[i]), t_mean_c_for_rn)
-        out = topoclimate_forcing(
-            doy=doy, month=month,
-            t_mean_ref_c=t_mean_ref_all[:, i], t_max_ref_c=t_max_ref_all[:, i], t_min_ref_c=t_min_ref_all[:, i],
-            p_ref_mm=p_ref_all[:, i], ea_ref_kpa=np.full(len(doy), ea_ref_kpa[i]),
-            u2_m_s=np.full(len(doy), u2_m_s[i]), rn_mj_m2=rn_mj_m2,
-            z_cell_m=elevation[i], z_ref_m=z_ref_m[i], lat_deg=lats[i],
-            slope_deg=slope[i], aspect_deg=aspect[i],
-            gamma_k_per_m=gamma_k_per_m, precip_gradient_per_m=precip_gradient_per_m,
-            w_max_mm=w_max_mm[i], theta_sat=soil["theta_sat"][i], psi_sat_mpa=soil["psi_sat_mpa"][i],
-            b_clapp_hornberger=soil["b_clapp_hornberger"][i], theta_fc=soil["theta_fc"][i],
-            theta_lim=soil["theta_lim"][i], gdd_budburst=GDD_BUDBURST_PLACEHOLDER,
-            concavity_index=concavity[i], calm_clear_night_frac=CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER,
-            pressure_kpa=pressure_kpa_era5[i],
-        )
-        real_cwd_mm[i] = out.cwd_mm["pm_fao56"]
-        if (i + 1) % 200 == 0:
-            print(f"  [{i + 1}/{n}] done", flush=True)
+    real_cwd_mm_by_group = {}
+    for gname, w_max_mm in w_max_mm_by_group.items():
+        print(f"  === {gname} (rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP[gname]}) ===", flush=True)
+        real_cwd_mm = np.full(n, np.nan)
+        for i in range(n):
+            if not valid_mask[i]:
+                continue
+            gamma_of_day = gamma_k_per_m[month - 1]
+            t_mean_c_for_rn = downscale.downscale_temperature(t_mean_ref_all[:, i], elevation[i], z_ref_m[i], gamma_of_day)
+            rn_mj_m2 = net_radiation_from_era5(np.full(len(doy), ssrd[i]), np.full(len(doy), strd[i]), t_mean_c_for_rn)
+            out = topoclimate_forcing(
+                doy=doy, month=month,
+                t_mean_ref_c=t_mean_ref_all[:, i], t_max_ref_c=t_max_ref_all[:, i], t_min_ref_c=t_min_ref_all[:, i],
+                p_ref_mm=p_ref_all[:, i], ea_ref_kpa=np.full(len(doy), ea_ref_kpa[i]),
+                u2_m_s=np.full(len(doy), u2_m_s[i]), rn_mj_m2=rn_mj_m2,
+                z_cell_m=elevation[i], z_ref_m=z_ref_m[i], lat_deg=lats[i],
+                slope_deg=slope[i], aspect_deg=aspect[i],
+                gamma_k_per_m=gamma_k_per_m, precip_gradient_per_m=precip_gradient_per_m,
+                w_max_mm=w_max_mm[i], theta_sat=soil["theta_sat"][i], psi_sat_mpa=soil["psi_sat_mpa"][i],
+                b_clapp_hornberger=soil["b_clapp_hornberger"][i], theta_fc=soil["theta_fc"][i],
+                theta_lim=soil["theta_lim"][i], gdd_budburst=GDD_BUDBURST_PLACEHOLDER,
+                concavity_index=concavity[i], calm_clear_night_frac=CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER,
+                pressure_kpa=pressure_kpa_era5[i],
+            )
+            real_cwd_mm[i] = out.cwd_mm["pm_fao56"]
+            if (i + 1) % 500 == 0:
+                print(f"    [{i + 1}/{n}] done", flush=True)
+        n_ok = int(np.sum(~np.isnan(real_cwd_mm)))
+        print(f"  {gname}: {n_ok}/{n} real CWD values computed", flush=True)
+        real_cwd_mm_by_group[gname] = real_cwd_mm
 
-    n_ok = int(np.sum(~np.isnan(real_cwd_mm)))
-    print(f"=== {n_ok}/{n} real CWD values computed ===", flush=True)
-    np.savez_compressed(OUT_PATH, lats=lats, lons=lons, groups=groups, real_cwd_mm=real_cwd_mm)
-    print(f"=== Wrote {OUT_PATH} ===", flush=True)
+    np.savez_compressed(
+        OUT_PATH, lats=lats, lons=lons, groups=groups,
+        species_to_functional_group=json.dumps(SPECIES_TO_FUNCTIONAL_GROUP),
+        **{f"real_cwd_mm__{g}": arr for g, arr in real_cwd_mm_by_group.items()},
+    )
+    print(f"=== Wrote {OUT_PATH} (real per-group CWD: {list(real_cwd_mm_by_group)}) ===", flush=True)
 
 
 if __name__ == "__main__":

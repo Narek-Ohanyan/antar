@@ -24,10 +24,18 @@ documented placeholders (not silently defaulted):
 * ``gdd_budburst`` -- species/functional-group specific per the concept note;
   no species-specific value has been derived yet. 200 GDD-days (base 5 degC)
   stands in as a generic literature-typical temperate-tree order of magnitude.
-* ``rooting_depth_mm`` (1000 mm) -- feeds w_max_mm = (theta_fc - theta_lim) *
-  rooting_depth; no XYLEM rooting-depth trait exists yet, so a generic
-  temperate-tree order-of-magnitude value stands in (Canadell et al. 1996
-  put median tree rooting depth around 1-2 m).
+* ``rooting_depth_mm`` (1000 mm here) -- feeds w_max_mm = (theta_fc - theta_lim)
+  * rooting_depth. This standalone run stays species-agnostic (one generic
+  value for the whole grid) by design; real per-group values now exist
+  (``ROOTING_DEPTH_MM_BY_GROUP``, Canadell et al. 1996, 2.9-9.5 m depending on
+  functional group) and callers that know their real species (XYLEM, REFUGIUM,
+  future-projections, MERISTEM's CWD extraction) pass them through
+  ``extract_static_grid_inputs``/``compute_grid_forcing``'s ``rooting_depth_mm``
+  parameter instead -- each calling this module's forcing pipeline once per
+  real functional group rather than once per cell, since w_max_mm (and
+  therefore the whole real water-balance signal: CWD, WSI, soil psi) was
+  previously shared identically across all 4 species, which is itself a real
+  simplification worth having fixed, not just the constant's value.
 
 Two real, defensible modelling choices specific to this run (not framework
 defaults, documented here rather than in library code):
@@ -62,6 +70,7 @@ left on disk by this script.
 import datetime
 import json
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -93,12 +102,41 @@ ERA5LAND_TILE_SIZE_PX = 3072  # GEE shard size confirmed against terrain.tif's o
 
 CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER = 0.3
 GDD_BUDBURST_PLACEHOLDER = 200.0
-ROOTING_DEPTH_MM_PLACEHOLDER = 1000.0
+ROOTING_DEPTH_MM_PLACEHOLDER = 1000.0  # generic default -- this script's own standalone grid run
+# is deliberately species-agnostic (see module docstring); callers that know their real
+# functional group should pass ROOTING_DEPTH_MM_BY_GROUP[group] to extract_static_grid_inputs/
+# compute_grid_forcing instead. Real values: Canadell et al. (1996), Oecologia 108, 583-595 --
+# biome-level (not genus-level: the paper reports by biome/functional-type, not individually for
+# Fagus/Quercus/Pinus/Juniperus), still a real, large improvement over one flat guess shared by
+# every species. mesic_diffuse_porous_broadleaf and ring_porous_oak share the same real value --
+# the paper's temperate-deciduous-forest figure covers both (Fagus orientalis/Carpinus betulus AND
+# Quercus macranthera/iberica fall in the same biome class, not two different real numbers).
+ROOTING_DEPTH_MM_BY_GROUP = {
+    "mesic_diffuse_porous_broadleaf": 2900.0,  # temperate deciduous forest
+    "ring_porous_oak": 2900.0,                 # temperate deciduous forest (same biome class)
+    "pine": 3900.0,                            # temperate coniferous forest
+    "juniper_arid_conifer": 9500.0,            # desert/arid shrubland (arid-adapted, deep-rooted)
+}
 
 COARSE_REF_WINDOW_PX = 15  # +-15 px at 30m = 930m, matching CHELSA-daily's own ~927m pixel
 CONCAVITY_WINDOW_PX = 3    # 7x7 (210m) local neighbourhood for cold-air-pooling concavity
 
 ERA5LAND_TILE_IDS = {
+    (0, 0): "1Osy7hh3XbhDJgOTuXnIKGvMeA1RLIG_H", (0, 3072): "1CJB9LZtDaIfVEXzbGV8N-skFElU17v7e",
+    (0, 6144): "1XDzUgFxdulZWTvN90-x5fmhp018wKclz", (0, 9216): "1Ordcx93EtwZTRvaTpnp9w2aZwlWt5u68",
+    (3072, 0): "1DFpW0KFisx2C9778QH66MHnibEuVLgY_", (3072, 3072): "1QrtWlHR19aGLl5p7D5BJ3EKTx4SzJK7J",
+    (3072, 6144): "1BLG95JTJZ1soePO1bureX5UtXgmHizlY", (3072, 9216): "1_9Ajxw3rySxh9fOzZJMKfxWy3nJQ3fiv",
+    (6144, 0): "1UT6WqhnlNftbhagsZ__ZlLOQMF1nHzd5", (6144, 3072): "113jX1fWiW0F4dawd9tC7KWSpByQ2PGWn",
+    (6144, 6144): "1aYXhxaWjYQhl0qVZQHvMcOJAy_-TU6bQ", (6144, 9216): "1KiQzUMLM01Q5E-y5n-Qgi3krOXEOAR5W",
+    (9216, 0): "1zIiisaynM-CWe_QreVrCT9qIRQLgOqGt", (9216, 3072): "13hrIrruW5H-Ux_CzbWy8RNYkLQH6gFjJ",
+    (9216, 6144): "16V2QKatPrNfiNe1m5whc42L8vKHjvGN2", (9216, 9216): "1DvIQ6aV-rVge00BH4eXZPNrT0u7i-c9v",
+}
+# Bilinear-resampled, re-exported 2026-10-01 (configs/resampling_policy.yaml's fix for the real
+# ~300x ERA5-Land-to-master-grid upsample). Every real run through REFUGIUM/future-projections/
+# AEGIS/MERISTEM-in-progress used the ORIGINAL nearest-neighbor tiles, kept here for any re-run
+# that needs to reproduce those exact numbers -- see configs/manifests/gee_exports.yaml for the
+# full real id/size/MD5 record of both versions.
+ERA5LAND_TILE_IDS_NEAREST_NEIGHBOR_ORIGINAL = {
     (0, 0): "1kQxh_EDcCn6Ih5xyfvfIZuQE2mWNPqaS", (0, 3072): "1ZCNxrs6P3-_Y8DYg-MetdslHjQnV0phA",
     (0, 6144): "13YdynAAjD0KwDYzpMt3C5GmnH3eKEDHP", (0, 9216): "1rm4-5kX8tO5i855b3BGEP7cXqbb8htzT",
     (3072, 0): "1psHQxLuxdRcN1Oczv7VDh1mcB8a7N38s", (3072, 3072): "1LkBgsLjeZ1_uRlO1c6FHmsZ8pxpIPjnT",
@@ -187,35 +225,67 @@ def extract_soils(token, lats, lons):
 
 
 def extract_era5land(token, row_px, col_px, year=YEAR):
+    """Per-tile ERA5-Land read with retry-on-exception (fresh token each attempt). A real
+    transient vsicurl read failure crashed this function's pre-retry version mid-XYLEM-run
+    (2026-10-01, RasterioIOError inside a plain per-point loop with no retry) -- the GDAL
+    HTTP timeout alone bounds how long a single stalled request hangs, but does nothing for a
+    request that fails fast and needs a retry; see compute_real_cwd_for_meristem.py's
+    extract_era5land_vectorized, which already had this pattern, for the precedent."""
     n = len(row_px)
     wind10, ssrd, strd, dewpoint_k, pressure_pa = (np.full(n, np.nan) for _ in range(5))
     tile_row = (row_px // ERA5LAND_TILE_SIZE_PX) * ERA5LAND_TILE_SIZE_PX
     tile_col = (col_px // ERA5LAND_TILE_SIZE_PX) * ERA5LAND_TILE_SIZE_PX
 
+    failed_tiles = []
     for tile_key in sorted(set(zip(tile_row.tolist(), tile_col.tolist()))):
         file_id = ERA5LAND_TILE_IDS[tile_key]
         sel = (tile_row == tile_key[0]) & (tile_col == tile_key[1])
-        url = drive_vsicurl_url(file_id)
-        with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
-            with rasterio.open(url) as src:
-                bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
-                for i in np.where(sel)[0]:
-                    lr, lc = int(row_px[i] - tile_key[0]), int(col_px[i] - tile_key[1])
-                    w = Window(lc, lr, 1, 1)
-                    wind10[i] = src.read(bidx[f"wind_speed_{year}"], window=w)[0, 0]
-                    ssrd[i] = src.read(bidx[f"ssrd_{year}"], window=w)[0, 0]
-                    strd[i] = src.read(bidx[f"strd_{year}"], window=w)[0, 0]
-                    dewpoint_k[i] = src.read(bidx[f"dewpoint_{year}"], window=w)[0, 0]
-                    pressure_pa[i] = src.read(bidx[f"surface_pressure_{year}"], window=w)[0, 0]
+
+        last_err = None
+        for attempt in range(3):
+            try:
+                fresh_token = get_access_token()
+                url = drive_vsicurl_url(file_id)
+                with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
+                    with rasterio.open(url) as src:
+                        bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
+                        tile_vals = {k: np.full(n, np.nan) for k in
+                                     ["wind_speed", "ssrd", "strd", "dewpoint", "surface_pressure"]}
+                        for i in np.where(sel)[0]:
+                            lr, lc = int(row_px[i] - tile_key[0]), int(col_px[i] - tile_key[1])
+                            w = Window(lc, lr, 1, 1)
+                            for bandname in tile_vals:
+                                tile_vals[bandname][i] = src.read(bidx[f"{bandname}_{year}"], window=w)[0, 0]
+                for arr, key in [(wind10, "wind_speed"), (ssrd, "ssrd"), (strd, "strd"),
+                                  (dewpoint_k, "dewpoint"), (pressure_pa, "surface_pressure")]:
+                    arr[sel] = tile_vals[key][sel]
+                last_err = None
+                break
+            except rasterio.errors.RasterioIOError as e:
+                last_err = e
+                print(f"  tile {tile_key}: read failed (attempt {attempt + 1}/3): {e}", flush=True)
+                time.sleep(5)
+        if last_err is not None:
+            print(f"  tile {tile_key}: FAILED after 3 attempts, {sel.sum()} points left NaN", flush=True)
+            failed_tiles.append(tile_key)
+            continue
         print(f"  tile {tile_key}: {sel.sum()} points", flush=True)
+    if failed_tiles:
+        print(f"  === {len(failed_tiles)} tile(s) failed all retries: {failed_tiles} ===", flush=True)
     return wind10, ssrd, strd, dewpoint_k, pressure_pa
 
 
 def extract_static_grid_inputs():
-    """Terrain and soils: year-independent, extracted once and reused across years.
+    """Terrain and soils: year-independent AND species-independent, extracted once and reused
+    across years and across real functional groups.
 
-    Factored out so a multi-year caller (MNEME's hazard-panel build) pays for
-    terrain/soil extraction once, not once per year.
+    Factored out so a multi-year caller (MNEME's hazard-panel build) pays for terrain/soil
+    extraction once, not once per year. Does NOT bake in rooting depth -- clay/sand/soc ->
+    theta_fc/theta_lim/etc. (``soil_hydraulic_parameters``) are genuinely species-independent soil
+    properties; only w_max_mm = (theta_fc - theta_lim) * rooting_depth varies by real functional
+    group, and that multiply is cheap and local (no network), so it happens in
+    :func:`compute_forcing_for_year` instead, where a per-group caller can repeat it 4 times for
+    ~free rather than re-streaming terrain/soils/ERA5-Land 4 times for no reason.
     """
     lats, lons, chelsa_row, chelsa_col = grid_latlon()
     n = len(lats)
@@ -233,13 +303,12 @@ def extract_static_grid_inputs():
     valid_soil = ~np.isnan(clay_pct)
     print(f"  {valid_soil.sum()}/{n} points have real soil data", flush=True)
     soil = soil_hydraulic_parameters(sand_pct, clay_pct, soc_g_kg)
-    w_max_mm = (soil["theta_fc"] - soil["theta_lim"]) * ROOTING_DEPTH_MM_PLACEHOLDER
 
     return {
         "lats": lats, "lons": lons, "chelsa_row": chelsa_row, "chelsa_col": chelsa_col,
         "token": token, "elevation": elevation, "slope": slope, "aspect": aspect,
         "concavity": concavity, "z_ref_m": z_ref_m, "row_px": row_px, "col_px": col_px,
-        "soil": soil, "w_max_mm": w_max_mm, "valid_soil": valid_soil,
+        "soil": soil, "valid_soil": valid_soil,
     }
 
 
@@ -255,25 +324,20 @@ def _load_chelsa_arrays():
     return _CHELSA_CACHE
 
 
-def compute_forcing_for_year(static, year):
-    """Real per-cell CellTopoclimate for one year, given :func:`extract_static_grid_inputs`'s
-    output. Separated from terrain/soil extraction so a multi-year caller only pays the
-    (cheap) ERA5-Land/CHELSA/topoclimate_forcing cost once per year, not the (streamed,
-    slower) terrain/soil cost.
+def extract_year_climate_inputs(static, year):
+    """ERA5-Land + CHELSA-daily reference + lapse config for one year -- expensive (streamed) but
+    genuinely species-independent, so it's extracted exactly once per (static, year) regardless of
+    how many real functional groups later consume it. Separated out of
+    :func:`compute_forcing_for_year` so a multi-group caller doesn't re-stream ERA5-Land once per
+    group for no reason (only the cheap local w_max_mm multiply actually varies by group).
 
-    Fetches a fresh access token on every call rather than reusing ``static["token"]`` --
-    Google OAuth access tokens expire after ~1 hour, and a multi-year caller (MNEME's hazard
-    panel) runs for several hours; reusing one token caused a real crash (HTTP 400 on year 8
-    of 10, `scripts/fit_mneme_hazard_panel.py`, 2026-09-30) that lost the whole run since it
-    checkpointed nothing. Refreshing per year is cheap (one token exchange) next to the
-    minutes of streaming each year already costs.
+    Fetches a fresh access token rather than reusing ``static["token"]`` -- see
+    :func:`compute_forcing_for_year`'s original docstring note on the real OAuth-expiry crash
+    this guards against.
     """
     lats, lons, chelsa_row, chelsa_col = static["lats"], static["lons"], static["chelsa_row"], static["chelsa_col"]
     token = get_access_token()
-    elevation, slope, aspect = static["elevation"], static["slope"], static["aspect"]
-    concavity, z_ref_m, row_px, col_px = static["concavity"], static["z_ref_m"], static["row_px"], static["col_px"]
-    soil, w_max_mm, valid_soil = static["soil"], static["w_max_mm"], static["valid_soil"]
-    n = len(lats)
+    row_px, col_px = static["row_px"], static["col_px"]
 
     print(f"=== ERA5-Land {year} (streamed per-tile) ===", flush=True)
     wind10, ssrd, strd, dewpoint_k, pressure_pa = extract_era5land(token, row_px, col_px, year=year)
@@ -290,7 +354,6 @@ def compute_forcing_for_year(static, year):
     dates = [day0 + datetime.timedelta(days=d) for d in range(i0, i1)]
     doy = np.array([d.timetuple().tm_yday for d in dates])
     month = np.array([d.month for d in dates])
-    n_days = len(dates)
 
     pr = arrs["pr"]
     pr_available = i1 <= pr.shape[0]
@@ -304,55 +367,138 @@ def compute_forcing_for_year(static, year):
     gamma_k_per_m = np.array([lapse["temperature"]["gamma_k_per_m_by_month"][m] for m in month_order])
     precip_gradient_per_m = np.array([lapse["precipitation"]["gradient_per_m_by_month"][m] for m in month_order])
 
+    valid_mask = static["valid_soil"] & valid_era5 & pr_available
+    return {
+        "doy": doy, "month": month, "valid_mask": valid_mask,
+        "ea_ref_kpa": ea_ref_kpa, "u2_m_s": u2_m_s, "ssrd": ssrd, "strd": strd,
+        "pressure_kpa_era5": pressure_kpa_era5,
+        "t_mean_ref_all": t_mean_ref_all, "t_max_ref_all": t_max_ref_all, "t_min_ref_all": t_min_ref_all,
+        "p_ref_all": p_ref_all,
+        "gamma_k_per_m": gamma_k_per_m, "precip_gradient_per_m": precip_gradient_per_m,
+    }
+
+
+def _forcing_cell(static, climate, w_max_mm, i):
+    """One real cell's CellTopoclimate, given already-extracted static+climate inputs and a
+    (possibly group-specific) w_max_mm array. The actual per-cell, per-group computation --
+    cheap and local, no network -- shared by every caller below."""
+    elevation, slope, aspect = static["elevation"], static["slope"], static["aspect"]
+    concavity, z_ref_m, lats = static["concavity"], static["z_ref_m"], static["lats"]
+    soil = static["soil"]
+    doy, month = climate["doy"], climate["month"]
+    n_days = len(doy)
+    t_mean_ref_c = climate["t_mean_ref_all"][:, i]
+    t_max_ref_c = climate["t_max_ref_all"][:, i]
+    t_min_ref_c = climate["t_min_ref_all"][:, i]
+    p_ref_mm = climate["p_ref_all"][:, i]
+
+    gamma_of_day = climate["gamma_k_per_m"][month - 1]
+    t_mean_c_for_rn = downscale.downscale_temperature(t_mean_ref_c, elevation[i], z_ref_m[i], gamma_of_day)
+    rn_mj_m2 = net_radiation_from_era5(np.full(n_days, climate["ssrd"][i]), np.full(n_days, climate["strd"][i]), t_mean_c_for_rn)
+
+    return topoclimate_forcing(
+        doy=doy, month=month,
+        t_mean_ref_c=t_mean_ref_c, t_max_ref_c=t_max_ref_c, t_min_ref_c=t_min_ref_c,
+        p_ref_mm=p_ref_mm, ea_ref_kpa=np.full(n_days, climate["ea_ref_kpa"][i]),
+        u2_m_s=np.full(n_days, climate["u2_m_s"][i]), rn_mj_m2=rn_mj_m2,
+        z_cell_m=elevation[i], z_ref_m=z_ref_m[i], lat_deg=lats[i],
+        slope_deg=slope[i], aspect_deg=aspect[i],
+        gamma_k_per_m=climate["gamma_k_per_m"], precip_gradient_per_m=climate["precip_gradient_per_m"],
+        w_max_mm=w_max_mm[i], theta_sat=soil["theta_sat"][i], psi_sat_mpa=soil["psi_sat_mpa"][i],
+        b_clapp_hornberger=soil["b_clapp_hornberger"][i], theta_fc=soil["theta_fc"][i],
+        theta_lim=soil["theta_lim"][i], gdd_budburst=GDD_BUDBURST_PLACEHOLDER,
+        concavity_index=concavity[i], calm_clear_night_frac=CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER,
+        pressure_kpa=climate["pressure_kpa_era5"][i],
+    )
+
+
+def compute_forcing_for_year(static, year, rooting_depth_mm=ROOTING_DEPTH_MM_PLACEHOLDER):
+    """Real per-cell CellTopoclimate for one year, given :func:`extract_static_grid_inputs`'s
+    output. Separated from terrain/soil extraction so a multi-year caller only pays the
+    (cheap) ERA5-Land/CHELSA/topoclimate_forcing cost once per year, not the (streamed,
+    slower) terrain/soil cost.
+
+    Single-rooting-depth convenience wrapper (one real value for the whole grid) -- for a real
+    per-functional-group run, use :func:`compute_forcing_for_year_multi_group` instead, which
+    shares this same expensive ERA5-Land/CHELSA extraction across all groups rather than
+    repeating it.
+    """
+    climate = extract_year_climate_inputs(static, year)
+    soil = static["soil"]
+    w_max_mm = (soil["theta_fc"] - soil["theta_lim"]) * rooting_depth_mm
+    n = len(static["lats"])
+
     results = []
-    valid_mask = valid_soil & valid_era5 & pr_available
     for i in range(n):
-        if not valid_mask[i]:
+        if not climate["valid_mask"][i]:
             results.append(None)
             continue
-        t_mean_ref_c, t_max_ref_c, t_min_ref_c = t_mean_ref_all[:, i], t_max_ref_all[:, i], t_min_ref_all[:, i]
-        p_ref_mm = p_ref_all[:, i]
-
-        gamma_of_day = gamma_k_per_m[month - 1]
-        t_mean_c_for_rn = downscale.downscale_temperature(t_mean_ref_c, elevation[i], z_ref_m[i], gamma_of_day)
-        rn_mj_m2 = net_radiation_from_era5(np.full(n_days, ssrd[i]), np.full(n_days, strd[i]), t_mean_c_for_rn)
-
-        out = topoclimate_forcing(
-            doy=doy, month=month,
-            t_mean_ref_c=t_mean_ref_c, t_max_ref_c=t_max_ref_c, t_min_ref_c=t_min_ref_c,
-            p_ref_mm=p_ref_mm, ea_ref_kpa=np.full(n_days, ea_ref_kpa[i]),
-            u2_m_s=np.full(n_days, u2_m_s[i]), rn_mj_m2=rn_mj_m2,
-            z_cell_m=elevation[i], z_ref_m=z_ref_m[i], lat_deg=lats[i],
-            slope_deg=slope[i], aspect_deg=aspect[i],
-            gamma_k_per_m=gamma_k_per_m, precip_gradient_per_m=precip_gradient_per_m,
-            w_max_mm=w_max_mm[i], theta_sat=soil["theta_sat"][i], psi_sat_mpa=soil["psi_sat_mpa"][i],
-            b_clapp_hornberger=soil["b_clapp_hornberger"][i], theta_fc=soil["theta_fc"][i],
-            theta_lim=soil["theta_lim"][i], gdd_budburst=GDD_BUDBURST_PLACEHOLDER,
-            concavity_index=concavity[i], calm_clear_night_frac=CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER,
-            pressure_kpa=pressure_kpa_era5[i],
-        )
-        results.append(out)
+        results.append(_forcing_cell(static, climate, w_max_mm, i))
     n_ok = sum(1 for r in results if r is not None)
     print(f"  {year}: {n_ok}/{n} points produced real forcing output", flush=True)
     return results
 
 
-def compute_grid_forcing(year=YEAR):
-    """Build the real CellTopoclimate for every valid grid point, for one year.
+def compute_forcing_for_year_multi_group(static, year, rooting_depth_by_group):
+    """Real per-cell CellTopoclimate for one year, once per real functional group -- the group-
+    aware counterpart to :func:`compute_forcing_for_year`. Streams ERA5-Land and loads CHELSA
+    exactly once (shared, species-independent); only the cheap local w_max_mm multiply and the
+    final topoclimate_forcing call repeat per group, since w_max_mm = (theta_fc - theta_lim) *
+    rooting_depth is the one real quantity in this whole pipeline that actually depends on species
+    (via rooting_depth_by_group -- see ROOTING_DEPTH_MM_BY_GROUP).
 
-    Factored out of :func:`main` so other scripts (XYLEM's mechanistic-hazard
-    re-fit, MNEME's hazard-panel build) can get the same real per-cell forcing
-    without duplicating the extraction/orchestration logic -- re-running this
-    (a few minutes, all transient/streamed, nothing extra cached) rather than
-    trying to serialize full daily CellTopoclimate objects to disk.
+    Returns ``{group_name: [CellTopoclimate or None, ...]}``.
+    """
+    climate = extract_year_climate_inputs(static, year)
+    soil = static["soil"]
+    n = len(static["lats"])
+
+    results_by_group = {}
+    for group, rooting_depth_mm in rooting_depth_by_group.items():
+        w_max_mm = (soil["theta_fc"] - soil["theta_lim"]) * rooting_depth_mm
+        group_results = []
+        for i in range(n):
+            if not climate["valid_mask"][i]:
+                group_results.append(None)
+                continue
+            group_results.append(_forcing_cell(static, climate, w_max_mm, i))
+        n_ok = sum(1 for r in group_results if r is not None)
+        print(f"  {year} / {group} (rooting_depth_mm={rooting_depth_mm}): {n_ok}/{n} points produced real forcing output", flush=True)
+        results_by_group[group] = group_results
+    return results_by_group
+
+
+def compute_grid_forcing(year=YEAR, rooting_depth_mm=ROOTING_DEPTH_MM_PLACEHOLDER):
+    """Build the real CellTopoclimate for every valid grid point, for one year, one (generic or
+    single real) rooting depth.
+
+    Factored out of :func:`main` so other scripts can get the same real per-cell forcing without
+    duplicating the extraction/orchestration logic. ``rooting_depth_mm`` defaults to the generic
+    placeholder (this script's own standalone run is species-agnostic by design). For a real
+    multi-group run, use :func:`compute_grid_forcing_multi_group` instead -- it shares the
+    expensive streamed extraction across all real functional groups rather than repeating it once
+    per group the way calling this function in a loop would.
 
     Returns ``(lats, lons, elevation, results)``; ``results[i]`` is a
     :class:`antar.climate.forcing.CellTopoclimate` or ``None`` where soil/
     ERA5-Land/CHELSA-pr data was unavailable.
     """
     static = extract_static_grid_inputs()
-    results = compute_forcing_for_year(static, year)
+    results = compute_forcing_for_year(static, year, rooting_depth_mm=rooting_depth_mm)
     return static["lats"], static["lons"], static["elevation"], results
+
+
+def compute_grid_forcing_multi_group(year=YEAR, rooting_depth_by_group=ROOTING_DEPTH_MM_BY_GROUP):
+    """Real per-group counterpart to :func:`compute_grid_forcing`: one real, efficient call gets
+    every real functional group's own CellTopoclimate (via its own real rooting depth) while
+    streaming terrain/soils/ERA5-Land exactly once, not once per group.
+
+    Returns ``(lats, lons, elevation, results_by_group)``; ``results_by_group[group][i]`` is a
+    :class:`antar.climate.forcing.CellTopoclimate` or ``None``.
+    """
+    static = extract_static_grid_inputs()
+    results_by_group = compute_forcing_for_year_multi_group(static, year, rooting_depth_by_group)
+    return static["lats"], static["lons"], static["elevation"], results_by_group
 
 
 def main():
@@ -369,7 +515,9 @@ def main():
         "placeholders": {
             "calm_clear_night_frac": CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER,
             "gdd_budburst": GDD_BUDBURST_PLACEHOLDER,
-            "rooting_depth_mm": ROOTING_DEPTH_MM_PLACEHOLDER,
+            "rooting_depth_mm": (f"{ROOTING_DEPTH_MM_PLACEHOLDER} (generic default -- this "
+                                  "standalone run is species-agnostic by design; real per-group "
+                                  f"values used elsewhere: {ROOTING_DEPTH_MM_BY_GROUP})"),
         },
         "points": [],
     }

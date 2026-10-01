@@ -43,7 +43,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_topohydro_grid import compute_grid_forcing  # noqa: E402
+from run_topohydro_grid import compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP  # noqa: E402
 
 from antar.hydraulics.pipeline import mechanistic_hazard_for_cell  # noqa: E402
 from antar.hydraulics.twophase import Traits  # noqa: E402
@@ -89,11 +89,18 @@ def main():
         print(f"{name}: {g['status']}" + (f" (hyper_sd={g.get('hyper_sd')})" if g["status"] == "ok" else ""),
               flush=True)
 
-    print("=== Building real 2019 gridded TOPOHYDRO forcing (reused from run_topohydro_grid) ===", flush=True)
-    lats, lons, elevation, cells = compute_grid_forcing()
+    # Real per-group forcing, one efficient call: w_max_mm (and therefore the whole water-balance
+    # signal CWD/WSI/soil psi) now uses each group's own real rooting depth rather than one
+    # generic value shared across all 4 species -- see run_topohydro_grid.py's module docstring.
+    # Terrain/soils/ERA5-Land are streamed exactly once, shared across all 4 groups; only the
+    # cheap local w_max_mm multiply and the final topoclimate_forcing call repeat per group.
+    print(f"=== Building real 2019 gridded TOPOHYDRO forcing per group "
+          f"(rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP}) ===", flush=True)
+    rooting_depth_for_fit_groups = {g: ROOTING_DEPTH_MM_BY_GROUP[g] for g in groups
+                                     if groups[g]["status"] == "ok"}
+    lats, lons, elevation, cells_by_group = compute_grid_forcing_multi_group(
+        rooting_depth_by_group=rooting_depth_for_fit_groups)
     n = len(lats)
-    n_valid_cells = sum(1 for c in cells if c is not None)
-    print(f"=== {n_valid_cells}/{n} cells have real forcing ===", flush=True)
 
     results = {
         "run_date": __import__("datetime").date.today().isoformat(),
@@ -111,6 +118,11 @@ def main():
         if g["status"] != "ok":
             results["groups"][name] = {"status": g["status"], "example_taxa": g["example_taxa"]}
             continue
+
+        cells = cells_by_group[name]
+        n_valid_cells = sum(1 for c in cells if c is not None)
+        print(f"  {n_valid_cells}/{n} cells have real forcing", flush=True)
+
         cell_results = []
         for i in range(n):
             if cells[i] is None:
