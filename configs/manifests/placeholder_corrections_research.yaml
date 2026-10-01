@@ -65,8 +65,8 @@
     GDD_BUDBURST_PLACEHOLDER=200 stays a placeholder. Real, concrete next step instead of
     continuing to chase an inaccessible citation: a formal sensitivity sweep (perturb
     GDD_BUDBURST_PLACEHOLDER across a defensible literature-typical range, e.g. 0-300 GDD base-5,
-    re-run the cheap 78-point grid, report how much real viability actually moves) -- see
-    scripts/sensitivity_sweep_placeholders.py.
+    re-run the cheap 78-point grid, report how much real viability actually moves). NOT written
+    yet -- genuinely still open, not done under a name that sounds like it exists.
 
 - variable: calm_clear_night_frac_real_fix
   source: Not a literature number -- the real fix is architectural, not a search result.
