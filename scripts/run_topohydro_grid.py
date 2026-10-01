@@ -550,16 +550,24 @@ def compute_grid_forcing_multi_group(year=YEAR, rooting_depth_by_group=ROOTING_D
 
 
 def main():
-    lats, lons, elevation, results = compute_grid_forcing()
+    dense = "--dense" in sys.argv
+    grid_rows, grid_cols = (DENSE_GRID_ROWS, DENSE_GRID_COLS) if dense else (GRID_ROWS, GRID_COLS)
+    out_path = (Path(__file__).resolve().parent.parent / "configs" / "fitted"
+                / "topohydro_grid_run_2019_dense.yaml") if dense else OUT_PATH
+
+    lats, lons, elevation, results = compute_grid_forcing(grid_rows=grid_rows, grid_cols=grid_cols)
     n = len(lats)
     n_ok = sum(1 for r in results if r is not None)
 
     summary = {
         "run_date": datetime.date.today().isoformat(),
         "year": YEAR,
+        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
         "n_grid_points": int(n),
         "n_with_real_output": int(n_ok),
-        "grid_definition": "8x10 subsample (every 40th pixel) of CHELSA-daily's 312x396 armenia grid",
+        "grid_definition": ("29x36 subsample (every 11th pixel) of CHELSA-daily's 312x396 armenia "
+                             "grid" if dense else
+                             "8x10 subsample (every 40th pixel) of CHELSA-daily's 312x396 armenia grid"),
         "placeholders": {
             "calm_clear_night_frac": CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER,
             "gdd_budburst": GDD_BUDBURST_PLACEHOLDER,
@@ -587,9 +595,9 @@ def main():
             }
         summary["points"].append(row)
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUT_PATH.write_text(yaml.dump(summary, sort_keys=False, default_flow_style=False))
-    print(f"=== Wrote {OUT_PATH} ===", flush=True)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(yaml.dump(summary, sort_keys=False, default_flow_style=False))
+    print(f"=== Wrote {out_path} ===", flush=True)
 
 
 if __name__ == "__main__":
