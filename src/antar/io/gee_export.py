@@ -283,6 +283,12 @@ def export_soils(bbox_wgs84, crs: str, scale_m: float, drive_folder: str = "anta
     """SoilGrids 2.0 (Poggio et al. 2021) clay/sand/silt fraction and organic carbon,
     0-30 cm mean, for the Saxton & Rawls (2006) pedotransfer functions. Returns the
     started task.
+
+    ``.resample('bilinear')`` applied before export: SoilGrids' native 250m is a real ~8x
+    upsample to this project's 30m master grid, and GEE's export default (nearest-neighbor)
+    would leave every derived TOPOHYDRO cell (theta_sat, psi_sat_mpa, b_clapp_hornberger)
+    blocky at 250m resolution -- see configs/resampling_policy.yaml for the full per-source
+    reasoning this was decided against before being applied here.
     """
     aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
     bands = {}
@@ -290,7 +296,7 @@ def export_soils(bbox_wgs84, crs: str, scale_m: float, drive_folder: str = "anta
         img = ee.Image(f"projects/soilgrids-isric/{prop}_mean")
         depths = ["0-5cm", "5-15cm", "15-30cm"]
         bands[prop] = img.select([f"{prop}_{d}_mean" for d in depths]).reduce(ee.Reducer.mean()).rename(f"{prop}_0_30cm_mean")
-    image = ee.Image.cat(list(bands.values())).toFloat()
+    image = ee.Image.cat(list(bands.values())).toFloat().resample("bilinear")
     task = ee.batch.Export.image.toDrive(
         image=image, description="antar_soils", folder=drive_folder, region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
     )
@@ -330,7 +336,11 @@ def export_era5land_forcing(bbox_wgs84, year_start: int, year_end: int, crs: str
         bands[f"dewpoint_{y}"] = yearly.select("dewpoint_temperature_2m").mean().rename(f"dewpoint_{y}")
         bands[f"surface_pressure_{y}"] = yearly.select("surface_pressure").mean().rename(f"surface_pressure_{y}")
 
-    image = ee.Image.cat(list(bands.values())).toFloat()
+    # .resample('bilinear'): ERA5-Land's native ~9km is a real ~300x upsample to this project's
+    # 30m master grid -- GEE's export default (nearest-neighbor) means every real gridded
+    # TOPOHYDRO run this session effectively read off whichever coarse 9km cell a point happened
+    # to land nearest to, not a smooth field. See configs/resampling_policy.yaml.
+    image = ee.Image.cat(list(bands.values())).toFloat().resample("bilinear")
     task = ee.batch.Export.image.toDrive(
         image=image, description="antar_era5land_forcing", folder=drive_folder,
         region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
