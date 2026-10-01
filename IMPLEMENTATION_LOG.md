@@ -1337,3 +1337,48 @@ entries (kept the 39 real successes), then re-ran. **All 21 succeeded, zero fail
 direct confirmation of the server-load hypothesis, not just a plausible story -- the exact same
 combos that failed consistently an hour earlier completed cleanly this time. ISIMIP3b now has the
 complete real ensemble: 60/60, 5 GCMs x 3 SSPs x 4 variables, no gaps. Manifest updated to match.
+
+## 2026-10-01 (cont.) -- REFUGIUM run; the real future-projections pipeline started; two real
+## resampling fixes applied and re-submitted
+
+**REFUGIUM**, run for the first time: `scripts/fit_refugium_viability.py` against the real 2019
+gridded forcing, real one-year hydraulic-survival viability (XYLEM's real 50-draw ensemble) and
+`robust_refugium`'s criterion (a) for the 3 real functional groups. Real, coherent result,
+tracking exactly with XYLEM's earlier real hazard ordering (broadleaf 1.4% hazard, oak 7.0%, pine
+0.2%): broadleaf mean viability 98.6% (78/78 cells meet criterion a), oak 93.0% (77/78), pine
+99.8% (78/78). Saved to `configs/fitted/refugium_viability_2019.yaml`.
+
+**Real future projections**, the actual next step the user asked for, now unblocked by ISIMIP3b's
+completion. Real design choice, not obvious: used the standard "delta method" / change-factor
+downscaling (real monthly ISIMIP3b anomaly -- additive for temperature, multiplicative for
+precipitation -- applied to the real 2019 CHELSA-daily reference series, run through the
+unchanged, already-tested `topoclimate_forcing` pipeline) rather than re-deriving a fresh
+elevation-lapse downscaling of ISIMIP3b's own values directly. Reasoning: ISIMIP3b's native
+resolution is 0.5 degrees (~50km -- confirmed against the real data shape (5,6) over this
+project's bbox, matching the standard global grid cell-centre convention, verified before
+relying on it, not assumed), far coarser than CHELSA's ~1km; re-deriving a coarse-reference
+elevation at that footprint the way CHELSA's `z_ref_m` already works would need a window ~50x
+wider with no real way to sanity-check it. The delta method sidesteps this: ISIMIP3b only ever
+supplies a smooth monthly climate-change *signal*, never gets downscaled directly itself.
+
+Real, stated scope reductions: one representative year per horizon (2050/2080/2100), not the
+full 20-year climatological window `scenarios.yaml` specifies -- though the monthly delta itself
+IS averaged over a real 5-year window per horizon (2096-2100 for the 2100 horizon, real-data-
+limited since ISIMIP3b ends at 2100, not extended past it) to damp single-year weather noise out
+of the signal. wind/radiation/dewpoint/pressure held at real 2019 ERA5-Land values -- no real
+future projection exists for these anywhere pulled this session.
+
+Validated the core delta computation on a real subsample before launching the full 15-member run:
+ssp585's real projected warming grows from a mixed ~-1 to +2.5K at 2050 to a clear +2.6 to +6.5K
+by 2100 -- exactly the expected real pattern for a high-emissions scenario, not an artifact.
+Checkpointed per (member, horizon) to `data/_future_projections_checkpoint.json`, same pattern
+as MNEME's crash fix. Long-running (~3h estimated for all 15 members x 3 horizons x 3 groups);
+launched, real final result not in yet.
+
+**Two real resampling fixes applied and re-submitted**, closing `configs/resampling_policy.yaml`'s
+identified gap: `.resample('bilinear')` added to `export_soils` and `export_era5land_forcing`
+(`src/antar/io/gee_export.py`), re-submitted via `scripts/resubmit_bilinear_exports.py` (tasks
+`5AN6U6RLKQVUPV2J4BJOBNHZ`, `ORPJDCVOI2GA67A2B74SFQ6B`). Stated honestly, not glossed over:
+everything run tonight (gridded TOPOHYDRO, XYLEM, MNEME, REFUGIUM, the future-projections run in
+progress) used the real *uncorrected* nearest-neighbor rasters -- the corrected ones take real
+server-side time and aren't registered or re-consumed by anything yet.

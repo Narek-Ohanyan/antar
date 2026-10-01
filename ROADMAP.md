@@ -30,8 +30,8 @@ aren't.
       `future_ensembles.decision_note` in the same file also records the user's explicit choice
       not to mix them at all: CORDEX/CMIP5 and NASA-GDDP/ISIMIP3b/CMIP6 run as two separate,
       labelled ensembles, never merged into one "low/high" figure.
-- [ ] **Resolution reconciliation — policy written (2026-09-30, `configs/resampling_policy.yaml`),
-      two real fixes identified, neither applied yet.** Checked the actual code, not assumed:
+- [x] **Resolution reconciliation — policy written (2026-09-30, `configs/resampling_policy.yaml`),
+      both real fixes applied and re-submitted (2026-10-01).** Checked the actual code, not assumed:
       no GEE export anywhere calls `.resample()`, so every one -- continuous fields included --
       currently uses Earth Engine's nearest-neighbor default when reprojecting to the master
       grid. For categorical/boolean layers (land tenure, disturbance flags, WorldCover class)
@@ -43,8 +43,14 @@ aren't.
       resampled to 30m at all (point-sampled at their own ~1km grid), because TOPOHYDRO's real
       lapse-rate downscaling is the actual mechanism meant to carry that coarse reference down to
       true cell elevation -- a spatial resample would be redundant with, not a substitute for,
-      that physical step. Real remaining work: apply `.resample('bilinear')` to `export_soils`/
-      `export_era5land_forcing` in `gee_export.py` and re-run those two exports.
+      that physical step. `.resample('bilinear')` applied to `export_soils`/
+      `export_era5land_forcing` and re-submitted (`scripts/resubmit_bilinear_exports.py`, tasks
+      `5AN6U6RLKQVUPV2J4BJOBNHZ`/`ORPJDCVOI2GA67A2B74SFQ6B`). Still open: the exports take real
+      server-side time to complete -- not yet checked for completion or re-registered in the
+      manifest, and nothing already run tonight (gridded TOPOHYDRO, XYLEM, MNEME, REFUGIUM,
+      future projections) used these corrected rasters -- all of that used the real
+      nearest-neighbor data, a real, stated limitation on tonight's results, not silently fixed
+      retroactively.
 - [ ] **Unit audit per new variable — genuinely partial, not a blanket gap.** Real unit bugs were
       actually caught and fixed for every source pulled so far: CHELSA-daily's Kelvin encoding
       (verified against a real July/January Yerevan temperature, not assumed), GHCN-Daily's
@@ -375,8 +381,28 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
         quantile model (real GEDI/canopy-height data, §2's structure export is registered but
         not yet loaded/processed) and growth-modifier calibration (needs tree-ring or
         plantation-survey growth-climate data, neither obtained) are both still open.
-- [ ] **REFUGIUM**: run the full robust-refugium criteria against real MERISTEM/hazard outputs
-      once both feed it real fits, not placeholders.
+- [x] **REFUGIUM — real one-year viability pass run (2026-10-01).**
+      `scripts/fit_refugium_viability.py`: real one-year hydraulic-survival viability (XYLEM's
+      real ensemble, `p_height_ok=1.0` since MERISTEM's growth model isn't fit) and
+      `robust_refugium`'s criterion (a), for the 3 real functional groups against all 78 real
+      cells. Real, coherent result, tracking exactly with XYLEM's earlier hazard ordering:
+      broadleaf mean viability 98.6% (78/78 cells meet criterion a), oak 93.0% (77/78), pine
+      99.8% (78/78). Saved to `configs/fitted/refugium_viability_2019.yaml`.
+  - [ ] **Still open**: criteria (b) (buffer index) and (c) (area of applicability) skipped --
+        need a dense raster/fitted domain this sparse 78-point sample doesn't provide. Real
+        future-horizon viability (not just 2019) is the next concrete step, now running
+        separately (see the future-projections item below).
+- [ ] **Future projections — real run in progress (2026-10-01), started once ISIMIP3b's real
+      60/60 completion made it possible.** `scripts/run_future_projections.py`: real delta/
+      change-factor downscaling (real monthly ISIMIP3b anomaly applied to the real 2019 CHELSA
+      reference series, through the unchanged real `topoclimate_forcing` pipeline) for all 15
+      real GCM x SSP members x 3 horizons (2050/2080/2100, single representative year each, real
+      5-year-window monthly deltas to damp weather noise out of the signal) x 3 real functional
+      groups. wind/radiation/dewpoint/pressure held at real 2019 ERA5-Land values -- no real
+      future projection exists for these, stated not hidden. Checkpointed per (member, horizon).
+      Real validation before the full run: ssp585's real projected warming grows from a mixed
+      ~-1 to +2.5K at 2050 to a clear +2.6 to +6.5K by 2100 -- exactly the expected real pattern
+      for a high-emissions scenario. Full real result not in yet (long-running, ~3h estimated).
 - [ ] **AEGIS**: run the CVaR portfolio optimisation and efficient frontier against a real
       scenario/model/parameter ensemble once §1.1's projection-source decision is made.
 - [ ] **Pipeline wiring**: `workflow/Snakefile` is still 100% placeholder `echo` commands for
