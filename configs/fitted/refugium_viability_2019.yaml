@@ -13,14 +13,14 @@ groups:
     example_taxa: Fagus orientalis; Carpinus betulus
     n_cells: 78
     n_robust_refugia_criterion_a: 78
-    mean_viability_across_cells: 0.9857641025641025
-    mean_refugium_score_across_cells: 0.9996153846153846
+    mean_viability_across_cells: 0.9973294871794872
+    mean_refugium_score_across_cells: 1.0
     cells:
     - lat: 41.39583333333333
       lon: 43.40416666666667
       elevation_m: 1738.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -35,8 +35,8 @@ groups:
     - lat: 41.39583333333333
       lon: 44.07083333333333
       elevation_m: 1449.0
-      viability_ensemble_mean: 0.9997
-      viability_ensemble_min: 0.985
+      viability_ensemble_mean: 0.9998
+      viability_ensemble_min: 0.99
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -51,48 +51,48 @@ groups:
     - lat: 41.39583333333333
       lon: 44.7375
       elevation_m: 456.0
-      viability_ensemble_mean: 0.9996
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 45.07083333333333
       elevation_m: 288.0
-      viability_ensemble_mean: 0.9538
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9788
+      viability_ensemble_min: 0.11499999999999999
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 45.40416666666667
       elevation_m: 484.0
-      viability_ensemble_mean: 0.9725
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9986000000000002
+      viability_ensemble_min: 0.935
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 45.737500000000004
       elevation_m: 370.0
-      viability_ensemble_mean: 0.9978
-      viability_ensemble_min: 0.94
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 46.07083333333333
       elevation_m: 641.0
-      viability_ensemble_mean: 0.9926999999999999
-      viability_ensemble_min: 0.77
+      viability_ensemble_mean: 0.9996
+      viability_ensemble_min: 0.98
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 46.40416666666667
       elevation_m: 633.0
-      viability_ensemble_mean: 0.9997
-      viability_ensemble_min: 0.985
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -107,24 +107,24 @@ groups:
     - lat: 41.0625
       lon: 43.7375
       elevation_m: 2004.0
-      viability_ensemble_mean: 0.9858999999999999
-      viability_ensemble_min: 0.45499999999999996
+      viability_ensemble_mean: 0.9967
+      viability_ensemble_min: 0.835
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 44.07083333333333
       elevation_m: 2228.0
-      viability_ensemble_mean: 0.9974000000000001
-      viability_ensemble_min: 0.925
+      viability_ensemble_mean: 0.9978
+      viability_ensemble_min: 0.935
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 44.40416666666667
       elevation_m: 1555.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -139,64 +139,64 @@ groups:
     - lat: 41.0625
       lon: 45.07083333333333
       elevation_m: 841.0
-      viability_ensemble_mean: 0.993
-      viability_ensemble_min: 0.765
+      viability_ensemble_mean: 0.9986
+      viability_ensemble_min: 0.94
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 45.40416666666667
       elevation_m: 578.0
-      viability_ensemble_mean: 0.9965
-      viability_ensemble_min: 0.925
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 45.737500000000004
       elevation_m: 263.0
-      viability_ensemble_mean: 0.9843999999999999
-      viability_ensemble_min: 0.565
+      viability_ensemble_mean: 0.9993000000000001
+      viability_ensemble_min: 0.965
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 46.07083333333333
       elevation_m: 309.0
-      viability_ensemble_mean: 0.9521
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9996
+      viability_ensemble_min: 0.98
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 46.40416666666667
       elevation_m: 135.0
-      viability_ensemble_mean: 0.9118999999999999
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9995
+      viability_ensemble_min: 0.975
       viability_ensemble_max: 1.0
-      refugium_score: 0.97875
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 43.40416666666667
       elevation_m: 1663.0
-      viability_ensemble_mean: 0.9991
-      viability_ensemble_min: 0.965
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 43.7375
       elevation_m: 1484.0
-      viability_ensemble_mean: 0.9958
-      viability_ensemble_min: 0.85
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 44.07083333333333
       elevation_m: 2128.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -211,31 +211,31 @@ groups:
     - lat: 40.729166666666664
       lon: 44.7375
       elevation_m: 1974.0
-      viability_ensemble_mean: 0.9959
-      viability_ensemble_min: 0.84
+      viability_ensemble_mean: 0.9984999999999999
+      viability_ensemble_min: 0.935
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 45.07083333333333
       elevation_m: 1208.0
-      viability_ensemble_mean: 0.9934999999999999
-      viability_ensemble_min: 0.92
+      viability_ensemble_mean: 0.9997
+      viability_ensemble_min: 0.99
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 45.40416666666667
       elevation_m: 1911.0
-      viability_ensemble_mean: 0.9996
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 0.9998
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 45.737500000000004
       elevation_m: 1681.0
-      viability_ensemble_mean: 0.9776
+      viability_ensemble_mean: 0.9786
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -243,79 +243,79 @@ groups:
     - lat: 40.729166666666664
       lon: 46.07083333333333
       elevation_m: 611.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 46.40416666666667
       elevation_m: 300.0
-      viability_ensemble_mean: 0.9571999999999999
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9882
+      viability_ensemble_min: 0.62
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 43.40416666666667
       elevation_m: 1804.0
-      viability_ensemble_mean: 0.9984999999999999
-      viability_ensemble_min: 0.96
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 43.7375
       elevation_m: 1480.0
-      viability_ensemble_mean: 0.9892
-      viability_ensemble_min: 0.565
+      viability_ensemble_mean: 0.9993000000000001
+      viability_ensemble_min: 0.965
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 44.07083333333333
       elevation_m: 2240.0
-      viability_ensemble_mean: 0.9714
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9982
+      viability_ensemble_min: 0.915
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 44.40416666666667
       elevation_m: 1681.0
-      viability_ensemble_mean: 0.9925
-      viability_ensemble_min: 0.75
+      viability_ensemble_mean: 0.9996
+      viability_ensemble_min: 0.98
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 44.7375
       elevation_m: 1950.0
-      viability_ensemble_mean: 0.9997
-      viability_ensemble_min: 0.985
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 45.07083333333333
       elevation_m: 2106.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 45.737500000000004
       elevation_m: 2247.0
-      viability_ensemble_mean: 0.9982000000000001
-      viability_ensemble_min: 0.94
+      viability_ensemble_mean: 0.9993000000000001
+      viability_ensemble_min: 0.975
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 46.07083333333333
       elevation_m: 2080.0
-      viability_ensemble_mean: 0.9737
+      viability_ensemble_mean: 0.9774
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -323,64 +323,64 @@ groups:
     - lat: 40.39583333333333
       lon: 46.40416666666667
       elevation_m: 1803.0
-      viability_ensemble_mean: 0.9995
-      viability_ensemble_min: 0.985
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 43.40416666666667
       elevation_m: 2072.0
-      viability_ensemble_mean: 0.9937999999999999
-      viability_ensemble_min: 0.69
+      viability_ensemble_mean: 0.9991
+      viability_ensemble_min: 0.955
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 43.7375
       elevation_m: 998.0
-      viability_ensemble_mean: 0.9664
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9869
+      viability_ensemble_min: 0.5449999999999999
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 44.07083333333333
       elevation_m: 858.0
-      viability_ensemble_mean: 0.9819000000000001
-      viability_ensemble_min: 0.69
+      viability_ensemble_mean: 0.9991
+      viability_ensemble_min: 0.975
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 44.7375
       elevation_m: 1449.0
-      viability_ensemble_mean: 0.9862000000000001
-      viability_ensemble_min: 0.79
+      viability_ensemble_mean: 0.9996
+      viability_ensemble_min: 0.99
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 45.07083333333333
       elevation_m: 2665.0
-      viability_ensemble_mean: 0.9880000000000001
-      viability_ensemble_min: 0.6699999999999999
+      viability_ensemble_mean: 0.9959
+      viability_ensemble_min: 0.845
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 45.40416666666667
       elevation_m: 2569.0
-      viability_ensemble_mean: 0.9981
-      viability_ensemble_min: 0.905
+      viability_ensemble_mean: 0.9987999999999999
+      viability_ensemble_min: 0.94
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 45.737500000000004
       elevation_m: 2696.0
-      viability_ensemble_mean: 0.9995
-      viability_ensemble_min: 0.975
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -395,31 +395,31 @@ groups:
     - lat: 40.0625
       lon: 46.40416666666667
       elevation_m: 1814.0
-      viability_ensemble_mean: 0.9978999999999999
-      viability_ensemble_min: 0.9
+      viability_ensemble_mean: 0.9980000000000001
+      viability_ensemble_min: 0.905
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 43.40416666666667
       elevation_m: 2316.0
-      viability_ensemble_mean: 0.9995
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 43.7375
       elevation_m: 1919.0
-      viability_ensemble_mean: 0.9996
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 44.07083333333333
       elevation_m: 2305.0
-      viability_ensemble_mean: 0.9624999999999999
+      viability_ensemble_mean: 0.9790000000000001
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -427,15 +427,15 @@ groups:
     - lat: 39.729166666666664
       lon: 44.40416666666667
       elevation_m: 2152.0
-      viability_ensemble_mean: 0.9847
-      viability_ensemble_min: 0.61
+      viability_ensemble_mean: 0.9991
+      viability_ensemble_min: 0.965
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 44.7375
       elevation_m: 800.0
-      viability_ensemble_mean: 0.971
+      viability_ensemble_mean: 0.9797
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -443,31 +443,31 @@ groups:
     - lat: 39.729166666666664
       lon: 45.07083333333333
       elevation_m: 1616.0
-      viability_ensemble_mean: 0.9569999999999999
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9982
+      viability_ensemble_min: 0.9299999999999999
       viability_ensemble_max: 1.0
-      refugium_score: 0.995625
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 45.40416666666667
       elevation_m: 1179.0
-      viability_ensemble_mean: 0.9876999999999999
-      viability_ensemble_min: 0.655
+      viability_ensemble_mean: 0.9963
+      viability_ensemble_min: 0.875
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 45.737500000000004
       elevation_m: 2448.0
-      viability_ensemble_mean: 0.9984999999999999
-      viability_ensemble_min: 0.94
+      viability_ensemble_mean: 0.9997
+      viability_ensemble_min: 0.985
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 46.07083333333333
       elevation_m: 3189.0
-      viability_ensemble_mean: 0.9989
+      viability_ensemble_mean: 0.9990000000000001
       viability_ensemble_min: 0.96
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -475,168 +475,168 @@ groups:
     - lat: 39.729166666666664
       lon: 46.40416666666667
       elevation_m: 1442.0
-      viability_ensemble_mean: 0.9993000000000001
-      viability_ensemble_min: 0.98
+      viability_ensemble_mean: 0.9998
+      viability_ensemble_min: 0.99
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 43.40416666666667
       elevation_m: 2708.0
-      viability_ensemble_mean: 0.9739
-      viability_ensemble_min: 0.010000000000000009
+      viability_ensemble_mean: 0.9947
+      viability_ensemble_min: 0.75
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 43.7375
       elevation_m: 2678.0
-      viability_ensemble_mean: 0.9884000000000001
-      viability_ensemble_min: 0.745
+      viability_ensemble_mean: 0.9998
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 44.07083333333333
       elevation_m: 2208.0
-      viability_ensemble_mean: 0.9946999999999998
-      viability_ensemble_min: 0.885
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 44.40416666666667
       elevation_m: 1403.0
-      viability_ensemble_mean: 0.9641
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9937
+      viability_ensemble_min: 0.8
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 44.7375
       elevation_m: 1704.0
-      viability_ensemble_mean: 0.9663
-      viability_ensemble_min: 0.505
+      viability_ensemble_mean: 0.9977000000000001
+      viability_ensemble_min: 0.94
       viability_ensemble_max: 1.0
-      refugium_score: 0.9981249999999999
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.07083333333333
       elevation_m: 846.0
-      viability_ensemble_mean: 0.9617
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9975
+      viability_ensemble_min: 0.905
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.40416666666667
       elevation_m: 1188.0
-      viability_ensemble_mean: 0.9902000000000001
-      viability_ensemble_min: 0.73
+      viability_ensemble_mean: 0.9996
+      viability_ensemble_min: 0.99
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.737500000000004
       elevation_m: 2346.0
-      viability_ensemble_mean: 0.9791
-      viability_ensemble_min: 0.525
+      viability_ensemble_mean: 0.9978999999999999
+      viability_ensemble_min: 0.9299999999999999
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 46.07083333333333
       elevation_m: 2671.0
-      viability_ensemble_mean: 0.9992
-      viability_ensemble_min: 0.965
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 46.40416666666667
       elevation_m: 1499.0
-      viability_ensemble_mean: 0.9843999999999999
-      viability_ensemble_min: 0.63
+      viability_ensemble_mean: 0.9995
+      viability_ensemble_min: 0.98
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 43.40416666666667
       elevation_m: 1845.0
-      viability_ensemble_mean: 0.9839
-      viability_ensemble_min: 0.595
+      viability_ensemble_mean: 0.9997
+      viability_ensemble_min: 0.99
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 43.7375
       elevation_m: 1996.0
-      viability_ensemble_mean: 0.9871000000000001
-      viability_ensemble_min: 0.79
+      viability_ensemble_mean: 0.9998
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 44.07083333333333
       elevation_m: 2237.0
-      viability_ensemble_mean: 0.9797
-      viability_ensemble_min: 0.41500000000000004
+      viability_ensemble_mean: 0.9989
+      viability_ensemble_min: 0.96
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 44.40416666666667
       elevation_m: 1877.0
-      viability_ensemble_mean: 0.9965999999999999
-      viability_ensemble_min: 0.92
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 44.7375
       elevation_m: 2604.0
-      viability_ensemble_mean: 0.9508
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9952000000000001
+      viability_ensemble_min: 0.795
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.07083333333333
       elevation_m: 1025.0
-      viability_ensemble_mean: 0.9296999999999999
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9928
+      viability_ensemble_min: 0.875
       viability_ensemble_max: 1.0
-      refugium_score: 0.9975
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.40416666666667
       elevation_m: 877.0
-      viability_ensemble_mean: 0.9726
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9974000000000001
+      viability_ensemble_min: 0.885
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.737500000000004
       elevation_m: 977.0
-      viability_ensemble_mean: 0.9672999999999999
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9950999999999999
+      viability_ensemble_min: 0.79
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 46.07083333333333
       elevation_m: 3630.0
-      viability_ensemble_mean: 0.9956
-      viability_ensemble_min: 0.885
+      viability_ensemble_mean: 0.9998
+      viability_ensemble_min: 0.99
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 46.40416666666667
       elevation_m: 1384.0
-      viability_ensemble_mean: 0.9773000000000002
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9991
+      viability_ensemble_min: 0.955
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -644,102 +644,102 @@ groups:
     status: ok
     example_taxa: Quercus macranthera; Q. iberica
     n_cells: 78
-    n_robust_refugia_criterion_a: 77
-    mean_viability_across_cells: 0.9298410256410257
-    mean_refugium_score_across_cells: 0.9841907051282052
+    n_robust_refugia_criterion_a: 78
+    mean_viability_across_cells: 0.9714025641025642
+    mean_refugium_score_across_cells: 0.9993349358974359
     cells:
     - lat: 41.39583333333333
       lon: 43.40416666666667
       elevation_m: 1738.0
-      viability_ensemble_mean: 0.9893000000000001
-      viability_ensemble_min: 0.65
+      viability_ensemble_mean: 0.9915999999999999
+      viability_ensemble_min: 0.72
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 43.7375
       elevation_m: 2125.0
-      viability_ensemble_mean: 0.997
-      viability_ensemble_min: 0.9299999999999999
+      viability_ensemble_mean: 0.9976
+      viability_ensemble_min: 0.94
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 44.07083333333333
       elevation_m: 1449.0
-      viability_ensemble_mean: 0.9717
-      viability_ensemble_min: 0.010000000000000009
+      viability_ensemble_mean: 0.9783999999999999
+      viability_ensemble_min: 0.275
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 44.40416666666667
       elevation_m: 736.0
-      viability_ensemble_mean: 0.9868000000000001
-      viability_ensemble_min: 0.81
+      viability_ensemble_mean: 0.9895
+      viability_ensemble_min: 0.86
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 44.7375
       elevation_m: 456.0
-      viability_ensemble_mean: 0.9797
-      viability_ensemble_min: 0.625
+      viability_ensemble_mean: 0.9868000000000001
+      viability_ensemble_min: 0.725
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 45.07083333333333
       elevation_m: 288.0
-      viability_ensemble_mean: 0.8832000000000001
-      viability_ensemble_min: 0.0
-      viability_ensemble_max: 1.0
-      refugium_score: 0.973125
-      robust_refugium_criterion_a: true
-    - lat: 41.39583333333333
-      lon: 45.40416666666667
-      elevation_m: 484.0
-      viability_ensemble_mean: 0.9046000000000001
-      viability_ensemble_min: 0.0
-      viability_ensemble_max: 1.0
-      refugium_score: 0.990625
-      robust_refugium_criterion_a: true
-    - lat: 41.39583333333333
-      lon: 45.737500000000004
-      elevation_m: 370.0
-      viability_ensemble_mean: 0.9345
-      viability_ensemble_min: 0.0
-      viability_ensemble_max: 1.0
-      refugium_score: 0.9675
-      robust_refugium_criterion_a: true
-    - lat: 41.39583333333333
-      lon: 46.07083333333333
-      elevation_m: 641.0
-      viability_ensemble_mean: 0.9386
+      viability_ensemble_mean: 0.9456
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 0.9975
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
+      lon: 45.40416666666667
+      elevation_m: 484.0
+      viability_ensemble_mean: 0.9688
+      viability_ensemble_min: 0.0
+      viability_ensemble_max: 1.0
+      refugium_score: 1.0
+      robust_refugium_criterion_a: true
+    - lat: 41.39583333333333
+      lon: 45.737500000000004
+      elevation_m: 370.0
+      viability_ensemble_mean: 0.995
+      viability_ensemble_min: 0.9
+      viability_ensemble_max: 1.0
+      refugium_score: 1.0
+      robust_refugium_criterion_a: true
+    - lat: 41.39583333333333
+      lon: 46.07083333333333
+      elevation_m: 641.0
+      viability_ensemble_mean: 0.982
+      viability_ensemble_min: 0.505
+      viability_ensemble_max: 1.0
+      refugium_score: 1.0
+      robust_refugium_criterion_a: true
+    - lat: 41.39583333333333
       lon: 46.40416666666667
       elevation_m: 633.0
-      viability_ensemble_mean: 0.9806
-      viability_ensemble_min: 0.42500000000000004
+      viability_ensemble_mean: 0.9895
+      viability_ensemble_min: 0.635
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 43.40416666666667
       elevation_m: 2786.0
-      viability_ensemble_mean: 0.9991
-      viability_ensemble_min: 0.96
+      viability_ensemble_mean: 0.9992
+      viability_ensemble_min: 0.965
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 43.7375
       elevation_m: 2004.0
-      viability_ensemble_mean: 0.9344
+      viability_ensemble_mean: 0.9616000000000001
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -747,7 +747,7 @@ groups:
     - lat: 41.0625
       lon: 44.07083333333333
       elevation_m: 2228.0
-      viability_ensemble_mean: 0.951
+      viability_ensemble_mean: 0.9519999999999998
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -755,119 +755,119 @@ groups:
     - lat: 41.0625
       lon: 44.40416666666667
       elevation_m: 1555.0
-      viability_ensemble_mean: 0.9882
-      viability_ensemble_min: 0.63
+      viability_ensemble_mean: 0.9908
+      viability_ensemble_min: 0.6799999999999999
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 44.7375
       elevation_m: 1593.0
-      viability_ensemble_mean: 0.9715
-      viability_ensemble_min: 0.025000000000000022
+      viability_ensemble_mean: 0.9722
+      viability_ensemble_min: 0.020000000000000018
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 45.07083333333333
       elevation_m: 841.0
-      viability_ensemble_mean: 0.9369
+      viability_ensemble_mean: 0.9662999999999999
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9981249999999999
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 45.40416666666667
       elevation_m: 578.0
-      viability_ensemble_mean: 0.9275
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9873000000000001
+      viability_ensemble_min: 0.775
       viability_ensemble_max: 1.0
-      refugium_score: 0.980625
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 45.737500000000004
       elevation_m: 263.0
-      viability_ensemble_mean: 0.9025
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9695
+      viability_ensemble_min: 0.0050000000000000044
       viability_ensemble_max: 1.0
-      refugium_score: 0.9724999999999999
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 46.07083333333333
       elevation_m: 309.0
-      viability_ensemble_mean: 0.8506999999999998
+      viability_ensemble_mean: 0.9689
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9681249999999999
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 46.40416666666667
       elevation_m: 135.0
-      viability_ensemble_mean: 0.7453
+      viability_ensemble_mean: 0.9470000000000001
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.785625
-      robust_refugium_criterion_a: false
+      refugium_score: 0.995
+      robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 43.40416666666667
       elevation_m: 1663.0
-      viability_ensemble_mean: 0.9750999999999999
-      viability_ensemble_min: 0.525
+      viability_ensemble_mean: 0.9954999999999999
+      viability_ensemble_min: 0.845
       viability_ensemble_max: 1.0
-      refugium_score: 0.9981249999999999
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 43.7375
       elevation_m: 1484.0
-      viability_ensemble_mean: 0.9481999999999999
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.99
+      viability_ensemble_min: 0.72
       viability_ensemble_max: 1.0
-      refugium_score: 0.99125
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 44.07083333333333
       elevation_m: 2128.0
-      viability_ensemble_mean: 0.9811000000000001
-      viability_ensemble_min: 0.625
+      viability_ensemble_mean: 0.9936
+      viability_ensemble_min: 0.89
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 44.40416666666667
       elevation_m: 2250.0
-      viability_ensemble_mean: 0.9953
-      viability_ensemble_min: 0.915
+      viability_ensemble_mean: 0.9977000000000001
+      viability_ensemble_min: 0.96
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 44.7375
       elevation_m: 1974.0
-      viability_ensemble_mean: 0.9464000000000001
+      viability_ensemble_mean: 0.965
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9975
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 45.07083333333333
       elevation_m: 1208.0
-      viability_ensemble_mean: 0.9025
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9727
+      viability_ensemble_min: 0.665
       viability_ensemble_max: 1.0
-      refugium_score: 0.995625
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 45.40416666666667
       elevation_m: 1911.0
-      viability_ensemble_mean: 0.986
-      viability_ensemble_min: 0.725
+      viability_ensemble_mean: 0.991
+      viability_ensemble_min: 0.8
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 45.737500000000004
       elevation_m: 1681.0
-      viability_ensemble_mean: 0.9192999999999999
+      viability_ensemble_mean: 0.9333
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -875,79 +875,79 @@ groups:
     - lat: 40.729166666666664
       lon: 46.07083333333333
       elevation_m: 611.0
-      viability_ensemble_mean: 0.9858
-      viability_ensemble_min: 0.7150000000000001
+      viability_ensemble_mean: 0.9964999999999999
+      viability_ensemble_min: 0.915
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 46.40416666666667
       elevation_m: 300.0
-      viability_ensemble_mean: 0.8961999999999999
+      viability_ensemble_mean: 0.9145
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.993125
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 43.40416666666667
       elevation_m: 1804.0
-      viability_ensemble_mean: 0.9738999999999999
-      viability_ensemble_min: 0.515
+      viability_ensemble_mean: 0.9972999999999999
+      viability_ensemble_min: 0.925
       viability_ensemble_max: 1.0
-      refugium_score: 0.9975
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 43.7375
       elevation_m: 1480.0
-      viability_ensemble_mean: 0.9362
+      viability_ensemble_mean: 0.9753999999999999
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.99125
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 44.07083333333333
       elevation_m: 2240.0
-      viability_ensemble_mean: 0.8856
+      viability_ensemble_mean: 0.9719999999999999
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9668749999999999
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 44.40416666666667
       elevation_m: 1681.0
-      viability_ensemble_mean: 0.9307
+      viability_ensemble_mean: 0.9711000000000002
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.989375
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 44.7375
       elevation_m: 1950.0
-      viability_ensemble_mean: 0.9868000000000001
-      viability_ensemble_min: 0.605
+      viability_ensemble_mean: 0.9915
+      viability_ensemble_min: 0.6950000000000001
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 45.07083333333333
       elevation_m: 2106.0
-      viability_ensemble_mean: 0.9742999999999999
-      viability_ensemble_min: 0.18500000000000005
+      viability_ensemble_mean: 0.9928
+      viability_ensemble_min: 0.775
       viability_ensemble_max: 1.0
-      refugium_score: 0.9975
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 45.737500000000004
       elevation_m: 2247.0
-      viability_ensemble_mean: 0.9655
-      viability_ensemble_min: 0.135
+      viability_ensemble_mean: 0.9836
+      viability_ensemble_min: 0.5549999999999999
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 46.07083333333333
       elevation_m: 2080.0
-      viability_ensemble_mean: 0.9333999999999999
+      viability_ensemble_mean: 0.9477
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -955,7 +955,7 @@ groups:
     - lat: 40.39583333333333
       lon: 46.40416666666667
       elevation_m: 1803.0
-      viability_ensemble_mean: 0.9652000000000001
+      viability_ensemble_mean: 0.9693
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -963,71 +963,71 @@ groups:
     - lat: 40.0625
       lon: 43.40416666666667
       elevation_m: 2072.0
-      viability_ensemble_mean: 0.9699000000000001
+      viability_ensemble_mean: 0.9786
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9981249999999999
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 43.7375
       elevation_m: 998.0
-      viability_ensemble_mean: 0.8981
+      viability_ensemble_mean: 0.9421
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9975
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 44.07083333333333
       elevation_m: 858.0
-      viability_ensemble_mean: 0.8811000000000001
+      viability_ensemble_mean: 0.9539000000000002
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.981875
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 44.7375
       elevation_m: 1449.0
-      viability_ensemble_mean: 0.8623999999999999
-      viability_ensemble_min: 0.0
-      viability_ensemble_max: 1.0
-      refugium_score: 0.974375
-      robust_refugium_criterion_a: true
-    - lat: 40.0625
-      lon: 45.07083333333333
-      elevation_m: 2665.0
-      viability_ensemble_mean: 0.8826
-      viability_ensemble_min: 0.0
-      viability_ensemble_max: 1.0
-      refugium_score: 0.9981249999999999
-      robust_refugium_criterion_a: true
-    - lat: 40.0625
-      lon: 45.40416666666667
-      elevation_m: 2569.0
-      viability_ensemble_mean: 0.9717
-      viability_ensemble_min: 0.07499999999999996
+      viability_ensemble_mean: 0.9695
+      viability_ensemble_min: 0.6799999999999999
       viability_ensemble_max: 1.0
       refugium_score: 0.9975
       robust_refugium_criterion_a: true
     - lat: 40.0625
+      lon: 45.07083333333333
+      elevation_m: 2665.0
+      viability_ensemble_mean: 0.9252000000000001
+      viability_ensemble_min: 0.0
+      viability_ensemble_max: 1.0
+      refugium_score: 1.0
+      robust_refugium_criterion_a: true
+    - lat: 40.0625
+      lon: 45.40416666666667
+      elevation_m: 2569.0
+      viability_ensemble_mean: 0.9773000000000001
+      viability_ensemble_min: 0.09999999999999998
+      viability_ensemble_max: 1.0
+      refugium_score: 1.0
+      robust_refugium_criterion_a: true
+    - lat: 40.0625
       lon: 45.737500000000004
       elevation_m: 2696.0
-      viability_ensemble_mean: 0.9636000000000001
-      viability_ensemble_min: 0.125
+      viability_ensemble_mean: 0.9887
+      viability_ensemble_min: 0.74
       viability_ensemble_max: 1.0
-      refugium_score: 0.9924999999999999
+      refugium_score: 0.9975
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 46.07083333333333
       elevation_m: 2554.0
-      viability_ensemble_mean: 0.9836000000000001
-      viability_ensemble_min: 0.74
+      viability_ensemble_mean: 0.9856
+      viability_ensemble_min: 0.775
       viability_ensemble_max: 1.0
       refugium_score: 0.9981249999999999
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 46.40416666666667
       elevation_m: 1814.0
-      viability_ensemble_mean: 0.9639
+      viability_ensemble_mean: 0.965
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -1035,71 +1035,71 @@ groups:
     - lat: 39.729166666666664
       lon: 43.40416666666667
       elevation_m: 2316.0
-      viability_ensemble_mean: 0.9766999999999999
-      viability_ensemble_min: 0.625
+      viability_ensemble_mean: 0.9893000000000001
+      viability_ensemble_min: 0.81
       viability_ensemble_max: 1.0
-      refugium_score: 0.9975
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 43.7375
       elevation_m: 1919.0
-      viability_ensemble_mean: 0.9784
-      viability_ensemble_min: 0.72
+      viability_ensemble_mean: 0.9973000000000001
+      viability_ensemble_min: 0.95
       viability_ensemble_max: 1.0
-      refugium_score: 0.9981249999999999
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 44.07083333333333
       elevation_m: 2305.0
-      viability_ensemble_mean: 0.8635
+      viability_ensemble_mean: 0.9342
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9768749999999999
+      refugium_score: 0.99625
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 44.40416666666667
       elevation_m: 2152.0
-      viability_ensemble_mean: 0.9170999999999999
+      viability_ensemble_mean: 0.9682000000000001
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9775
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 44.7375
       elevation_m: 800.0
-      viability_ensemble_mean: 0.8772
+      viability_ensemble_mean: 0.9641
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9525
+      refugium_score: 0.9981249999999999
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 45.07083333333333
       elevation_m: 1616.0
-      viability_ensemble_mean: 0.8482999999999999
+      viability_ensemble_mean: 0.9594
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.8775
+      refugium_score: 0.995625
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 45.40416666666667
       elevation_m: 1179.0
-      viability_ensemble_mean: 0.8896999999999999
+      viability_ensemble_mean: 0.9488000000000001
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.984375
+      refugium_score: 0.995
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 45.737500000000004
       elevation_m: 2448.0
-      viability_ensemble_mean: 0.9568000000000001
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9814999999999999
+      viability_ensemble_min: 0.54
       viability_ensemble_max: 1.0
-      refugium_score: 0.9975
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 46.07083333333333
       elevation_m: 3189.0
-      viability_ensemble_mean: 0.9740000000000001
+      viability_ensemble_mean: 0.9777
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -1107,15 +1107,15 @@ groups:
     - lat: 39.729166666666664
       lon: 46.40416666666667
       elevation_m: 1442.0
-      viability_ensemble_mean: 0.9634999999999999
-      viability_ensemble_min: 0.45499999999999996
+      viability_ensemble_mean: 0.9777000000000001
+      viability_ensemble_min: 0.655
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 43.40416666666667
       elevation_m: 2708.0
-      viability_ensemble_mean: 0.9220000000000002
+      viability_ensemble_mean: 0.9504
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
@@ -1123,161 +1123,161 @@ groups:
     - lat: 39.39583333333333
       lon: 43.7375
       elevation_m: 2678.0
-      viability_ensemble_mean: 0.9203999999999999
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9661
+      viability_ensemble_min: 0.07499999999999996
       viability_ensemble_max: 1.0
-      refugium_score: 0.993125
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 44.07083333333333
       elevation_m: 2208.0
-      viability_ensemble_mean: 0.9410000000000001
-      viability_ensemble_min: 0.495
+      viability_ensemble_mean: 0.9902
+      viability_ensemble_min: 0.855
       viability_ensemble_max: 1.0
-      refugium_score: 0.97125
+      refugium_score: 0.9981249999999999
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 44.40416666666667
       elevation_m: 1403.0
-      viability_ensemble_mean: 0.8904
+      viability_ensemble_mean: 0.9183
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9781249999999999
+      refugium_score: 0.995625
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 44.7375
       elevation_m: 1704.0
-      viability_ensemble_mean: 0.8340000000000001
+      viability_ensemble_mean: 0.9375
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.941875
+      refugium_score: 0.995
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.07083333333333
       elevation_m: 846.0
-      viability_ensemble_mean: 0.8808
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9599
+      viability_ensemble_min: 0.24
       viability_ensemble_max: 1.0
-      refugium_score: 0.966875
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.40416666666667
       elevation_m: 1188.0
-      viability_ensemble_mean: 0.9295
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9843999999999999
+      viability_ensemble_min: 0.585
       viability_ensemble_max: 1.0
-      refugium_score: 0.98
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.737500000000004
       elevation_m: 2346.0
-      viability_ensemble_mean: 0.9049
+      viability_ensemble_mean: 0.9522999999999999
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.985
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 46.07083333333333
       elevation_m: 2671.0
-      viability_ensemble_mean: 0.9596999999999999
-      viability_ensemble_min: 0.17500000000000004
+      viability_ensemble_mean: 0.9931
+      viability_ensemble_min: 0.845
       viability_ensemble_max: 1.0
-      refugium_score: 0.9975
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 46.40416666666667
       elevation_m: 1499.0
-      viability_ensemble_mean: 0.8969
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9828999999999999
+      viability_ensemble_min: 0.595
       viability_ensemble_max: 1.0
-      refugium_score: 0.98
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 43.40416666666667
       elevation_m: 1845.0
-      viability_ensemble_mean: 0.8826
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9833
+      viability_ensemble_min: 0.575
       viability_ensemble_max: 1.0
-      refugium_score: 0.940625
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 43.7375
       elevation_m: 1996.0
-      viability_ensemble_mean: 0.8641
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9806
+      viability_ensemble_min: 0.7050000000000001
       viability_ensemble_max: 1.0
-      refugium_score: 0.985625
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 44.07083333333333
       elevation_m: 2237.0
-      viability_ensemble_mean: 0.9048999999999999
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9673999999999999
+      viability_ensemble_min: 0.010000000000000009
       viability_ensemble_max: 1.0
-      refugium_score: 0.963125
+      refugium_score: 0.9975
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 44.40416666666667
       elevation_m: 1877.0
-      viability_ensemble_mean: 0.9513999999999999
-      viability_ensemble_min: 0.0050000000000000044
+      viability_ensemble_mean: 0.9890000000000001
+      viability_ensemble_min: 0.77
       viability_ensemble_max: 1.0
-      refugium_score: 0.993125
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 44.7375
       elevation_m: 2604.0
-      viability_ensemble_mean: 0.8774000000000001
+      viability_ensemble_mean: 0.9453
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.98375
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.07083333333333
       elevation_m: 1025.0
-      viability_ensemble_mean: 0.8114
+      viability_ensemble_mean: 0.9017000000000001
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.92375
+      refugium_score: 0.99375
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.40416666666667
       elevation_m: 877.0
-      viability_ensemble_mean: 0.9147
+      viability_ensemble_mean: 0.9677000000000001
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.98875
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.737500000000004
       elevation_m: 977.0
-      viability_ensemble_mean: 0.8842
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9626
+      viability_ensemble_min: 0.08999999999999997
       viability_ensemble_max: 1.0
-      refugium_score: 0.9650000000000001
+      refugium_score: 0.9975
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 46.07083333333333
       elevation_m: 3630.0
-      viability_ensemble_mean: 0.9471
-      viability_ensemble_min: 0.05500000000000005
+      viability_ensemble_mean: 0.9843999999999999
+      viability_ensemble_min: 0.56
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 46.40416666666667
       elevation_m: 1384.0
-      viability_ensemble_mean: 0.9275
+      viability_ensemble_mean: 0.9781
       viability_ensemble_min: 0.0
       viability_ensemble_max: 1.0
-      refugium_score: 0.9775
+      refugium_score: 1.0
       robust_refugium_criterion_a: true
   pine:
     status: ok
     example_taxa: Pinus kochiana
     n_cells: 78
     n_robust_refugia_criterion_a: 78
-    mean_viability_across_cells: 0.9982089743589745
+    mean_viability_across_cells: 0.9999948717948718
     mean_refugium_score_across_cells: 1.0
     cells:
     - lat: 41.39583333333333
@@ -1323,16 +1323,16 @@ groups:
     - lat: 41.39583333333333
       lon: 45.07083333333333
       elevation_m: 288.0
-      viability_ensemble_mean: 0.9873000000000001
-      viability_ensemble_min: 0.51
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.39583333333333
       lon: 45.40416666666667
       elevation_m: 484.0
-      viability_ensemble_mean: 0.9984999999999999
-      viability_ensemble_min: 0.9299999999999999
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1347,8 +1347,8 @@ groups:
     - lat: 41.39583333333333
       lon: 46.07083333333333
       elevation_m: 641.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1371,16 +1371,16 @@ groups:
     - lat: 41.0625
       lon: 43.7375
       elevation_m: 2004.0
-      viability_ensemble_mean: 0.9991
-      viability_ensemble_min: 0.955
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 44.07083333333333
       elevation_m: 2228.0
-      viability_ensemble_mean: 0.9991
-      viability_ensemble_min: 0.975
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1403,8 +1403,8 @@ groups:
     - lat: 41.0625
       lon: 45.07083333333333
       elevation_m: 841.0
-      viability_ensemble_mean: 0.9996
-      viability_ensemble_min: 0.98
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1419,24 +1419,24 @@ groups:
     - lat: 41.0625
       lon: 45.737500000000004
       elevation_m: 263.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 46.07083333333333
       elevation_m: 309.0
-      viability_ensemble_mean: 0.9989
-      viability_ensemble_min: 0.96
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 41.0625
       lon: 46.40416666666667
       elevation_m: 135.0
-      viability_ensemble_mean: 0.9986000000000002
-      viability_ensemble_min: 0.96
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1467,16 +1467,16 @@ groups:
     - lat: 40.729166666666664
       lon: 44.40416666666667
       elevation_m: 2250.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.995
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.729166666666664
       lon: 44.7375
       elevation_m: 1974.0
-      viability_ensemble_mean: 0.9990000000000001
-      viability_ensemble_min: 0.96
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1499,8 +1499,8 @@ groups:
     - lat: 40.729166666666664
       lon: 45.737500000000004
       elevation_m: 1681.0
-      viability_ensemble_mean: 0.9923000000000001
-      viability_ensemble_min: 0.62
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1515,8 +1515,8 @@ groups:
     - lat: 40.729166666666664
       lon: 46.40416666666667
       elevation_m: 300.0
-      viability_ensemble_mean: 0.9959
-      viability_ensemble_min: 0.84
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1531,24 +1531,24 @@ groups:
     - lat: 40.39583333333333
       lon: 43.7375
       elevation_m: 1480.0
-      viability_ensemble_mean: 0.9993000000000001
-      viability_ensemble_min: 0.965
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 44.07083333333333
       elevation_m: 2240.0
-      viability_ensemble_mean: 0.9913
-      viability_ensemble_min: 0.605
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 44.40416666666667
       elevation_m: 1681.0
-      viability_ensemble_mean: 0.9999000000000001
-      viability_ensemble_min: 0.995
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1571,16 +1571,16 @@ groups:
     - lat: 40.39583333333333
       lon: 45.737500000000004
       elevation_m: 2247.0
-      viability_ensemble_mean: 0.9993000000000001
-      viability_ensemble_min: 0.975
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.39583333333333
       lon: 46.07083333333333
       elevation_m: 2080.0
-      viability_ensemble_mean: 0.9869
-      viability_ensemble_min: 0.475
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1595,24 +1595,24 @@ groups:
     - lat: 40.0625
       lon: 43.40416666666667
       elevation_m: 2072.0
-      viability_ensemble_mean: 0.9996
-      viability_ensemble_min: 0.98
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 43.7375
       elevation_m: 998.0
-      viability_ensemble_mean: 0.9950999999999999
-      viability_ensemble_min: 0.8
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 44.07083333333333
       elevation_m: 858.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1627,24 +1627,24 @@ groups:
     - lat: 40.0625
       lon: 45.07083333333333
       elevation_m: 2665.0
-      viability_ensemble_mean: 0.9954
-      viability_ensemble_min: 0.83
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 45.40416666666667
       elevation_m: 2569.0
-      viability_ensemble_mean: 0.9991
-      viability_ensemble_min: 0.955
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 40.0625
       lon: 45.737500000000004
       elevation_m: 2696.0
-      viability_ensemble_mean: 0.9997
-      viability_ensemble_min: 0.985
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1683,56 +1683,56 @@ groups:
     - lat: 39.729166666666664
       lon: 44.07083333333333
       elevation_m: 2305.0
-      viability_ensemble_mean: 0.9881
-      viability_ensemble_min: 0.485
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 44.40416666666667
       elevation_m: 2152.0
-      viability_ensemble_mean: 0.998
-      viability_ensemble_min: 0.92
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 44.7375
       elevation_m: 800.0
-      viability_ensemble_mean: 0.98
-      viability_ensemble_min: 0.0
+      viability_ensemble_mean: 0.9999000000000001
+      viability_ensemble_min: 0.995
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 45.07083333333333
       elevation_m: 1616.0
-      viability_ensemble_mean: 0.9987
-      viability_ensemble_min: 0.955
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 45.40416666666667
       elevation_m: 1179.0
-      viability_ensemble_mean: 0.9996
-      viability_ensemble_min: 0.985
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 45.737500000000004
       elevation_m: 2448.0
-      viability_ensemble_mean: 0.9994
-      viability_ensemble_min: 0.97
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.729166666666664
       lon: 46.07083333333333
       elevation_m: 3189.0
-      viability_ensemble_mean: 0.9993000000000001
-      viability_ensemble_min: 0.975
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1747,16 +1747,16 @@ groups:
     - lat: 39.39583333333333
       lon: 43.40416666666667
       elevation_m: 2708.0
-      viability_ensemble_mean: 0.9891
-      viability_ensemble_min: 0.575
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 43.7375
       elevation_m: 2678.0
-      viability_ensemble_mean: 0.9984999999999999
-      viability_ensemble_min: 0.955
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1771,40 +1771,40 @@ groups:
     - lat: 39.39583333333333
       lon: 44.40416666666667
       elevation_m: 1403.0
-      viability_ensemble_mean: 0.9989
-      viability_ensemble_min: 0.965
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 44.7375
       elevation_m: 1704.0
-      viability_ensemble_mean: 0.9994
-      viability_ensemble_min: 0.98
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.07083333333333
       elevation_m: 846.0
-      viability_ensemble_mean: 0.9987
-      viability_ensemble_min: 0.945
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.40416666666667
       elevation_m: 1188.0
-      viability_ensemble_mean: 0.9999000000000001
-      viability_ensemble_min: 0.995
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.39583333333333
       lon: 45.737500000000004
       elevation_m: 2346.0
-      viability_ensemble_mean: 0.9989
-      viability_ensemble_min: 0.95
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1819,16 +1819,16 @@ groups:
     - lat: 39.39583333333333
       lon: 46.40416666666667
       elevation_m: 1499.0
-      viability_ensemble_mean: 0.9999000000000001
-      viability_ensemble_min: 0.995
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 43.40416666666667
       elevation_m: 1845.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.99
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1843,8 +1843,8 @@ groups:
     - lat: 39.0625
       lon: 44.07083333333333
       elevation_m: 2237.0
-      viability_ensemble_mean: 0.9998
-      viability_ensemble_min: 0.995
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
@@ -1859,48 +1859,48 @@ groups:
     - lat: 39.0625
       lon: 44.7375
       elevation_m: 2604.0
-      viability_ensemble_mean: 0.9882
-      viability_ensemble_min: 0.5800000000000001
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.07083333333333
       elevation_m: 1025.0
-      viability_ensemble_mean: 0.9976999999999999
-      viability_ensemble_min: 0.965
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.40416666666667
       elevation_m: 877.0
-      viability_ensemble_mean: 0.9995
-      viability_ensemble_min: 0.975
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 45.737500000000004
       elevation_m: 977.0
-      viability_ensemble_mean: 0.9976999999999999
-      viability_ensemble_min: 0.885
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 46.07083333333333
       elevation_m: 3630.0
-      viability_ensemble_mean: 0.9990000000000001
-      viability_ensemble_min: 0.965
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
     - lat: 39.0625
       lon: 46.40416666666667
       elevation_m: 1384.0
-      viability_ensemble_mean: 0.9991
-      viability_ensemble_min: 0.955
+      viability_ensemble_mean: 1.0
+      viability_ensemble_min: 1.0
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true

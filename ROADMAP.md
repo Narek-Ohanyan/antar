@@ -403,9 +403,14 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       `scripts/fit_refugium_viability.py`: real one-year hydraulic-survival viability (XYLEM's
       real ensemble, `p_height_ok=1.0` since MERISTEM's growth model isn't fit) and
       `robust_refugium`'s criterion (a), for the 3 real functional groups against all 78 real
-      cells. Real, coherent result, tracking exactly with XYLEM's earlier hazard ordering:
-      broadleaf mean viability 98.6% (78/78 cells meet criterion a), oak 93.0% (77/78), pine
-      99.8% (78/78). Saved to `configs/fitted/refugium_viability_2019.yaml`.
+      cells. Real, coherent result, tracking exactly with XYLEM's earlier hazard ordering.
+      **Numbers updated 2026-10-01 after the species-aware rooting-depth fix**: broadleaf mean
+      viability 99.7% (78/78 meet criterion a), oak 97.1% (78/78), pine 100.0% (78/78) -- all
+      real and higher than the original flat-rooting-depth run (98.6%/93.0%/99.8%), which makes
+      real physical sense: broadleaf/oak/pine all got a deeper real rooting depth (2.9-3.9m) than
+      the old flat 1.0m guess, giving more accessible soil water and less real drought stress.
+      XYLEM's matching real h_mech dropped the same direction: 0.27%/2.86%/0.00% (was
+      1.4%/7.0%/0.2%). Saved to `configs/fitted/refugium_viability_2019.yaml`.
   - [ ] **Still open**: criteria (b) (buffer index) and (c) (area of applicability) skipped --
         need a dense raster/fitted domain this sparse 78-point sample doesn't provide. Real
         future-horizon viability (not just 2019) is the next concrete step, now running
@@ -420,12 +425,16 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       IMPLEMENTATION_LOG.md) then completed cleanly, checkpointed per (member, horizon), ~2h20m
       total. Saved to `configs/fitted/future_projections.yaml` (45 members x 3 groups x 78 cells).
       **Real, honest, somewhat surprising finding**: mean viability is nearly flat across all 9
-      scenario x horizon combinations and all 5 GCMs -- broadleaf 0.983-0.989, oak 0.921-0.941, pine
-      0.998-0.999 -- with tight ensemble spread (sigma 0.001-0.014) and no clear monotonic decline even
-      under ssp585/2100. Not massaged to show a trend: the mechanistic hazard model (XYLEM) is most
-      sensitive to variables this delta method holds fixed at 2019 ERA5-Land values (wind, radiation,
-      humidity), so CMIP6's real temperature/precipitation deltas alone don't move it much at this
-      site sample. A real limitation to flag, not a result to oversell.
+      scenario x horizon combinations and all 5 GCMs. Not massaged to show a trend: the
+      mechanistic hazard model (XYLEM) is most sensitive to variables this delta method holds
+      fixed at 2019 ERA5-Land values (wind, radiation, humidity), so CMIP6's real temperature/
+      precipitation deltas alone don't move it much at this site sample. A real limitation to
+      flag, not a result to oversell. **Numbers updated 2026-10-01 after the species-aware
+      rooting-depth fix** (re-run, same qualitative flat-viability finding, slightly higher
+      across the board matching REFUGIUM's own shift): broadleaf 0.997-0.998, oak 0.972-0.975,
+      pine 1.000 -- pine is now essentially saturated at every real scenario and horizon, a real
+      consequence of its deep (3.9m) real rooting depth giving it very little real drought stress
+      to begin with at this site sample.
 - [x] **AEGIS — real meaningful multi-scenario run complete (2026-10-01).**
       `scripts/fit_aegis_portfolio.py`: real viability (REFUGIUM/the real future-projections
       ensemble), real cost/value (World Bank/government source, all 4 user scope decisions
@@ -438,14 +447,16 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       existed (script auto-detects it, confirmed via `scenario_source: future_projections` in the
       output): MILP solves correctly at all 5 real budget levels, efficient frontier computes
       correctly. **Real, honest finding, consistent with future-projections' own flat-viability
-      result above**: CVaR (24139.6) is nearly identical to expected value (24155.8) and price of
+      result above**: CVaR is nearly identical to expected value and price of
       robustness is again 0.00 -- not a validation-scale artifact this time, but the real
       consequence of viability barely varying across the 45 real scenarios, so there is little
       real downside tail for CVaR to hedge against. Budget still isn't binding at 78 units (same
       58 units planted at every real budget level, $9.3M-$663M) -- a genuine property of running
       at this site-sample scale, not a bug. Saved to `configs/fitted/aegis_portfolio.yaml`. (Numbers
-      updated 2026-10-01 after the Ecosystem Map eligibility refinement below dropped eligible
-      units from 61 to 58; re-run, same qualitative result.)
+      updated twice 2026-10-01: once after the Ecosystem Map eligibility refinement dropped
+      eligible units from 61 to 58, again after the species-aware rooting-depth fix --
+      expected=24185.9, cvar=24185.8, both real and even closer together than before, consistent
+      with REFUGIUM's own higher post-fix viability numbers above.)
       **Real research done (2026-10-01) on the benefit/cost independence gap, real negative
       result**: searched for a real literature-sourced survival multiplier by intervention method
       to reduce AEGIS's stated independence (benefit by group only, cost by method only).

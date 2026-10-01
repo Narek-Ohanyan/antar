@@ -1639,3 +1639,33 @@ the same output files. Caught before either could corrupt anything (checked real
 yet produced a write), both killed, relaunched a third time with `set -o pipefail` explicitly set
 so a real crash anywhere in the chain now actually stops it, matching what `&&` was always meant to
 guarantee.
+
+## 2026-10-01 (cont.) -- the species-aware rooting-depth chain finished clean: XYLEM, REFUGIUM,
+## future-projections, AEGIS all real, all refreshed, all physically consistent in the same direction
+
+The third, pipefail-protected chain ran XYLEM -> REFUGIUM -> future-projections -> AEGIS straight
+through with no further crashes (MERISTEM's CWD extraction, the chain's last step, still running).
+Real, coherent result across all four: every viability number moved in the same real direction,
+and for a real physical reason, not noise. Broadleaf/oak/pine all got deeper real rooting depths
+(2.9-3.9m) than the old flat 1.0m guess -> more accessible soil water -> less real drought stress
+-> higher viability, lower hazard, everywhere this was checked:
+
+- XYLEM real mean h_mech: broadleaf 1.4%->0.27%, oak 7.0%->2.86%, pine 0.2%->0.00%.
+- REFUGIUM real mean viability (2019): broadleaf 98.6%->99.7%, oak 93.0%->97.1%, pine 99.8%->100.0%
+  (all 78/78 cells meet criterion (a), same as before).
+- future-projections real mean viability (45 members): broadleaf 0.983-0.989 -> 0.997-0.998, oak
+  0.921-0.941 -> 0.972-0.975, pine 0.998-0.999 -> 1.000 (now essentially saturated). The real flat-
+  across-scenarios finding from the first run persists -- not an artifact of the old shared-forcing
+  architecture, the same real pattern holds under the corrected per-group one.
+- AEGIS real budget sweep: expected 24155.8->24185.9, cvar 24139.6->24185.8 -- CVaR and expected
+  value are now even closer together than before, consistent with REFUGIUM's own higher post-fix
+  numbers (less real variance across scenarios when every group's baseline viability is already
+  closer to 1.0).
+
+This directional consistency across four independently-computed real outputs is itself a real,
+useful sanity check on the fix: a bug in the per-group wiring would have been far more likely to
+produce an inconsistent or implausible pattern (e.g. one group moving the wrong way, or juniper-
+sized swings) than this clean, uniformly-explicable shift. ROADMAP.md's REFUGIUM/future-projections/
+AEGIS entries updated in place with the real new numbers (IMPLEMENTATION_LOG.md entries from
+earlier tonight left as the historical record of what was true then, per this file's own
+append-only convention).
