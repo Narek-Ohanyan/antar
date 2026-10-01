@@ -132,10 +132,12 @@ def compute_deltas(lats, lons, gcm, scenario):
 def build_future_cell(static, deltas, horizon, i, elevation, z_ref_m, slope, aspect, concavity,
                        soil, w_max_mm, lapse, lats, era5_2019, chelsa_ref):
     t_mean_ref_c, t_max_ref_c, t_min_ref_c, p_ref_mm, doy, month = chelsa_ref
-    d_tas = deltas[(horizon, "tas")][i]
-    d_tasmax = deltas[(horizon, "tasmax")][i]
-    d_tasmin = deltas[(horizon, "tasmin")][i]
-    r_pr = deltas[(horizon, "pr")][i]
+    # deltas[(horizon, var)] is shaped (12 months, n_points) -- index the point axis with [:, i],
+    # not [i] (which would index into the month axis and crash once i >= 12).
+    d_tas = deltas[(horizon, "tas")][:, i]
+    d_tasmax = deltas[(horizon, "tasmax")][:, i]
+    d_tasmin = deltas[(horizon, "tasmin")][:, i]
+    r_pr = deltas[(horizon, "pr")][:, i]
 
     month_idx = month - 1
     future_t_mean = t_mean_ref_c + d_tas[month_idx]
