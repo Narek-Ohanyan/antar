@@ -168,18 +168,38 @@ def grid_latlon(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
 
 
 def get_access_token():
+    """Real OAuth token refresh, retried on transient transport failure.
+
+    A real crash hit mid-REFUGIUM-dense-run (2026-10-02): the token endpoint itself
+    (oauth2.googleapis.com) dropped the connection (google.auth.exceptions.TransportError /
+    requests.exceptions.ConnectionError), a failure mode entirely outside rasterio's scope -- every
+    retry wrapper added tonight only caught rasterio.errors.RasterioIOError around the *raster*
+    read, not a failure in the token refresh those retries call fresh each attempt. Fixing it once
+    here, at the source, protects every caller automatically rather than teaching each retry loop
+    about a second exception type.
+    """
     import ee
     from google.oauth2.credentials import Credentials
     import google.auth.transport.requests as gareq
+    import google.auth.exceptions
+    import requests.exceptions
 
     creds_path = Path.home() / ".config" / "earthengine" / "credentials"
     d = json.loads(creds_path.read_text())
-    creds = Credentials(
-        None, refresh_token=d["refresh_token"], token_uri="https://oauth2.googleapis.com/token",
-        client_id=ee.oauth.CLIENT_ID, client_secret=ee.oauth.CLIENT_SECRET, scopes=d["scopes"],
-    )
-    creds.refresh(gareq.Request())
-    return creds.token
+    last_err = None
+    for attempt in range(3):
+        try:
+            creds = Credentials(
+                None, refresh_token=d["refresh_token"], token_uri="https://oauth2.googleapis.com/token",
+                client_id=ee.oauth.CLIENT_ID, client_secret=ee.oauth.CLIENT_SECRET, scopes=d["scopes"],
+            )
+            creds.refresh(gareq.Request())
+            return creds.token
+        except (google.auth.exceptions.TransportError, requests.exceptions.ConnectionError) as e:
+            last_err = e
+            print(f"  get_access_token: refresh failed (attempt {attempt + 1}/3): {e}", flush=True)
+            time.sleep(5)
+    raise last_err
 
 
 def drive_vsicurl_url(file_id: str) -> str:
