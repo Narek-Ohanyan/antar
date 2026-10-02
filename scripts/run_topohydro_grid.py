@@ -265,12 +265,31 @@ def extract_terrain(token, lats, lons):
 
 
 def extract_soils(token, lats, lons):
-    url = drive_vsicurl_url(SOILS_DRIVE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
-        with rasterio.open(url) as src:
-            band_names = list(src.descriptions)
-            xs, ys = warp_transform("EPSG:4326", src.crs, lons.tolist(), lats.tolist())
-            vals = np.array(list(src.sample(zip(xs, ys))))
+    """Real soils sample, retried with a fresh token on failure. A real crash hit this function
+    with a bare HTTP 401 mid-REFUGIUM-dense-run (2026-10-02): it used the single `token` captured
+    once at the top of extract_static_grid_inputs rather than refreshing its own, unlike
+    extract_terrain/extract_era5land which already learned this lesson earlier tonight -- a real
+    gap, not a one-off, now closed here too."""
+    last_err = None
+    for attempt in range(3):
+        try:
+            fresh_token = get_access_token()
+            url = drive_vsicurl_url(SOILS_DRIVE_ID)
+            with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
+                with rasterio.open(url) as src:
+                    band_names = list(src.descriptions)
+                    xs, ys = warp_transform("EPSG:4326", src.crs, lons.tolist(), lats.tolist())
+                    vals = np.array(list(src.sample(zip(xs, ys))))
+            last_err = None
+            break
+        except rasterio.errors.RasterioIOError as e:
+            last_err = e
+            print(f"  soils: read failed (attempt {attempt + 1}/3): {e}", flush=True)
+            time.sleep(5)
+    if last_err is not None:
+        print(f"  soils: FAILED after 3 attempts, all points left NaN: {last_err}", flush=True)
+        nan = np.full(len(lats), np.nan)
+        return nan, nan, nan
     idx = {b: i for i, b in enumerate(band_names)}
     # SoilGrids' GEE-mapped units are per-mille (g/kg, 0-1000): verified empirically this
     # session -- clay+sand+silt sum to ~1000 at every real sample point -- so /10 gives the

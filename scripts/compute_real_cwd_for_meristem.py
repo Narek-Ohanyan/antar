@@ -86,6 +86,30 @@ def load_all_points():
     return np.array(groups), all_ll[:, 0], all_ll[:, 1]  # group labels, lats, lons
 
 
+def _download_full_raster(file_id, local_path, label):
+    """Full local download, retried with a fresh token on failure. A real bug found during a
+    broader audit (2026-10-02): this used a single token passed in once, never refreshed --
+    the exact class of failure already fixed in extract_terrain/extract_soils/extract_era5land
+    in run_topohydro_grid.py, just not yet ported here. Returns (data, profile, band_descriptions)."""
+    last_err = None
+    for attempt in range(3):
+        try:
+            print(f"  downloading {label} (transient, full, attempt {attempt + 1}/3)...", flush=True)
+            fresh_token = get_access_token()
+            url = drive_vsicurl_url(file_id)
+            with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
+                with rasterio.open(url) as src:
+                    data = src.read()
+                    profile = src.profile
+                    band_descriptions = src.descriptions
+            return data, profile, band_descriptions
+        except rasterio.errors.RasterioIOError as e:
+            last_err = e
+            print(f"  {label}: download failed (attempt {attempt + 1}/3): {e}", flush=True)
+            time.sleep(5)
+    raise last_err
+
+
 def extract_terrain_soils_local(lats, lons, token):
     """Full local download of terrain.tif + soils.tif (transient), fast local numpy extraction
     for all points -- see module docstring for why, at this point count."""
@@ -93,23 +117,12 @@ def extract_terrain_soils_local(lats, lons, token):
     terrain_path = DATA_DIR / "_tmp_terrain_meristem.tif"
     soils_path = DATA_DIR / "_tmp_soils_meristem.tif"
 
-    print("  downloading terrain.tif (transient, full)...", flush=True)
-    url = drive_vsicurl_url(TERRAIN_DRIVE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
-        with rasterio.open(url) as src:
-            data = src.read()
-            profile = src.profile
+    data, profile, _ = _download_full_raster(TERRAIN_DRIVE_ID, terrain_path, "terrain.tif")
     with rasterio.open(terrain_path, "w", **profile) as dst:
         dst.write(data)
     del data
 
-    print("  downloading soils.tif (transient, full)...", flush=True)
-    url = drive_vsicurl_url(SOILS_DRIVE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
-        with rasterio.open(url) as src:
-            data = src.read()
-            profile = src.profile
-            band_descriptions = src.descriptions
+    data, profile, band_descriptions = _download_full_raster(SOILS_DRIVE_ID, soils_path, "soils.tif")
     # .profile does NOT include band descriptions (names) -- a real bug this hit: soils needs
     # band names (clay_0_30cm_mean etc.) for extraction, unlike terrain which reads by index.
     # Copy descriptions onto the local copy explicitly, don't assume .profile carries them.
