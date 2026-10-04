@@ -1687,3 +1687,50 @@ attempt would cost another real ~3.5h for uncertain improvement given tonight's 
 to this script the way MNEME's panel build and future-projections already have, so a partial
 failure doesn't force a full from-scratch redo) rather than silently blocking the higher-priority
 queue the user explicitly set.
+
+## 2026-10-04 -- the unattended overnight dense run failed silently; both "dense" outputs were
+## badly degraded subsamples, and one had already been committed with numbers quoted from it
+
+**What actually happened, stated plainly.** The chain XYLEM dense -> REFUGIUM dense -> MNEME dense
+did not deliver what was promised. Reading the logs after the fact:
+
+- A multi-hour Google Drive disruption hit part-way through (HTTP 400s, GDAL "not recognized as
+  being in a supported file format" -- Drive serving a non-GeoTIFF body -- connection resets, OAuth
+  token-endpoint timeouts). A live probe on 2026-10-04 found Drive fully healthy again (all probed
+  ERA5-Land tiles returned valid `image/tiff` range responses), so this was a transient outage, not
+  a permanent block or quota ban.
+- **XYLEM dense finished with only 212/1044 cells; REFUGIUM dense with only 418/1044** -- and they
+  cover *different* subsets. Per-tile retries "succeeded" at degrading gracefully (failed tiles left
+  NaN), so both scripts exited 0 and wrote output files that looked like valid dense results but
+  were badly biased subsamples of whichever tiles happened to read. Graceful degradation is the
+  right behaviour for one stray bad tile; it is the wrong behaviour when most of the grid is lost,
+  because the output then silently misrepresents its own coverage.
+- The commit `a22c2e4` message quoted XYLEM dense means (broadleaf 0.10% / oak 2.01% / pine 0.00%)
+  as a real dense result. Those numbers came from the 212-cell subsample and **should not be
+  cited**. The file has been removed from `configs/fitted/` and the repo index; both degraded
+  outputs are preserved for provenance only under `data/_degraded_dense_runs/` (gitignored).
+- MNEME dense then lost soils, every vitality tile, the disturbance ancillary and every ERA5-Land
+  tile, and finally crashed on an uncaught `KeyError: 'wind_speed_2013'` -- Drive had returned a
+  non-GeoTIFF body that GDAL opened as an empty dataset with no band names (a `KeyError`, not the
+  `RasterioIOError` the retry wrappers caught).
+- The chain then sat dead for roughly 33 hours: one outage window ended it, nothing retried it, and
+  I was not woken until this session resumed. The "wake up to finished results" goal was not met.
+
+**Fixes (all in this commit):**
+1. `DriveCoverageError` + `MAX_LOST_FRACTION = 3%`: terrain, ERA5-Land, soils and MNEME's vitality /
+   disturbance extractions now *raise* if more than 3% of points are lost to read failures (or soils
+   / disturbance are unreadable at all), so a degraded run can no longer write an output that
+   passes for a clean one.
+2. MNEME's disturbance fallback no longer defaults `no_disturbance=True` on failure. That default was
+   not harmless: it would let real harvest/fire years be labeled as dieback events -- a silent
+   scientific error. It now raises.
+3. Band-name validation: an opened tile with no expected band names is treated as a failed read
+   (retryable `RasterioIOError`), closing the uncaught-`KeyError` path.
+4. Exponential-ish backoff (`RETRY_SLEEPS_S = [5, 30, 120]`) in place of a flat 5 s, since a Drive
+   disruption lasts minutes, not seconds.
+5. `scripts/run_dense_chain.sh`: runs TOPOHYDRO -> XYLEM -> REFUGIUM -> MNEME dense with each step
+   retried up to 10 times, 15 min apart, so an outage window costs time rather than the chain.
+
+**Honest status of the "dense" work as of this entry:** no valid dense-grid result exists yet.
+The only valid results are the 78-point ones (XYLEM / REFUGIUM / future-projections / AEGIS), which
+remain correct and in place.

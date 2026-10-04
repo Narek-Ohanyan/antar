@@ -60,6 +60,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
     DATA_DIR, drive_vsicurl_url, extract_static_grid_inputs, compute_forcing_for_year,
     get_access_token, GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
+    DriveCoverageError, MAX_LOST_FRACTION, RETRY_SLEEPS_S,
 )
 
 from antar.hazard.observation import dieback_event  # noqa: E402
@@ -107,13 +108,16 @@ def extract_vitality_and_disturbance(token, row_px, col_px):
         local_cols = col_px[sel] - tile_key[1]
 
         last_err = None
-        for attempt in range(3):
+        for attempt in range(len(RETRY_SLEEPS_S) + 1):
             try:
                 fresh_token = get_access_token()
                 url = drive_vsicurl_url(file_id)
                 with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
                     with rasterio.open(url) as src:
                         bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
+                        if f"kndvi_{VITALITY_YEARS[0]}" not in bidx:
+                            raise rasterio.errors.RasterioIOError(
+                                f"vitality tile {tile_key} opened without band names -- not a valid response")
                         xs_geo, ys_geo = src.xy(local_rows, local_cols)
                         coords = list(zip(xs_geo, ys_geo))
                         tile_vals = np.full((len(sel), len(VITALITY_YEARS)), np.nan)
@@ -125,15 +129,20 @@ def extract_vitality_and_disturbance(token, row_px, col_px):
                 break
             except rasterio.errors.RasterioIOError as e:
                 last_err = e
-                print(f"  vitality tile {tile_key}: read failed (attempt {attempt + 1}/3): {e}", flush=True)
-                time.sleep(5)
+                print(f"  vitality tile {tile_key}: read failed (attempt {attempt + 1}/{len(RETRY_SLEEPS_S) + 1}): {e}", flush=True)
+                if attempt < len(RETRY_SLEEPS_S):
+                    time.sleep(RETRY_SLEEPS_S[attempt])
         if last_err is not None:
-            print(f"  vitality tile {tile_key}: FAILED after 3 attempts, {len(sel)} points left NaN", flush=True)
+            print(f"  vitality tile {tile_key}: FAILED after {len(RETRY_SLEEPS_S) + 1} attempts", flush=True)
             failed_tiles.append(tile_key)
             continue
         print(f"  vitality tile {tile_key}: {len(sel)} points", flush=True)
     if failed_tiles:
         print(f"  === {len(failed_tiles)} vitality tile(s) failed all retries: {failed_tiles} ===", flush=True)
+        lost = int(np.all(np.isnan(kndvi), axis=1).sum())
+        if lost / n > MAX_LOST_FRACTION:
+            raise DriveCoverageError(f"vitality lost {lost}/{n} points ({failed_tiles}) -- refusing "
+                                     "to build an event panel from a badly degraded sample")
 
     no_disturbance = np.full((n, len(VITALITY_YEARS)), True)
     last_err = None
@@ -156,7 +165,9 @@ def extract_vitality_and_disturbance(token, row_px, col_px):
             print(f"  disturbance ancillary: read failed (attempt {attempt + 1}/3): {e}", flush=True)
             time.sleep(5)
     if last_err is not None:
-        print(f"  disturbance ancillary: FAILED after 3 attempts, no_disturbance left at default True", flush=True)
+        # Never default to no_disturbance=True: that would let real harvest/fire years be labeled
+        # as dieback events -- a silent scientific error, not a harmless fallback.
+        raise DriveCoverageError(f"disturbance ancillary unreadable after retries: {last_err}")
     else:
         print(f"  disturbance ancillary: {n} points", flush=True)
     return kndvi, no_disturbance

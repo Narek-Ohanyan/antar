@@ -202,6 +202,20 @@ def get_access_token():
     raise last_err
 
 
+class DriveCoverageError(RuntimeError):
+    """Raised when a Drive-streamed extraction loses too many points to read failures. A real
+    failure mode (2026-10-02/03): during a multi-hour Drive disruption, per-tile retries "succeeded"
+    at degrading gracefully -- leaving the points NaN -- so the dense XYLEM/REFUGIUM runs finished
+    "cleanly" with only 212/1044 and 418/1044 cells and wrote output files that looked like valid
+    dense results but were badly biased subsamples. Graceful degradation is right for a stray bad
+    tile; it is wrong when most of the grid is lost, because the result then silently misrepresents
+    its own coverage. Fail loudly instead and let the caller retry once Drive recovers."""
+
+
+MAX_LOST_FRACTION = 0.03  # >3% of points lost to read failures (beyond legitimately-missing soil) = abort
+RETRY_SLEEPS_S = [5, 30, 120]  # exponential-ish backoff: a Drive disruption can last minutes, not seconds
+
+
 def drive_vsicurl_url(file_id: str) -> str:
     return f"/vsicurl/https://www.googleapis.com/drive/v3/files/{file_id}?alt=media"
 
@@ -261,6 +275,8 @@ def extract_terrain(token, lats, lons):
             print(f"    terrain: {i + 1}/{n}", flush=True)
     if failed_points:
         print(f"  terrain: {len(failed_points)} point(s) failed all retries, left NaN", flush=True)
+        if len(failed_points) / n > MAX_LOST_FRACTION:
+            raise DriveCoverageError(f"terrain lost {len(failed_points)}/{n} points to read failures")
     return elevation, slope, aspect, concavity, z_ref, row_px, col_px
 
 
@@ -287,9 +303,8 @@ def extract_soils(token, lats, lons):
             print(f"  soils: read failed (attempt {attempt + 1}/3): {e}", flush=True)
             time.sleep(5)
     if last_err is not None:
-        print(f"  soils: FAILED after 3 attempts, all points left NaN: {last_err}", flush=True)
-        nan = np.full(len(lats), np.nan)
-        return nan, nan, nan
+        print(f"  soils: FAILED after 3 attempts: {last_err}", flush=True)
+        raise DriveCoverageError(f"soils unreadable after retries: {last_err}")
     idx = {b: i for i, b in enumerate(band_names)}
     # SoilGrids' GEE-mapped units are per-mille (g/kg, 0-1000): verified empirically this
     # session -- clay+sand+silt sum to ~1000 at every real sample point -- so /10 gives the
@@ -318,13 +333,20 @@ def extract_era5land(token, row_px, col_px, year=YEAR):
         sel = (tile_row == tile_key[0]) & (tile_col == tile_key[1])
 
         last_err = None
-        for attempt in range(3):
+        for attempt in range(len(RETRY_SLEEPS_S) + 1):
             try:
                 fresh_token = get_access_token()
                 url = drive_vsicurl_url(file_id)
                 with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
                     with rasterio.open(url) as src:
                         bidx = {b: j + 1 for j, b in enumerate(src.descriptions)}
+                        if f"wind_speed_{year}" not in bidx:
+                            # Drive occasionally serves a non-GeoTIFF body (HTML quota/error page)
+                            # that GDAL opens as an empty dataset with no band names -- a real
+                            # failure that surfaced as an uncaught KeyError, not a RasterioIOError.
+                            raise rasterio.errors.RasterioIOError(
+                                f"tile {tile_key} opened without band '{'wind_speed'}_{year}' "
+                                f"(got {len(bidx)} named bands) -- not a valid ERA5 tile response")
                         tile_vals = {k: np.full(n, np.nan) for k in
                                      ["wind_speed", "ssrd", "strd", "dewpoint", "surface_pressure"]}
                         for i in np.where(sel)[0]:
@@ -339,13 +361,19 @@ def extract_era5land(token, row_px, col_px, year=YEAR):
                 break
             except rasterio.errors.RasterioIOError as e:
                 last_err = e
-                print(f"  tile {tile_key}: read failed (attempt {attempt + 1}/3): {e}", flush=True)
-                time.sleep(5)
+                print(f"  tile {tile_key}: read failed (attempt {attempt + 1}/{len(RETRY_SLEEPS_S) + 1}): {e}", flush=True)
+                if attempt < len(RETRY_SLEEPS_S):
+                    time.sleep(RETRY_SLEEPS_S[attempt])
         if last_err is not None:
-            print(f"  tile {tile_key}: FAILED after 3 attempts, {sel.sum()} points left NaN", flush=True)
+            print(f"  tile {tile_key}: FAILED after {len(RETRY_SLEEPS_S) + 1} attempts, {sel.sum()} points left NaN", flush=True)
             failed_tiles.append(tile_key)
             continue
         print(f"  tile {tile_key}: {sel.sum()} points", flush=True)
+    lost = int(np.isnan(wind10).sum())
+    if lost / n > MAX_LOST_FRACTION:
+        raise DriveCoverageError(
+            f"ERA5-Land lost {lost}/{n} points ({len(failed_tiles)} tile(s) failed all retries: "
+            f"{failed_tiles}) -- refusing to continue with a badly degraded sample")
     if failed_tiles:
         print(f"  === {len(failed_tiles)} tile(s) failed all retries: {failed_tiles} ===", flush=True)
     return wind10, ssrd, strd, dewpoint_k, pressure_pa
