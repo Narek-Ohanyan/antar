@@ -1,4 +1,4 @@
-# antar — ANTAR repository skeleton
+# ANTAR — Assessment of Niche, Treeline & Analogue Refugia
 
 ANTAR (Assessment of Niche, Treeline & Analogue Refugia) is a hybrid process-statistical framework for
 predicting where climate-resilient reforestation will hold in Armenia. This repo fixes the interfaces

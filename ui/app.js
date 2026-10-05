@@ -73,6 +73,8 @@ function route() {
   const page = (location.hash.replace(/^#\//, "").split("?")[0]) || "home";
   const fn = PAGES[page] || renderHome;
   $("nav").innerHTML = NAV.map(([k, t]) => `<a href="#/${k}" class="${k === page ? "active" : ""}">${t}</a>`).join("");
+  const activeLink = $("nav a.active"); if (activeLink) activeLink.scrollIntoView({ inline: "center", block: "nearest" });   // phones: keep the current page visible in the scrolling nav
+  if (state.heroCleanup) { state.heroCleanup(); state.heroCleanup = null; }
   if (state.mapCleanup) { state.mapCleanup(); state.mapCleanup = null; }
   if (state.mapObj) { state.mapObj.remove(); state.mapObj = null; }
   window.scrollTo(0, 0);
@@ -97,8 +99,16 @@ function renderHome() {
   const eng = state.meth.engines;
   const stat = (num, cap, sub) => `<div class="card stat"><div class="num">${num}</div><div class="cap">${cap}</div><div class="sub">${sub || ""}</div></div>`;
   view().innerHTML = `<div class="wrap">
-    <div class="hero"><img class="hero-logo" src="assets/antar_logo.jpeg" alt="ANTAR"><h1>Armenia reforestation refugia</h1>
-    <p class="lead">A hybrid process-statistical framework for finding climate-resilient places to restore forest in Armenia: it models water stress, hydraulic failure, species niches, treeline and scenario-robust planting decisions, and reports each result with the caveats that came with it.</p></div>
+    <div class="hero">
+      <div class="hero-stage">
+        <video id="hero-video" class="hero-video" poster="assets/hero-poster.jpg" muted loop playsinline preload="metadata" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1">
+          <source src="assets/hero.mp4" type="video/mp4"><img src="assets/hero-poster.jpg" alt="ANTAR">
+        </video>
+        <button type="button" id="hero-toggle" class="hero-toggle" aria-label="Pause the logo animation" title="Pause the logo animation"></button>
+      </div>
+      <h1>ANTAR — Assessment of Niche, Treeline &amp; Analogue Refugia</h1>
+    <p class="lead">A hybrid process-statistical framework for finding climate-resilient places to restore forest in Armenia: it models water stress, hydraulic failure, species niches, treeline and scenario-robust planting decisions, and reports each result with the caveats that came with it.</p>
+      <div class="hero-cta"><a class="btn" href="#/map">Open the map</a><a class="btn secondary" href="#/method">How it works</a></div></div>
     ${banner()}
     <h2>Headline results</h2>
     <div class="grid cols-4">
@@ -111,13 +121,43 @@ function renderHome() {
     <div class="grid cols-3">${eng.map((e) => `<div class="card"><h3>${esc(e.name)}</h3><p class="small muted">${esc(e.status)}</p><a href="#/method" data-jump="${e.id}">How it works →</a></div>`).join("")}</div>
     <h2>Where to look</h2>
     <div class="grid cols-3">
-      <div class="card"><h3>Map</h3><p class="small">Pick any vulnerability, probability or climate quantity, a climate model, an emissions path and a horizon, and see it coloured across the whole country, with today's forest cover and marz borders.</p><a class="btn" href="#/map">Open the map</a></div>
+      <div class="card"><h3>Map</h3><p class="small">Pick any vulnerability, probability or climate quantity, a climate model, an emissions path and a horizon, and see it coloured across the whole country, with today's forest cover and marz borders.</p><a class="btn secondary" href="#/map">Open the map</a></div>
       <div class="card"><h3>Treeline</h3><p class="small">How far uphill the climatic treeline moves in each of 45 climate-model × scenario × horizon members.</p><a class="btn secondary" href="#/treeline">See treeline change</a></div>
       <div class="card"><h3>Decision</h3><p class="small">A budget-constrained, scenario-robust planting portfolio and its efficient frontier.</p><a class="btn secondary" href="#/decision">See the portfolio</a></div>
     </div></div>`;
   view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => { sessionStorageSafe("jump", a.dataset.jump); }));
+  initHeroVideo();
 }
 function sessionStorageSafe(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* ignore */ } }
+
+/* Hero video: muted, looping, never the only way to see the name (the heading says it). Autoplay is skipped when the
+   visitor asks for reduced motion or Save-Data; the visitor can always pause or play; it also pauses off-screen. */
+function initHeroVideo() {
+  const v = $("#hero-video"), btn = $("#hero-toggle");
+  if (!v || !btn) return;
+  const mq = matchMedia("(prefers-reduced-motion: reduce)"), conn = navigator.connection || {};
+  const PLAY = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>';
+  const PAUSE = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><rect x="6" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.2" fill="currentColor"/></svg>';
+  let wantPlay = !(mq.matches || conn.saveData), visible = true;
+  const label = (playing) => { const t = playing ? "Pause the logo animation" : "Play the logo animation"; btn.innerHTML = playing ? PAUSE : PLAY; btn.setAttribute("aria-label", t); btn.title = t; };
+  // a rejected play() (hidden tab, iOS low-power mode) only shows the play button; the wish to play is kept and retried
+  const sync = () => { if (wantPlay && visible && document.visibilityState !== "hidden") v.play().catch(() => label(false)); else v.pause(); };
+  v.muted = v.defaultMuted = true;
+  v.addEventListener("play", () => label(true));
+  v.addEventListener("pause", () => label(false));
+  const src = v.querySelector("source");
+  if (src) src.addEventListener("error", () => { btn.hidden = true; });          // file missing: the poster image stays
+  btn.addEventListener("click", () => { wantPlay = v.paused; sync(); });
+  const onMotion = () => { if (mq.matches) { wantPlay = false; sync(); } };
+  mq.addEventListener("change", onMotion);
+  const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.25 });
+  io.observe(v);
+  const onVis = () => sync();
+  document.addEventListener("visibilitychange", onVis);
+  label(false);
+  sync();
+  state.heroCleanup = () => { io.disconnect(); document.removeEventListener("visibilitychange", onVis); mq.removeEventListener("change", onMotion); v.pause(); };
+}
 
 /* ---- Treeline ---- */
 function renderTreeline() {

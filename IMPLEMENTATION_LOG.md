@@ -1829,3 +1829,21 @@ User feedback: the sample points must be removed from everywhere, and most maps 
   elevation-adjusted variant (each neighbour moved to the target's elevation with an OLS slope); it is used for a quantity only
   if its leave-one-out R^2 beats plain IDW by >= 0.02, the choice is fixed per quantity from its 2019 field so a baseline and its
   scenarios never differ by method, and both scores are shown on the map. Cross-checked against numpy in `tests/test_ui_interp.py`.
+
+## 2026-10-05 -- hero video on the homepage; the project name is exactly one string
+
+* **Name rule (user):** the project is "ANTAR — Assessment of Niche, Treeline & Analogue Refugia" everywhere, no other invented
+  name. The browser title, the meta description, the hero heading, the README title and the package description now use it;
+  the earlier "Armenia refugia explorer" (title) and "Armenia reforestation refugia" (hero heading) are gone.
+  `tests/test_ui_name.py` pins the title and the hero heading to the exact string and fails if another name appears in the UI.
+* **Hero video:** the supplied animation (`ui/assets/hero.mp4`, 10 s, 1280x720, H.264, 2.5 MB, moov atom first so it streams) is a
+  logo reveal on a white background: birds and leaves cross the wordmark, the camera pushes into the "A" to show a forest valley
+  inside it, a light flare sweeps through, and it returns to the wordmark, so it loops cleanly. It sits on a white stage
+  (`--stage`, the footage's own background, in both themes) with the full-name heading, the description and one primary action
+  below it. Poster frame `ui/assets/hero-poster.jpg` (62 kB) shows before playback and is the fallback.
+  Behaviour: muted, looping, `playsinline`; not autoplayed under `prefers-reduced-motion` or Save-Data; a 44 px play/pause
+  button (WCAG 2.2.2); pauses when scrolled out of view or the tab is hidden; a rejected `play()` is retried rather than abandoned;
+  the video is `aria-hidden` because the heading carries the name. The clip has an unused AAC audio track (about 30 kB);
+  there is no ffmpeg here to strip it, and it is muted.
+* Phones: the sticky nav wrapped into five rows and covered about a third of the screen; it is now one horizontally scrolling row.
+* Dev note: `python -m http.server` does not answer HTTP range requests, which Safari requires for video; GitHub Pages does.
