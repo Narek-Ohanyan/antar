@@ -1,5 +1,6 @@
-run_date: '2026-10-01'
+run_date: '2026-10-05'
 year: 2019
+grid: validation_80pt_stride40
 v_star: 0.6
 rho: 0.8
 lam: 0.5
@@ -24,6 +25,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1199261495486302
     - lat: 41.39583333333333
       lon: 43.7375
       elevation_m: 2125.0
@@ -32,6 +37,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08362847448884835
     - lat: 41.39583333333333
       lon: 44.07083333333333
       elevation_m: 1449.0
@@ -40,6 +49,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08278585083288406
     - lat: 41.39583333333333
       lon: 44.40416666666667
       elevation_m: 736.0
@@ -48,6 +61,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08943563542257653
     - lat: 41.39583333333333
       lon: 44.7375
       elevation_m: 456.0
@@ -56,6 +73,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.21481411657697058
     - lat: 41.39583333333333
       lon: 45.07083333333333
       elevation_m: 288.0
@@ -64,6 +85,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 36.42395849568374
+      wsi: 19.23099427093746
+      psi_min_mpa: -0.5878280187161635
     - lat: 41.39583333333333
       lon: 45.40416666666667
       elevation_m: 484.0
@@ -72,6 +97,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 6.257473064427523
+      wsi: 3.1715440333211524
+      psi_min_mpa: -0.3792006267407267
     - lat: 41.39583333333333
       lon: 45.737500000000004
       elevation_m: 370.0
@@ -80,6 +109,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.24612794419292985
     - lat: 41.39583333333333
       lon: 46.07083333333333
       elevation_m: 641.0
@@ -88,6 +121,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1303808469221516
     - lat: 41.39583333333333
       lon: 46.40416666666667
       elevation_m: 633.0
@@ -96,6 +133,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09186525332673275
     - lat: 41.0625
       lon: 43.40416666666667
       elevation_m: 2786.0
@@ -104,6 +145,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09708029030132649
     - lat: 41.0625
       lon: 43.7375
       elevation_m: 2004.0
@@ -112,6 +157,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.17042859864952484
     - lat: 41.0625
       lon: 44.07083333333333
       elevation_m: 2228.0
@@ -120,6 +169,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.10958505755878091
     - lat: 41.0625
       lon: 44.40416666666667
       elevation_m: 1555.0
@@ -128,6 +181,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.12033033873646842
     - lat: 41.0625
       lon: 44.7375
       elevation_m: 1593.0
@@ -136,6 +193,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.12677279440990918
     - lat: 41.0625
       lon: 45.07083333333333
       elevation_m: 841.0
@@ -144,6 +205,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.2109114738894946
     - lat: 41.0625
       lon: 45.40416666666667
       elevation_m: 578.0
@@ -152,6 +217,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 10.059714489208186
+      wsi: 5.104375879407366
+      psi_min_mpa: -0.38964358641427693
     - lat: 41.0625
       lon: 45.737500000000004
       elevation_m: 263.0
@@ -160,6 +229,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 34.30094218019653
+      wsi: 16.765180281556564
+      psi_min_mpa: -0.5418409022162394
     - lat: 41.0625
       lon: 46.07083333333333
       elevation_m: 309.0
@@ -168,6 +241,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 9.413693016611585
+      wsi: 4.479456448730667
+      psi_min_mpa: -0.3833009905518529
     - lat: 41.0625
       lon: 46.40416666666667
       elevation_m: 135.0
@@ -176,6 +253,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 7.876656413509637
+      wsi: 3.6793549981574443
+      psi_min_mpa: -0.38089220088574005
     - lat: 40.729166666666664
       lon: 43.40416666666667
       elevation_m: 1663.0
@@ -184,6 +265,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 22.86699707733162
+      wsi: 12.904416383922454
+      psi_min_mpa: -0.48343577914273467
     - lat: 40.729166666666664
       lon: 43.7375
       elevation_m: 1484.0
@@ -192,6 +277,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 36.36510356089213
+      wsi: 19.516812275570135
+      psi_min_mpa: -0.5317887359632693
     - lat: 40.729166666666664
       lon: 44.07083333333333
       elevation_m: 2128.0
@@ -200,6 +289,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.16273614290073327
     - lat: 40.729166666666664
       lon: 44.40416666666667
       elevation_m: 2250.0
@@ -208,6 +301,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.13225343196363173
     - lat: 40.729166666666664
       lon: 44.7375
       elevation_m: 1974.0
@@ -216,6 +313,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1505473070802275
     - lat: 40.729166666666664
       lon: 45.07083333333333
       elevation_m: 1208.0
@@ -224,6 +325,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 16.278562596391556
+      wsi: 8.255587977219612
+      psi_min_mpa: -0.4661872342360274
     - lat: 40.729166666666664
       lon: 45.40416666666667
       elevation_m: 1911.0
@@ -232,6 +337,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.14637900487211028
     - lat: 40.729166666666664
       lon: 45.737500000000004
       elevation_m: 1681.0
@@ -240,6 +349,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.13436229664475383
     - lat: 40.729166666666664
       lon: 46.07083333333333
       elevation_m: 611.0
@@ -248,6 +361,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 20.698617455747364
+      wsi: 10.583762370490563
+      psi_min_mpa: -0.4745708636548344
     - lat: 40.729166666666664
       lon: 46.40416666666667
       elevation_m: 300.0
@@ -256,6 +373,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 75.2665083840364
+      wsi: 35.0971051348958
+      psi_min_mpa: -0.687858180132211
     - lat: 40.39583333333333
       lon: 43.40416666666667
       elevation_m: 1804.0
@@ -264,6 +385,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 14.3021100636329
+      wsi: 8.122843652198634
+      psi_min_mpa: -0.4089501909378118
     - lat: 40.39583333333333
       lon: 43.7375
       elevation_m: 1480.0
@@ -272,6 +397,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 44.40041589285432
+      wsi: 23.081798609830916
+      psi_min_mpa: -0.5582870766822333
     - lat: 40.39583333333333
       lon: 44.07083333333333
       elevation_m: 2240.0
@@ -280,6 +409,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 7.187713788074697
+      wsi: 4.647969693339606
+      psi_min_mpa: -0.39152586975774495
     - lat: 40.39583333333333
       lon: 44.40416666666667
       elevation_m: 1681.0
@@ -288,6 +421,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.20187422197156255
     - lat: 40.39583333333333
       lon: 44.7375
       elevation_m: 1950.0
@@ -296,6 +433,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1329119051275516
     - lat: 40.39583333333333
       lon: 45.07083333333333
       elevation_m: 2106.0
@@ -304,6 +445,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.17104284689107974
     - lat: 40.39583333333333
       lon: 45.737500000000004
       elevation_m: 2247.0
@@ -312,6 +457,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19254341024565297
     - lat: 40.39583333333333
       lon: 46.07083333333333
       elevation_m: 2080.0
@@ -320,6 +469,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.14373727756361113
     - lat: 40.39583333333333
       lon: 46.40416666666667
       elevation_m: 1803.0
@@ -328,6 +481,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09830228925212879
     - lat: 40.0625
       lon: 43.40416666666667
       elevation_m: 2072.0
@@ -336,6 +493,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 8.017565946326503
+      wsi: 4.694725380488968
+      psi_min_mpa: -0.37239412907384056
     - lat: 40.0625
       lon: 43.7375
       elevation_m: 998.0
@@ -344,6 +505,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 73.67670207211704
+      wsi: 34.79773883785252
+      psi_min_mpa: -0.6432906176190218
     - lat: 40.0625
       lon: 44.07083333333333
       elevation_m: 858.0
@@ -352,6 +517,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 77.69104487301236
+      wsi: 36.7148225298575
+      psi_min_mpa: -0.6316604235489776
     - lat: 40.0625
       lon: 44.7375
       elevation_m: 1449.0
@@ -360,6 +529,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19093848033792957
     - lat: 40.0625
       lon: 45.07083333333333
       elevation_m: 2665.0
@@ -368,6 +541,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.16396118437102566
     - lat: 40.0625
       lon: 45.40416666666667
       elevation_m: 2569.0
@@ -376,6 +553,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.15888903880667735
     - lat: 40.0625
       lon: 45.737500000000004
       elevation_m: 2696.0
@@ -384,6 +565,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.029584205481151038
+      wsi: 0.033255916947599884
+      psi_min_mpa: -0.2502128281065446
     - lat: 40.0625
       lon: 46.07083333333333
       elevation_m: 2554.0
@@ -392,6 +577,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08990511065239755
     - lat: 40.0625
       lon: 46.40416666666667
       elevation_m: 1814.0
@@ -400,6 +589,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.06574594462362429
     - lat: 39.729166666666664
       lon: 43.40416666666667
       elevation_m: 2316.0
@@ -408,6 +601,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.18025594294313596
     - lat: 39.729166666666664
       lon: 43.7375
       elevation_m: 1919.0
@@ -416,6 +613,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 4.154908648196935
+      wsi: 2.2888004694596056
+      psi_min_mpa: -0.3357013628757874
     - lat: 39.729166666666664
       lon: 44.07083333333333
       elevation_m: 2305.0
@@ -424,6 +625,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 63.48355500554037
+      wsi: 34.14924474635908
+      psi_min_mpa: -0.6961066539682761
     - lat: 39.729166666666664
       lon: 44.40416666666667
       elevation_m: 2152.0
@@ -432,6 +637,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 40.39250126212493
+      wsi: 21.907081805980074
+      psi_min_mpa: -0.6283556249089042
     - lat: 39.729166666666664
       lon: 44.7375
       elevation_m: 800.0
@@ -440,6 +649,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 52.752952674329286
+      wsi: 23.28971066388639
+      psi_min_mpa: -0.5465460235712425
     - lat: 39.729166666666664
       lon: 45.07083333333333
       elevation_m: 1616.0
@@ -448,6 +661,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 74.79056644604583
+      wsi: 35.151861116721975
+      psi_min_mpa: -0.5786060117110736
     - lat: 39.729166666666664
       lon: 45.40416666666667
       elevation_m: 1179.0
@@ -456,6 +673,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 113.31003466488318
+      wsi: 50.90086564898625
+      psi_min_mpa: -0.7433576720577745
     - lat: 39.729166666666664
       lon: 45.737500000000004
       elevation_m: 2448.0
@@ -464,6 +685,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 5.6536829004030995
+      wsi: 3.7041285182637167
+      psi_min_mpa: -0.37107249662452724
     - lat: 39.729166666666664
       lon: 46.07083333333333
       elevation_m: 3189.0
@@ -472,6 +697,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09081483617755966
     - lat: 39.729166666666664
       lon: 46.40416666666667
       elevation_m: 1442.0
@@ -480,6 +709,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.16201242316895423
     - lat: 39.39583333333333
       lon: 43.40416666666667
       elevation_m: 2708.0
@@ -488,6 +721,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 5.341100060281524
+      wsi: 3.743132106318463
+      psi_min_mpa: -0.3680649607127852
     - lat: 39.39583333333333
       lon: 43.7375
       elevation_m: 2678.0
@@ -496,6 +733,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 14.750815764673575
+      wsi: 9.873244652067388
+      psi_min_mpa: -0.4567756092960792
     - lat: 39.39583333333333
       lon: 44.07083333333333
       elevation_m: 2208.0
@@ -504,6 +745,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 106.97863251868415
+      wsi: 51.8158015586321
+      psi_min_mpa: -0.7469713559051248
     - lat: 39.39583333333333
       lon: 44.40416666666667
       elevation_m: 1403.0
@@ -512,6 +757,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 136.57214419439077
+      wsi: 62.532445365832075
+      psi_min_mpa: -0.7579110734075071
     - lat: 39.39583333333333
       lon: 44.7375
       elevation_m: 1704.0
@@ -520,6 +769,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 109.92256843285983
+      wsi: 50.66178639412052
+      psi_min_mpa: -0.711996395362743
     - lat: 39.39583333333333
       lon: 45.07083333333333
       elevation_m: 846.0
@@ -528,6 +781,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 135.42947716545174
+      wsi: 61.19568127872472
+      psi_min_mpa: -0.7958364421797705
     - lat: 39.39583333333333
       lon: 45.40416666666667
       elevation_m: 1188.0
@@ -536,6 +793,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 91.50251716677585
+      wsi: 38.67276943724219
+      psi_min_mpa: -0.6813806745057739
     - lat: 39.39583333333333
       lon: 45.737500000000004
       elevation_m: 2346.0
@@ -544,6 +805,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 29.280429493138378
+      wsi: 15.945820668704068
+      psi_min_mpa: -0.5367187694460105
     - lat: 39.39583333333333
       lon: 46.07083333333333
       elevation_m: 2671.0
@@ -552,6 +817,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.6334773842978167
+      wsi: 0.43696687402163875
+      psi_min_mpa: -0.28828246467240515
     - lat: 39.39583333333333
       lon: 46.40416666666667
       elevation_m: 1499.0
@@ -560,6 +829,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 24.658947721145257
+      wsi: 12.524365833091542
+      psi_min_mpa: -0.4862997718029971
     - lat: 39.0625
       lon: 43.40416666666667
       elevation_m: 1845.0
@@ -568,6 +841,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 36.09974067333747
+      wsi: 15.339369411712497
+      psi_min_mpa: -0.49075766606402044
     - lat: 39.0625
       lon: 43.7375
       elevation_m: 1996.0
@@ -576,6 +853,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 54.39990937156531
+      wsi: 24.33551106247874
+      psi_min_mpa: -0.5168135726819272
     - lat: 39.0625
       lon: 44.07083333333333
       elevation_m: 2237.0
@@ -584,6 +865,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 70.5635011825205
+      wsi: 34.487211272473395
+      psi_min_mpa: -0.6201081781201147
     - lat: 39.0625
       lon: 44.40416666666667
       elevation_m: 1877.0
@@ -592,6 +877,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 152.42204940357314
+      wsi: 69.01326700441469
+      psi_min_mpa: -0.8445014148929646
     - lat: 39.0625
       lon: 44.7375
       elevation_m: 2604.0
@@ -600,6 +889,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 56.965925144197385
+      wsi: 31.769595375281256
+      psi_min_mpa: -0.6931103023184526
     - lat: 39.0625
       lon: 45.07083333333333
       elevation_m: 1025.0
@@ -608,6 +901,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 150.5153968140585
+      wsi: 66.46935999094944
+      psi_min_mpa: -0.827503192354385
     - lat: 39.0625
       lon: 45.40416666666667
       elevation_m: 877.0
@@ -616,6 +913,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 176.93355541055465
+      wsi: 77.78925126399002
+      psi_min_mpa: -0.8940422705658984
     - lat: 39.0625
       lon: 45.737500000000004
       elevation_m: 977.0
@@ -624,6 +925,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 115.06916707025803
+      wsi: 48.00209226718224
+      psi_min_mpa: -0.789331690737265
     - lat: 39.0625
       lon: 46.07083333333333
       elevation_m: 3630.0
@@ -632,6 +937,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.18013939499974618
     - lat: 39.0625
       lon: 46.40416666666667
       elevation_m: 1384.0
@@ -640,6 +949,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 52.49226629985456
+      wsi: 24.845424419681155
+      psi_min_mpa: -0.5735607757530319
   ring_porous_oak:
     status: ok
     example_taxa: Quercus macranthera; Q. iberica
@@ -656,6 +969,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1199261495486302
     - lat: 41.39583333333333
       lon: 43.7375
       elevation_m: 2125.0
@@ -664,6 +981,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08362847448884835
     - lat: 41.39583333333333
       lon: 44.07083333333333
       elevation_m: 1449.0
@@ -672,6 +993,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08278585083288406
     - lat: 41.39583333333333
       lon: 44.40416666666667
       elevation_m: 736.0
@@ -680,6 +1005,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08943563542257653
     - lat: 41.39583333333333
       lon: 44.7375
       elevation_m: 456.0
@@ -688,6 +1017,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.21481411657697058
     - lat: 41.39583333333333
       lon: 45.07083333333333
       elevation_m: 288.0
@@ -696,6 +1029,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.9975
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 36.42395849568374
+      wsi: 19.23099427093746
+      psi_min_mpa: -0.5878280187161635
     - lat: 41.39583333333333
       lon: 45.40416666666667
       elevation_m: 484.0
@@ -704,6 +1041,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 6.257473064427523
+      wsi: 3.1715440333211524
+      psi_min_mpa: -0.3792006267407267
     - lat: 41.39583333333333
       lon: 45.737500000000004
       elevation_m: 370.0
@@ -712,6 +1053,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.24612794419292985
     - lat: 41.39583333333333
       lon: 46.07083333333333
       elevation_m: 641.0
@@ -720,6 +1065,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1303808469221516
     - lat: 41.39583333333333
       lon: 46.40416666666667
       elevation_m: 633.0
@@ -728,6 +1077,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09186525332673275
     - lat: 41.0625
       lon: 43.40416666666667
       elevation_m: 2786.0
@@ -736,6 +1089,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09708029030132649
     - lat: 41.0625
       lon: 43.7375
       elevation_m: 2004.0
@@ -744,6 +1101,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.17042859864952484
     - lat: 41.0625
       lon: 44.07083333333333
       elevation_m: 2228.0
@@ -752,6 +1113,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.10958505755878091
     - lat: 41.0625
       lon: 44.40416666666667
       elevation_m: 1555.0
@@ -760,6 +1125,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.12033033873646842
     - lat: 41.0625
       lon: 44.7375
       elevation_m: 1593.0
@@ -768,6 +1137,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.12677279440990918
     - lat: 41.0625
       lon: 45.07083333333333
       elevation_m: 841.0
@@ -776,6 +1149,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.2109114738894946
     - lat: 41.0625
       lon: 45.40416666666667
       elevation_m: 578.0
@@ -784,6 +1161,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 10.059714489208186
+      wsi: 5.104375879407366
+      psi_min_mpa: -0.38964358641427693
     - lat: 41.0625
       lon: 45.737500000000004
       elevation_m: 263.0
@@ -792,6 +1173,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 34.30094218019653
+      wsi: 16.765180281556564
+      psi_min_mpa: -0.5418409022162394
     - lat: 41.0625
       lon: 46.07083333333333
       elevation_m: 309.0
@@ -800,6 +1185,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 9.413693016611585
+      wsi: 4.479456448730667
+      psi_min_mpa: -0.3833009905518529
     - lat: 41.0625
       lon: 46.40416666666667
       elevation_m: 135.0
@@ -808,6 +1197,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.995
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 7.876656413509637
+      wsi: 3.6793549981574443
+      psi_min_mpa: -0.38089220088574005
     - lat: 40.729166666666664
       lon: 43.40416666666667
       elevation_m: 1663.0
@@ -816,6 +1209,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 22.86699707733162
+      wsi: 12.904416383922454
+      psi_min_mpa: -0.48343577914273467
     - lat: 40.729166666666664
       lon: 43.7375
       elevation_m: 1484.0
@@ -824,6 +1221,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 36.36510356089213
+      wsi: 19.516812275570135
+      psi_min_mpa: -0.5317887359632693
     - lat: 40.729166666666664
       lon: 44.07083333333333
       elevation_m: 2128.0
@@ -832,6 +1233,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.16273614290073327
     - lat: 40.729166666666664
       lon: 44.40416666666667
       elevation_m: 2250.0
@@ -840,6 +1245,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.13225343196363173
     - lat: 40.729166666666664
       lon: 44.7375
       elevation_m: 1974.0
@@ -848,6 +1257,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1505473070802275
     - lat: 40.729166666666664
       lon: 45.07083333333333
       elevation_m: 1208.0
@@ -856,6 +1269,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 16.278562596391556
+      wsi: 8.255587977219612
+      psi_min_mpa: -0.4661872342360274
     - lat: 40.729166666666664
       lon: 45.40416666666667
       elevation_m: 1911.0
@@ -864,6 +1281,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.14637900487211028
     - lat: 40.729166666666664
       lon: 45.737500000000004
       elevation_m: 1681.0
@@ -872,6 +1293,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.94
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.13436229664475383
     - lat: 40.729166666666664
       lon: 46.07083333333333
       elevation_m: 611.0
@@ -880,6 +1305,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 20.698617455747364
+      wsi: 10.583762370490563
+      psi_min_mpa: -0.4745708636548344
     - lat: 40.729166666666664
       lon: 46.40416666666667
       elevation_m: 300.0
@@ -888,6 +1317,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.92
+      cwd_mm: 75.2665083840364
+      wsi: 35.0971051348958
+      psi_min_mpa: -0.687858180132211
     - lat: 40.39583333333333
       lon: 43.40416666666667
       elevation_m: 1804.0
@@ -896,6 +1329,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 14.3021100636329
+      wsi: 8.122843652198634
+      psi_min_mpa: -0.4089501909378118
     - lat: 40.39583333333333
       lon: 43.7375
       elevation_m: 1480.0
@@ -904,6 +1341,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 44.40041589285432
+      wsi: 23.081798609830916
+      psi_min_mpa: -0.5582870766822333
     - lat: 40.39583333333333
       lon: 44.07083333333333
       elevation_m: 2240.0
@@ -912,6 +1353,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 7.187713788074697
+      wsi: 4.647969693339606
+      psi_min_mpa: -0.39152586975774495
     - lat: 40.39583333333333
       lon: 44.40416666666667
       elevation_m: 1681.0
@@ -920,6 +1365,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.20187422197156255
     - lat: 40.39583333333333
       lon: 44.7375
       elevation_m: 1950.0
@@ -928,6 +1377,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1329119051275516
     - lat: 40.39583333333333
       lon: 45.07083333333333
       elevation_m: 2106.0
@@ -936,6 +1389,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.17104284689107974
     - lat: 40.39583333333333
       lon: 45.737500000000004
       elevation_m: 2247.0
@@ -944,6 +1401,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19254341024565297
     - lat: 40.39583333333333
       lon: 46.07083333333333
       elevation_m: 2080.0
@@ -952,6 +1413,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.94
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.14373727756361113
     - lat: 40.39583333333333
       lon: 46.40416666666667
       elevation_m: 1803.0
@@ -960,6 +1425,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09830228925212879
     - lat: 40.0625
       lon: 43.40416666666667
       elevation_m: 2072.0
@@ -968,6 +1437,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 8.017565946326503
+      wsi: 4.694725380488968
+      psi_min_mpa: -0.37239412907384056
     - lat: 40.0625
       lon: 43.7375
       elevation_m: 998.0
@@ -976,6 +1449,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 73.67670207211704
+      wsi: 34.79773883785252
+      psi_min_mpa: -0.6432906176190218
     - lat: 40.0625
       lon: 44.07083333333333
       elevation_m: 858.0
@@ -984,6 +1461,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 77.69104487301236
+      wsi: 36.7148225298575
+      psi_min_mpa: -0.6316604235489776
     - lat: 40.0625
       lon: 44.7375
       elevation_m: 1449.0
@@ -992,6 +1473,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.9975
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19093848033792957
     - lat: 40.0625
       lon: 45.07083333333333
       elevation_m: 2665.0
@@ -1000,6 +1485,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.92
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.16396118437102566
     - lat: 40.0625
       lon: 45.40416666666667
       elevation_m: 2569.0
@@ -1008,6 +1497,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.15888903880667735
     - lat: 40.0625
       lon: 45.737500000000004
       elevation_m: 2696.0
@@ -1016,6 +1509,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.9975
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.029584205481151038
+      wsi: 0.033255916947599884
+      psi_min_mpa: -0.2502128281065446
     - lat: 40.0625
       lon: 46.07083333333333
       elevation_m: 2554.0
@@ -1024,6 +1521,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.9981249999999999
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08990511065239755
     - lat: 40.0625
       lon: 46.40416666666667
       elevation_m: 1814.0
@@ -1032,6 +1533,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.06574594462362429
     - lat: 39.729166666666664
       lon: 43.40416666666667
       elevation_m: 2316.0
@@ -1040,6 +1545,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.18025594294313596
     - lat: 39.729166666666664
       lon: 43.7375
       elevation_m: 1919.0
@@ -1048,6 +1557,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 4.154908648196935
+      wsi: 2.2888004694596056
+      psi_min_mpa: -0.3357013628757874
     - lat: 39.729166666666664
       lon: 44.07083333333333
       elevation_m: 2305.0
@@ -1056,6 +1569,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.99625
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 63.48355500554037
+      wsi: 34.14924474635908
+      psi_min_mpa: -0.6961066539682761
     - lat: 39.729166666666664
       lon: 44.40416666666667
       elevation_m: 2152.0
@@ -1064,6 +1581,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 40.39250126212493
+      wsi: 21.907081805980074
+      psi_min_mpa: -0.6283556249089042
     - lat: 39.729166666666664
       lon: 44.7375
       elevation_m: 800.0
@@ -1072,6 +1593,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.9981249999999999
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 52.752952674329286
+      wsi: 23.28971066388639
+      psi_min_mpa: -0.5465460235712425
     - lat: 39.729166666666664
       lon: 45.07083333333333
       elevation_m: 1616.0
@@ -1080,6 +1605,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.995625
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 74.79056644604583
+      wsi: 35.151861116721975
+      psi_min_mpa: -0.5786060117110736
     - lat: 39.729166666666664
       lon: 45.40416666666667
       elevation_m: 1179.0
@@ -1088,6 +1617,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.995
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 113.31003466488318
+      wsi: 50.90086564898625
+      psi_min_mpa: -0.7433576720577745
     - lat: 39.729166666666664
       lon: 45.737500000000004
       elevation_m: 2448.0
@@ -1096,6 +1629,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 5.6536829004030995
+      wsi: 3.7041285182637167
+      psi_min_mpa: -0.37107249662452724
     - lat: 39.729166666666664
       lon: 46.07083333333333
       elevation_m: 3189.0
@@ -1104,6 +1641,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09081483617755966
     - lat: 39.729166666666664
       lon: 46.40416666666667
       elevation_m: 1442.0
@@ -1112,6 +1653,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.16201242316895423
     - lat: 39.39583333333333
       lon: 43.40416666666667
       elevation_m: 2708.0
@@ -1120,6 +1665,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 5.341100060281524
+      wsi: 3.743132106318463
+      psi_min_mpa: -0.3680649607127852
     - lat: 39.39583333333333
       lon: 43.7375
       elevation_m: 2678.0
@@ -1128,6 +1677,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 14.750815764673575
+      wsi: 9.873244652067388
+      psi_min_mpa: -0.4567756092960792
     - lat: 39.39583333333333
       lon: 44.07083333333333
       elevation_m: 2208.0
@@ -1136,6 +1689,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.9981249999999999
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 106.97863251868415
+      wsi: 51.8158015586321
+      psi_min_mpa: -0.7469713559051248
     - lat: 39.39583333333333
       lon: 44.40416666666667
       elevation_m: 1403.0
@@ -1144,6 +1701,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.995625
       robust_refugium_criterion_a: true
+      p_viable: 0.92
+      cwd_mm: 136.57214419439077
+      wsi: 62.532445365832075
+      psi_min_mpa: -0.7579110734075071
     - lat: 39.39583333333333
       lon: 44.7375
       elevation_m: 1704.0
@@ -1152,6 +1713,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.995
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 109.92256843285983
+      wsi: 50.66178639412052
+      psi_min_mpa: -0.711996395362743
     - lat: 39.39583333333333
       lon: 45.07083333333333
       elevation_m: 846.0
@@ -1160,6 +1725,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 135.42947716545174
+      wsi: 61.19568127872472
+      psi_min_mpa: -0.7958364421797705
     - lat: 39.39583333333333
       lon: 45.40416666666667
       elevation_m: 1188.0
@@ -1168,6 +1737,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 91.50251716677585
+      wsi: 38.67276943724219
+      psi_min_mpa: -0.6813806745057739
     - lat: 39.39583333333333
       lon: 45.737500000000004
       elevation_m: 2346.0
@@ -1176,6 +1749,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 29.280429493138378
+      wsi: 15.945820668704068
+      psi_min_mpa: -0.5367187694460105
     - lat: 39.39583333333333
       lon: 46.07083333333333
       elevation_m: 2671.0
@@ -1184,6 +1761,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.6334773842978167
+      wsi: 0.43696687402163875
+      psi_min_mpa: -0.28828246467240515
     - lat: 39.39583333333333
       lon: 46.40416666666667
       elevation_m: 1499.0
@@ -1192,6 +1773,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 24.658947721145257
+      wsi: 12.524365833091542
+      psi_min_mpa: -0.4862997718029971
     - lat: 39.0625
       lon: 43.40416666666667
       elevation_m: 1845.0
@@ -1200,6 +1785,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 36.09974067333747
+      wsi: 15.339369411712497
+      psi_min_mpa: -0.49075766606402044
     - lat: 39.0625
       lon: 43.7375
       elevation_m: 1996.0
@@ -1208,6 +1797,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 54.39990937156531
+      wsi: 24.33551106247874
+      psi_min_mpa: -0.5168135726819272
     - lat: 39.0625
       lon: 44.07083333333333
       elevation_m: 2237.0
@@ -1216,6 +1809,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.9975
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 70.5635011825205
+      wsi: 34.487211272473395
+      psi_min_mpa: -0.6201081781201147
     - lat: 39.0625
       lon: 44.40416666666667
       elevation_m: 1877.0
@@ -1224,6 +1821,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 152.42204940357314
+      wsi: 69.01326700441469
+      psi_min_mpa: -0.8445014148929646
     - lat: 39.0625
       lon: 44.7375
       elevation_m: 2604.0
@@ -1232,6 +1833,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 56.965925144197385
+      wsi: 31.769595375281256
+      psi_min_mpa: -0.6931103023184526
     - lat: 39.0625
       lon: 45.07083333333333
       elevation_m: 1025.0
@@ -1240,6 +1845,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.99375
       robust_refugium_criterion_a: true
+      p_viable: 0.92
+      cwd_mm: 150.5153968140585
+      wsi: 66.46935999094944
+      psi_min_mpa: -0.827503192354385
     - lat: 39.0625
       lon: 45.40416666666667
       elevation_m: 877.0
@@ -1248,6 +1857,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 176.93355541055465
+      wsi: 77.78925126399002
+      psi_min_mpa: -0.8940422705658984
     - lat: 39.0625
       lon: 45.737500000000004
       elevation_m: 977.0
@@ -1256,6 +1869,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 0.9975
       robust_refugium_criterion_a: true
+      p_viable: 0.96
+      cwd_mm: 115.06916707025803
+      wsi: 48.00209226718224
+      psi_min_mpa: -0.789331690737265
     - lat: 39.0625
       lon: 46.07083333333333
       elevation_m: 3630.0
@@ -1264,6 +1881,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.18013939499974618
     - lat: 39.0625
       lon: 46.40416666666667
       elevation_m: 1384.0
@@ -1272,6 +1893,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 0.98
+      cwd_mm: 52.49226629985456
+      wsi: 24.845424419681155
+      psi_min_mpa: -0.5735607757530319
   pine:
     status: ok
     example_taxa: Pinus kochiana
@@ -1288,6 +1913,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08395626496480324
     - lat: 41.39583333333333
       lon: 43.7375
       elevation_m: 2125.0
@@ -1296,6 +1925,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.06505557901868846
     - lat: 41.39583333333333
       lon: 44.07083333333333
       elevation_m: 1449.0
@@ -1304,6 +1937,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.06454780753858484
     - lat: 41.39583333333333
       lon: 44.40416666666667
       elevation_m: 736.0
@@ -1312,6 +1949,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.06827707236159213
     - lat: 41.39583333333333
       lon: 44.7375
       elevation_m: 456.0
@@ -1320,6 +1961,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.12671187757170888
     - lat: 41.39583333333333
       lon: 45.07083333333333
       elevation_m: 288.0
@@ -1328,6 +1973,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 2.3911123623124846
+      wsi: 1.2411150259398054
+      psi_min_mpa: -0.32177799056780443
     - lat: 41.39583333333333
       lon: 45.40416666666667
       elevation_m: 484.0
@@ -1336,6 +1985,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19517915529705285
     - lat: 41.39583333333333
       lon: 45.737500000000004
       elevation_m: 370.0
@@ -1344,6 +1997,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.13939823340624236
     - lat: 41.39583333333333
       lon: 46.07083333333333
       elevation_m: 641.0
@@ -1352,6 +2009,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08932866016421832
     - lat: 41.39583333333333
       lon: 46.40416666666667
       elevation_m: 633.0
@@ -1360,6 +2021,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.06967561918413412
     - lat: 41.0625
       lon: 43.40416666666667
       elevation_m: 2786.0
@@ -1368,6 +2033,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.07239326923952885
     - lat: 41.0625
       lon: 43.7375
       elevation_m: 2004.0
@@ -1376,6 +2045,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.10781231407853456
     - lat: 41.0625
       lon: 44.07083333333333
       elevation_m: 2228.0
@@ -1384,6 +2057,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.07886363074319706
     - lat: 41.0625
       lon: 44.40416666666667
       elevation_m: 1555.0
@@ -1392,6 +2069,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08432221332307253
     - lat: 41.0625
       lon: 44.7375
       elevation_m: 1593.0
@@ -1400,6 +2081,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08755704765933266
     - lat: 41.0625
       lon: 45.07083333333333
       elevation_m: 841.0
@@ -1408,6 +2093,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.12441725278206825
     - lat: 41.0625
       lon: 45.40416666666667
       elevation_m: 578.0
@@ -1416,6 +2105,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.20100482740164885
     - lat: 41.0625
       lon: 45.737500000000004
       elevation_m: 263.0
@@ -1424,6 +2117,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 1.5972563229837096
+      wsi: 0.7634495996000925
+      psi_min_mpa: -0.2963075306862661
     - lat: 41.0625
       lon: 46.07083333333333
       elevation_m: 309.0
@@ -1432,6 +2129,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19653670611030846
     - lat: 41.0625
       lon: 46.40416666666667
       elevation_m: 135.0
@@ -1440,6 +2141,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19509068330935503
     - lat: 40.729166666666664
       lon: 43.40416666666667
       elevation_m: 1663.0
@@ -1448,6 +2153,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0032092995344989994
+      wsi: 0.0022079998993768113
+      psi_min_mpa: -0.2599341553514025
     - lat: 40.729166666666664
       lon: 43.7375
       elevation_m: 1484.0
@@ -1456,6 +2165,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 1.61131297269805
+      wsi: 0.8859379568273269
+      psi_min_mpa: -0.30567478085903876
     - lat: 40.729166666666664
       lon: 44.07083333333333
       elevation_m: 2128.0
@@ -1464,6 +2177,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.10381122965131594
     - lat: 40.729166666666664
       lon: 44.40416666666667
       elevation_m: 2250.0
@@ -1472,6 +2189,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.08981245699278491
     - lat: 40.729166666666664
       lon: 44.7375
       elevation_m: 1974.0
@@ -1480,6 +2201,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09886816394996133
     - lat: 40.729166666666664
       lon: 45.07083333333333
       elevation_m: 1208.0
@@ -1488,6 +2213,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.2461354813317735
     - lat: 40.729166666666664
       lon: 45.40416666666667
       elevation_m: 1911.0
@@ -1496,6 +2225,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09663295805494905
     - lat: 40.729166666666664
       lon: 45.737500000000004
       elevation_m: 1681.0
@@ -1504,6 +2237,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09107621189546307
     - lat: 40.729166666666664
       lon: 46.07083333333333
       elevation_m: 611.0
@@ -1512,6 +2249,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.25131153607009
     - lat: 40.729166666666664
       lon: 46.40416666666667
       elevation_m: 300.0
@@ -1520,6 +2261,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 16.248915161454644
+      wsi: 7.855737720859569
+      psi_min_mpa: -0.4118845063711071
     - lat: 40.39583333333333
       lon: 43.40416666666667
       elevation_m: 1804.0
@@ -1528,6 +2273,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.2165341244325369
     - lat: 40.39583333333333
       lon: 43.7375
       elevation_m: 1480.0
@@ -1536,6 +2285,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 3.9963444752711568
+      wsi: 2.1184121695197007
+      psi_min_mpa: -0.3240225503962825
     - lat: 40.39583333333333
       lon: 44.07083333333333
       elevation_m: 2240.0
@@ -1544,6 +2297,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19935280837417377
     - lat: 40.39583333333333
       lon: 44.40416666666667
       elevation_m: 1681.0
@@ -1552,6 +2309,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.12124810258880524
     - lat: 40.39583333333333
       lon: 44.7375
       elevation_m: 1950.0
@@ -1560,6 +2321,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09077814596215332
     - lat: 40.39583333333333
       lon: 45.07083333333333
       elevation_m: 2106.0
@@ -1568,6 +2333,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.10818230808041583
     - lat: 40.39583333333333
       lon: 45.737500000000004
       elevation_m: 2247.0
@@ -1576,6 +2345,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.11673918810610456
     - lat: 40.39583333333333
       lon: 46.07083333333333
       elevation_m: 2080.0
@@ -1584,6 +2357,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.09491883245392323
     - lat: 40.39583333333333
       lon: 46.40416666666667
       elevation_m: 1803.0
@@ -1592,6 +2369,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.07318734595460331
     - lat: 40.0625
       lon: 43.40416666666667
       elevation_m: 2072.0
@@ -1600,6 +2381,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.19290499753019244
     - lat: 40.0625
       lon: 43.7375
       elevation_m: 998.0
@@ -1608,6 +2393,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 16.700397591186793
+      wsi: 7.997251996750917
+      psi_min_mpa: -0.39598801404147166
     - lat: 40.0625
       lon: 44.07083333333333
       elevation_m: 858.0
@@ -1616,6 +2405,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 18.671711045879306
+      wsi: 8.84317094910386
+      psi_min_mpa: -0.39715667736028876
     - lat: 40.0625
       lon: 44.7375
       elevation_m: 1449.0
@@ -1624,6 +2417,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.11584393367632694
     - lat: 40.0625
       lon: 45.07083333333333
       elevation_m: 2665.0
@@ -1632,6 +2429,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.10449375087745462
     - lat: 40.0625
       lon: 45.40416666666667
       elevation_m: 2569.0
@@ -1640,6 +2441,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1022027892006026
     - lat: 40.0625
       lon: 45.737500000000004
       elevation_m: 2696.0
@@ -1648,6 +2453,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.1389651715397192
     - lat: 40.0625
       lon: 46.07083333333333
       elevation_m: 2554.0
@@ -1656,6 +2465,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.06859467805567769
     - lat: 40.0625
       lon: 46.40416666666667
       elevation_m: 1814.0
@@ -1664,6 +2477,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.05472987678987827
     - lat: 39.729166666666664
       lon: 43.40416666666667
       elevation_m: 2316.0
@@ -1672,6 +2489,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.11107984550425933
     - lat: 39.729166666666664
       lon: 43.7375
       elevation_m: 1919.0
@@ -1680,6 +2501,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.17676777525756024
     - lat: 39.729166666666664
       lon: 44.07083333333333
       elevation_m: 2305.0
@@ -1688,6 +2513,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 12.744742109836574
+      wsi: 7.446640362489264
+      psi_min_mpa: -0.4000716306832337
     - lat: 39.729166666666664
       lon: 44.40416666666667
       elevation_m: 2152.0
@@ -1696,6 +2525,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 4.339982587332951
+      wsi: 2.3880628577300715
+      psi_min_mpa: -0.3470782889620781
     - lat: 39.729166666666664
       lon: 44.7375
       elevation_m: 800.0
@@ -1704,6 +2537,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 5.148770322839702
+      wsi: 2.2673032247915037
+      psi_min_mpa: -0.33271896646773763
     - lat: 39.729166666666664
       lon: 45.07083333333333
       elevation_m: 1616.0
@@ -1712,6 +2549,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 16.60084068102216
+      wsi: 8.143133621367948
+      psi_min_mpa: -0.36328486784789005
     - lat: 39.729166666666664
       lon: 45.40416666666667
       elevation_m: 1179.0
@@ -1720,6 +2561,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 41.61689835007269
+      wsi: 18.613387840687007
+      psi_min_mpa: -0.49775438789188386
     - lat: 39.729166666666664
       lon: 45.737500000000004
       elevation_m: 2448.0
@@ -1728,6 +2573,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.18990282464076388
     - lat: 39.729166666666664
       lon: 46.07083333333333
       elevation_m: 3189.0
@@ -1736,6 +2585,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.0687321713730669
     - lat: 39.729166666666664
       lon: 46.40416666666667
       elevation_m: 1442.0
@@ -1744,6 +2597,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.10425431673329215
     - lat: 39.39583333333333
       lon: 43.40416666666667
       elevation_m: 2708.0
@@ -1752,6 +2609,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.18818465498349404
     - lat: 39.39583333333333
       lon: 43.7375
       elevation_m: 2678.0
@@ -1760,6 +2621,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.23184728202480487
     - lat: 39.39583333333333
       lon: 44.07083333333333
       elevation_m: 2208.0
@@ -1768,6 +2633,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 37.95689986557528
+      wsi: 19.70549405223248
+      psi_min_mpa: -0.5036349514281636
     - lat: 39.39583333333333
       lon: 44.40416666666667
       elevation_m: 1403.0
@@ -1776,6 +2645,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 56.38632430686457
+      wsi: 25.297074354141206
+      psi_min_mpa: -0.534886577228492
     - lat: 39.39583333333333
       lon: 44.7375
       elevation_m: 1704.0
@@ -1784,6 +2657,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 39.49506765848038
+      wsi: 18.87940092152847
+      psi_min_mpa: -0.4706050931029352
     - lat: 39.39583333333333
       lon: 45.07083333333333
       elevation_m: 846.0
@@ -1792,6 +2669,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 55.81203735015393
+      wsi: 23.584438041371353
+      psi_min_mpa: -0.5412741105395986
     - lat: 39.39583333333333
       lon: 45.40416666666667
       elevation_m: 1188.0
@@ -1800,6 +2681,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 26.680709649530208
+      wsi: 11.407112205966964
+      psi_min_mpa: -0.424476076193485
     - lat: 39.39583333333333
       lon: 45.737500000000004
       elevation_m: 2346.0
@@ -1808,6 +2693,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.7909640031953655
+      wsi: 0.4438832325033405
+      psi_min_mpa: -0.2907359204917653
     - lat: 39.39583333333333
       lon: 46.07083333333333
       elevation_m: 2671.0
@@ -1816,6 +2705,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.154864751735337
     - lat: 39.39583333333333
       lon: 46.40416666666667
       elevation_m: 1499.0
@@ -1824,6 +2717,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.006420940676989728
+      wsi: 0.0034291790201471106
+      psi_min_mpa: -0.2693281172384812
     - lat: 39.0625
       lon: 43.40416666666667
       elevation_m: 1845.0
@@ -1832,6 +2729,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.6487002681502414
+      wsi: 0.28994405909701415
+      psi_min_mpa: -0.2771565585080838
     - lat: 39.0625
       lon: 43.7375
       elevation_m: 1996.0
@@ -1840,6 +2741,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 3.076667368067042
+      wsi: 1.4530315243890677
+      psi_min_mpa: -0.296176655259774
     - lat: 39.0625
       lon: 44.07083333333333
       elevation_m: 2237.0
@@ -1848,6 +2753,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 14.230425303917352
+      wsi: 7.714114074390145
+      psi_min_mpa: -0.39507835823864895
     - lat: 39.0625
       lon: 44.40416666666667
       elevation_m: 1877.0
@@ -1856,6 +2765,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 69.0607306360164
+      wsi: 31.885023247045844
+      psi_min_mpa: -0.594443221934917
     - lat: 39.0625
       lon: 44.7375
       elevation_m: 2604.0
@@ -1864,6 +2777,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 11.242351690397612
+      wsi: 6.754117575047794
+      psi_min_mpa: -0.3933958464356418
     - lat: 39.0625
       lon: 45.07083333333333
       elevation_m: 1025.0
@@ -1872,6 +2789,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 67.25378449060284
+      wsi: 28.23863946391058
+      psi_min_mpa: -0.5975525582243864
     - lat: 39.0625
       lon: 45.40416666666667
       elevation_m: 877.0
@@ -1880,6 +2801,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 90.29738282479698
+      wsi: 37.07012677080618
+      psi_min_mpa: -0.6679583411531496
     - lat: 39.0625
       lon: 45.737500000000004
       elevation_m: 977.0
@@ -1888,6 +2813,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 41.382379887019965
+      wsi: 17.222832747116623
+      psi_min_mpa: -0.5254572713100242
     - lat: 39.0625
       lon: 46.07083333333333
       elevation_m: 3630.0
@@ -1896,6 +2825,10 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 0.0
+      wsi: 0.0
+      psi_min_mpa: -0.10944082717644987
     - lat: 39.0625
       lon: 46.40416666666667
       elevation_m: 1384.0
@@ -1904,5 +2837,9 @@ groups:
       viability_ensemble_max: 1.0
       refugium_score: 1.0
       robust_refugium_criterion_a: true
+      p_viable: 1.0
+      cwd_mm: 5.6975390784361215
+      wsi: 2.752668453987473
+      psi_min_mpa: -0.34534873288050155
   juniper_arid_conifer:
     status: skipped_no_real_trait_variance_estimate
