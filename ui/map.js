@@ -163,8 +163,8 @@ function seriesFor(q, sel) {
   if (!q.src) return null;
   const g = state.G[q.src.gid], vals = ensembleStat(q.src.members, q.src.mat, g.n_cells, sel);
   const stops = q.good === "low" ? DIV_BAD_HIGH : q.good === "high" ? DIV_GOOD_HIGH : DIV_SHIFT;
+  if (sel.stat === "spread" && sel.gcm === "ens") return { gid: q.src.gid, values: vals, diverging: false, spread: true, unit: q.unit };
   if (q.scenarioOnly) return { gid: q.src.gid, values: vals, diverging: true, stops, unit: "m" };
-  if (sel.stat === "spread" && sel.gcm === "ens") return { gid: q.src.gid, values: vals, diverging: false, spread: true };
   if (sel.diff) {
     const base = g.layers[q.id];
     if (!base) return { gid: q.src.gid, values: vals, diverging: false, noDiff: true };

@@ -1775,3 +1775,32 @@ scenario summaries) over Armenian cells only.
   exists; map requirement (continuous surface over the whole country, change layer) recorded in ROADMAP.md.
 * The prior-project name still appears in the committed concept paper (`docs/concept_v2/*.tex`, the user's own v2
   specification) and in this log's rename history; left as-is pending the user's decision.
+
+## 2026-10-05 -- real map: whole country coloured, Armenia only, forest cover, marz borders
+
+User requirement: interactive map of Armenia only (no street basemap), current forest cover with everything else in one
+colour, marz borders, and the result colours covering the whole country, not 23 points; projections of every vulnerability and
+probability per scenario.
+
+* `scripts/build_map_assets.py`: reads the 10 m Ecosystem Map in 500 m blocks, reprojects to one Web-Mercator grid (566 x 594 px,
+  650 m), writes region ids, forest (31-37), woodland (39/41/43/44), per-group cover and water PNGs plus smoothed borders.
+  Country area from the raster 29,772 km2 vs official 29,743 km2; forest 3,178 km2 (10.7%), woodland 2,153 km2, water 1,376 km2.
+  Pinus kochiana (class 36) is only ~5 km2 in the whole map, which is why no mapped pine cover ever fell in a sampled window.
+* Marz borders: geoBoundaries gbOpen ARM ADM1 (Wikimedia-derived, 2005, CC BY 2.5), recorded in
+  `configs/manifests/geoboundaries_arm_adm1.yaml`. Coarse (~300 vertices/marz); the outer border always follows the Ecosystem Map,
+  leftover in-country pixels take the nearest marz. 11 real towns checked against their marz in `tests/test_map_assets.py`.
+* `ui/interp.js`: IDW (8 nearest nodes, power 2) in node and browser; `tests/test_ui_interp.py` checks it against an independent numpy
+  implementation. Found and fixed a bug there: `isFinite(null)` is true in JS, so missing node values were read as 0 in the
+  leave-one-out score (RMSE 0.28 instead of ~0 for a constant field); regression test added.
+* Honest result of the first look: with 25 nodes the leave-one-out R^2 is about 0 (treeline shift -0.04) -- the surface between
+  nodes carries no information yet. The UI says so for every selection. The dense grid is what makes the surface meaningful.
+* Honest result 2: viability and hydraulic-hazard CHANGE is ~0 everywhere (e.g. broadleaf, SSP5-8.5, 2100: about -0.0001). Baseline
+  hazard is near zero (mean viability 0.97-1.00) and the future runs perturb only temperature and precipitation. Water-stress
+  quantities should be the more sensitive indicators, so `run_future_projections.py` now stores per-group CWD, WSI, minimum soil
+  potential, P[V>=V*], viability P10/P90 and the scenario climate for every member, and `fit_refugium_viability.py` stores the
+  matching 2019 per-group values (same rooting depth, so change is like-for-like). Neither script's output exists yet in the new
+  form; both come with the dense run. (Edits were made while the dense chain was in its TOPOHYDRO step, before the REFUGIUM step
+  started, and only to scripts the running step had not yet loaded.)
+* `ui/build_data.py` now exports scenario data as generic named series (`fp_series`, `tl_series`) with a favourable-direction flag
+  per quantity; the UI prefers the dense grid over the validation grid when both exist (the old sort picked "validation" first -- a
+  latent bug, never triggered because no dense result existed).

@@ -624,9 +624,20 @@ Not started by design (explicitly deferred pending real model fits — see
       top-level description in one pass rather than multiple partial edits. Do this rewrite when
       those three are done, not before, even though the text is known-inaccurate in the meantime.
 
-## UI requirement (user, 2026-10-05) -- deferred until all real data is in
+## UI requirement (user, 2026-10-05) -- first pass built 2026-10-05; polish deferred until all real data is in
 - The map must be a real continuous coloured surface covering the whole of Armenia (not scatter points):
   render at the native 312x396 CHELSA resolution clipped by `configs/armenia_mask_chelsa_312x396.npz`,
   interpolated from the sample nodes, with the interpolation method and its error stated on the page.
 - It must show CHANGE (scenario minus baseline) as a first-class layer, with a diverging scale.
 - Logo (`antar_logo.jpeg`) is in place; the rest of the UI polish waits for the dense Armenia-only results.
+
+Built so far (map page, `ui/map.js` + `ui/interp.js` + `scripts/build_map_assets.py`): Armenia only, no street basemap; whole
+country coloured by an inverse-distance surface between model nodes (leave-one-out R^2 and RMSE shown for every selection,
+cross-checked against numpy in `tests/test_ui_interp.py`); "Current forest cover" view (forest classes 31-37, woodland
+39/41/43/44, water, everything else one colour) from the 10 m Ecosystem Map; marz borders; scenario / horizon / climate-model /
+ensemble-statistic (mean, lowest, highest, disagreement) controls; change-vs-2019 mode with a direction-aware diverging scale;
+per-marz table (area-weighted, also weighted by today's forest cover); pointer read-out.
+Still to do on the map: (1) re-run `run_future_projections.py` (adds P[V>=V*], viability P10/P90, per-group CWD/WSI/soil
+potential and scenario climate to every member; the 25-node file predates this, so those layers show "2019 only" until the dense
+run lands); (2) replace plain IDW by regression-kriging on elevation once a DEM is available at the display grid, and keep it only
+if its leave-one-out score beats IDW; (3) official marz boundaries instead of geoBoundaries (Wikimedia, 2005, km-level error).
