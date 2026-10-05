@@ -91,3 +91,20 @@ def test_geometry_helpers():
     sq = np.array([[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]], dtype=float)
     sm = chaikin(sq, iters=2)
     assert np.allclose(sm[0], sm[-1]) and sm[:, 0].min() >= 0 and sm[:, 0].max() <= 1   # smoothing stays inside the hull
+
+
+def test_elevation_raster_matches_known_places(grid):
+    if not (ASSETS / "elevation.png").exists():
+        pytest.skip("elevation raster not built")
+    rgb = np.array(Image.open(ASSETS / "elevation.png")).astype(int)
+    z = rgb[..., 0] * 256 + rgb[..., 1]
+    at = lambda lat, lon: z[pixel(grid, lat, lon)]
+    assert 850 < at(40.18, 44.51) < 1150          # Yerevan, ~900-1000 m
+    assert 1850 < at(40.35, 45.35) < 2050         # Lake Sevan surface, ~1900 m
+    assert at(40.53, 44.20) > 3300                # Mount Aragats massif
+    assert at(38.90, 46.24) < 1100                # Meghri, Araks valley
+    assert at(39.95, 44.60) < 1100                # Ararat plain
+    region = load("region")
+    assert (z[region == 0] == 0).all()
+    info = json.loads((ASSETS / "elevation.json").read_text())
+    assert info["node_elevation_check"]["validation"]["rmse_m"] < 80   # raster vs the elevations the models actually used

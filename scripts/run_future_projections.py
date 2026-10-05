@@ -38,8 +38,14 @@ Runs all 15 real GCM x SSP members x 3 horizons x 3 real XYLEM functional groups
 skipped, same precedent as every other real run -- n=1 XFT record, no real variance estimate)
 through XYLEM's real two-level Monte Carlo and REFUGIUM's real viability/robust-refugium.
 """
+import os
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "VECLIB_MAXIMUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ.setdefault(_v, "1")
 import datetime
 import json
+import multiprocessing
+import os
+import pickle
 import sys
 from pathlib import Path
 
@@ -51,7 +57,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
     DATA_DIR, extract_static_grid_inputs, extract_era5land, _load_chelsa_arrays,
     saturation_vapour_pressure, wind_speed_2m, ROOTING_DEPTH_MM_BY_GROUP,
-    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
+    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS, ROOTING_DEPTH_MM_PLACEHOLDER,
 )
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
 from fit_refugium_viability import V_STAR, RHO, LAM  # noqa: E402
@@ -179,6 +185,106 @@ def build_future_cell(static, deltas, horizon, i, elevation, z_ref_m, slope, asp
     )
 
 
+# ---------------------------------------------------------------------------------------------
+# One (GCM, SSP, horizon) member: every valid cell x every real group. Independent of every other member
+# (cell seeds are the cell's grid index, nothing is shared), so members run in parallel worker processes
+# and give bit-identical numbers to a serial run.
+# ---------------------------------------------------------------------------------------------
+SCHEMA = 2     # bumped when the per-member record gains fields; older checkpoint files are ignored
+_CTX = {}
+
+
+def _r(x, nd=6):
+    return None if x is None else round(float(x), nd)
+
+
+def run_member_horizon(c, deltas, gcm, scenario, horizon):
+    """c: the shared context dict (see main). Returns the member record."""
+    lats, lons, n = c["lats"], c["lons"], c["n"]
+    cell_results, climate_rows, generic_rows = {}, [], []
+    for i in range(n):
+        if not c["valid_mask"][i]:
+            continue
+        chelsa_ref_i = (c["t_mean_ref_all"][:, i], c["t_max_ref_all"][:, i], c["t_min_ref_all"][:, i],
+                        c["p_ref_all"][:, i], c["doy"], c["month"])
+        cell = None
+        for gname, g in c["groups"].items():
+            # each group's own w_max_mm (its own rooting depth) gives its own CWD / WSI / soil-potential signal
+            cell = build_future_cell({}, deltas, horizon, i, c["elevation"], c["z_ref_m"], c["slope"], c["aspect"],
+                                     c["concavity"], c["soil"], c["w_max_mm_by_group"][gname], c["lapse"], lats,
+                                     c["era5_2019"], chelsa_ref_i)
+            psi_soil = cell.psi_soil_mpa[PET_FORMULATION]
+
+            def simulate(traits, psi_soil=psi_soil, cell=cell):
+                sim = simulate_two_phase(psi_soil, cell.t_max_c, cell.vpd_24h_kpa, cell.pressure_kpa, traits, 1.0)
+                return sim["hfi_max"]
+
+            h = two_level_failure_probability(simulate, g["base"], g["hyper_sd"], g["individual_sd"],
+                                              outer_draws=OUTER_DRAWS, inner_draws=INNER_DRAWS, seed=i)
+            v = np.array([viability([hh], p_height_ok=1.0) for hh in h])
+            p_viable = float(np.mean(v >= V_STAR))      # share of the 50 trait-knowledge draws with V >= V*
+            cell_results.setdefault(gname, []).append({
+                "lat": float(lats[i]), "lon": float(lons[i]),
+                "viability_mean": float(v.mean()), "h_mech_mean": float(h.mean()),
+                "viability_p10": _r(np.percentile(v, 10)), "viability_p90": _r(np.percentile(v, 90)),
+                "p_viable": _r(p_viable), "robust_criterion_a": bool(p_viable >= RHO),
+                "h_mech_sd": _r(h.std()),                                              # outer-loop (trait-knowledge) spread
+                "refugium_score": _r(refugium_score(v[:, None], lam=LAM)[0]),         # median - lam * IQR across the 50 draws
+                "cwd_mm": _r(cell.cwd_mm[PET_FORMULATION], 3), "wsi": _r(cell.wsi[PET_FORMULATION], 4),
+                "psi_min_mpa": _r(np.min(psi_soil), 4),
+            })
+        # generic (species-agnostic, 1000 mm rooting depth) water balance: the scenario counterpart of the 2019
+        # TOPOHYDRO layers, with all three PET formulations
+        gcell = build_future_cell({}, deltas, horizon, i, c["elevation"], c["z_ref_m"], c["slope"], c["aspect"],
+                                  c["concavity"], c["soil"], c["w_max_mm_generic"], c["lapse"], lats,
+                                  c["era5_2019"], chelsa_ref_i)
+        generic_rows.append({"lat": float(lats[i]), "lon": float(lons[i]),
+                             "cwd_mm_by_pet": {k: _r(v, 3) for k, v in gcell.cwd_mm.items()},
+                             "wsi": _r(gcell.wsi[PET_FORMULATION], 4),
+                             "psi_min_mpa": _r(np.min(gcell.psi_soil_mpa[PET_FORMULATION]), 4)})
+        # group-independent climate of the scenario year (identical for every group's cell)
+        climate_rows.append({
+            "lat": float(lats[i]), "lon": float(lons[i]),
+            "t_mean_c": _r(np.mean(gcell.t_mean_c), 4), "precip_mm": _r(np.sum(gcell.p_mm), 2),
+            "gdd": _r(gcell.gdd_cumulative[-1], 2), "late_frost_days": int(gcell.late_frost_days),
+            "gsl_days": int(gcell.growing_season_length_days), "gst_c": _r(gcell.growing_season_mean_t_c, 4),
+        })
+    group_summary = {}
+    for gname, rows in cell_results.items():
+        group_summary[gname] = {
+            "n_cells": len(rows),
+            "mean_viability": float(np.mean([r["viability_mean"] for r in rows])),
+            "mean_h_mech": float(np.mean([r["h_mech_mean"] for r in rows])),
+            "mean_refugium_score": float(np.mean([r["refugium_score"] for r in rows])),
+            "cells": rows,
+        }
+    return {"schema": SCHEMA, "gcm": gcm, "scenario": scenario, "horizon": horizon, "groups": group_summary,
+            "climate": climate_rows, "generic": generic_rows}
+
+
+def _init_worker(ctx_path):
+    global _CTX
+    with open(ctx_path, "rb") as f:
+        _CTX = pickle.load(f)
+    _CTX["delta_cache"] = {}
+
+
+def _run_task(task):
+    gcm, scenario, horizon = task
+    key = (gcm, scenario)
+    if key not in _CTX["delta_cache"]:                       # local ISIMIP3b files, no network
+        _CTX["delta_cache"][key] = compute_deltas(_CTX["lats"], _CTX["lons"], gcm, scenario)
+    t0 = datetime.datetime.now()
+    rec = run_member_horizon(_CTX, _CTX["delta_cache"][key], gcm, scenario, horizon)
+    return f"{gcm}__{scenario}__{horizon}", rec, (datetime.datetime.now() - t0).total_seconds()
+
+
+def _arg(name, default=None):
+    if name in sys.argv:
+        return sys.argv[sys.argv.index(name) + 1]
+    return default
+
+
 def main():
     dense = "--dense" in sys.argv
     grid_rows, grid_cols = (DENSE_GRID_ROWS, DENSE_GRID_COLS) if dense else (GRID_ROWS, GRID_COLS)
@@ -231,92 +337,63 @@ def main():
     w_max_mm_by_group = {g: (soil["theta_fc"] - soil["theta_lim"]) * ROOTING_DEPTH_MM_BY_GROUP[g]
                           for g in real_groups}
 
-    members = [(gcm, scenario) for gcm in GCMS for scenario in SCENARIOS]
+    w_max_mm_generic = (soil["theta_fc"] - soil["theta_lim"]) * ROOTING_DEPTH_MM_PLACEHOLDER
 
+    gcms = _arg("--gcms", ",".join(GCMS)).split(",")
+    scenarios = _arg("--scenarios", ",".join(SCENARIOS)).split(",")
+    workers = int(_arg("--workers", "6"))
+    out_path = Path(_arg("--out", str(out_path)))
+    ckpt_dir = DATA_DIR / f"_future_ckpt_{out_path.stem}"
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    tasks = [(g, s, h) for g in gcms for s in scenarios for h in HORIZONS]
     results = {}
-    if checkpoint_path.exists():
-        results = json.loads(checkpoint_path.read_text())
-        print(f"  resuming from checkpoint: {len(results)} (member,horizon) entries already done", flush=True)
+    for g, s, h in tasks:
+        f = ckpt_dir / f"{g}__{s}__{h}.json"
+        if f.exists():
+            rec = json.loads(f.read_text())
+            if rec.get("schema") == SCHEMA:
+                results[f"{g}__{s}__{h}"] = rec
+    todo = [t for t in tasks if f"{t[0]}__{t[1]}__{t[2]}" not in results]
+    print(f"=== {len(tasks)} members; {len(results)} already in {ckpt_dir.name}; {len(todo)} to run on {workers} worker(s) ===", flush=True)
 
-    for gcm, scenario in members:
-        print(f"=== {gcm} / {scenario}: real monthly deltas (local, no network) ===", flush=True)
-        deltas = compute_deltas(lats, lons, gcm, scenario)
-        chelsa_ref_base = (t_mean_ref_all, t_max_ref_all, t_min_ref_all, p_ref_all, doy, month)
+    ctx = {"lats": lats, "lons": lons, "n": n, "valid_mask": valid_mask, "elevation": elevation, "z_ref_m": z_ref_m,
+           "slope": slope, "aspect": aspect, "concavity": concavity, "soil": soil, "lapse": lapse,
+           "era5_2019": era5_2019, "t_mean_ref_all": t_mean_ref_all, "t_max_ref_all": t_max_ref_all,
+           "t_min_ref_all": t_min_ref_all, "p_ref_all": p_ref_all, "doy": doy, "month": month,
+           "groups": real_groups, "w_max_mm_by_group": w_max_mm_by_group, "w_max_mm_generic": w_max_mm_generic}
 
-        for horizon in HORIZONS:
-            mkey = f"{gcm}__{scenario}__{horizon}"
-            if mkey in results:
-                print(f"  {mkey}: skipped, already in checkpoint", flush=True)
-                continue
-            print(f"  === {mkey} ===", flush=True)
-            cell_results = {}
-            climate_rows = []
-            for i in range(n):
-                if not valid_mask[i]:
-                    continue
-                chelsa_ref_i = (
-                    chelsa_ref_base[0][:, i], chelsa_ref_base[1][:, i], chelsa_ref_base[2][:, i],
-                    chelsa_ref_base[3][:, i], doy, month,
-                )
+    def keep(mkey, rec, secs):
+        results[mkey] = rec
+        (ckpt_dir / f"{mkey}.json").write_text(json.dumps(rec))
+        print(f"  {mkey}: done in {secs / 60:.1f} min ({len(results)}/{len(tasks)})", flush=True)
 
-                for gname, g in real_groups.items():
-                    # Real per-group cell: each group's own w_max_mm gives its own real CWD/WSI/
-                    # soil-psi signal, not one shared generic forcing result across all species.
-                    cell = build_future_cell(static, deltas, horizon, i, elevation, z_ref_m, slope, aspect,
-                                              concavity, soil, w_max_mm_by_group[gname], lapse, lats,
-                                              era5_2019, chelsa_ref_i)
-                    psi_soil = cell.psi_soil_mpa[PET_FORMULATION]
+    if todo and workers > 1:
+        ctx_path = DATA_DIR / f"_future_ctx_{out_path.stem}.pkl"
+        with open(ctx_path, "wb") as f:
+            pickle.dump(ctx, f, protocol=pickle.HIGHEST_PROTOCOL)
+        try:
+            with multiprocessing.get_context("spawn").Pool(workers, initializer=_init_worker, initargs=(str(ctx_path),)) as pool:
+                for mkey, rec, secs in pool.imap_unordered(_run_task, todo):
+                    keep(mkey, rec, secs)
+        finally:
+            ctx_path.unlink(missing_ok=True)
+    elif todo:
+        _init_ctx = dict(ctx, delta_cache={})
+        for g, s, h in todo:
+            if (g, s) not in _init_ctx["delta_cache"]:
+                _init_ctx["delta_cache"][(g, s)] = compute_deltas(lats, lons, g, s)
+            t0 = datetime.datetime.now()
+            keep(f"{g}__{s}__{h}", run_member_horizon(_init_ctx, _init_ctx["delta_cache"][(g, s)], g, s, h),
+                 (datetime.datetime.now() - t0).total_seconds())
 
-                    def simulate(traits, psi_soil=psi_soil, cell=cell):
-                        sim = simulate_two_phase(psi_soil, cell.t_max_c, cell.vpd_24h_kpa, cell.pressure_kpa, traits, 1.0)
-                        return sim["hfi_max"]
-
-                    h = two_level_failure_probability(
-                        simulate, g["base"], g["hyper_sd"], g["individual_sd"],
-                        outer_draws=OUTER_DRAWS, inner_draws=INNER_DRAWS, seed=i,
-                    )
-                    v = np.array([viability([hh], p_height_ok=1.0) for hh in h])
-                    p_viable = float(np.mean(v >= V_STAR))   # share of the 50 trait-knowledge draws with V >= V*
-                    cell_results.setdefault(gname, []).append({
-                        "lat": float(lats[i]), "lon": float(lons[i]),
-                        "viability_mean": float(v.mean()), "h_mech_mean": float(h.mean()),
-                        "viability_p10": float(np.percentile(v, 10)), "viability_p90": float(np.percentile(v, 90)),
-                        "p_viable": p_viable, "robust_criterion_a": bool(p_viable >= RHO),
-                        "h_mech_sd": float(h.std()),                                  # outer-loop (trait-knowledge) spread, as in the 2019 run
-                        "refugium_score": float(refugium_score(v[:, None], lam=LAM)[0]),   # median - lam * IQR across the 50 draws
-                        # group-specific because w_max_mm (rooting depth) differs per group
-                        "cwd_mm": float(cell.cwd_mm[PET_FORMULATION]), "wsi": float(cell.wsi[PET_FORMULATION]),
-                        "psi_min_mpa": float(np.min(psi_soil)),
-                    })
-                # group-independent climate of the scenario year (identical for every group's cell)
-                climate_rows.append({
-                    "lat": float(lats[i]), "lon": float(lons[i]),
-                    "t_mean_c": float(np.mean(cell.t_mean_c)), "precip_mm": float(np.sum(cell.p_mm)),
-                    "gdd": float(cell.gdd_cumulative[-1]), "late_frost_days": int(cell.late_frost_days),
-                    "gsl_days": int(cell.growing_season_length_days), "gst_c": float(cell.growing_season_mean_t_c),
-                })
-                if (i + 1) % 20 == 0:
-                    print(f"    [{i + 1}/{n}] cells done", flush=True)
-
-            group_summary = {}
-            for gname, rows in cell_results.items():
-                v_ens = np.array([[r["viability_mean"] for r in rows]])  # (1, n_cells) -- per-cell mean already collapses the real outer-loop ensemble
-                score = refugium_score(v_ens, lam=0.5)
-                group_summary[gname] = {
-                    "n_cells": len(rows),
-                    "mean_viability": float(np.mean([r["viability_mean"] for r in rows])),
-                    "mean_h_mech": float(np.mean([r["h_mech_mean"] for r in rows])),
-                    "mean_refugium_score": float(np.mean(score)),
-                    "cells": rows,
-                }
-            results[mkey] = {"gcm": gcm, "scenario": scenario, "horizon": horizon, "groups": group_summary,
-                             "climate": climate_rows}
-            checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
-            checkpoint_path.write_text(json.dumps(results))
-            print(f"  {mkey}: checkpointed", flush=True)
+    missing = [t for t in tasks if f"{t[0]}__{t[1]}__{t[2]}" not in results]
+    if missing:
+        raise SystemExit(f"{len(missing)} members missing -- not writing a partial ensemble")
 
     final = {
         "run_date": datetime.date.today().isoformat(),
+        "schema": SCHEMA,
         "baseline_year": BASELINE_YEAR,
         "baseline_window": list(BASELINE_WINDOW),
         "horizons": {str(k): list(v) for k, v in HORIZONS.items()},
@@ -325,15 +402,21 @@ def main():
                   "reference series, run through the unchanged real topoclimate_forcing pipeline, "
                   "once per real functional group using that group's own real rooting depth "
                   f"({ROOTING_DEPTH_MM_BY_GROUP}, Canadell et al. 1996) rather than one generic "
-                  "value shared across all species. wind/radiation/dewpoint/pressure held at real "
-                  "2019 ERA5-Land values -- no real future projection exists for these.",
-        "members": results,
+                  "value shared across all species, plus once with the generic 1000 mm rooting depth "
+                  "(the scenario counterpart of the species-agnostic 2019 TOPOHYDRO layers). wind/"
+                  "radiation/dewpoint/pressure held at real 2019 ERA5-Land values -- no real future "
+                  "projection exists for these. Per cell and group: 50 trait-knowledge draws x 200 "
+                  "individual draws; viability mean, P10/P90, P[V >= V*], robust-refugium criterion (a), "
+                  "risk-averse score, outer-loop hazard spread.",
+        "members": {k: results[k] for k in sorted(results)},
     }
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(yaml.dump(final, sort_keys=False, default_flow_style=False))
+    Dumper = getattr(yaml, "CSafeDumper", yaml.SafeDumper)
+    out_path.write_text(yaml.dump(final, Dumper=Dumper, sort_keys=False, default_flow_style=False))
     print(f"=== Wrote {out_path} ===", flush=True)
-    if checkpoint_path.exists():
-        checkpoint_path.unlink()
+    for f in ckpt_dir.glob("*.json"):
+        f.unlink()
+    ckpt_dir.rmdir()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,16 @@
+{
+ "built": "2026-10-05",
+ "source": "project terrain raster (SRTM-derived, 30 m, EPSG:32638), band 1",
+ "resampling": "average over each 650 m Mercator pixel (~498 m on the ground)",
+ "encoding": "elevation_m = 256*R + G",
+ "min_m": 383,
+ "max_m": 3912,
+ "mean_m": 1851.6,
+ "node_elevation_check": {
+  "validation": {
+   "n": 25,
+   "mean_diff_m": 3.3,
+   "rmse_m": 33.7
+  }
+ }
+}

@@ -206,6 +206,12 @@ def build_map_plan(layers, series_ids):
     for lid, label in [("t_mean", "Mean annual temperature"), ("precip", "Annual precipitation"), ("gdd", "Growing degree days"),
                        ("late_frost", "Late-frost days"), ("gsl", "Growing-season length")]:
         add(lid, label, None, TOPO, FP)
+    for lid, label in [("cwd_pm_fao56", "Climatic water deficit (pm_fao56, generic rooting depth)"),
+                       ("cwd_priestley_taylor", "Climatic water deficit (priestley_taylor, generic rooting depth)"),
+                       ("cwd_energy_only", "Climatic water deficit (energy_only, generic rooting depth)"),
+                       ("wsi", "Water-stress integral (PM-FAO56, generic rooting depth)"),
+                       ("psi_min", "Minimum soil water potential (PM-FAO56, generic rooting depth)")]:
+        add(lid, label, None, TOPO, FP)
     for g, meta in GROUPS.items():
         short = meta["short"]
         for lid, label, bf in [("cwd", "Climatic water deficit", RF), ("wsi", "Water-stress integral", RF), ("psimin", "Minimum soil water potential", RF),
@@ -246,11 +252,11 @@ def build():
             for pet, v in p["cwd_mm_by_pet_formulation"].items():
                 if pet not in pets:
                     pets.append(pet)
-                G.set(f"cwd_{pet}", k, r(v, 1), {"label": f"Climatic water deficit ({pet})", "unit": "mm", "engine": "TOPOHYDRO", "pet": pet})
+                G.set(f"cwd_{pet}", k, r(v, 1), {"label": f"Climatic water deficit ({pet}, generic rooting depth)", "unit": "mm", "engine": "TOPOHYDRO", "pet": pet})
             wsi = p["wsi_by_pet_formulation"].get("pm_fao56")
-            G.set("wsi", k, r(wsi, 2), {"label": "Water-stress integral (PM-FAO56)", "unit": "", "engine": "TOPOHYDRO"})
+            G.set("wsi", k, r(wsi, 2), {"label": "Water-stress integral (PM-FAO56, generic rooting depth)", "unit": "", "engine": "TOPOHYDRO"})
             psi = p["psi_soil_mpa_annual_min_by_pet_formulation"].get("pm_fao56")
-            G.set("psi_min", k, r(psi, 2), {"label": "Minimum soil water potential (PM-FAO56)", "unit": "MPa", "engine": "TOPOHYDRO"})
+            G.set("psi_min", k, r(psi, 2), {"label": "Minimum soil water potential (PM-FAO56, generic rooting depth)", "unit": "MPa", "engine": "TOPOHYDRO"})
         engines["topohydro"] = {"grid": gid, "n_cells": info["n_cells"], "pet_formulations": pets,
                                 "placeholders": topo.get("placeholders")}
 
@@ -383,6 +389,11 @@ def build():
             for fld, lid, nd in [("t_mean_c", "t_mean", 2), ("precip_mm", "precip", 0), ("gdd", "gdd", 0),
                                  ("late_frost_days", "late_frost", 0), ("gsl_days", "gsl", 0)]:
                 series[lid] = [[r(c[fld], nd) for c in fp["members"][m]["climate"]] for m in member_keys]
+        if all("generic" in fp["members"][m] for m in member_keys):
+            for pet in ("pm_fao56", "priestley_taylor", "energy_only"):
+                series[f"cwd_{pet}"] = [[r(c["cwd_mm_by_pet"].get(pet), 1) for c in fp["members"][m]["generic"]] for m in member_keys]
+            series["wsi"] = [[r(c["wsi"], 2) for c in fp["members"][m]["generic"]] for m in member_keys]
+            series["psi_min"] = [[r(c["psi_min_mpa"], 2) for c in fp["members"][m]["generic"]] for m in member_keys]
         G.scen["fp_series"] = series
         fp_in = in_arm(first["groups"][gnames[0]]["cells"])
         # Precomputed ensemble summary over ARMENIAN cells only: mean over cells, then mean / min / max across GCMs.
@@ -510,12 +521,6 @@ def build():
                                     # sampled-window layers are 500 m samples at the nodes, not fields: the real raster is the map
                                     "map": meta.get("engine") != "Ecosystem map"}
 
-    # The generic cwd/wsi/psi layers use one placeholder rooting depth for every species. Once the per-group
-    # versions exist they replace them on the map (they stay in the site/place table).
-    if any(f"cwd_{g}" in layer_catalogue for g in GROUPS):
-        for lid in ("cwd_pm_fao56", "cwd_priestley_taylor", "cwd_energy_only", "wsi", "psi_min"):
-            if lid in layer_catalogue:
-                layer_catalogue[lid]["map"] = False
     series_ids = set()
     for gd in (json.loads((OUT / f["file"]).read_text()) for f in grid_files.values()):
         series_ids |= set(gd["scenarios"].get("fp_series", {})) | set(gd["scenarios"].get("tl_series", {}))
