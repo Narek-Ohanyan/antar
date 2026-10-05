@@ -4,7 +4,7 @@
 Nothing here computes science: it only reshapes already-fitted results. Two rules keep the UI
 honest about what it shows:
 
-1. **Dense results are used only when complete.** For each dataset the 1044-point dense file is
+1. **Dense results are used only when complete.** For each dataset the Armenia-only dense file is
    preferred, but only if it covers at least DENSE_MIN_COVERAGE of the dense grid. A dense file
    that exists yet falls short (e.g. one written by a run that lost most of its Drive tiles) is
    *rejected and the rejection is recorded* in the manifest, so a partial subsample can never be
@@ -24,16 +24,20 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+from antar.io.armenia_mask import inside_armenia, load_mask  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 FITTED = ROOT / "configs" / "fitted"
 MANIFESTS = ROOT / "configs" / "manifests"
 OUT = Path(__file__).resolve().parent / "data"
 
-DENSE_N = 1044
+DENSE_STRIDE = 7
+DENSE_N = int(load_mask()[np.ix_(np.arange(0, 312, DENSE_STRIDE), np.arange(0, 396, DENSE_STRIDE))].sum())  # Armenian cells on the dense grid
 DENSE_MIN_COVERAGE = 0.90
 GRIDS = {
-    "validation": "80-point validation grid (stride 40)",
-    "dense": "1044-point dense grid (stride 11)",
+    "validation": "stride-40 validation grid (Armenian cells only)",
+    "dense": f"Armenia-only dense grid (stride {DENSE_STRIDE})",
 }
 GROUPS = {
     "mesic_diffuse_porous_broadleaf": {"label": "Broadleaf (Fagus, Carpinus)", "short": "broadleaf"},
@@ -81,6 +85,11 @@ def clean(o):
 
 def dump(o, path):
     path.write_text(json.dumps(clean(o), separators=(",", ":"), allow_nan=False))
+
+
+def in_arm(cells):
+    """Boolean mask over a list of {lat, lon} dicts: True where the cell is inside Armenia."""
+    return np.array([bool(inside_armenia(c["lat"], c["lon"])) for c in cells], dtype=bool)
 
 
 def key(lat, lon):
@@ -150,18 +159,23 @@ class GridBuilder:
             self.layer_meta[layer_id] = meta
 
     def finalise(self):
-        order = sorted(self.keys, key=lambda k: (-k[0], k[1]))
+        # The sampling frame is a rectangle that Armenia fills only ~37% of; cells in Georgia, Azerbaijan,
+        # Turkey, Iran or Nakhchivan are dropped here so nothing shown, averaged or recommended is foreign.
+        kept = [k for k in self.keys if bool(inside_armenia(k[0], k[1]))]
+        self.n_dropped_foreign = len(self.keys) - len(kept)
+        order = sorted(kept, key=lambda k: (-k[0], k[1]))
         index = {k: i for i, k in enumerate(order)}
         out = {
             "grid": self.gid, "label": GRIDS[self.gid], "n_cells": len(order),
             "lat": [k[0] for k in order], "lon": [k[1] for k in order],
             "elev": [r(self.keys[k]["elev"], 0) for k in order],
-            "layers": {}, "scenarios": {},
+            "layers": {}, "scenarios": {}, "n_cells_dropped_outside_armenia": self.n_dropped_foreign,
         }
         for lid, vals in self.layers.items():
             arr = [None] * len(order)
             for k, v in vals.items():
-                arr[index[k]] = v
+                if k in index:
+                    arr[index[k]] = v
             out["layers"][lid] = arr
         return out, index
 
@@ -216,7 +230,9 @@ def build():
                       {"label": f"Hydraulic-failure hazard — {GROUPS[gname]['label']}", "unit": "probability/yr", "engine": "XYLEM", "group": gname})
                 G.set(f"hmech_sd_{gname}", k, r(c["h_mech_outer_spread_sd"], 5),
                       {"label": f"Hazard uncertainty (outer-loop sd) — {GROUPS[gname]['short']}", "unit": "", "engine": "XYLEM", "group": gname})
-            xylem_summary[gname] = {"status": "ok", "n_cells": g["n_cells"], "mean_h_mech": r(g["h_mech_mean_across_cells"], 5)}
+            ins = in_arm(g["cells"])
+            xylem_summary[gname] = {"status": "ok", "n_cells": int(ins.sum()),
+                                    "mean_h_mech": r(np.mean([c["h_mech_mean"] for c, i in zip(g["cells"], ins) if i]), 5) if ins.any() else None}
         engines["xylem"] = {"grid": gid, "groups": xylem_summary, "outer_draws": xy.get("outer_draws"),
                             "inner_draws": xy.get("inner_draws"),
                             "individual_sd_fraction": xy.get("individual_sd_fraction_of_hyper_sd_placeholder")}
@@ -229,6 +245,7 @@ def build():
                            "refugium_viability_2019_dense.yaml", _min_group_cells)
     provenance["refugium"] = info
     baseline_viab = {}
+    refugium_arm = {}
     if rf:
         G = grids[gid]
         for gname, g in rf["groups"].items():
@@ -242,12 +259,13 @@ def build():
                       {"label": f"Risk-averse refugium score — {GROUPS[gname]['short']}", "unit": "", "engine": "REFUGIUM", "group": gname})
                 G.set(f"robust_{gname}", k, 1 if c["robust_refugium_criterion_a"] else 0,
                       {"label": f"Robust refugium, criterion (a) — {GROUPS[gname]['short']}", "unit": "0/1", "engine": "REFUGIUM", "group": gname, "binary": True})
-            baseline_viab[gname] = r(g["mean_viability_across_cells"], 4)
+            ins = in_arm(g["cells"])
+            vals = [c["viability_ensemble_mean"] for c, i in zip(g["cells"], ins) if i]
+            baseline_viab[gname] = r(np.mean(vals), 4) if vals else None
+            refugium_arm[gname] = {"mean_viability": baseline_viab[gname], "n_cells": int(ins.sum()),
+                                   "n_robust": int(sum(1 for c, i in zip(g["cells"], ins) if i and c["robust_refugium_criterion_a"]))}
         engines["refugium"] = {"grid": gid, "v_star": rf.get("v_star"), "rho": rf.get("rho"), "lam": rf.get("lam"),
-                               "groups": {gn: {"mean_viability": r(g.get("mean_viability_across_cells"), 4),
-                                               "n_cells": g.get("n_cells"),
-                                               "n_robust": g.get("n_robust_refugia_criterion_a")}
-                                          for gn, g in rf["groups"].items() if g.get("status") == "ok"},
+                               "groups": refugium_arm,
                                "scope_note": rf.get("scope_note")}
 
     # ---- Treeline (today + change) -----------------------------------------------------------
@@ -270,12 +288,21 @@ def build():
                                        "horizon": tc["members"][m]["horizon"]} for m in member_keys]
         G.scen["treeline_cell_keys"] = cell_keys
         G.scen["treeline_shift"] = [[r(v, 0) for v in tc["members"][m]["shift_m"]] for m in member_keys]
-        treeline_summary = {"grid": gid, "summary": tc["summary_by_scenario_horizon"],
+        tl_in = in_arm(tc["cells"])
+        tl_summary = {}
+        for ssp in ("ssp126", "ssp370", "ssp585"):
+            for hz in (2050, 2080, 2100):
+                per_gcm = [float(np.nanmean(np.array(m["shift_m"], dtype=float)[tl_in]))
+                           for m in tc["members"].values() if m["scenario"] == ssp and int(m["horizon"]) == hz]
+                tl_summary[f"{ssp}__{hz}"] = {"ensemble_mean_shift_m": round(float(np.mean(per_gcm)), 1),
+                                              "ensemble_min_shift_m": round(float(np.min(per_gcm)), 1),
+                                              "ensemble_max_shift_m": round(float(np.max(per_gcm)), 1), "n_gcms": len(per_gcm)}
+        treeline_summary = {"grid": gid, "summary": tl_summary, "n_cells_armenia": int(tl_in.sum()),
                             "baseline_check_max_abs_diff_c": tc.get("baseline_check_max_abs_diff_c"),
                             "method": tc["method"], "scope_note": tc["scope_note"],
                             "gamma_k_per_km": r(tc["gamma_growing_season_k_per_km"], 2),
                             "threshold_c": tc["thermal_threshold_c"],
-                            "frac_pairs_negative": r(float(np.mean([v < 0 for m in tc["members"].values() for v in m["shift_m"]])), 4)}
+                            "frac_pairs_negative": r(float(np.mean([v < 0 for m in tc["members"].values() for v, i in zip(m["shift_m"], tl_in) if i])), 4)}
 
     # ---- Future projections --------------------------------------------------------------------
     fp, gid, info = choose("Future projections", "future_projections.yaml", "future_projections_dense.yaml", _future_cells)
@@ -294,14 +321,16 @@ def build():
                                for m in member_keys] for gn in gnames}
         G.scen["hmech"] = {gn: [[r(c["h_mech_mean"], 5) for c in fp["members"][m]["groups"][gn]["cells"]]
                                 for m in member_keys] for gn in gnames}
-        # Precomputed ensemble summary: mean over cells, then mean / min / max across GCMs.
+        fp_in = in_arm(first["groups"][gnames[0]]["cells"])
+        # Precomputed ensemble summary over ARMENIAN cells only: mean over cells, then mean / min / max across GCMs.
         scen_summary = {}
         for gn in gnames:
             scen_summary[gn] = {}
             for ssp in ("ssp126", "ssp370", "ssp585"):
                 scen_summary[gn][ssp] = {}
                 for hz in (2050, 2080, 2100):
-                    vals = [fp["members"][m]["groups"][gn]["mean_viability"] for m in member_keys
+                    vals = [float(np.mean([c["viability_mean"] for c, i in zip(fp["members"][m]["groups"][gn]["cells"], fp_in) if i]))
+                            for m in member_keys
                             if fp["members"][m]["scenario"] == ssp and int(fp["members"][m]["horizon"]) == hz]
                     scen_summary[gn][ssp][str(hz)] = {"mean": r(np.mean(vals), 4), "min": r(np.min(vals), 4),
                                                        "max": r(np.max(vals), 4), "n_gcms": len(vals)}
@@ -381,14 +410,14 @@ def build():
         scen = {}
         if "members" in G.scen:
             n = len(index)
-            order = [index[k] for k in G.scen["cell_keys"]]
+            pairs = [(index[k], j) for j, k in enumerate(G.scen["cell_keys"]) if k in index]
 
             def remap(mat):
                 out = []
                 for row in mat:
                     full = [None] * n
-                    for pos, v in zip(order, row):
-                        full[pos] = v
+                    for pos, j in pairs:
+                        full[pos] = row[j]
                     out.append(full)
                 return out
             scen["members"] = G.scen["members"]
@@ -396,19 +425,19 @@ def build():
             scen["hmech"] = {gn: remap(m) for gn, m in G.scen["hmech"].items()}
         if "treeline_members" in G.scen:
             n = len(index)
-            order = [index[k] for k in G.scen["treeline_cell_keys"]]
+            pairs = [(index[k], j) for j, k in enumerate(G.scen["treeline_cell_keys"]) if k in index]
             full_rows = []
             for row in G.scen["treeline_shift"]:
                 full = [None] * n
-                for pos, v in zip(order, row):
-                    full[pos] = v
+                for pos, j in pairs:
+                    full[pos] = row[j]
                 full_rows.append(full)
             scen["treeline_members"] = G.scen["treeline_members"]
             scen["treeline_shift"] = full_rows
         data["scenarios"] = scen
         fname = f"grid_{gid}.json"
         dump(data, OUT / fname)
-        grid_files[gid] = {"file": fname, "n_cells": data["n_cells"], "label": GRIDS[gid],
+        grid_files[gid] = {"file": fname, "n_cells": data["n_cells"], "label": GRIDS[gid], "n_dropped_outside_armenia": data["n_cells_dropped_outside_armenia"],
                            "bytes": (OUT / fname).stat().st_size,
                            "has_scenarios": bool(scen.get("members")), "has_treeline_change": bool(scen.get("treeline_members"))}
         for lid, meta in G.layer_meta.items():

@@ -1735,7 +1735,7 @@ did not deliver what was promised. Reading the logs after the fact:
 The only valid results are the 78-point ones (XYLEM / REFUGIUM / future-projections / AEGIS), which
 remain correct and in place.
 
-## 2026-10-05 -- the study grid is two-thirds foreign territory; sampling frame corrected (IN PROGRESS)
+## 2026-10-05 -- the study grid is two-thirds foreign territory; sampling frame corrected (see follow-up below)
 
 Found while building the UI: the CHELSA rectangle (lon 43.4-46.7, lat 38.8-41.4) is only 36.7% Armenia.
 Measured against the national Ecosystem Map, just **25 of the 80 stride-40 "validation" cells are inside
@@ -1755,3 +1755,23 @@ NOT yet done (outputs below are STALE and still contain foreign cells): re-run `
 `in_armenia` layer/toggle; re-launch the dense chain (`scripts/run_dense_chain.sh`) on the new grid; update
 `DENSE_N` and grid labels in `ui/build_data.py`. The existing 78-point per-cell results remain valid for their
 25 Armenian cells (cells are computed independently). No dense result exists yet.
+
+### Follow-up, same day: stale outputs regenerated, earlier validation claim retracted
+
+Re-ran `integrate_ecosystem_map.py` and `fit_aegis_portfolio.py` with the Armenia-only fixes, and made
+`ui/build_data.py` drop foreign cells and recompute every headline (XYLEM, REFUGIUM, baseline, treeline,
+scenario summaries) over Armenian cells only.
+
+* **Ecosystem-map validation (n = 23 cells inside Armenia):** broadleaf rho = 0.281 (p = 0.194), oak rho = 0.192
+  (p = 0.380), pine undefined (no mapped pine cover in any window). Neither is significant. The earlier
+  "statistically significant, genuine external validation" statement (n = 61, rho 0.26-0.33) is **retracted**: it
+  counted foreign cells where mapped forest cover is zero by construction. 4 of 23 cells are >50% human-modified.
+* **AEGIS:** 23 Armenian candidate units, 11 eligible (inside Armenia, not WDPA-protected, plantable land
+  cover). Expected = CVaR = 4587 at every budget and all 11 are planted, so the price of robustness is 0 on this
+  sample -- an artefact of there being fewer eligible units than budget, not evidence that robustness is free.
+* **Baseline viability, Armenian cells only:** broadleaf 0.999, oak 0.975, pine 1.000 (one-year hydraulic survival,
+  p_height_ok fixed at 1; near-ceiling values are why the UI widens colour scales).
+* **Logo** added to the UI; palette derived from it. UI work beyond that is deferred by the user until all real data
+  exists; map requirement (continuous surface over the whole country, change layer) recorded in ROADMAP.md.
+* The prior-project name still appears in the committed concept paper (`docs/concept_v2/*.tex`, the user's own v2
+  specification) and in this log's rename history; left as-is pending the user's decision.

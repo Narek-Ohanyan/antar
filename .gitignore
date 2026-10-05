@@ -20,3 +20,6 @@ dist/
 
 # Notebooks
 .ipynb_checkpoints/
+
+# Snakemake working state
+.snakemake/

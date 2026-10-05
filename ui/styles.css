@@ -1,29 +1,29 @@
 :root {
   --bg: #f6f7f4; --surface: #ffffff; --surface-2: #eef1ea; --text: #1b2420; --muted: #5d6b63;
-  --border: #d9dfd5; --accent: #2f6b4f; --accent-ink: #ffffff; --accent-soft: #dcebe3;
+  --border: #d9dfd5; --accent: #0f766a; --accent-ink: #ffffff; --accent-soft: #d7ece8;
   --good: #2f6b4f; --good-bg: #dcebe3; --warn: #8a5a00; --warn-bg: #fbeccb;
   --bad: #9b2c2c; --bad-bg: #f7dcdc; --neutral: #4b5a52; --neutral-bg: #e4e8e1;
   --shadow: 0 1px 2px rgba(20,35,28,.06), 0 4px 14px rgba(20,35,28,.06);
   --radius: 10px; --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --c1: #2f6b4f; --c2: #c27c0e; --c3: #a63d40; --c4: #3c6e9f;
+  --c1: #0f766a; --c2: #9a6b2f; --c3: #a84a1e; --c4: #1f3a68;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #121714; --surface: #1a211d; --surface-2: #232c27; --text: #e7ece8; --muted: #9aa8a0;
-    --border: #2f3a34; --accent: #6fbf94; --accent-ink: #0d1a13; --accent-soft: #233a2e;
+    --border: #2f3a34; --accent: #4fc0ae; --accent-ink: #06201c; --accent-soft: #17332e;
     --good: #7fcaa2; --good-bg: #213a2d; --warn: #e6b455; --warn-bg: #3a2f17;
     --bad: #ee8b8b; --bad-bg: #3d2222; --neutral: #a9b6ae; --neutral-bg: #28322c;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.35);
-    --c1: #6fbf94; --c2: #e6a73c; --c3: #e07a7d; --c4: #7fb2e0;
+    --c1: #4fc0ae; --c2: #d3a05a; --c3: #e07f55; --c4: #8fb0e6;
   }
 }
 :root[data-theme="dark"] {
   --bg: #121714; --surface: #1a211d; --surface-2: #232c27; --text: #e7ece8; --muted: #9aa8a0;
-  --border: #2f3a34; --accent: #6fbf94; --accent-ink: #0d1a13; --accent-soft: #233a2e;
+  --border: #2f3a34; --accent: #4fc0ae; --accent-ink: #06201c; --accent-soft: #17332e;
   --good: #7fcaa2; --good-bg: #213a2d; --warn: #e6b455; --warn-bg: #3a2f17;
   --bad: #ee8b8b; --bad-bg: #3d2222; --neutral: #a9b6ae; --neutral-bg: #28322c;
   --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.35);
-  --c1: #6fbf94; --c2: #e6a73c; --c3: #e07a7d; --c4: #7fb2e0;
+  --c1: #4fc0ae; --c2: #d3a05a; --c3: #e07f55; --c4: #8fb0e6;
 }
 * { box-sizing: border-box; }
 html { color-scheme: light dark; }
@@ -38,7 +38,9 @@ code { background: var(--surface-2); padding: .1em .35em; border-radius: 4px; fo
 
 .topbar { position: sticky; top: 0; z-index: 1000; background: var(--surface); border-bottom: 1px solid var(--border); }
 .topbar .wrap { display: flex; align-items: center; gap: 14px; min-height: 54px; flex-wrap: wrap; }
-.brand { font-weight: 700; letter-spacing: .04em; color: var(--accent); text-decoration: none; font-size: 1.1rem; }
+.brand { display: inline-flex; align-items: center; text-decoration: none; }
+.brand-logo { height: 36px; width: auto; display: block; background: #fff; border-radius: 8px; padding: 1px 8px; }
+.hero-logo { height: 92px; width: auto; display: block; margin-bottom: 14px; background: #fff; border-radius: 12px; padding: 4px 16px; box-shadow: var(--shadow); }
 nav { display: flex; gap: 2px; flex-wrap: wrap; flex: 1; }
 nav a { padding: 7px 10px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: .92rem; }
 nav a:hover { background: var(--surface-2); }

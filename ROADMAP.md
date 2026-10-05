@@ -483,8 +483,9 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       gitignored under `data/ecosystem_map/`) and integrated via `scripts/integrate_ecosystem_map.py`
       two ways: (1) **real validation** -- REFUGIUM's predicted viability vs. real observed nearby
       forest-class cover (500m window) at the 78-cell grid: broadleaf rho=0.326 (p=0.010), oak
-      rho=0.264 (p=0.040) -- real, statistically significant positive correlation, genuine external
-      validation of the mechanistic hazard model's predictions. Pine's correlation is undefined
+      rho=0.264 (p=0.040) -- **RETRACTED 2026-10-05**: this n=61 sample included cells over neighbouring
+      countries (mapped cover is zero there by construction). Restricted to the 23 sampled cells inside Armenia:
+      broadleaf rho=0.281 (p=0.194), oak rho=0.192 (p=0.380) -- NOT significant; not evidence of validation. Pine's correlation is undefined
       (zero real pine cover in any of the 61 in-bounds windows -- a real limitation of the
       systematic sampling grid under-sampling Armenia's actual concentrated Pinus kochiana stands,
       flagged not hidden). Juniper has no real REFUGIUM viability to correlate against (already
@@ -522,7 +523,7 @@ synthetic/placeholder data only (`configs/species_traits.csv` is entirely
       around directly). `configs/cv.yaml` updated with the real finding and its honest caveat.
       Concrete next step: re-estimate once a denser real grid exists -- the same grid-
       densification work would also directly feed MNEME's event-panel fix below and tighten the
-      ecosystem-map validation correlations (rho=0.26-0.33 currently, n=61).
+      ecosystem-map validation correlations (rho=0.19-0.28, n=23 inside Armenia, not significant).
 - [ ] **Pipeline wiring**: `workflow/Snakefile` is still 100% placeholder `echo` commands for
       every rule — replace each with the real `antar.*` entry point once its inputs are real,
       so the pipeline can actually run end-to-end rather than existing only as tested library code.
@@ -622,3 +623,10 @@ Not started by design (explicitly deferred pending real model fits — see
       incrementally: hold it until REFUGIUM, AEGIS and the UI all land, then rewrite the whole
       top-level description in one pass rather than multiple partial edits. Do this rewrite when
       those three are done, not before, even though the text is known-inaccurate in the meantime.
+
+## UI requirement (user, 2026-10-05) -- deferred until all real data is in
+- The map must be a real continuous coloured surface covering the whole of Armenia (not scatter points):
+  render at the native 312x396 CHELSA resolution clipped by `configs/armenia_mask_chelsa_312x396.npz`,
+  interpolated from the sample nodes, with the interpolation method and its error stated on the page.
+- It must show CHANGE (scenario minus baseline) as a first-class layer, with a diverging scale.
+- Logo (`antar_logo.jpeg`) is in place; the rest of the UI polish waits for the dense Armenia-only results.

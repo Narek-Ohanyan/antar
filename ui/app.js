@@ -142,7 +142,7 @@ function renderHome() {
   const eng = state.meth.engines;
   const stat = (num, cap, sub) => `<div class="card stat"><div class="num">${num}</div><div class="cap">${cap}</div><div class="sub">${sub || ""}</div></div>`;
   view().innerHTML = `<div class="wrap">
-    <div class="hero"><h1>ANTAR — Armenia reforestation refugia</h1>
+    <div class="hero"><img class="hero-logo" src="assets/antar_logo.jpeg" alt="ANTAR"><h1>Armenia reforestation refugia</h1>
     <p class="lead">A hybrid process-statistical framework for finding climate-resilient places to restore forest in Armenia: it models water stress, hydraulic failure, species niches, treeline and scenario-robust planting decisions, and reports each result with the caveats that came with it.</p></div>
     ${banner()}
     <h2>Headline results</h2>

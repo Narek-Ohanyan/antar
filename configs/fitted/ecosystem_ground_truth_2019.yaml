@@ -1,4 +1,4 @@
-run_date: '2026-10-01'
+run_date: '2026-10-05'
 source: Ecosystem Map of Armenia (BCC Armenia / Institute of Botany NAS RA / IOER,
   2026-09-18)
 window_radius_m: 500.0
@@ -11,22 +11,23 @@ scope_note: Local 500m-radius class-fraction sample at the real 78-cell grid, NO
   border (the project's rectangular BBOX extends past it) and have no coverage here
   -- left unset, not zero-filled.
 n_cells_total: 78
-n_cells_outside_armenia_border: 17
+n_cells_outside_armenia_border: 55
+n_cells_inside_armenia: 23
 validation_viability_vs_observed_forest_cover:
   mesic_diffuse_porous_broadleaf:
-    spearman_rho: 0.32620442740352423
-    p_value: 0.010298877597418881
-    n: 61
-    mean_observed_forest_cover_fraction: 0.015715270601885704
+    spearman_rho: 0.28122299765058856
+    p_value: 0.19363270395945714
+    n: 23
+    mean_observed_forest_cover_fraction: 0.03943773628331408
   ring_porous_oak:
-    spearman_rho: 0.26380952709010924
-    p_value: 0.039942733574997204
-    n: 61
-    mean_observed_forest_cover_fraction: 0.0294008462686879
+    spearman_rho: 0.19220043832759146
+    p_value: 0.37962352295861856
+    n: 23
+    mean_observed_forest_cover_fraction: 0.07797189533847917
   pine:
     spearman_rho: .nan
     p_value: .nan
-    n: 61
+    n: 23
     mean_observed_forest_cover_fraction: 0.0
 human_modified_fraction_threshold_for_aegis: 0.5
 n_cells_human_modified: 4
@@ -36,56 +37,67 @@ cells:
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 43.7375
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 44.07083333333333
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 44.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 44.7375
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 45.07083333333333
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 45.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 45.737500000000004
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 46.07083333333333
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.39583333333333
   lon: 46.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.0625
   lon: 43.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 41.0625
   lon: 43.7375
   outside_real_armenia_raster_extent: false
@@ -95,6 +107,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 41.0625
   lon: 44.07083333333333
   outside_real_armenia_raster_extent: false
@@ -104,6 +117,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 41.0625
   lon: 44.40416666666667
   outside_real_armenia_raster_extent: false
@@ -113,6 +127,7 @@ cells:
     ring_porous_oak: 0.0012743848642289971
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 41.0625
   lon: 44.7375
   outside_real_armenia_raster_extent: false
@@ -122,6 +137,7 @@ cells:
     ring_porous_oak: 0.3828056072934026
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 41.0625
   lon: 45.07083333333333
   outside_real_armenia_raster_extent: false
@@ -131,6 +147,7 @@ cells:
     ring_porous_oak: 9.802960494069208e-05
     pine: 0.0
     juniper_arid_conifer: 0.0007842368395255367
+  inside_armenia: false
 - lat: 41.0625
   lon: 45.40416666666667
   outside_real_armenia_raster_extent: false
@@ -140,6 +157,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 41.0625
   lon: 45.737500000000004
   outside_real_armenia_raster_extent: false
@@ -149,6 +167,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 41.0625
   lon: 46.07083333333333
   outside_real_armenia_raster_extent: false
@@ -158,6 +177,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 41.0625
   lon: 46.40416666666667
   outside_real_armenia_raster_extent: false
@@ -167,11 +187,13 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.729166666666664
   lon: 43.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 40.729166666666664
   lon: 43.7375
   outside_real_armenia_raster_extent: false
@@ -181,6 +203,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.729166666666664
   lon: 44.07083333333333
   outside_real_armenia_raster_extent: false
@@ -190,6 +213,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.729166666666664
   lon: 44.40416666666667
   outside_real_armenia_raster_extent: false
@@ -199,6 +223,7 @@ cells:
     ring_porous_oak: 0.00039211841976276833
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.729166666666664
   lon: 44.7375
   outside_real_armenia_raster_extent: false
@@ -208,6 +233,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.729166666666664
   lon: 45.07083333333333
   outside_real_armenia_raster_extent: false
@@ -217,6 +243,7 @@ cells:
     ring_porous_oak: 0.38613861386138615
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.729166666666664
   lon: 45.40416666666667
   outside_real_armenia_raster_extent: false
@@ -226,6 +253,7 @@ cells:
     ring_porous_oak: 0.15292618370747968
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.729166666666664
   lon: 45.737500000000004
   outside_real_armenia_raster_extent: false
@@ -235,6 +263,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.729166666666664
   lon: 46.07083333333333
   outside_real_armenia_raster_extent: false
@@ -244,6 +273,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.729166666666664
   lon: 46.40416666666667
   outside_real_armenia_raster_extent: false
@@ -253,11 +283,13 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.39583333333333
   lon: 43.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 40.39583333333333
   lon: 43.7375
   outside_real_armenia_raster_extent: false
@@ -267,6 +299,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.39583333333333
   lon: 44.07083333333333
   outside_real_armenia_raster_extent: false
@@ -276,6 +309,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.39583333333333
   lon: 44.40416666666667
   outside_real_armenia_raster_extent: false
@@ -285,6 +319,7 @@ cells:
     ring_porous_oak: 0.008822664444662289
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.39583333333333
   lon: 44.7375
   outside_real_armenia_raster_extent: false
@@ -294,6 +329,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.39583333333333
   lon: 45.07083333333333
   outside_real_armenia_raster_extent: false
@@ -303,6 +339,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.39583333333333
   lon: 45.737500000000004
   outside_real_armenia_raster_extent: false
@@ -312,6 +349,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.39583333333333
   lon: 46.07083333333333
   outside_real_armenia_raster_extent: false
@@ -321,6 +359,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.39583333333333
   lon: 46.40416666666667
   outside_real_armenia_raster_extent: false
@@ -330,11 +369,13 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.0625
   lon: 43.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 40.0625
   lon: 43.7375
   outside_real_armenia_raster_extent: false
@@ -344,6 +385,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.0625
   lon: 44.07083333333333
   outside_real_armenia_raster_extent: false
@@ -353,6 +395,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.0625
   lon: 44.7375
   outside_real_armenia_raster_extent: false
@@ -362,6 +405,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0016665032839917656
+  inside_armenia: true
 - lat: 40.0625
   lon: 45.07083333333333
   outside_real_armenia_raster_extent: false
@@ -371,6 +415,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.0625
   lon: 45.40416666666667
   outside_real_armenia_raster_extent: false
@@ -380,6 +425,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.0625
   lon: 45.737500000000004
   outside_real_armenia_raster_extent: false
@@ -389,6 +435,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 40.0625
   lon: 46.07083333333333
   outside_real_armenia_raster_extent: false
@@ -398,6 +445,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 40.0625
   lon: 46.40416666666667
   outside_real_armenia_raster_extent: false
@@ -407,11 +455,13 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.729166666666664
   lon: 43.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 39.729166666666664
   lon: 43.7375
   outside_real_armenia_raster_extent: false
@@ -421,6 +471,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.729166666666664
   lon: 44.07083333333333
   outside_real_armenia_raster_extent: false
@@ -430,6 +481,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.729166666666664
   lon: 44.40416666666667
   outside_real_armenia_raster_extent: false
@@ -439,6 +491,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.729166666666664
   lon: 44.7375
   outside_real_armenia_raster_extent: false
@@ -448,6 +501,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.729166666666664
   lon: 45.07083333333333
   outside_real_armenia_raster_extent: false
@@ -457,6 +511,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.729166666666664
   lon: 45.40416666666667
   outside_real_armenia_raster_extent: false
@@ -466,6 +521,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 39.729166666666664
   lon: 45.737500000000004
   outside_real_armenia_raster_extent: false
@@ -475,6 +531,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 39.729166666666664
   lon: 46.07083333333333
   outside_real_armenia_raster_extent: false
@@ -484,6 +541,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.729166666666664
   lon: 46.40416666666667
   outside_real_armenia_raster_extent: false
@@ -493,11 +551,13 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 43.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 43.7375
   outside_real_armenia_raster_extent: false
@@ -507,6 +567,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 44.07083333333333
   outside_real_armenia_raster_extent: false
@@ -516,6 +577,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 44.40416666666667
   outside_real_armenia_raster_extent: false
@@ -525,6 +587,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 44.7375
   outside_real_armenia_raster_extent: false
@@ -534,6 +597,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 45.07083333333333
   outside_real_armenia_raster_extent: false
@@ -543,6 +607,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 45.40416666666667
   outside_real_armenia_raster_extent: false
@@ -552,6 +617,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 45.737500000000004
   outside_real_armenia_raster_extent: false
@@ -561,6 +627,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.39583333333333
   lon: 46.07083333333333
   outside_real_armenia_raster_extent: false
@@ -570,6 +637,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: true
 - lat: 39.39583333333333
   lon: 46.40416666666667
   outside_real_armenia_raster_extent: false
@@ -579,11 +647,13 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 43.40416666666667
   outside_real_armenia_raster_extent: true
   human_modified_fraction: null
   forest_cover_fraction_by_group: null
+  inside_armenia: false
 - lat: 39.0625
   lon: 43.7375
   outside_real_armenia_raster_extent: false
@@ -593,6 +663,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 44.07083333333333
   outside_real_armenia_raster_extent: false
@@ -602,6 +673,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 44.40416666666667
   outside_real_armenia_raster_extent: false
@@ -611,6 +683,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 44.7375
   outside_real_armenia_raster_extent: false
@@ -620,6 +693,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 45.07083333333333
   outside_real_armenia_raster_extent: false
@@ -629,6 +703,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 45.40416666666667
   outside_real_armenia_raster_extent: false
@@ -638,6 +713,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 45.737500000000004
   outside_real_armenia_raster_extent: false
@@ -647,6 +723,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 46.07083333333333
   outside_real_armenia_raster_extent: false
@@ -656,6 +733,7 @@ cells:
     ring_porous_oak: 0.0
     pine: 0.0
     juniper_arid_conifer: 0.0
+  inside_armenia: false
 - lat: 39.0625
   lon: 46.40416666666667
   outside_real_armenia_raster_extent: false
@@ -665,3 +743,4 @@ cells:
     ring_porous_oak: 0.8609940201940987
     pine: 0.0
     juniper_arid_conifer: 9.802960494069208e-05
+  inside_armenia: true
