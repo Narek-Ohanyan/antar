@@ -1870,3 +1870,8 @@ User: the video must be fullscreen with the navbar on it, and the whole design c
   page; sections fade up on scroll (reduced-motion and a no-observer fallback show everything); skip link; focus moves to the page
   content on navigation; three-column footer; one primary action in the hero.
 * The home heading "The six engines" was wrong (seven are listed, including treeline change); it now follows the count.
+* **Hero text legibility (user screenshot):** at 5-6 s the camera pushes into the "A" and the letters and sparkles pass behind the
+  heading. The heading, descriptor and rule now sit on a frosted translucent pane (`.hero-text`: 80% white, 14 px backdrop blur,
+  hairline border); the secondary button gets the same translucent fill. Checked at the deepest zoom frame (5.9 s) on desktop and at
+  phone width. Ink text over the darkest teal behind the pane is above 10:1, the descriptor above 5.5:1; browsers without
+  `backdrop-filter` get a 94% white pane instead.
