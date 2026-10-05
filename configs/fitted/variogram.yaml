@@ -1,0 +1,55 @@
+run_date: '2026-10-05'
+grid: validation_80pt_stride40
+variable: CWD (pm_fao56), OLS-detrended against elevation
+n_points: 78
+n_pairs: 3003
+detrend:
+  slope_mm_per_m: -0.038626688857549336
+  intercept_mm: 229.1492149540401
+empirical_semivariogram:
+- lag_km: 24.2
+  semivariance: 1821.71
+  n_pairs: 68
+- lag_km: 40.4
+  semivariance: 3315.89
+  n_pairs: 184
+- lag_km: 56.5
+  semivariance: 4473.69
+  n_pairs: 60
+- lag_km: 72.7
+  semivariance: 6081.85
+  n_pairs: 260
+- lag_km: 88.8
+  semivariance: 6516.75
+  n_pairs: 231
+- lag_km: 105.0
+  semivariance: 7487.38
+  n_pairs: 119
+- lag_km: 121.1
+  semivariance: 9462.43
+  n_pairs: 283
+- lag_km: 137.3
+  semivariance: 7940.37
+  n_pairs: 188
+- lag_km: 153.4
+  semivariance: 11523.42
+  n_pairs: 324
+- lag_km: 169.6
+  semivariance: 10117.94
+  n_pairs: 134
+- lag_km: 185.7
+  semivariance: 14308.54
+  n_pairs: 246
+exponential_fit:
+  nugget: 8.503096906368463e-09
+  sill: 28617.079780013682
+  range_param_km: 328.24402531102686
+  practical_range_km: 984.7320759330805
+  r2: 0.9209057207220641
+linear_fit:
+  slope: 66.12503394440382
+  r2: 0.9269187109953617
+plateau_visible: false
+verdict: still no clear plateau -- the exponential fit doesn't meaningfully beat a
+  straight line. The practical-range number remains an upper-bound-ish signal, not
+  a confident estimate.

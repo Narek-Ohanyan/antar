@@ -76,6 +76,18 @@ for c, g, nc in zip(bin_centers, gamma, bin_counts):
 def exp_model(h, nugget, sill, rng):
     return nugget + sill * (1 - np.exp(-h / rng))
 
+result = {
+    "run_date": __import__("datetime").date.today().isoformat(),
+    "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
+    "variable": "CWD (pm_fao56), OLS-detrended against elevation",
+    "n_points": int(n),
+    "n_pairs": int(len(dists)),
+    "detrend": {"slope_mm_per_m": float(coef[0]), "intercept_mm": float(coef[1])},
+    "empirical_semivariogram": [
+        {"lag_km": round(float(c), 1), "semivariance": round(float(g), 2), "n_pairs": nc}
+        for c, g, nc in zip(bin_centers, gamma, bin_counts)
+    ],
+}
 try:
     popt, _ = curve_fit(exp_model, bin_centers, gamma, p0=[gamma.min(), gamma.max() - gamma.min(), 25.0],
                          bounds=([0, 0, 1], [gamma.max(), gamma.max() * 2, 1000]))
@@ -93,12 +105,27 @@ try:
     pred_lin = Alin @ coef_lin
     r2_lin = 1 - np.sum((gamma - pred_lin)**2) / np.sum((gamma - gamma.mean())**2)
     print(f"real plain-linear (no-sill) fit: R2={r2_lin:.4f} (slope={coef_lin[0]:.4f})")
-    if r2_exp - r2_lin < 0.03:
-        print("=== Real finding: still no clear plateau -- exponential fit doesn't meaningfully "
-              "beat a straight line. The practical-range number above remains an upper-bound-ish "
-              "signal, not a confident estimate. ===")
+    plateau_visible = bool(r2_exp - r2_lin >= 0.03)
+    if not plateau_visible:
+        verdict = ("still no clear plateau -- the exponential fit doesn't meaningfully beat a straight "
+                   "line. The practical-range number remains an upper-bound-ish signal, not a "
+                   "confident estimate.")
     else:
-        print("=== Real finding: the exponential fit meaningfully beats a straight line -- a real "
-              "plateau is now visible, the practical-range number above is a genuine estimate. ===")
+        verdict = ("the exponential fit meaningfully beats a straight line -- a real plateau is now "
+                   "visible, the practical-range number is a genuine estimate.")
+    print(f"=== Real finding: {verdict} ===")
+    result["exponential_fit"] = {
+        "nugget": float(nugget), "sill": float(sill), "range_param_km": float(rng),
+        "practical_range_km": float(practical_range_km), "r2": float(r2_exp),
+    }
+    result["linear_fit"] = {"slope": float(coef_lin[0]), "r2": float(r2_lin)}
+    result["plateau_visible"] = plateau_visible
+    result["verdict"] = verdict
 except Exception as e:
     print(f"\nfit failed: {e}")
+    result["fit_error"] = str(e)
+
+from pathlib import Path  # noqa: E402
+out = Path("configs/fitted") / ("variogram_dense.yaml" if dense else "variogram.yaml")
+out.write_text(yaml.dump(result, sort_keys=False, default_flow_style=False))
+print(f"=== Wrote {out} ===")

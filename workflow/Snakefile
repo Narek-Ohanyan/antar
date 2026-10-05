@@ -1,57 +1,177 @@
-# ANTAR workflow skeleton (Snakemake).  Rules declare the *contract* between modules;
-# commands are placeholders that call the corresponding package entry points once implemented.
+# ANTAR workflow (Snakemake). Every rule runs a real, existing script and produces a real fitted
+# output under configs/fitted/ -- there are no placeholder `echo` rules. The earlier skeleton's
+# stages that have no implementation yet (master-grid zarr, hydraulic emulator, nested blocked-CV
+# validation report, Sobol variance decomposition) are deliberately NOT declared here as fake
+# rules; they are listed under "Not yet implemented" at the bottom so the DAG never claims work
+# that does not exist.
+#
+#   snakemake --cores 4 --resources drive_streams=1            # 80-point validation grid
+#   snakemake --cores 4 --resources drive_streams=1 --config dense=true   # 1044-point dense grid
+#   snakemake -n                                                # dry run: print the plan only
+#
+# `--resources drive_streams=1` serialises the steps that stream rasters from Google Drive. Running
+# them concurrently was observed to degrade/throttle reads (see IMPLEMENTATION_LOG.md, 2026-10-02
+# to 2026-10-04); Snakemake does not enforce the limit unless you pass it.
+#
+# Raw data pulls (pull_*.py, register_*.py, submit_*.py) are intentionally outside this DAG: they
+# are one-off, network-bound, and several take hours. Their products live under data/ (gitignored)
+# and are declared below as ancient() inputs so they are checked for existence but never trigger
+# a re-pull. See configs/manifests/ for the provenance of each.
 configfile: "configs/study_area.yaml"
+
+DENSE = bool(config.get("dense", False))
+SUF = "_dense" if DENSE else ""
+FLAG = "--dense" if DENSE else ""
+FITTED = "configs/fitted"
+PY = "python3"
+
+CHELSA_DAILY = ancient("data/chelsa")
+ISIMIP = ancient("data/isimip3b")
+ECOSYSTEM_MAP = ancient("data/ecosystem_map")
+BIOCLIM = ancient("data/chelsa_bioclim")
+
 
 rule all:
     input:
-        "results/decision/robust_portfolio.parquet",
-        "results/validation/report.html"
+        f"{FITTED}/aegis_portfolio{SUF}.yaml",
+        f"{FITTED}/treeline_change{SUF}.yaml",
+        f"{FITTED}/mneme_hazard_panel_2010_2019{SUF}.yaml",
+        f"{FITTED}/xylem_mechanistic_hazard_2019{SUF}.yaml",
+        f"{FITTED}/variogram{SUF}.yaml",
+        f"{FITTED}/meristem_adult_niche.yaml",
+        "ui/data/manifest.json",
 
-rule master_grid:
-    output: "data/interim/grid.json"
-    shell: "python -m antar.io.grid --out {output}"
 
-rule topoclimate:                      # TOPOHYDRO: downscaled forcing, PET ensemble, snow, soil water, CWD/REW/WSI/SPEI
-    input: "data/interim/grid.json"
-    output: "data/processed/climate_indices.zarr"
-    shell: "echo 'TOPOHYDRO: implement climate.* pipeline'"
+# --- TOPOHYDRO -------------------------------------------------------------------------------
+rule lapse_rate:        # monthly temperature lapse rate + precipitation gradient from GHCN-D stations
+    input: "data/_staging_ghcnd"
+    output: f"{FITTED}/topohydro_lapse_rate.yaml"
+    shell: f"{PY} scripts/fit_topohydro_lapse_rate.py"
 
-rule hydraulics_emulator:              # XYLEM: LHS runs of the two-phase engine + monotone surrogate
-    input: "data/processed/climate_indices.zarr", "configs/species_traits.csv"
-    output: "models/hydraulic_emulator.joblib"
-    shell: "echo 'XYLEM: run engine on LHS design, fit monotone emulator'"
 
-rule labels:                           # MNEME targets: vitality anomalies, events, cause attribution, design-based accuracy
-    input: "data/interim/grid.json"
-    output: "data/processed/hazard_panel.parquet"
-    shell: "echo 'MNEME: build person-period panel'"
+rule topohydro:         # gridded downscaled forcing + water balance (CWD, WSI, GDD, growing season)
+    input: f"{FITTED}/topohydro_lapse_rate.yaml", CHELSA_DAILY
+    output: f"{FITTED}/topohydro_grid_run_2019{SUF}.yaml"
+    params: flag=FLAG
+    resources: drive_streams=1
+    retries: 5
+    shell: f"{PY} scripts/run_topohydro_grid.py {{params.flag}}"
 
-rule hazard_model:                     # MNEME: cloglog panel GLM + monotone GBM, nested blocked CV, NNLS stacking, AOA
-    input: "data/processed/hazard_panel.parquet", "models/hydraulic_emulator.joblib"
-    output: "models/hazard_stack.joblib", "results/validation/cv_scores.csv"
-    shell: "echo 'MNEME: fit + validate'"
 
-rule niche_structure_regeneration:     # MERISTEM
-    input: "data/processed/climate_indices.zarr"
-    output: "models/niche_height_regen.joblib"
-    shell: "echo 'MERISTEM: adult niche, attainable height, establishment hazard'"
+# --- XYLEM / REFUGIUM / MNEME ----------------------------------------------------------------
+rule xylem:             # mechanistic hydraulic-failure hazard, two-level Monte Carlo, per functional group
+    input:
+        f"{FITTED}/topohydro_lapse_rate.yaml", "configs/species_traits.csv",
+        f"{FITTED}/xylem_trait_hyper_sd.yaml", CHELSA_DAILY,
+    output: f"{FITTED}/xylem_mechanistic_hazard_2019{SUF}.yaml"
+    params: flag=FLAG
+    resources: drive_streams=1
+    retries: 5
+    shell: f"{PY} scripts/fit_xylem_mechanistic_hazard.py {{params.flag}}"
 
-rule viability_refugia:                # REFUGIUM: per scenario member
-    input: "models/hazard_stack.joblib", "models/niche_height_regen.joblib"
-    output: "results/viability/ensemble.zarr"
-    shell: "echo 'REFUGIUM: cohort viability + refugia'"
 
-rule uncertainty:
-    input: "results/viability/ensemble.zarr"
-    output: "results/uncertainty/variance_decomposition.csv"
-    shell: "echo 'uncertainty: variance decomposition + Sobol'"
+rule refugium:          # viability + robust-refugium criterion (a) from XYLEM's hazard ensemble
+    input:
+        f"{FITTED}/topohydro_lapse_rate.yaml", "configs/species_traits.csv",
+        f"{FITTED}/xylem_trait_hyper_sd.yaml", CHELSA_DAILY,
+    output: f"{FITTED}/refugium_viability_2019{SUF}.yaml"
+    params: flag=FLAG
+    resources: drive_streams=1
+    retries: 5
+    shell: f"{PY} scripts/fit_refugium_viability.py {{params.flag}}"
 
-rule decision:
-    input: "results/viability/ensemble.zarr", "results/uncertainty/variance_decomposition.csv"
-    output: "results/decision/robust_portfolio.parquet"
-    shell: "echo 'AEGIS: CVaR portfolio'"
 
-rule validation_report:
-    input: "results/validation/cv_scores.csv"
-    output: "results/validation/report.html"
-    shell: "echo 'design-based accuracy, AOA maps, calibration, model card'"
+rule mneme:             # person-period dieback panel + stacked hazard fit (reports a null result if events < 2)
+    input: f"{FITTED}/topohydro_lapse_rate.yaml", CHELSA_DAILY
+    output: f"{FITTED}/mneme_hazard_panel_2010_2019{SUF}.yaml"
+    params: flag=FLAG
+    resources: drive_streams=1
+    retries: 5
+    shell: f"{PY} scripts/fit_mneme_hazard_panel.py {{params.flag}}"
+
+
+# --- MERISTEM --------------------------------------------------------------------------------
+rule meristem:          # per-species presence-background adult niche (GBIF + CHELSA bioclim)
+    input: "configs/gbif_occurrences_armenia.csv", BIOCLIM
+    output: f"{FITTED}/meristem_adult_niche.yaml"
+    shell: f"{PY} scripts/fit_meristem_adult_niche.py"
+
+
+# --- Treeline --------------------------------------------------------------------------------
+rule treeline_diagnostic:   # today's (2019) potential-treeline elevation per cell
+    input: f"{FITTED}/topohydro_lapse_rate.yaml", CHELSA_DAILY
+    output: f"{FITTED}/treeline_diagnostic_2019.yaml"
+    resources: drive_streams=1
+    retries: 5
+    shell: f"{PY} scripts/compute_treeline_diagnostic.py"
+
+
+rule treeline_change:       # treeline shift across the 45-member ISIMIP3b ensemble (delta method)
+    input: f"{FITTED}/treeline_diagnostic_2019.yaml", f"{FITTED}/topohydro_lapse_rate.yaml", ISIMIP, CHELSA_DAILY
+    output: f"{FITTED}/treeline_change{SUF}.yaml"
+    params: flag=FLAG
+    resources: drive_streams=1
+    retries: 5
+    shell: f"{PY} scripts/compute_treeline_change.py {{params.flag}}"
+
+
+# --- Future projections, ecosystem-map validation, decision ----------------------------------
+rule future_projections:    # 45-member (5 GCM x 3 SSP x 3 horizon) viability ensemble, delta-method downscaling
+    input:
+        f"{FITTED}/topohydro_lapse_rate.yaml", "configs/species_traits.csv",
+        f"{FITTED}/xylem_trait_hyper_sd.yaml", ISIMIP, CHELSA_DAILY,
+    output: f"{FITTED}/future_projections{SUF}.yaml"
+    params: flag=FLAG
+    resources: drive_streams=1
+    retries: 5
+    shell: f"{PY} scripts/run_future_projections.py {{params.flag}}"
+
+
+rule ecosystem_ground_truth:    # real Ecosystem Map of Armenia: validation correlations + human-modified exclusion
+    input: f"{FITTED}/refugium_viability_2019.yaml", ECOSYSTEM_MAP
+    output: f"{FITTED}/ecosystem_ground_truth_2019.yaml"
+    shell: f"{PY} scripts/integrate_ecosystem_map.py"
+
+
+rule aegis:                 # CVaR-robust portfolio over options x scenarios, budget sweep + efficient frontier
+    input:
+        f"{FITTED}/future_projections{SUF}.yaml", f"{FITTED}/ecosystem_ground_truth_2019.yaml",
+        ECOSYSTEM_MAP,
+    output: f"{FITTED}/aegis_portfolio{SUF}.yaml"
+    params: flag=FLAG
+    resources: drive_streams=1
+    retries: 5
+    shell: f"{PY} scripts/fit_aegis_portfolio.py {{params.flag}}"
+
+
+# --- Sampling-design diagnostics -------------------------------------------------------------
+rule variogram:         # empirical variogram of elevation-detrended CWD -> informs configs/cv.yaml block size
+    input: f"{FITTED}/topohydro_grid_run_2019{SUF}.yaml"
+    output: f"{FITTED}/variogram{SUF}.yaml"
+    params: flag=FLAG
+    shell: f"{PY} scripts/estimate_variogram.py {{params.flag}}"
+
+
+# --- UI --------------------------------------------------------------------------------------
+rule ui_data:           # bundle every real fitted output into ui/data/*.json for the static UI
+    input:
+        f"{FITTED}/topohydro_grid_run_2019{SUF}.yaml",
+        f"{FITTED}/xylem_mechanistic_hazard_2019{SUF}.yaml",
+        f"{FITTED}/refugium_viability_2019{SUF}.yaml",
+        f"{FITTED}/future_projections{SUF}.yaml",
+        f"{FITTED}/treeline_change{SUF}.yaml",
+        f"{FITTED}/aegis_portfolio{SUF}.yaml",
+        f"{FITTED}/mneme_hazard_panel_2010_2019{SUF}.yaml",
+        f"{FITTED}/variogram{SUF}.yaml",
+        f"{FITTED}/meristem_adult_niche.yaml",
+        f"{FITTED}/ecosystem_ground_truth_2019.yaml",
+    output: "ui/data/manifest.json"
+    shell: f"{PY} ui/build_data.py"
+
+
+# --- Not yet implemented (deliberately not declared as rules) ---------------------------------
+#  * nested blocked cross-validation per configs/cv.yaml (needs a denser grid and, for MNEME, real events)
+#  * monotone hydraulic emulator surrogate
+#  * Sobol / variance-decomposition uncertainty stage
+#  * full Eq. 7.3 MNEME design (age spline, DLNM cross-basis) -- needs real stand-age / structure data
+#  * MERISTEM attainable-height model fit (needs real height/growth data)
