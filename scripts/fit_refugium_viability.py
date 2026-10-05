@@ -106,9 +106,12 @@ def main():
 
         print(f"=== {name}: real viability ensemble per cell ===", flush=True)
         v_ensemble = np.full((OUTER_DRAWS, len(valid_idx)), np.nan)
+        hydro = []   # group-specific (rooting-depth-dependent) water stress, kept so scenario change can be shown against it
         for col, i in enumerate(valid_idx):
             cell = cells[i]
             psi_soil = cell.psi_soil_mpa[PET_FORMULATION]
+            hydro.append({"cwd_mm": float(cell.cwd_mm[PET_FORMULATION]), "wsi": float(cell.wsi[PET_FORMULATION]),
+                          "psi_min_mpa": float(np.min(psi_soil))})
 
             def simulate(traits, psi_soil=psi_soil, cell=cell):
                 sim = simulate_two_phase(psi_soil, cell.t_max_c, cell.vpd_24h_kpa, cell.pressure_kpa, traits, 1.0)
@@ -134,6 +137,8 @@ def main():
                 "viability_ensemble_max": float(v_ensemble[:, col].max()),
                 "refugium_score": float(score[col]),
                 "robust_refugium_criterion_a": bool(robust_mask[col]),
+                "p_viable": float(np.mean(v_ensemble[:, col] >= V_STAR)),
+                **hydro[col],
             })
         n_robust = int(robust_mask.sum())
         results["groups"][name] = {

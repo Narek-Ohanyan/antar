@@ -44,6 +44,13 @@ GROUPS = {
     "ring_porous_oak": {"label": "Oak (Quercus macranthera, Q. iberica)", "short": "oak"},
     "pine": {"label": "Pine (Pinus kochiana)", "short": "pine"},
 }
+# group-specific (rooting-depth-dependent) water-stress fields: (field in yaml, layer-id prefix, label, unit, decimals)
+HYDRO_FIELDS = [("cwd_mm", "cwd", "Climatic water deficit", "mm", 1), ("wsi", "wsi", "Water-stress integral", "", 2),
+                ("psi_min_mpa", "psimin", "Minimum soil water potential", "MPa", 2)]
+# For colouring change maps: which direction is favourable for the forest. Matched on the layer-id prefix.
+GOOD_DIRECTION = [("viab_", "high"), ("pviab_", "high"), ("robust_", "high"), ("refscore_", "high"), ("hmech_sd", None),
+                  ("hmech_", "low"), ("cwd_", "low"), ("wsi", "low"), ("psimin_", "high"), ("psi_min", "high"),
+                  ("late_frost", "low"), ("treeline_margin", "high"), ("treeline_shift", "high"), ("treeline_2019", "high")]
 ROOTING_DEPTH_M = {"mesic_diffuse_porous_broadleaf": 2.9, "ring_porous_oak": 2.9, "pine": 3.9,
                    "juniper_arid_conifer": 9.5}
 
@@ -259,6 +266,13 @@ def build():
                       {"label": f"Risk-averse refugium score — {GROUPS[gname]['short']}", "unit": "", "engine": "REFUGIUM", "group": gname})
                 G.set(f"robust_{gname}", k, 1 if c["robust_refugium_criterion_a"] else 0,
                       {"label": f"Robust refugium, criterion (a) — {GROUPS[gname]['short']}", "unit": "0/1", "engine": "REFUGIUM", "group": gname, "binary": True})
+                if "p_viable" in c:
+                    G.set(f"pviab_{gname}", k, r(c["p_viable"], 3),
+                          {"label": f"Probability that viability ≥ {rf.get('v_star')} — {GROUPS[gname]['short']}", "unit": "probability", "engine": "REFUGIUM", "group": gname})
+                for fld, lid, label, unit, nd in HYDRO_FIELDS:
+                    if fld in c:
+                        G.set(f"{lid}_{gname}", k, r(c[fld], nd),
+                              {"label": f"{label} — {GROUPS[gname]['short']} rooting depth", "unit": unit, "engine": "REFUGIUM", "group": gname})
             ins = in_arm(g["cells"])
             vals = [c["viability_ensemble_mean"] for c, i in zip(g["cells"], ins) if i]
             baseline_viab[gname] = r(np.mean(vals), 4) if vals else None
@@ -287,7 +301,8 @@ def build():
         G.scen["treeline_members"] = [{"gcm": tc["members"][m]["gcm"], "ssp": tc["members"][m]["scenario"],
                                        "horizon": tc["members"][m]["horizon"]} for m in member_keys]
         G.scen["treeline_cell_keys"] = cell_keys
-        G.scen["treeline_shift"] = [[r(v, 0) for v in tc["members"][m]["shift_m"]] for m in member_keys]
+        G.scen["tl_series"] = {"treeline_shift": [[r(v, 0) for v in tc["members"][m]["shift_m"]] for m in member_keys],
+                               "treeline_2019": [[r(v, 0) for v in tc["members"][m]["potential_treeline_m"]] for m in member_keys]}
         tl_in = in_arm(tc["cells"])
         tl_summary = {}
         for ssp in ("ssp126", "ssp370", "ssp585"):
@@ -317,10 +332,19 @@ def build():
         G.scen["members"] = [{"gcm": fp["members"][m]["gcm"], "ssp": fp["members"][m]["scenario"],
                               "horizon": int(fp["members"][m]["horizon"])} for m in member_keys]
         G.scen["cell_keys"] = cell_keys
-        G.scen["viab"] = {gn: [[r(c["viability_mean"], 4) for c in fp["members"][m]["groups"][gn]["cells"]]
-                               for m in member_keys] for gn in gnames}
-        G.scen["hmech"] = {gn: [[r(c["h_mech_mean"], 5) for c in fp["members"][m]["groups"][gn]["cells"]]
-                                for m in member_keys] for gn in gnames}
+        series = {}
+        # (yaml field, layer-id prefix, decimals); a series is exported only if EVERY member has the field
+        for fld, lid, nd in [("viability_mean", "viab", 4), ("h_mech_mean", "hmech", 5), ("p_viable", "pviab", 3),
+                             ("cwd_mm", "cwd", 1), ("wsi", "wsi", 2), ("psi_min_mpa", "psimin", 2)]:
+            for gn in gnames:
+                rows = [fp["members"][m]["groups"][gn]["cells"] for m in member_keys]
+                if all(fld in c for cells in rows for c in cells):
+                    series[f"{lid}_{gn}"] = [[r(c[fld], nd) for c in cells] for cells in rows]
+        if all("climate" in fp["members"][m] for m in member_keys):
+            for fld, lid, nd in [("t_mean_c", "t_mean", 2), ("precip_mm", "precip", 0), ("gdd", "gdd", 0),
+                                 ("late_frost_days", "late_frost", 0), ("gsl_days", "gsl", 0)]:
+                series[lid] = [[r(c[fld], nd) for c in fp["members"][m]["climate"]] for m in member_keys]
+        G.scen["fp_series"] = series
         fp_in = in_arm(first["groups"][gnames[0]]["cells"])
         # Precomputed ensemble summary over ARMENIAN cells only: mean over cells, then mean / min / max across GCMs.
         scen_summary = {}
@@ -421,19 +445,20 @@ def build():
                     out.append(full)
                 return out
             scen["members"] = G.scen["members"]
-            scen["viab"] = {gn: remap(m) for gn, m in G.scen["viab"].items()}
-            scen["hmech"] = {gn: remap(m) for gn, m in G.scen["hmech"].items()}
+            scen["fp_series"] = {qid: remap(m) for qid, m in G.scen["fp_series"].items()}
         if "treeline_members" in G.scen:
             n = len(index)
             pairs = [(index[k], j) for j, k in enumerate(G.scen["treeline_cell_keys"]) if k in index]
-            full_rows = []
-            for row in G.scen["treeline_shift"]:
-                full = [None] * n
-                for pos, j in pairs:
-                    full[pos] = row[j]
-                full_rows.append(full)
+            def remap_tl(mat):
+                rows = []
+                for row in mat:
+                    full = [None] * n
+                    for pos, j in pairs:
+                        full[pos] = row[j]
+                    rows.append(full)
+                return rows
             scen["treeline_members"] = G.scen["treeline_members"]
-            scen["treeline_shift"] = full_rows
+            scen["tl_series"] = {qid: remap_tl(m) for qid, m in G.scen["tl_series"].items()}
         data["scenarios"] = scen
         fname = f"grid_{gid}.json"
         dump(data, OUT / fname)
@@ -441,7 +466,10 @@ def build():
                            "bytes": (OUT / fname).stat().st_size,
                            "has_scenarios": bool(scen.get("members")), "has_treeline_change": bool(scen.get("treeline_members"))}
         for lid, meta in G.layer_meta.items():
-            layer_catalogue[lid] = {**meta, "grid": gid, "grid_label": GRIDS[gid]}
+            good = next((d for pre, d in GOOD_DIRECTION if lid.startswith(pre)), None)
+            layer_catalogue[lid] = {**meta, "grid": gid, "grid_label": GRIDS[gid], "good": good,
+                                    # sampled-window layers are 500 m samples at the nodes, not fields: the real raster is the map
+                                    "map": meta.get("engine") != "Ecosystem map"}
 
     # ---- references from the dataset manifests ------------------------------------------------
     refs, seen = [], set()

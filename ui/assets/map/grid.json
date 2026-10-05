@@ -1,0 +1,151 @@
+{
+ "crs": "EPSG:3857",
+ "x0": 4831265.900428073,
+ "y_top": 5078944.868733779,
+ "px_m": 650.0,
+ "width": 566,
+ "height": 594,
+ "bounds_latlon": [
+  [
+   38.798468,
+   43.4
+  ],
+  [
+   41.45,
+   46.704902
+  ]
+ ],
+ "earth_radius_m": 6378137.0,
+ "regions": [
+  {
+   "id": 1,
+   "name": "Aragatsotn",
+   "iso": "AM-AG",
+   "area_km2": 2724.2
+  },
+  {
+   "id": 2,
+   "name": "Ararat",
+   "iso": "AM-AR",
+   "area_km2": 1938.5
+  },
+  {
+   "id": 3,
+   "name": "Armavir",
+   "iso": "AM-AV",
+   "area_km2": 1264.5
+  },
+  {
+   "id": 4,
+   "name": "Gegharkunik",
+   "iso": "AM-GR",
+   "area_km2": 5354.2
+  },
+  {
+   "id": 5,
+   "name": "Kotayk",
+   "iso": "AM-KT",
+   "area_km2": 2051.2
+  },
+  {
+   "id": 6,
+   "name": "Lori",
+   "iso": "AM-LO",
+   "area_km2": 3761.7
+  },
+  {
+   "id": 7,
+   "name": "Shirak",
+   "iso": "AM-SH",
+   "area_km2": 2814.1
+  },
+  {
+   "id": 8,
+   "name": "Syunik",
+   "iso": "AM-SU",
+   "area_km2": 4550.3
+  },
+  {
+   "id": 9,
+   "name": "Tavush",
+   "iso": "AM-TV",
+   "area_km2": 2833.3
+  },
+  {
+   "id": 10,
+   "name": "Vayots Dzor",
+   "iso": "AM-VD",
+   "area_km2": 2268.6
+  },
+  {
+   "id": 11,
+   "name": "Yerevan",
+   "iso": "AM-ER",
+   "area_km2": 211.6
+  }
+ ],
+ "country_area_km2": 29772.3,
+ "official_area_km2": 29743.0,
+ "forest_classes": {
+  "forest": [
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37
+  ],
+  "woodland": [
+   39,
+   41,
+   43,
+   44
+  ],
+  "broadleaf": [
+   31
+  ],
+  "oak": [
+   32,
+   33,
+   34,
+   35
+  ],
+  "pine": [
+   36
+  ],
+  "juniper": [
+   44
+  ],
+  "water": [
+   1001
+  ]
+ },
+ "class_names": {
+  "31": "Fagus orientalis and other deciduous",
+  "32": "Quercus macranthera and other deciduous",
+  "33": "Quercus macranthera",
+  "34": "Quercus iberica and other deciduous",
+  "35": "Quercus iberica",
+  "36": "Pinus kochiana",
+  "37": "Closed forest plantations",
+  "39": "Open woodland plantations",
+  "41": "Subalpine woodlands",
+  "43": "Mixed woodlands",
+  "44": "Juniper woodlands",
+  "1001": "Water bodies"
+ },
+ "cover_area_km2": {
+  "forest": 3178.1,
+  "woodland": 2153.4,
+  "water": 1375.5,
+  "forest_broadleaf": 1340.5,
+  "forest_oak": 1780.9,
+  "forest_pine": 5.4,
+  "forest_juniper": 55.8
+ },
+ "sources": {
+  "outline_and_cover": "Ecosystem Map of Armenia (BCC Armenia / Institute of Botany NAS RA / IOER, 2026), CC BY 4.0, 10 m, block-averaged to 500 m",
+  "marz_borders": "geoBoundaries gbOpen ARM ADM1 (Wikimedia-derived, 2005), CC BY 2.5; approximate"
+ }
+}

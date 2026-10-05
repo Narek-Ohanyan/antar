@@ -54,6 +54,7 @@ from run_topohydro_grid import (  # noqa: E402
     GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
 )
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
+from fit_refugium_viability import V_STAR, RHO  # noqa: E402
 
 from antar.climate import downscale  # noqa: E402
 from antar.climate.forcing import topoclimate_forcing  # noqa: E402
@@ -249,6 +250,7 @@ def main():
                 continue
             print(f"  === {mkey} ===", flush=True)
             cell_results = {}
+            climate_rows = []
             for i in range(n):
                 if not valid_mask[i]:
                     continue
@@ -274,10 +276,23 @@ def main():
                         outer_draws=OUTER_DRAWS, inner_draws=INNER_DRAWS, seed=i,
                     )
                     v = np.array([viability([hh], p_height_ok=1.0) for hh in h])
+                    p_viable = float(np.mean(v >= V_STAR))   # share of the 50 trait-knowledge draws with V >= V*
                     cell_results.setdefault(gname, []).append({
                         "lat": float(lats[i]), "lon": float(lons[i]),
                         "viability_mean": float(v.mean()), "h_mech_mean": float(h.mean()),
+                        "viability_p10": float(np.percentile(v, 10)), "viability_p90": float(np.percentile(v, 90)),
+                        "p_viable": p_viable, "robust_criterion_a": bool(p_viable >= RHO),
+                        # group-specific because w_max_mm (rooting depth) differs per group
+                        "cwd_mm": float(cell.cwd_mm[PET_FORMULATION]), "wsi": float(cell.wsi[PET_FORMULATION]),
+                        "psi_min_mpa": float(np.min(psi_soil)),
                     })
+                # group-independent climate of the scenario year (identical for every group's cell)
+                climate_rows.append({
+                    "lat": float(lats[i]), "lon": float(lons[i]),
+                    "t_mean_c": float(np.mean(cell.t_mean_c)), "precip_mm": float(np.sum(cell.p_mm)),
+                    "gdd": float(cell.gdd_cumulative[-1]), "late_frost_days": int(cell.late_frost_days),
+                    "gsl_days": int(cell.growing_season_length_days), "gst_c": float(cell.growing_season_mean_t_c),
+                })
                 if (i + 1) % 20 == 0:
                     print(f"    [{i + 1}/{n}] cells done", flush=True)
 
@@ -292,7 +307,8 @@ def main():
                     "mean_refugium_score": float(np.mean(score)),
                     "cells": rows,
                 }
-            results[mkey] = {"gcm": gcm, "scenario": scenario, "horizon": horizon, "groups": group_summary}
+            results[mkey] = {"gcm": gcm, "scenario": scenario, "horizon": horizon, "groups": group_summary,
+                             "climate": climate_rows}
             checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
             checkpoint_path.write_text(json.dumps(results))
             print(f"  {mkey}: checkpointed", flush=True)

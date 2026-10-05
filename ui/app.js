@@ -15,12 +15,13 @@ const ok = (v) => v != null && isFinite(v);
 function fmt(v, d = 3) { return ok(v) ? (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString("en") : +Number(v).toFixed(d) + "") : "—"; }
 const pct = (v, d = 1) => (ok(v) ? (100 * v).toFixed(d) + "%" : "—");
 const chip = (kind, text) => `<span class="chip ${kind}">${esc(text)}</span>`;
-const gridChip = (gid) => chip(gid === "dense" ? "good" : "neutral", gid === "dense" ? "1044-pt dense grid" : "80-pt validation grid");
+const gridChip = (gid) => chip(gid === "dense" ? "good" : "neutral", gid === "dense" ? "921-node dense grid" : "25-node validation grid");
 const groupLabel = (g) => (state.M.groups[g] ? state.M.groups[g].label : g);
 function pageParams() { const q = location.hash.split("?")[1] || ""; return Object.fromEntries(new URLSearchParams(q)); }
 function setParams(p) { const base = location.hash.split("?")[0]; history.replaceState(null, "", base + "?" + new URLSearchParams(p).toString()); }
-function scenarioGridId() { return Object.keys(state.G).filter((g) => state.G[g].scenarios && state.G[g].scenarios.members).sort().reverse()[0]; }
-function treelineGridId() { return Object.keys(state.G).filter((g) => state.G[g].scenarios && state.G[g].scenarios.treeline_members).sort().reverse()[0]; }
+const denseFirst = (ids) => ids.slice().sort((a, b) => (b === "dense") - (a === "dense"));
+function scenarioGridId() { return denseFirst(Object.keys(state.G).filter((g) => state.G[g].scenarios && state.G[g].scenarios.members))[0]; }
+function treelineGridId() { return denseFirst(Object.keys(state.G).filter((g) => state.G[g].scenarios && state.G[g].scenarios.treeline_members))[0]; }
 
 /* ---------- colour scales ---------- */
 const SEQ = ["#440154", "#482878", "#3e4989", "#31688e", "#26828e", "#1f9e89", "#35b779", "#6ece58", "#b5de2b", "#fde725"];
@@ -58,55 +59,8 @@ function makeScale(values, { diverging, stops, binary, unit }) {
   return { fn: (x) => ramp(st, (x - lo) / (hi - lo)), lo, hi, stops: st, min: v[0], max: v[v.length - 1], widened };
 }
 
-/* ---------- quantities for the map ---------- */
-function scenarioKind(id) {
-  if (id === "treeline_shift") return { kind: "treeline" };
-  if (id.startsWith("viab_")) return { kind: "viab", group: id.slice(5) };
-  if (id.startsWith("hmech_") && !id.startsWith("hmech_sd_")) return { kind: "hmech", group: id.slice(6) };
-  return null;
-}
-function buildQuantities() {
-  const M = state.M, Q = {};
-  for (const [id, meta] of Object.entries(M.layers)) Q[id] = { id, ...meta, scen: scenarioKind(id) };
-  const tg = treelineGridId();
-  if (tg) Q.treeline_shift = { id: "treeline_shift", label: "Treeline shift vs 2019 (scenario)", unit: "m", engine: "Treeline", grid: tg, grid_label: M.grids[tg].label, scen: { kind: "treeline" }, scenarioOnly: true };
-  return Q;
-}
 const ENGINE_ORDER = ["TOPOHYDRO", "XYLEM", "REFUGIUM", "Treeline", "Ecosystem map"];
 const ENGINE_TITLE = { TOPOHYDRO: "Climate & water balance (TOPOHYDRO)", XYLEM: "Hydraulic-failure hazard (XYLEM)", REFUGIUM: "Viability & refugia (REFUGIUM)", Treeline: "Treeline", "Ecosystem map": "Observed land cover (Ecosystem Map)" };
-
-function scenarioMembers(sg, kind) { return kind === "treeline" ? sg.scenarios.treeline_members : sg.scenarios.members; }
-function scenarioMatrix(sg, scen) {
-  if (scen.kind === "treeline") return sg.scenarios.treeline_shift;
-  return scen.kind === "viab" ? sg.scenarios.viab[scen.group] : sg.scenarios.hmech[scen.group];
-}
-function ensembleAt(sg, scen, sel) {
-  const members = scenarioMembers(sg, scen.kind), mat = scenarioMatrix(sg, scen);
-  if (!mat) return null;
-  const idx = [];
-  members.forEach((m, i) => { if (m.ssp === sel.ssp && m.horizon === +sel.hz && (sel.gcm === "ens" || m.gcm === sel.gcm)) idx.push(i); });
-  return Array.from({ length: sg.n_cells }, (_, c) => { const vs = idx.map((i) => mat[i][c]).filter(ok); return vs.length ? mean(vs) : null; });
-}
-function getSeries(q, sel) {
-  const M = state.M;
-  if (sel.mode === "base" && !q.scenarioOnly) {
-    const g = state.G[q.grid];
-    return { grid: g, gid: q.grid, values: g.layers[q.id], diverging: false, binary: M.layers[q.id] && M.layers[q.id].binary };
-  }
-  const sgid = q.scen.kind === "treeline" ? treelineGridId() : scenarioGridId();
-  if (!sgid) return null;
-  const sg = state.G[sgid];
-  const vals = ensembleAt(sg, q.scen, sel);
-  if (!vals) return null;
-  if (q.scen.kind === "treeline") return { grid: sg, gid: sgid, values: vals, diverging: true, stops: DIV_SHIFT };
-  if (sel.diff) {
-    const base = sg.layers[q.id];
-    if (!base) return { grid: sg, gid: sgid, values: vals, diverging: false, noDiff: true };
-    const d = vals.map((v, i) => (ok(v) && ok(base[i]) ? v - base[i] : null));
-    return { grid: sg, gid: sgid, values: d, diverging: true, stops: q.scen.kind === "hmech" ? DIV_BAD_HIGH : DIV_GOOD_HIGH };
-  }
-  return { grid: sg, gid: sgid, values: vals, diverging: false };
-}
 
 /* ---------- pages ---------- */
 const PAGES = {
@@ -119,6 +73,7 @@ function route() {
   const page = (location.hash.replace(/^#\//, "").split("?")[0]) || "home";
   const fn = PAGES[page] || renderHome;
   $("nav").innerHTML = NAV.map(([k, t]) => `<a href="#/${k}" class="${k === page ? "active" : ""}">${t}</a>`).join("");
+  if (state.mapCleanup) { state.mapCleanup(); state.mapCleanup = null; }
   if (state.mapObj) { state.mapObj.remove(); state.mapObj = null; }
   window.scrollTo(0, 0);
   fn(pageParams());
@@ -128,7 +83,7 @@ function banner() {
   const M = state.M, rej = Object.values(M.provenance).flatMap((p) => p.rejected || []);
   const grids = Object.keys(M.grids);
   let h = "";
-  if (!grids.includes("dense")) h += `<div class="callout info"><strong>Grid in use:</strong> every layer currently comes from the 80-point validation grid. A denser 1044-point grid is being computed; a dense result is adopted only once it covers the grid almost completely.</div>`;
+  if (!grids.includes("dense")) h += `<div class="callout info"><strong>Grid in use:</strong> every layer currently comes from the 25-node validation grid (the Armenian cells of a coarse 80-point sample). A denser 921-node Armenia-only grid is being computed; a dense result is adopted only once it covers the grid almost completely.</div>`;
   if (rej.length) h += `<div class="callout"><strong>Dense result rejected:</strong> ${rej.map(esc).join("; ")}</div>`;
   return h;
 }
@@ -156,87 +111,13 @@ function renderHome() {
     <div class="grid cols-3">${eng.map((e) => `<div class="card"><h3>${esc(e.name)}</h3><p class="small muted">${esc(e.status)}</p><a href="#/method" data-jump="${e.id}">How it works →</a></div>`).join("")}</div>
     <h2>Where to look</h2>
     <div class="grid cols-3">
-      <div class="card"><h3>Map</h3><p class="small">Pick any quantity, a climate model, an emissions path and a horizon, and see it across the sampled cells.</p><a class="btn" href="#/map">Open the map</a></div>
+      <div class="card"><h3>Map</h3><p class="small">Pick any vulnerability, probability or climate quantity, a climate model, an emissions path and a horizon, and see it coloured across the whole country, with today's forest cover and marz borders.</p><a class="btn" href="#/map">Open the map</a></div>
       <div class="card"><h3>Treeline</h3><p class="small">How far uphill the climatic treeline moves in each of 45 climate-model × scenario × horizon members.</p><a class="btn secondary" href="#/treeline">See treeline change</a></div>
       <div class="card"><h3>Decision</h3><p class="small">A budget-constrained, scenario-robust planting portfolio and its efficient frontier.</p><a class="btn secondary" href="#/decision">See the portfolio</a></div>
     </div></div>`;
   view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => { sessionStorageSafe("jump", a.dataset.jump); }));
 }
 function sessionStorageSafe(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* ignore */ } }
-
-/* ---- Map ---- */
-function renderMap(p) {
-  const M = state.M, Q = buildQuantities();
-  const sg = scenarioGridId(), gcms = sg ? [...new Set(state.G[sg].scenarios.members.map((m) => m.gcm))].sort() : [];
-  const sel = { q: Q[p.q] ? p.q : (Q.viab_pine ? "viab_pine" : Object.keys(Q)[0]), mode: p.mode || "base", ssp: p.ssp || "ssp585", hz: +(p.hz || 2100), gcm: p.gcm || "ens", diff: p.diff === "1" };
-  if (Q[sel.q] && Q[sel.q].scenarioOnly) sel.mode = "scen";
-  const byEngine = {};
-  Object.values(Q).forEach((q) => (byEngine[q.engine] = byEngine[q.engine] || []).push(q));
-  const opts = ENGINE_ORDER.filter((e) => byEngine[e]).map((e) => `<optgroup label="${esc(ENGINE_TITLE[e] || e)}">${byEngine[e].map((q) => `<option value="${esc(q.id)}">${esc(q.label)}</option>`).join("")}</optgroup>`).join("");
-  view().innerHTML = `<div class="wrap">${banner()}<div class="maplayout">
-    <aside class="card side"><h3>What to show</h3>
-      <label for="q">Quantity</label><select id="q">${opts}</select>
-      <div id="scenctl"></div>
-      <div id="qinfo" class="small" style="margin-top:12px"></div>
-      <div class="legend" id="legend"></div>
-      <div id="cellinfo" style="margin-top:14px"></div>
-    </aside>
-    <div><div id="map"></div><p class="small muted" style="margin-top:8px">Each circle is one sampled grid cell, not a continuous surface. Basemap © OpenStreetMap contributors.</p></div></div></div>`;
-  $("#q").value = sel.q;
-  const grid0 = state.G[Object.keys(state.G)[0]];
-  const map = L.map("map", { zoomControl: true, scrollWheelZoom: true });
-  state.mapObj = map;
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 12, attribution: "© OpenStreetMap" }).addTo(map);
-  const lats = grid0.lat, lons = grid0.lon;
-  map.fitBounds([[Math.min(...lats) - 0.1, Math.min(...lons) - 0.1], [Math.max(...lats) + 0.1, Math.max(...lons) + 0.1]]);
-  let layerGroup = L.layerGroup().addTo(map);
-
-  function scenControls(q) {
-    if (!q.scen) { $("#scenctl").innerHTML = ""; return; }
-    const sgid = q.scen.kind === "treeline" ? treelineGridId() : scenarioGridId();
-    if (!sgid) { $("#scenctl").innerHTML = `<p class="small muted">No scenario results are available for this quantity.</p>`; return; }
-    $("#scenctl").innerHTML = `
-      ${q.scenarioOnly ? "" : `<label for="mode">Period</label><select id="mode"><option value="base">2019 baseline</option><option value="scen">Future scenario</option></select>`}
-      <div id="scen" style="${sel.mode === "scen" || q.scenarioOnly ? "" : "display:none"}">
-        <label for="ssp">Emissions path</label><select id="ssp">${Object.entries(SSP).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
-        <label for="hz">Horizon</label><select id="hz">${HORIZONS.map((h) => `<option value="${h}">${h}</option>`).join("")}</select>
-        <label for="gcm">Climate model</label><select id="gcm"><option value="ens">Ensemble mean (5 models)</option>${gcms.map((g) => `<option value="${g}">${g}</option>`).join("")}</select>
-        ${q.scen.kind === "treeline" ? "" : `<label class="toggle" style="margin-top:12px"><input type="checkbox" id="diff"> Show change vs 2019</label>`}
-      </div>`;
-    if ($("#mode")) $("#mode").value = sel.mode;
-    $("#ssp").value = sel.ssp; $("#hz").value = sel.hz; $("#gcm").value = sel.gcm;
-    if ($("#diff")) $("#diff").checked = sel.diff;
-    ["mode", "ssp", "hz", "gcm"].forEach((id) => $("#" + id) && $("#" + id).addEventListener("change", (e) => { sel[id] = e.target.value; if (id === "mode") $("#scen").style.display = sel.mode === "scen" ? "" : "none"; refresh(); }));
-    if ($("#diff")) $("#diff").addEventListener("change", (e) => { sel.diff = e.target.checked; refresh(); });
-  }
-
-  function refresh() {
-    const q = Q[sel.q];
-    const s = getSeries(q, sel);
-    layerGroup.clearLayers();
-    const meta = [`<div><strong>${esc(q.label)}</strong></div>`, `<div class="muted">${esc(q.engine)} · ${gridChip(s ? s.gid : q.grid)}</div>`];
-    if (q.placeholder) meta.push(`<div class="callout" style="margin:8px 0;padding:7px 10px">Placeholder input: ${esc(q.placeholder)}</div>`);
-    if (!s || !s.values) { $("#qinfo").innerHTML = meta.join("") + `<p class="muted">No data for this selection.</p>`; $("#legend").innerHTML = ""; return; }
-    if (s.noDiff) meta.push(`<div class="callout" style="margin:8px 0;padding:7px 10px">No 2019 baseline exists on this grid, so change cannot be shown.</div>`);
-    const unit = q.unit || "";
-    const sc = makeScale(s.values, { diverging: s.diverging, stops: s.stops, binary: s.binary, unit: s.noUnit ? '' : (q.unit || '') });
-    const g = s.grid, n = g.n_cells, radius = n < 200 ? 9 : n < 600 ? 6 : 4;
-    const present = s.values.filter(ok);
-    for (let i = 0; i < n; i++) {
-      const v = s.values[i];
-      const mk = L.circleMarker([g.lat[i], g.lon[i]], { radius, weight: 1, color: ok(v) ? "#0b1a12" : "#888", fillColor: ok(v) ? sc.fn(v) : "#bbb", fillOpacity: ok(v) ? 0.92 : 0.35 });
-      mk.bindPopup(() => `<strong>${g.lat[i].toFixed(3)}°N, ${g.lon[i].toFixed(3)}°E</strong><br>Elevation ${fmt(g.elev[i], 0)} m<br>${esc(q.label)}: <strong>${fmt(v, 4)}${s.binary ? "" : " " + esc(unit)}</strong><br><a href="#/site?grid=${s.gid}&i=${i}">Open in site explorer →</a>`);
-      mk.addTo(layerGroup);
-    }
-    $("#qinfo").innerHTML = meta.join("") + `<div class="kv" style="margin-top:8px"><span>Cells shown</span><span>${present.length} / ${n}</span><span>Data range</span><span>${fmt(Math.min(...present), 4)} – ${fmt(Math.max(...present), 4)} ${esc(s.binary ? "" : unit)}</span><span>Mean</span><span>${fmt(mean(present), 3)}</span></div>`;
-    $("#legend").innerHTML = sc.binary
-      ? `<div><span class="swatch"><i style="background:#2f8f5b"></i>yes</span><span class="swatch"><i style="background:#c0583a"></i>no</span></div>`
-      : `<div class="bar" style="background:linear-gradient(90deg,${sc.stops.join(",")})"></div><div class="ends"><span>${fmt(sc.lo, 3)}</span><span>${esc(unit)}${s.diverging ? " (centre = 0)" : ""}</span><span>${fmt(sc.hi, 3)}</span></div><p class="small muted" style="margin:4px 0 0">${sc.widened ? '<strong>Scale widened</strong>: the data vary by less than ' + fmt(MIN_SPAN[unit] || 0, 3) + ' ' + esc(unit) + ', so colours are not stretched to make tiny differences look large.' : 'Colour range clipped to the 2nd–98th percentile.'}</p>`;
-    setParams({ q: sel.q, mode: sel.mode, ssp: sel.ssp, hz: sel.hz, gcm: sel.gcm, diff: sel.diff ? 1 : 0 });
-  }
-  $("#q").addEventListener("change", (e) => { sel.q = e.target.value; if (Q[sel.q].scenarioOnly) sel.mode = "scen"; scenControls(Q[sel.q]); refresh(); });
-  scenControls(Q[sel.q]); refresh();
-}
 
 /* ---- Treeline ---- */
 function renderTreeline() {
@@ -276,7 +157,7 @@ function renderSite(p) {
 
   function perSsp(kind, group, baselineVal) {
     const members = kind === "treeline" ? sc.treeline_members : sc.members;
-    const mat = kind === "treeline" ? sc.treeline_shift : kind === "viab" ? sc.viab[group] : sc.hmech[group];
+    const mat = kind === "treeline" ? sc.tl_series.treeline_shift : kind === "viab" ? sc.fp_series["viab_" + group] : sc.fp_series["hmech_" + group];
     if (!mat) return [];
     return Object.keys(SSP).map((ssp) => ({
       name: SSP[ssp], color: SSP_COLOR[ssp],

@@ -1,0 +1,22 @@
+# Source manifest: marz (province) boundaries of Armenia, used only for the map's regional borders and
+# per-region summaries. The country outline itself comes from the national Ecosystem Map, not from here.
+source:
+  title: "geoBoundaries gbOpen ARM ADM1 (Armenia provinces and Yerevan city)"
+  provider: "geoBoundaries (William & Mary geoLab), built from Wikimedia source data"
+  metadata_api: "https://www.geoboundaries.org/api/current/gbOpen/ARM/ADM1/"
+  download_url: "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARM/ADM1/geoBoundaries-ARM-ADM1.geojson"
+  pinned_commit: "9469f09"
+  downloaded: "2026-10-05"
+  local_path: "data/boundaries/geoBoundaries-ARM-ADM1.geojson"   # gitignored
+  sha256: "17fc9aef2c68f9770a87e82d60587518879d49ea65e2767348d685a39162472d"
+  features: 11
+  license: "Creative Commons Attribution 2.5 Generic (per the API record; licence source: Wikimedia Commons)"
+  boundary_year_represented: 2005
+  source_data_update: "2023-01-19"
+caveats:
+  - "Coarse: about 300 vertices per marz, 2005 vintage, derived from a Wikimedia map. Positional accuracy is
+     of the order of kilometres, so internal marz borders are approximate."
+  - "Used to assign each national-map pixel to a marz. Pixels inside the Ecosystem Map's national outline but
+     outside these polygons are given the nearest marz; pixels inside these polygons but outside the national
+     outline are dropped, so the outer border always follows the Ecosystem Map."
+  - "To be replaced by official cadastral marz boundaries if a citable open source is found."

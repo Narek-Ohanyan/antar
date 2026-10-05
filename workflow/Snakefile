@@ -153,6 +153,14 @@ rule variogram:         # empirical variogram of elevation-detrended CWD -> info
 
 
 # --- UI --------------------------------------------------------------------------------------
+rule map_assets:        # forest cover, water, marz ids and borders on one Web-Mercator grid (no basemap needed)
+    input:
+        ancient("data/ecosystem_map/Ecosystem_Map_of_Armenia.tif"),
+        ancient("data/boundaries/geoBoundaries-ARM-ADM1.geojson"),
+    output: "ui/assets/map/grid.json"
+    shell: f"{PY} scripts/build_map_assets.py"
+
+
 rule ui_data:           # bundle every real fitted output into ui/data/*.json for the static UI
     input:
         f"{FITTED}/topohydro_grid_run_2019{SUF}.yaml",
