@@ -2,7 +2,7 @@
 # Refreshes the validation-grid (80-point, 25 Armenian) results so they carry every field the UI maps need:
 # per-species 2019 water stress and P[V >= V*] (refugium), and every scenario quantity (future projections,
 # run in parallel across the 45 GCM x SSP x horizon members). Same seeds as the earlier runs, so the fields that
-# already existed must come out identical -- check with tests/test_refresh_regression.py (see IMPLEMENTATION_LOG).
+# already existed must come out identical (checked once against the previous files; see IMPLEMENTATION_LOG).
 set -o pipefail
 cd "$(dirname "$0")/.."
 MAX_TRIES=${MAX_TRIES:-5}
