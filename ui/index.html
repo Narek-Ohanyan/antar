@@ -5,20 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ANTAR — Assessment of Niche, Treeline &amp; Analogue Refugia</title>
   <meta name="description" content="ANTAR — Assessment of Niche, Treeline &amp; Analogue Refugia: climate-resilient reforestation refugia in Armenia — water stress, hydraulic hazard, niche, treeline change and robust planting decisions.">
+  <meta name="theme-color" content="#fefefe">
+  <link rel="preload" href="assets/fonts/crimson-pro-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/source-sans-3-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="icon" href="assets/antar_logo.jpeg">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
+  <a class="skip" href="#view">Skip to main content</a>
+  <header class="topbar" id="topbar">
     <div class="wrap">
       <a class="brand" href="#/home" aria-label="ANTAR — home"><img class="brand-logo" src="assets/antar_logo.jpeg" alt="ANTAR"></a>
       <nav aria-label="Main"></nav>
-      <button class="theme-btn" id="theme" title="Switch light / dark theme" aria-label="Switch light or dark theme">◐</button>
+      <button class="theme-btn" id="theme" type="button" title="Switch light / dark theme" aria-label="Switch light or dark theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor" stroke="none"/></svg>
+      </button>
     </div>
   </header>
-  <main id="view"></main>
-  <footer><div class="wrap">ANTAR — Assessment of Niche, Treeline &amp; Analogue Refugia. Every figure is read from fitted results in <code>configs/fitted/</code>; caveats travel with the numbers.</div></footer>
+  <main id="view" tabindex="-1"></main>
+  <footer>
+    <div class="wrap foot">
+      <div>
+        <p class="foot-name">ANTAR — Assessment of Niche, Treeline &amp; Analogue Refugia</p>
+        <p>Every figure is read from fitted results in <code>configs/fitted/</code>; caveats travel with the numbers.</p>
+      </div>
+      <div><h4>Explore</h4><a href="#/map">Map</a><a href="#/site">Place explorer</a><a href="#/treeline">Treeline</a><a href="#/decision">Decision</a></div>
+      <div><h4>Method &amp; record</h4><a href="#/method">Method</a><a href="#/status">Status &amp; limits</a><a href="#/refs">References</a><a href="#/ack">Acknowledgments</a></div>
+    </div>
+  </footer>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="charts.js"></script>
   <script src="interp.js"></script>

@@ -15,7 +15,7 @@ def test_browser_title_is_the_full_name():
 
 def test_hero_heading_is_the_full_name():
     app = (UI / "app.js").read_text()
-    m = re.search(r'<div class="hero">.*?<h1>(.*?)</h1>', app, re.S)
+    m = re.search(r'<h1 id="hero-title">(.*?)</h1>', app, re.S)
     assert html.unescape(m.group(1)) == FULL
 
 

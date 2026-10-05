@@ -74,12 +74,17 @@ function route() {
   const fn = PAGES[page] || renderHome;
   $("nav").innerHTML = NAV.map(([k, t]) => `<a href="#/${k}" class="${k === page ? "active" : ""}">${t}</a>`).join("");
   const activeLink = $("nav a.active"); if (activeLink) activeLink.scrollIntoView({ inline: "center", block: "nearest" });   // phones: keep the current page visible in the scrolling nav
+  if (state.revealCleanup) { state.revealCleanup(); state.revealCleanup = null; }
   if (state.heroCleanup) { state.heroCleanup(); state.heroCleanup = null; }
+  document.body.classList.toggle("is-home", fn === renderHome);
   if (state.mapCleanup) { state.mapCleanup(); state.mapCleanup = null; }
   if (state.mapObj) { state.mapObj.remove(); state.mapObj = null; }
   window.scrollTo(0, 0);
+  syncTopbar();
   fn(pageParams());
+  view().focus({ preventScroll: true });          // screen readers land on the new page's content
 }
+function syncTopbar() { $("#topbar").classList.toggle("solid", window.scrollY > 24); }
 
 function banner() {
   const M = state.M, rej = Object.values(M.provenance).flatMap((p) => p.rejected || []);
@@ -98,37 +103,73 @@ function renderHome() {
   const t585 = tl && tl.summary["ssp585__2100"], t126 = tl && tl.summary["ssp126__2100"];
   const eng = state.meth.engines;
   const stat = (num, cap, sub) => `<div class="card stat"><div class="num">${num}</div><div class="cap">${cap}</div><div class="sub">${sub || ""}</div></div>`;
-  view().innerHTML = `<div class="wrap">
-    <div class="hero">
-      <div class="hero-stage">
-        <video id="hero-video" class="hero-video" poster="assets/hero-poster.jpg" muted loop playsinline preload="metadata" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1">
-          <source src="assets/hero.mp4" type="video/mp4"><img src="assets/hero-poster.jpg" alt="ANTAR">
-        </video>
+  view().innerHTML = `
+  <section class="hero-full" aria-labelledby="hero-title">
+    <div class="hero-media"><div class="hero-frame">
+      <video id="hero-video" class="hero-video" poster="assets/hero-poster.jpg" muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1">
+        <source src="assets/hero.mp4" type="video/mp4"><img src="assets/hero-poster.jpg" alt="ANTAR">
+      </video>
+    </div></div>
+    <div class="hero-copy">
+      <div class="hero-text">
+        <span class="rule" aria-hidden="true"></span>
+        <h1 id="hero-title">ANTAR — Assessment of Niche, Treeline &amp; Analogue Refugia</h1>
+        <p class="hero-sub">Climate-resilient places to restore forest in Armenia: water stress, hydraulic failure, species niches, treeline change and robust planting decisions.</p>
+      </div>
+      <div class="hero-cta">
+        <a class="btn" href="#/map">Open the map</a><a class="btn secondary" href="#/method">How it works</a>
         <button type="button" id="hero-toggle" class="hero-toggle" aria-label="Pause the logo animation" title="Pause the logo animation"></button>
       </div>
-      <h1>ANTAR — Assessment of Niche, Treeline &amp; Analogue Refugia</h1>
-    <p class="lead">A hybrid process-statistical framework for finding climate-resilient places to restore forest in Armenia: it models water stress, hydraulic failure, species niches, treeline and scenario-robust planting decisions, and reports each result with the caveats that came with it.</p>
-      <div class="hero-cta"><a class="btn" href="#/map">Open the map</a><a class="btn secondary" href="#/method">How it works</a></div></div>
-    ${banner()}
-    <h2>Headline results</h2>
-    <div class="grid cols-4">
+    </div>
+    <button type="button" id="scroll-cue" class="scroll-cue" aria-label="Scroll to the overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg></button>
+  </section>
+  <div class="wrap">
+    <section class="sec reveal" id="about">
+      <div class="sec-head"><span class="sec-no">01</span><h2>Overview</h2></div>
+      <div class="about">
+        <p class="lead">A hybrid process-statistical framework for finding climate-resilient places to restore forest in Armenia: it models water stress, hydraulic failure, species niches, treeline and scenario-robust planting decisions, and reports each result with the caveats that came with it.</p>
+        <div>${banner()}
+    <div class="callout"><strong>Read these with care.</strong> Viability stays near its 2019 level across scenarios because the future projections change temperature and precipitation but hold wind, radiation and humidity at 2019 values; that is a limitation of the method, not evidence that climate change is harmless. See <a href="#/status">Status &amp; limits</a>.</div></div>
+      </div>
+    </section>
+    <section class="sec reveal">
+      <div class="sec-head"><span class="sec-no">02</span><h2>Headline results</h2></div>
+      <div class="grid cols-4">
       ${Object.keys(M.groups).map((g) => stat(pct(base[g], 1), `${esc(M.groups[g].short)} — mean 2019 viability`, worst[g] ? `SSP5-8.5, 2100 ensemble mean: ${pct(worst[g].mean, 1)} (GCM range ${pct(worst[g].min, 1)}–${pct(worst[g].max, 1)})` : "")).join("")}
       ${t585 ? stat(`+${fmt(t585.ensemble_mean_shift_m, 0)} m`, "Climatic treeline shift, SSP5-8.5 by 2100", `GCM range +${fmt(t585.ensemble_min_shift_m, 0)} to +${fmt(t585.ensemble_max_shift_m, 0)} m` + (t126 ? ` · SSP1-2.6: +${fmt(t126.ensemble_mean_shift_m, 0)} m` : "")) : ""}
       ${ae ? stat(String(ae.n_units), "planting units evaluated", `${ae.n_scenarios} scenarios · price of robustness ${fmt(ae.frontier.price_of_robustness, 2)}`) : ""}
     </div>
-    <div class="callout"><strong>Read these with care.</strong> Viability stays near its 2019 level across scenarios because the future projections change temperature and precipitation but hold wind, radiation and humidity at 2019 values; that is a limitation of the method, not evidence that climate change is harmless. See <a href="#/status">Status &amp; limits</a>.</div>
-    <h2>The six engines</h2>
-    <div class="grid cols-3">${eng.map((e) => `<div class="card"><h3>${esc(e.name)}</h3><p class="small muted">${esc(e.status)}</p><a href="#/method" data-jump="${e.id}">How it works →</a></div>`).join("")}</div>
-    <h2>Where to look</h2>
-    <div class="grid cols-3">
-      <div class="card"><h3>Map</h3><p class="small">Pick any vulnerability, probability or climate quantity, a climate model, an emissions path and a horizon, and see it coloured across the whole country, with today's forest cover and marz borders.</p><a class="btn secondary" href="#/map">Open the map</a></div>
-      <div class="card"><h3>Treeline</h3><p class="small">How far uphill the climatic treeline moves in each of 45 climate-model × scenario × horizon members.</p><a class="btn secondary" href="#/treeline">See treeline change</a></div>
-      <div class="card"><h3>Decision</h3><p class="small">A budget-constrained, scenario-robust planting portfolio and its efficient frontier.</p><a class="btn secondary" href="#/decision">See the portfolio</a></div>
-    </div></div>`;
+    </section>
+    <section class="sec reveal">
+      <div class="sec-head"><span class="sec-no">03</span><h2>The ${["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][eng.length] || eng.length} engines</h2></div>
+      <div class="grid cols-3">${eng.map((e, i) => `<div class="card eng"><span class="eng-no">E${i + 1}</span><h3>${esc(e.name)}</h3><p class="small">${esc(e.status)}</p><a href="#/method" data-jump="${e.id}">How it works →</a></div>`).join("")}</div>
+    </section>
+    <section class="sec reveal">
+      <div class="sec-head"><span class="sec-no">04</span><h2>Where to look</h2></div>
+      <div class="grid cols-3">
+        <div class="card eng"><span class="eng-no">MAP</span><h3>Map</h3><p class="small">Pick any vulnerability, probability or climate quantity, a climate model, an emissions path and a horizon, and see it coloured across the whole country, with today's forest cover and marz borders.</p><a class="btn secondary" href="#/map">Open the map</a></div>
+        <div class="card eng"><span class="eng-no">TREELINE</span><h3>Treeline</h3><p class="small">How far uphill the climatic treeline moves in each of 45 climate-model × scenario × horizon members.</p><a class="btn secondary" href="#/treeline">See treeline change</a></div>
+        <div class="card eng"><span class="eng-no">DECISION</span><h3>Decision</h3><p class="small">A budget-constrained, scenario-robust planting portfolio and its efficient frontier.</p><a class="btn secondary" href="#/decision">See the portfolio</a></div>
+      </div>
+    </section>
+  </div>`;
   view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => { sessionStorageSafe("jump", a.dataset.jump); }));
   initHeroVideo();
+  initReveal();
 }
 function sessionStorageSafe(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* ignore */ } }
+
+/* Sections fade up as they enter the viewport. If the observer never reports (hidden tab, unsupported), everything is shown. */
+function initReveal() {
+  const els = [...view().querySelectorAll(".reveal")];
+  if (!els.length) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { els.forEach((e) => e.classList.add("in")); return; }
+  let fired = false;
+  const io = new IntersectionObserver((es) => { fired = true; es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
+  els.forEach((e) => io.observe(e));
+  const t = setTimeout(() => { if (!fired) els.forEach((e) => e.classList.add("in")); }, 1500);
+  state.revealCleanup = () => { io.disconnect(); clearTimeout(t); };
+}
 
 /* Hero video: muted, looping, never the only way to see the name (the heading says it). Autoplay is skipped when the
    visitor asks for reduced motion or Save-Data; the visitor can always pause or play; it also pauses off-screen. */
@@ -145,6 +186,8 @@ function initHeroVideo() {
   v.muted = v.defaultMuted = true;
   v.addEventListener("play", () => label(true));
   v.addEventListener("pause", () => label(false));
+  const cue = $("#scroll-cue");
+  if (cue) cue.addEventListener("click", () => $("#about").scrollIntoView({ behavior: mq.matches ? "auto" : "smooth", block: "start" }));
   const src = v.querySelector("source");
   if (src) src.addEventListener("error", () => { btn.hidden = true; });          // file missing: the poster image stays
   btn.addEventListener("click", () => { wantPlay = v.paused; sync(); });
@@ -315,6 +358,7 @@ async function init() {
     return;
   }
   window.addEventListener("hashchange", route);
+  window.addEventListener("scroll", syncTopbar, { passive: true });
   route();
 }
 function toggleTheme() {

@@ -1847,3 +1847,26 @@ User feedback: the sample points must be removed from everywhere, and most maps 
   there is no ffmpeg here to strip it, and it is muted.
 * Phones: the sticky nav wrapped into five rows and covered about a third of the screen; it is now one horizontally scrolling row.
 * Dev note: `python -m http.server` does not answer HTTP range requests, which Safari requires for video; GitHub Pages does.
+
+## 2026-10-05 -- full-screen hero with the navbar on it; academic editorial redesign
+
+User: the video must be fullscreen with the navbar on it, and the whole design cooler, more modern and academic.
+
+* **Hero.** The video fills the viewport (`100svh`); the navbar is fixed on top of it, transparent with a soft white scrim and
+  ink-coloured tokens in both themes (the footage is white), and turns into a frosted bar after 24 px of scrolling. The footage is
+  white, so it is shown in a 16:9 frame that is centred and fills the viewport only when the crop would be under ~3% (aspect >=
+  43:25); narrower viewports (laptops at 16:10, tablets, phones) show all of it and the white bars are invisible. The frame's top
+  and bottom edges are feathered so the camera push-in at 5-6 s never shows a hard edge. The full name, a one-line descriptor, the
+  two actions and the pause/play button sit at the bottom; the descriptor is hidden on viewports under 780 px tall so the copy never
+  touches the wordmark. A first attempt that centred nothing (`place-items: center` on an auto grid track left the 1600 px frame at
+  left 0 and cut the "R") was caught in the screenshot and fixed.
+* **Design system** (from the ui-ux-pro-max search, checked against the product before use): style *Swiss Modernism 2.0* (grid,
+  hairline rules, editorial) and the *Academic/Research* pairing -- Crimson Pro for headings and large figures. Its suggested body
+  face, Atkinson Hyperlegible, was tried and dropped: it draws a slashed zero, so "2019" reads "2O/19". Replaced by Source Sans 3;
+  IBM Plex Mono carries tabular figures. All three are SIL OFL, self-hosted in `ui/assets/fonts` (about 165 kB, no third-party
+  font requests). The search's suggested pattern ("Portfolio Grid") does not fit a research tool and was not used.
+* Tokens: warm paper background, ink text, teal/ochre/rust/navy from the logo; dark theme designed alongside (contrast >= 4.5:1 for text);
+  flat cards with hairline borders; journal-style tables (rules, no boxes; numbers in mono); numbered section heads (01-04) on the home
+  page; sections fade up on scroll (reduced-motion and a no-observer fallback show everything); skip link; focus moves to the page
+  content on navigation; three-column footer; one primary action in the hero.
+* The home heading "The six engines" was wrong (seven are listed, including treeline change); it now follows the count.
