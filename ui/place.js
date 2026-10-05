@@ -44,29 +44,39 @@ async function renderSite(p) {
   let hi = null, pin = null;
 
   const cache = {};
-  function evaluator(gid) {
-    const key = gid + "|" + sel.marz + "|" + sel.lat + "|" + sel.lon;
+  /* Value of one row of node values at the selection, by the same method the map uses for that quantity (id). */
+  const zAt = (lat, lon) => {
+    const col = Math.floor((Interp.mercX(lon) - G.x0) / G.px_m), row = Math.floor((G.y_top - Interp.mercY(lat)) / G.px_m);
+    const k = col >= 0 && row >= 0 && col < A.w && row < A.h ? A.rank[row * A.w + col] : -1;
+    return k >= 0 && A.z ? A.z[k] : NaN;
+  };
+  function evaluator(gid, id) {
+    const md = methodFor(id, gid, A).method, key = [gid, id, md, sel.marz, sel.lat, sel.lon].join("|");
     if (cache[key]) return cache[key];
-    const ip = interpFor(gid, A), g = state.G[gid];
+    const ip = interpFor(gid, A), g = state.G[gid], nz = nodeElev(gid);
+    const meta = state.M.layers[id] || {}, clamp = (v) => { const b = meta.binary ? [0, 1] : BOUNDS[meta.unit]; return b && ok(v) ? Math.min(b[1], Math.max(b[0], v)) : v; };
     let ev;
     if (!sel.marz) {
-      const it = Interp.build(ip.nx, ip.ny, [Interp.mercX(sel.lon)], [Interp.mercY(sel.lat)], IDW_K, IDW_POWER);
-      ev = (row) => Interp.apply(it, row)[0];
+      const it = Interp.build(ip.nx, ip.ny, [Interp.mercX(sel.lon)], [Interp.mercY(sel.lat)], IDW_K, IDW_POWER), tz = [zAt(sel.lat, sel.lon)];
+      ev = md === "elev" ? (row) => clamp(Interp.applyElev(it, row, nz, tz, Interp.olsSlope(nz, row))[0]) : (row) => clamp(Interp.apply(it, row)[0]);
     } else {
       const { it } = ip, W = new Float64Array(g.n_cells);
-      let aSum = 0;
+      let aSum = 0, zBar = 0;
       for (let k = 0; k < A.n; k++) {
         if (A.region[A.inIdx[k]] !== sel.marz) continue;
         let sw = 0; for (let j = 0; j < it.k; j++) sw += it.w[k * it.k + j];
         for (let j = 0; j < it.k; j++) W[it.idx[k * it.k + j]] += (A.area[k] * it.w[k * it.k + j]) / sw;
-        aSum += A.area[k];
+        aSum += A.area[k]; if (A.z) zBar += A.area[k] * A.z[k];
       }
       for (let j = 0; j < W.length; j++) W[j] /= aSum;
+      zBar /= aSum;
+      let wz = 0; for (let j = 0; j < W.length; j++) if (ok(nz[j])) wz += W[j] * nz[j];
+      // marz mean of the surface: sum_j W_j v_j (+ b (mean pixel elevation - sum_j W_j z_j) for the elevation-adjusted method)
       ev = (row) => {
-        if (row.every(ok)) { let v = 0; for (let j = 0; j < W.length; j++) v += W[j] * row[j]; return v; }
-        const vals = Interp.apply(it, row); let s = 0, a = 0;                       // missing node values: exact pixel mean instead
+        if (row.every(ok) && nz.every(ok)) { let v = 0; for (let j = 0; j < W.length; j++) v += W[j] * row[j]; return clamp(md === "elev" ? v + Interp.olsSlope(nz, row) * (zBar - wz) : v); }
+        const vals = surfaceFor(md, gid, A, row); let s = 0, a = 0;                  // missing node values: exact pixel mean instead
         for (let k = 0; k < A.n; k++) if (A.region[A.inIdx[k]] === sel.marz && isFinite(vals[k])) { s += A.area[k] * vals[k]; a += A.area[k]; }
-        return a ? s / a : null;
+        return a ? clamp(s / a) : null;
       };
     }
     return (cache[key] = ev);
@@ -86,7 +96,7 @@ async function renderSite(p) {
     const byEngine = {};
     for (const [id, meta] of Object.entries(M.layers)) {
       if (meta.engine === "Ecosystem map" || !relevant(id)) continue;
-      const row = state.G[meta.grid].layers[id], v = row ? evaluator(meta.grid)(row) : null;
+      const row = state.G[meta.grid].layers[id], v = row ? evaluator(meta.grid, id)(row) : null;
       if (ok(v)) (byEngine[meta.engine] = byEngine[meta.engine] || []).push([meta, v]);
     }
     $("#ptable").innerHTML = `<table><tbody>${ENGINE_ORDER.filter((e) => byEngine[e]).map((e) => `<tr><th colspan="2">${esc(ENGINE_TITLE[e] || e)}</th></tr>` + byEngine[e].map(([m, v]) => `<tr><td>${esc(m.label)}</td><td class="num">${fa(v)} ${esc(m.binary ? "(share)" : m.unit || "")}</td></tr>`).join("")).join("")}</tbody></table>`;
@@ -97,7 +107,7 @@ async function renderSite(p) {
       if (!relevant(pl.id)) continue;
       const src = scenarioSource(pl.id);
       if (!src) { pending.push(pl); continue; }
-      const ev = evaluator(src.gid), vals = src.mat.map((row) => ev(row));
+      const ev = evaluator(src.gid, pl.id), vals = src.mat.map((row) => ev(row));
       const baseRow = pl.id === "treeline_shift" ? null : state.G[src.gid].layers[pl.id];
       const base = pl.id === "treeline_shift" ? 0 : baseRow ? ev(baseRow) : null;
       const series = Object.keys(SSP).map((ssp) => ({ name: SSP[ssp], color: SSP_COLOR[ssp],

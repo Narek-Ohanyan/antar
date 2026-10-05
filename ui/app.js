@@ -218,11 +218,23 @@ function renderMethod() {
 }
 
 /* ---- Status & limits ---- */
+/* Which maps have results, which are waiting on a run, and which script produces what is missing. */
+function mapAvailability() {
+  const plan = state.M.map_plan || [];
+  if (!plan.length) return "";
+  const full = plan.filter((x) => x.scenario && (x.baseline || x.baseline === null)).length, base = plan.filter((x) => x.baseline && !x.scenario).length;
+  const mark = (v) => (v === null ? '<span class="muted">n/a</span>' : v ? chip("good", "ready") : chip("warn", "waiting"));
+  const rows = plan.map((x) => `<tr><td>${esc(x.label)}</td><td>${esc(x.group ? state.M.groups[x.group].short : "all")}</td><td>${mark(x.baseline)}</td><td>${mark(x.scenario)}</td><td class="small">${x.baseline === false ? `<code>${esc(x.baseline_from)}</code> (2019)` : ""}${x.baseline === false && !x.scenario ? "<br>" : ""}${!x.scenario ? `<code>${esc(x.scenario_from)}</code> (scenarios)` : ""}</td></tr>`).join("");
+  return `<h2>Which maps have results</h2><p class="small muted" style="max-width:780px">${plan.length} maps are planned. ${full} have both 2019 and scenario results now; ${base} have 2019 only; the rest are waiting for the run named in the last column. Waiting maps are listed in the map's menu as "2019 only for now" or "no results yet" rather than shown empty.</p>
+    <div class="card tablewrap"><table><thead><tr><th>Map</th><th>Species</th><th>2019</th><th>Scenarios</th><th>Produced by</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
 function renderStatus() {
   const m = state.meth, M = state.M;
   const prov = Object.entries(M.provenance).map(([k, p]) => `<tr><td>${esc(p.dataset)}</td><td><code>${esc(p.file || "missing")}</code></td><td>${p.grid ? gridChip(p.grid) : "—"}</td><td class="num">${p.n_cells ?? "—"}</td><td>${(p.rejected || []).map((r) => `<span class="small">${esc(r)}</span>`).join("<br>")}</td></tr>`).join("");
   view().innerHTML = `<div class="wrap"><h1>Status &amp; limits</h1><p class="muted" style="max-width:760px">What is fitted, what is reduced in scope, and what is still a placeholder. Nothing is hidden because it is incomplete.</p>
     <h2>Engines</h2><div class="card tablewrap"><table><thead><tr><th>Engine</th><th>State</th></tr></thead><tbody>${m.engines.map((e) => `<tr><td><a href="#/method" data-jump="${e.id}">${esc(e.name)}</a></td><td>${esc(e.status)}</td></tr>`).join("")}</tbody></table></div>
+    ${mapAvailability()}
     <h2>Placeholders and assumptions</h2><div class="card tablewrap"><table><thead><tr><th>Quantity</th><th>Value used</th><th>Affects</th><th>State</th></tr></thead><tbody>${m.placeholders.map((p) => `<tr><td>${esc(p.name)}</td><td>${esc(p.value)}</td><td>${esc(p.effect)}</td><td>${esc(p.state)}</td></tr>`).join("")}</tbody></table></div>
     <h2>Known gaps</h2><div class="card"><ul>${m.known_gaps.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>
     <h2>Data lineage — which file each result comes from</h2><div class="card tablewrap"><table><thead><tr><th>Result</th><th>File used</th><th>Grid</th><th class="num">Cells</th><th>Notes</th></tr></thead><tbody>${prov}</tbody></table>

@@ -31,11 +31,24 @@ function loadPng(url) {
   });
 }
 
+function loadRgb(url) {
+  return new Promise((resolve) => {
+    const im = new Image();
+    im.onload = () => {
+      const c = document.createElement("canvas"); c.width = im.width; c.height = im.height;
+      const cx = c.getContext("2d", { willReadFrequently: true }); cx.drawImage(im, 0, 0);
+      resolve(cx.getImageData(0, 0, im.width, im.height).data);
+    };
+    im.onerror = () => resolve(null);                       // elevation is optional: without it the surface is plain IDW
+    im.src = url;
+  });
+}
+
 async function loadMapAssets() {
   if (state.mapAssets) return state.mapAssets;
-  const [grid, borders, ...rasters] = await Promise.all([
+  const [grid, borders, elev, ...rasters] = await Promise.all([
     fetch("assets/map/grid.json").then((r) => r.json()), fetch("assets/map/borders.geojson").then((r) => r.json()),
-    ...MAP_FILES.map((f) => loadPng(`assets/map/${f}.png`)),
+    loadRgb("assets/map/elevation.png"), ...MAP_FILES.map((f) => loadPng(`assets/map/${f}.png`)),
   ]);
   const A = { grid, borders, w: grid.width, h: grid.height };
   MAP_FILES.forEach((f, i) => (A[f] = rasters[i]));
@@ -46,10 +59,12 @@ async function loadMapAssets() {
   for (let k = 0; k < A.n; k++) {
     const f = A.inIdx[k], row = Math.floor(f / A.w), col = f % A.w;
     A.rank[f] = k;
+    if (elev) { A.z = A.z || new Float32Array(A.n); A.z[k] = elev[f * 4] * 256 + elev[f * 4 + 1]; }
     A.tx[k] = grid.x0 + (col + 0.5) * grid.px_m; A.ty[k] = grid.y_top - (row + 0.5) * grid.px_m;
     A.lat[k] = (Math.atan(Math.sinh(A.ty[k] / grid.earth_radius_m)) * 180) / Math.PI;
     A.area[k] = ((grid.px_m * Math.cos((A.lat[k] * Math.PI) / 180)) ** 2) / 1e6;       // ground km2 of this pixel
   }
+  A.z = A.z || null;                                        // metres, per in-country pixel (map grid, ~500 m averages)
   state.mapAssets = A;
   return A;
 }
@@ -62,6 +77,46 @@ function interpFor(gid, A) {
     state.interp[gid] = { nx, ny, it: Interp.build(nx, ny, A.tx, A.ty, IDW_K, IDW_POWER) };
   }
   return state.interp[gid];
+}
+
+/* Node elevations (m) for a grid, NaN where missing. */
+function nodeElev(gid) {
+  state.nodeZ = state.nodeZ || {};
+  return (state.nodeZ[gid] = state.nodeZ[gid] || Float64Array.from(state.G[gid].elev, (v) => (v == null ? NaN : v)));
+}
+
+/* One interpolation method per quantity, fixed from its 2019 field (else its first scenario member), so a baseline
+   and its scenarios are always interpolated the same way and never differ by a change of method. "elev" moves each
+   neighbouring value to the target's elevation with a fitted slope; it is used only if its leave-one-out R2 beats
+   plain IDW by at least 0.02. */
+function methodFor(id, gid, A) {
+  state.methods = state.methods || {};
+  const key = id + "|" + gid;
+  if (state.methods[key]) return state.methods[key];
+  const g = state.G[gid], ip = interpFor(gid, A);
+  const row = g.layers[id] || (g.scenarios && g.scenarios.fp_series && g.scenarios.fp_series[id] && g.scenarios.fp_series[id][0]) ||
+    (g.scenarios && g.scenarios.tl_series && g.scenarios.tl_series[id] && g.scenarios.tl_series[id][0]);
+  let m = { method: "idw" };
+  if (A.z && row) {
+    const p = Interp.leaveOneOut(ip.nx, ip.ny, row, IDW_K, IDW_POWER), e = Interp.leaveOneOutElev(ip.nx, ip.ny, nodeElev(gid), row, IDW_K, IDW_POWER);
+    m = { method: e.r2 > p.r2 + 0.02 ? "elev" : "idw", r2_idw: p.r2, r2_elev: e.r2 };
+  }
+  return (state.methods[key] = m);
+}
+
+/* Physical bounds for absolute values (not for changes). */
+const BOUNDS = { probability: [0, 1], "probability/yr": [0, 1], fraction: [0, 1], "0/1": [0, 1], "share of models": [0, 1], days: [0, 366], mm: [0, Infinity], "°C·d": [0, Infinity] };
+function clampTo(vals, unit, binary) {
+  const b = binary ? [0, 1] : BOUNDS[unit];
+  if (b) for (let i = 0; i < vals.length; i++) if (isFinite(vals[i])) vals[i] = Math.min(b[1], Math.max(b[0], vals[i]));
+  return vals;
+}
+
+/* Surface for one row of node values with the given method. */
+function surfaceFor(method, gid, A, row) {
+  const ip = interpFor(gid, A);
+  if (method === "elev") { const z = nodeElev(gid); return Interp.applyElev(ip.it, row, z, A.z, Interp.olsSlope(z, row)); }
+  return Interp.apply(ip.it, row);
 }
 
 const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -324,26 +379,35 @@ async function renderMap(p) {
     }
     if (s.noDiff) meta.push(`<div class="callout" style="margin:8px 0;padding:7px 10px">No 2019 baseline exists on this grid, so change cannot be shown.</div>`);
     const g = state.G[s.gid], ip = interpFor(s.gid, A);
-    const vals = Interp.apply(ip.it, s.values);
     const unit = s.unit != null ? s.unit : q.unit || "";
+    const absolute = !s.change && !s.spread && !(q.scenarioOnly);
+    // absolute fields use the quantity's fixed method; change / disagreement fields are different quantities, judged on their own
+    let md = absolute ? methodFor(q.id, s.gid, A) : null;
+    if (!md) {
+      const p0 = Interp.leaveOneOut(ip.nx, ip.ny, s.values, IDW_K, IDW_POWER), e0 = A.z ? Interp.leaveOneOutElev(ip.nx, ip.ny, nodeElev(s.gid), s.values, IDW_K, IDW_POWER) : { r2: -Infinity };
+      md = { method: e0.r2 > p0.r2 + 0.02 ? "elev" : "idw", r2_idw: p0.r2, r2_elev: e0.r2 };
+    }
+    const vals = surfaceFor(md.method, s.gid, A, s.values);
+    if (absolute) clampTo(vals, unit, s.binary);
     let sc;
     if (s.binary) { const st = ["#c0583a", "#e8d9a0", "#2f8f5b"]; sc = { fn: (x) => ramp(st, x), lo: 0, hi: 1, stops: st }; }
     else { const sample = []; for (let k = 0; k < vals.length; k += 7) if (isFinite(vals[k])) sample.push(vals[k]); sc = makeScale(sample, { diverging: s.diverging, stops: s.stops, unit: s.spread ? "" : unit }); }
     setLayer("surface", drawSurface(A, vals, sc, sel.forestOnly), sel.opacity);
     setLayer("hatch", sel.hatch ? hatchCanvas : null);
     current = { vals, sc, q, s, unit };
-    const loo = Interp.leaveOneOut(ip.nx, ip.ny, s.values, IDW_K, IDW_POWER);
+    const loo = md.method === "elev" ? Interp.leaveOneOutElev(ip.nx, ip.ny, nodeElev(s.gid), s.values, IDW_K, IDW_POWER) : Interp.leaveOneOut(ip.nx, ip.ny, s.values, IDW_K, IDW_POWER);
+    const other = md.method === "elev" ? md.r2_idw : md.r2_elev;
     const present = s.values.filter(ok), sd = Math.sqrt(present.reduce((a, v) => a + (v - mean(present)) ** 2, 0) / present.length);
     const skill = loo.r2 >= 0.7 ? ["good", "good"] : loo.r2 >= 0.3 ? ["warn", "moderate"] : ["bad", "weak"];
     const label = s.change ? "change vs 2019" : s.spread ? "disagreement between the 5 models" : "";
     meta.push(`<div class="kv" style="margin-top:8px"><span>Model runs behind the surface</span><span>${present.length}</span><span>Range of those runs</span><span>${fa(Math.min(...present))} – ${fa(Math.max(...present))} ${esc(s.binary ? "" : unit)}</span><span>Mean of those runs</span><span>${fa(mean(present))}</span></div>
-      <div class="callout ${skill[0] === "good" ? "info" : skill[0] === "bad" ? "bad" : ""}" style="margin:10px 0 0;padding:8px 10px"><strong>Interpolation check:</strong> predicting each model run from the others gives R² = ${fmt(loo.r2, 2)}, RMSE ${fa(loo.rmse)} ${esc(s.binary ? "" : unit)} (spread of the runs: sd ${fa(sd)}). ${chip(skill[0], skill[1])} ${skill[1] === "weak" ? "Between the model runs the colours are poorly constrained; read the pattern as indicative only." : skill[1] === "moderate" ? "The surface follows the runs only partly." : ""}</div>`);
+      <div class="callout ${skill[0] === "good" ? "info" : skill[0] === "bad" ? "bad" : ""}" style="margin:10px 0 0;padding:8px 10px"><strong>Interpolation check</strong> (${md.method === "elev" ? "elevation-adjusted" : "distance-weighted"}${ok(other) ? `; the ${md.method === "elev" ? "plain" : "elevation-adjusted"} method scores R² = ${fmt(other, 2)}` : ""}): predicting each model run from the others gives R² = ${fmt(loo.r2, 2)}, RMSE ${fa(loo.rmse)} ${esc(s.binary ? "" : unit)} (spread of the runs: sd ${fa(sd)}). ${chip(skill[0], skill[1])} ${skill[1] === "weak" ? "Between the model runs the colours are poorly constrained; read the pattern as indicative only." : skill[1] === "moderate" ? "The surface follows the runs only partly." : ""}</div>`);
     $("#qinfo").innerHTML = meta.join("");
     $("#legend").innerHTML = (label ? `<div class="small" style="margin-bottom:4px"><strong>${esc(label)}</strong></div>` : "") + (s.binary
       ? `<div class="bar" style="background:linear-gradient(90deg,${sc.stops.join(",")})"></div><div class="ends"><span>not robust</span><span>mixed</span><span>robust</span></div>`
       : `<div class="bar" style="background:linear-gradient(90deg,${sc.stops.join(",")})"></div><div class="ends"><span>${fa(sc.lo)}</span><span>${esc(unit)}${s.diverging ? " (centre = 0)" : ""}</span><span>${fa(sc.hi)}</span></div>${sc.widened ? `<p class="small muted" style="margin:4px 0 0"><strong>Scale widened</strong>: the values vary by less than ${fmt(MIN_SPAN[unit] || 0, 3)} ${esc(unit)}, so the colours span at least that much instead of exaggerating a negligible difference.</p>` : ""}`);
     $("#regions").innerHTML = regionTable(vals, s.binary ? "" : unit, false);
-    $("#mapnote").textContent = `Surface = inverse-distance interpolation (${IDW_K} nearest of ${g.n_cells} model runs, power ${IDW_POWER}) clipped to Armenia; it is not a model run at every pixel. Forest cover and borders are the real national map.`;
+    $("#mapnote").textContent = `Surface = ${md.method === "elev" ? "elevation-adjusted " : ""}inverse-distance interpolation (${IDW_K} nearest of ${g.n_cells} model runs, power ${IDW_POWER}${md.method === "elev" ? "; each neighbour moved to the pixel's elevation with a fitted slope" : ""}) clipped to Armenia; it is not a model run at every pixel. Forest cover and borders are the real national map.`;
   }
 
   /* pointer read-out */

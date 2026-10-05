@@ -1804,3 +1804,28 @@ probability per scenario.
 * `ui/build_data.py` now exports scenario data as generic named series (`fp_series`, `tl_series`) with a favourable-direction flag
   per quantity; the UI prefers the dense grid over the validation grid when both exist (the old sort picked "validation" first -- a
   latent bug, never triggered because no dense result existed).
+
+## 2026-10-05 -- no points on the maps; 'no data' bug; place explorer; elevation-aware surface
+
+User feedback: the sample points must be removed from everywhere, and most maps said "no data".
+
+* **Points removed.** The map no longer has a "show model nodes" option, node markers, nearest-node text or links. The old Site
+  explorer (a dot-locator over the sampled cells) is replaced by the **Place explorer** (`ui/place.js`): click anywhere in Armenia
+  or pick a marz, and every quantity is shown for that place today and under each emissions path (mean of the 5 models, band =
+  lowest to highest model). Values at a place come from the same interpolated surface; a marz value is the area-weighted mean of it.
+  Chart markers at 2019/2050/2080/2100 and the variogram scatter are chart data, not map points, and stay.
+* **'No data' was my bug.** All 29 map quantities have 2019 data, but only 8 had scenario results, and the map defaulted every
+  quantity to scenario mode, so 21 of 29 showed "No data". A quantity without scenario results now opens on its 2019 field with a
+  note naming the script that will produce its scenarios; planned maps with no results at all are listed as disabled
+  "no results yet". `ui/build_data.py` now writes `map_plan` (36 planned maps, ready / waiting, producing script) and the Status
+  page shows it. Derived scenario series added where no run is needed (headroom below treeline, above own treeline).
+* **Scenario coverage today vs after the dense run.** Now: viability x3, hazard x3, potential treeline, headroom, above-treeline,
+  treeline shift (10 maps). After `run_future_projections.py` (dense): climate x5, per-species water deficit / stress integral /
+  soil potential x9, P[V>=V*] x3, refugium score x3, robust refugium x3, hazard uncertainty x3 -- all 36. `fit_refugium_viability.py`
+  stores the matching 2019 per-species fields. Generic-rooting-depth CWD/WSI/psi layers leave the map once per-species ones exist.
+* **Elevation-aware surface.** Plain IDW cannot reproduce quantities that follow elevation: annual temperature on 25 nodes had
+  leave-one-out R^2 = -0.23, RMSE 3.7 C. `scripts/build_dem_asset.py` averages the 30 m terrain raster onto the map grid
+  (`ui/assets/map/elevation.png`, 256*R+G metres, small derived file; raw terrain stays on Drive). `ui/interp.js` gained an
+  elevation-adjusted variant (each neighbour moved to the target's elevation with an OLS slope); it is used for a quantity only
+  if its leave-one-out R^2 beats plain IDW by >= 0.02, the choice is fixed per quantity from its 2019 field so a baseline and its
+  scenarios never differ by method, and both scores are shown on the map. Cross-checked against numpy in `tests/test_ui_interp.py`.

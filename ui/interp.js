@@ -95,6 +95,59 @@
     return { n: m, rmse: m ? Math.sqrt(sse / m) : NaN, r2: sst > 0 ? 1 - sse / sst : NaN, pred };
   }
 
-  const api = { R, mercX, mercY, knn, weights, build, apply, leaveOneOut };
+  /* Elevation-adjusted variant ("IDW with a lapse adjustment"): every neighbour value is first moved to the
+     target's elevation with one global slope b (OLS of value on elevation across the nodes), then averaged:
+       value(t) = sum_j w_tj (v_j + b (z_t - z_j)) / sum_j w_tj     over neighbours with finite v_j, z_j.
+     This equals regression on elevation plus IDW of the residuals, written without the intercept. */
+  function olsSlope(z, v, skip) {
+    let n = 0, mz = 0, mv = 0;
+    for (let i = 0; i < z.length; i++) if (i !== skip && fin(z[i]) && fin(v[i])) { n++; mz += z[i]; mv += v[i]; }
+    if (n < 3) return 0;
+    mz /= n; mv /= n;
+    let sxy = 0, sxx = 0;
+    for (let i = 0; i < z.length; i++) if (i !== skip && fin(z[i]) && fin(v[i])) { sxy += (z[i] - mz) * (v[i] - mv); sxx += (z[i] - mz) ** 2; }
+    return sxx > 0 ? sxy / sxx : 0;
+  }
+
+  function applyElev(interp, values, nodeZ, targetZ, b, out) {
+    const { idx, w, k, nt } = interp;
+    out = out || new Float32Array(nt);
+    for (let t = 0; t < nt; t++) {
+      let s = 0, sw = 0;
+      for (let j = 0; j < k; j++) {
+        const n = idx[t * k + j], v = values[n];
+        if (fin(v) && fin(nodeZ[n])) { s += w[t * k + j] * (v + b * (targetZ[t] - nodeZ[n])); sw += w[t * k + j]; }
+      }
+      out[t] = sw > 0 ? s / sw : NaN;
+    }
+    return out;
+  }
+
+  function scoreLoo(values, pred) {
+    let sse = 0, sst = 0, m = 0, mean = 0;
+    for (let i = 0; i < values.length; i++) if (fin(values[i]) && fin(pred[i])) { mean += values[i]; m++; }
+    mean /= m || 1;
+    for (let i = 0; i < values.length; i++) if (fin(values[i]) && fin(pred[i])) { sse += (values[i] - pred[i]) ** 2; sst += (values[i] - mean) ** 2; }
+    return { n: m, rmse: m ? Math.sqrt(sse / m) : NaN, r2: sst > 0 ? 1 - sse / sst : NaN, pred };
+  }
+
+  /* Leave-one-out for the elevation-adjusted method: the slope is refitted without the held-out node too. */
+  function leaveOneOutElev(nodeX, nodeY, nodeZ, values, k = 8, power = 2) {
+    const n = nodeX.length, ex = new Int32Array(n);
+    for (let i = 0; i < n; i++) ex[i] = i;
+    const nb = knn(nodeX, nodeY, nodeX, nodeY, k, ex), w = weights(nb, power), pred = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const b = olsSlope(nodeZ, values, i);
+      let s = 0, sw = 0;
+      for (let j = 0; j < nb.k; j++) {
+        const m = nb.idx[i * nb.k + j], v = values[m];
+        if (fin(v) && fin(nodeZ[m]) && fin(nodeZ[i])) { s += w[i * nb.k + j] * (v + b * (nodeZ[i] - nodeZ[m])); sw += w[i * nb.k + j]; }
+      }
+      pred[i] = sw > 0 ? s / sw : NaN;
+    }
+    return scoreLoo(values, pred);
+  }
+
+  const api = { R, mercX, mercY, knn, weights, build, apply, leaveOneOut, olsSlope, applyElev, leaveOneOutElev, fin };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else root.Interp = api;
 })(typeof window !== "undefined" ? window : globalThis);

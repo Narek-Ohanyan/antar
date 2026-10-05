@@ -81,3 +81,70 @@ def test_leave_one_out_ignores_missing_nodes():
     good = np.isfinite(vm)
     assert got["rmse"] == pytest.approx(np.sqrt(((vm[good] - pred[good]) ** 2).mean()), rel=1e-5)
     assert got["rmse"] < 0.5          # would be ~5 if the missing nodes were read as 0
+
+def run_js_elev(payload):
+    code = ("const I=require(%r);const d=JSON.parse(require('fs').readFileSync(0,'utf8'));"
+            "const it=I.build(d.nx,d.ny,d.tx,d.ty,d.k,d.p);const b=I.olsSlope(d.nz,d.v);"
+            "const out=Array.from(I.applyElev(it,d.v,d.nz,d.tz,b));"
+            "const loo=I.leaveOneOutElev(d.nx,d.ny,d.nz,d.v,d.k,d.p);"
+            "console.log(JSON.stringify({b,out,r2:loo.r2,rmse:loo.rmse,pred:Array.from(loo.pred)}));") % str(JS)
+    r = subprocess.run(["node", "-e", code], input=json.dumps(payload), capture_output=True, text=True, check=True)
+    return json.loads(r.stdout)
+
+
+def ols_ref(z, v, skip=None):
+    m = np.isfinite(z) & np.isfinite(v)
+    if skip is not None:
+        m[skip] = False
+    if m.sum() < 3:
+        return 0.0
+    zc, vc = z[m] - z[m].mean(), v[m] - v[m].mean()
+    return float((zc * vc).sum() / (zc ** 2).sum()) if (zc ** 2).sum() > 0 else 0.0
+
+
+def idw_elev_ref(nx, ny, nz, v, tx, ty, tz, k, b, skip_self=False):
+    out = np.full(len(tx), np.nan)
+    for t in range(len(tx)):
+        d = np.hypot(nx - tx[t], ny - ty[t])
+        if skip_self:
+            d[t] = np.inf
+        order = np.lexsort((np.arange(len(d)), d))[:k]
+        dn = d[order]
+        w = np.zeros(len(order))
+        if (dn < 1).any():
+            w[int(np.argmax(dn < 1))] = 1.0
+        else:
+            w = 1.0 / dn ** 2
+        adj = v[order] + b * (tz[t] - nz[order])
+        good = np.isfinite(adj)
+        out[t] = (w[good] * adj[good]).sum() / w[good].sum() if w[good].sum() > 0 else np.nan
+    return out
+
+
+def test_elevation_adjusted_matches_numpy_reference():
+    rng = np.random.default_rng(11)
+    n = 50
+    nx, ny, nz = rng.uniform(0, 2e5, n), rng.uniform(0, 2e5, n), rng.uniform(500, 3500, n)
+    v = 15 - 0.0065 * nz + 0.3 * rng.normal(size=n)
+    v[7] = np.nan
+    tx, ty, tz = rng.uniform(0, 2e5, 200), rng.uniform(0, 2e5, 200), rng.uniform(500, 4000, 200)
+    got = run_js_elev({"nx": nx.tolist(), "ny": ny.tolist(), "nz": nz.tolist(), "v": [None if np.isnan(a) else a for a in v],
+                       "tx": tx.tolist(), "ty": ty.tolist(), "tz": tz.tolist(), "k": 8, "p": 2})
+    b = ols_ref(nz, v)
+    assert got["b"] == pytest.approx(b, rel=1e-9)
+    np.testing.assert_allclose(got["out"], idw_elev_ref(nx, ny, nz, v, tx, ty, tz, 8, b), rtol=3e-5, atol=3e-5)
+    pred = np.array([idw_elev_ref(nx, ny, nz, v, nx, ny, nz, 8, ols_ref(nz, v, i), skip_self=True)[i] for i in range(n)])
+    np.testing.assert_allclose(got["pred"], pred, rtol=3e-5, atol=3e-5, equal_nan=True)
+
+
+def test_elevation_adjustment_recovers_a_lapse_rate_that_plain_idw_cannot():
+    """Temperature falling 6.5 K per km, nodes scattered over terrain of very different heights."""
+    rng = np.random.default_rng(5)
+    n = 40
+    nx, ny, nz = rng.uniform(0, 2e5, n), rng.uniform(0, 2e5, n), rng.uniform(500, 3500, n)
+    v = 20 - 0.0065 * nz
+    got = run_js_elev({"nx": nx.tolist(), "ny": ny.tolist(), "nz": nz.tolist(), "v": v.tolist(),
+                       "tx": nx.tolist(), "ty": ny.tolist(), "tz": nz.tolist(), "k": 8, "p": 2})
+    plain = run_js({"nx": nx.tolist(), "ny": ny.tolist(), "tx": nx.tolist(), "ty": ny.tolist(), "v": v.tolist(), "k": 8, "p": 2})
+    assert got["b"] == pytest.approx(-0.0065, rel=1e-6)
+    assert got["r2"] > 0.999 and plain["r2"] < 0.5
