@@ -67,8 +67,8 @@ OUT_PATH = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "futu
 CHECKPOINT_PATH = DATA_DIR / "_future_projections_checkpoint.json"
 # Real 2026-10-02 densification, explicitly requested (user: "re-run even if it will take a day
 # or two... I want real and solid outputs"): --dense runs the full real 45-member ensemble against
-# the 1044-point DENSE_GRID instead of 78, with its own output/checkpoint paths. A real, large
-# cost -- 45 members x 1044 points x 3 groups x the same real Monte Carlo that already ran 45x78x3
+# the Armenia-only DENSE_GRID instead of 78, with its own output/checkpoint paths. A real, large
+# cost -- 45 members x ~925 Armenian cells x 3 groups x the same real Monte Carlo that already ran 45x78x3
 # times before -- deliberately accepted, not cut down, per that explicit instruction.
 OUT_PATH_DENSE = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "future_projections_dense.yaml"
 CHECKPOINT_PATH_DENSE = DATA_DIR / "_future_projections_checkpoint_dense.json"
@@ -184,7 +184,7 @@ def main():
     out_path = OUT_PATH_DENSE if dense else OUT_PATH
     checkpoint_path = CHECKPOINT_PATH_DENSE if dense else CHECKPOINT_PATH
 
-    print(f"=== Static grid inputs ({'DENSE 1044-point' if dense else '80-point validation'} grid, "
+    print(f"=== Static grid inputs ({'DENSE Armenia-only (stride 7)' if dense else '80-point validation'} grid, "
           f"terrain/soil streamed once) ===", flush=True)
     static = extract_static_grid_inputs(grid_rows=grid_rows, grid_cols=grid_cols)
     lats, lons = static["lats"], static["lons"]

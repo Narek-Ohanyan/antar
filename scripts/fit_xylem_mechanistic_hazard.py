@@ -105,7 +105,7 @@ def main():
     # generic value shared across all 4 species -- see run_topohydro_grid.py's module docstring.
     # Terrain/soils/ERA5-Land are streamed exactly once, shared across all 4 groups; only the
     # cheap local w_max_mm multiply and the final topoclimate_forcing call repeat per group.
-    print(f"=== Building real {'DENSE (1044-point)' if dense else '2019'} gridded TOPOHYDRO "
+    print(f"=== Building real {'DENSE (Armenia-only, stride 7)' if dense else '2019'} gridded TOPOHYDRO "
           f"forcing per group (rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP}) ===", flush=True)
     rooting_depth_for_fit_groups = {g: ROOTING_DEPTH_MM_BY_GROUP[g] for g in groups
                                      if groups[g]["status"] == "ok"}
@@ -116,7 +116,7 @@ def main():
     results = {
         "run_date": __import__("datetime").date.today().isoformat(),
         "year": 2019,
-        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
+        "grid": "dense_armenia_stride7" if dense else "validation_80pt_stride40",
         "pet_formulation": PET_FORMULATION,
         "outer_draws": OUTER_DRAWS,
         "inner_draws": INNER_DRAWS,

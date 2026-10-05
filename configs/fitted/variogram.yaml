@@ -48,6 +48,7 @@ exponential_fit:
   r2: 0.9209057207220641
 linear_fit:
   slope: 66.12503394440382
+  intercept: 609.517131338933
   r2: 0.9269187109953617
 plateau_visible: false
 verdict: still no clear plateau -- the exponential fit doesn't meaningfully beat a

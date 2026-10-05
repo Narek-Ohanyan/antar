@@ -57,7 +57,7 @@ from antar.viability.cohort import viability  # noqa: E402
 from antar.viability.refugia import refugium_score, robust_refugium  # noqa: E402
 
 OUT_PATH = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "refugium_viability_2019.yaml"
-# Real 2026-10-01 densification: --dense runs against the 1044-point DENSE_GRID, writing to a
+# Real 2026-10-01 densification: --dense runs against the Armenia-only DENSE_GRID, writing to a
 # separate file so the original validation-grid result (what AEGIS keys off of) stays intact.
 OUT_PATH_DENSE = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "refugium_viability_2019_dense.yaml"
 V_STAR = 0.6   # viability threshold (robust_refugium's own default)
@@ -74,7 +74,7 @@ def main():
 
     # Real per-group forcing, one efficient call (shared streamed extraction, see
     # run_topohydro_grid.py's module docstring and fit_xylem_mechanistic_hazard.py's same pattern).
-    print(f"=== Building real {'DENSE (1044-point)' if dense else '2019'} gridded TOPOHYDRO "
+    print(f"=== Building real {'DENSE (Armenia-only, stride 7)' if dense else '2019'} gridded TOPOHYDRO "
           f"forcing per group (rooting_depth_mm={ROOTING_DEPTH_MM_BY_GROUP}) ===", flush=True)
     rooting_depth_for_fit_groups = {g: ROOTING_DEPTH_MM_BY_GROUP[g] for g in groups
                                      if groups[g]["status"] == "ok"}
@@ -85,7 +85,7 @@ def main():
     results = {
         "run_date": __import__("datetime").date.today().isoformat(),
         "year": 2019,
-        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
+        "grid": "dense_armenia_stride7" if dense else "validation_80pt_stride40",
         "v_star": V_STAR, "rho": RHO, "lam": LAM,
         "scope_note": ("Viability = one-year hydraulic survival only (p_height_ok=1.0 -- "
                         "MERISTEM's growth/attainable-height model is not fit against real "

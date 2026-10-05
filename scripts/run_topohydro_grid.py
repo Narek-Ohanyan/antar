@@ -81,6 +81,7 @@ from rasterio.windows import Window
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from antar.climate import downscale
+from antar.io.armenia_mask import load_mask as load_armenia_mask
 from antar.climate.forcing import topoclimate_forcing
 from antar.climate.radiation import net_radiation_from_era5
 from antar.climate.soil_pedotransfer import soil_hydraulic_parameters
@@ -94,17 +95,24 @@ BBOX = (43.4, 38.8, 46.7, 41.4)  # lon_min, lat_min, lon_max, lat_max
 CHELSA_GRID_SHAPE = (312, 396)
 GRID_ROWS = np.arange(0, 312, 40)   # 8 rows -- the original 80-point validation grid
 GRID_COLS = np.arange(0, 396, 40)   # 10 cols
-# A real, bounded densification (2026-10-01): stride 11 on the same native CHELSA 312x396 grid
-# gives 29x36 = 1044 points, ~13x denser than the original 78/80. Chosen from a real, measured
-# per-point cost (terrain+soils extraction ~2s/point, XYLEM/REFUGIUM's Monte Carlo ~1.3s per
-# (cell, group) from this session's own observed run times), bounding TOPOHYDRO+XYLEM+REFUGIUM's
-# total real added time to a few hours rather than attempting the full ~92M-cell 30m master grid
-# or even the full native-CHELSA 123,552-cell grid, both genuinely infeasible in one session.
-# Deliberately NOT used by future-projections: its 45-member ensemble re-running XYLEM/REFUGIUM's
-# Monte Carlo at this density would take roughly a day, not a few hours -- future-projections
-# stays on the original 78-point grid, a real, stated scope boundary, not a silent omission.
-DENSE_GRID_ROWS = np.arange(0, 312, 11)   # 29 rows
-DENSE_GRID_COLS = np.arange(0, 396, 11)   # 36 cols
+# The dense grid (redefined 2026-10-05). The first version (stride 11 over the whole rectangle, 1044
+# points) was found -- while building the UI -- to be about two-thirds foreign territory: Armenia
+# fills only 36.7% of the rectangle (45,322 of 123,552 CHELSA cells), so only ~330 of those 1044
+# cells were in Armenia and ~2/3 of the compute was spent on Georgia, Azerbaijan, Turkey and Iran.
+# The dense grid is now a stride-7 subsample of CHELSA's native cells RESTRICTED TO CELLS INSIDE
+# ARMENIA (src/antar/io/armenia_mask.py): ~925 cells, ~5 x 6.5 km apart, all Armenian. Stride 7
+# keeps the dominant cost (future-projections' 45 members x cells x 3 groups x ~1.3 s Monte Carlo)
+# near ~45 h while giving ~2.8x more Armenian cells than the old dense grid.
+class _ArmeniaOnlyAxis(np.ndarray):
+    """A grid axis whose grid is restricted to cells inside Armenia (see grid_latlon)."""
+    inside_armenia_only = True
+
+
+DENSE_STRIDE = 7
+DENSE_GRID_ROWS = np.arange(0, 312, DENSE_STRIDE).view(_ArmeniaOnlyAxis)
+DENSE_GRID_COLS = np.arange(0, 396, DENSE_STRIDE).view(_ArmeniaOnlyAxis)
+DENSE_GRID_ID = f"dense_armenia_stride{DENSE_STRIDE}"
+DENSE_GRID_LABEL = f"Armenia-only dense grid (stride {DENSE_STRIDE})"
 YEAR = 2019
 
 TERRAIN_DRIVE_ID = "17zOkIKhKZiDQaRtF2SwPhk3XOa37hpbe"
@@ -160,11 +168,17 @@ ERA5LAND_TILE_IDS_NEAREST_NEIGHBOR_ORIGINAL = {
 
 
 def grid_latlon(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
-    lats = BBOX[3] - (grid_rows + 0.5) * (BBOX[3] - BBOX[1]) / CHELSA_GRID_SHAPE[0]
-    lons = BBOX[0] + (grid_cols + 0.5) * (BBOX[2] - BBOX[0]) / CHELSA_GRID_SHAPE[1]
+    """Cell-centre lat/lon and CHELSA (row, col) for every grid cell. If either axis is an
+    ``_ArmeniaOnlyAxis`` (the dense grid), cells outside Armenia are dropped."""
+    lats = BBOX[3] - (np.asarray(grid_rows) + 0.5) * (BBOX[3] - BBOX[1]) / CHELSA_GRID_SHAPE[0]
+    lons = BBOX[0] + (np.asarray(grid_cols) + 0.5) * (BBOX[2] - BBOX[0]) / CHELSA_GRID_SHAPE[1]
     lon_grid, lat_grid = np.meshgrid(lons, lats)
-    chelsa_row, chelsa_col = np.meshgrid(grid_rows, grid_cols, indexing="ij")
-    return lat_grid.ravel(), lon_grid.ravel(), chelsa_row.ravel(), chelsa_col.ravel()
+    chelsa_row, chelsa_col = np.meshgrid(np.asarray(grid_rows), np.asarray(grid_cols), indexing="ij")
+    lat_f, lon_f, row_f, col_f = lat_grid.ravel(), lon_grid.ravel(), chelsa_row.ravel(), chelsa_col.ravel()
+    if getattr(grid_rows, "inside_armenia_only", False) or getattr(grid_cols, "inside_armenia_only", False):
+        keep = load_armenia_mask()[row_f, col_f]
+        lat_f, lon_f, row_f, col_f = lat_f[keep], lon_f[keep], row_f[keep], col_f[keep]
+    return lat_f, lon_f, row_f, col_f
 
 
 def get_access_token():
@@ -392,7 +406,7 @@ def extract_static_grid_inputs(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
     ~free rather than re-streaming terrain/soils/ERA5-Land 4 times for no reason.
 
     ``grid_rows``/``grid_cols`` default to the original 80-point validation grid; pass
-    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the real 1044-point densified grid.
+    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the Armenia-only dense grid.
     """
     lats, lons, chelsa_row, chelsa_col = grid_latlon(grid_rows, grid_cols)
     n = len(lats)
@@ -588,7 +602,7 @@ def compute_grid_forcing(year=YEAR, rooting_depth_mm=ROOTING_DEPTH_MM_PLACEHOLDE
     per group the way calling this function in a loop would.
 
     ``grid_rows``/``grid_cols`` default to the original 80-point validation grid; pass
-    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the real 1044-point densified grid.
+    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the Armenia-only dense grid.
 
     Returns ``(lats, lons, elevation, results)``; ``results[i]`` is a
     :class:`antar.climate.forcing.CellTopoclimate` or ``None`` where soil/
@@ -606,7 +620,7 @@ def compute_grid_forcing_multi_group(year=YEAR, rooting_depth_by_group=ROOTING_D
     streaming terrain/soils/ERA5-Land exactly once, not once per group.
 
     ``grid_rows``/``grid_cols`` default to the original 80-point validation grid; pass
-    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the real 1044-point densified grid.
+    ``DENSE_GRID_ROWS``/``DENSE_GRID_COLS`` for the Armenia-only dense grid.
 
     Returns ``(lats, lons, elevation, results_by_group)``; ``results_by_group[group][i]`` is a
     :class:`antar.climate.forcing.CellTopoclimate` or ``None``.
@@ -629,7 +643,7 @@ def main():
     summary = {
         "run_date": datetime.date.today().isoformat(),
         "year": YEAR,
-        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
+        "grid": DENSE_GRID_ID if dense else "validation_80pt_stride40",
         "n_grid_points": int(n),
         "n_with_real_output": int(n_ok),
         "grid_definition": ("29x36 subsample (every 11th pixel) of CHELSA-daily's 312x396 armenia "

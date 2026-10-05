@@ -56,6 +56,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import get_access_token, drive_vsicurl_url  # noqa: E402
 from antar.decision.optimize import robust_portfolio, efficient_frontier  # noqa: E402
+from antar.io.armenia_mask import inside_armenia  # noqa: E402
+import time  # noqa: E402
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "configs"
 OUT_PATH = CONFIG_DIR / "fitted" / "aegis_portfolio.yaml"
@@ -91,40 +93,50 @@ BUDGET_LEVELS_USD = [9.3e6, 45e6, 100e6, 300e6, 663e6]
 REPRESENTATIVE_BUDGET_USD = 45e6
 
 
-def load_eligibility(lats, lons):
-    token = get_access_token()
-    url = drive_vsicurl_url(LAND_TENURE_FILE_ID)
-    with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES"):
-        with rasterio.open(url) as src:
-            xs, ys = warp_transform("EPSG:4326", src.crs, lons.tolist(), lats.tolist())
-            protected = np.array(list(src.sample(zip(xs, ys))))[:, 0]
-    not_protected = protected < 0.5  # eligible = NOT protected
+WATER_CLASS = 1001  # Ecosystem Map "Water bodies" (e.g. Lake Sevan): inside Armenia but not plantable
 
-    # Real, narrowly scoped second exclusion from the Ecosystem Map of Armenia (2026-09-18):
-    # settlements/cropland/buildings/quarries. Deliberately does NOT exclude already-forested
-    # cells -- 3 of the 8 real intervention methods below (coppicing_oak, pine_thinning,
-    # wildfire_prevention) target existing forest, so that would wrongly zero out the options that
-    # most need it. See integrate_ecosystem_map.py's module docstring for the full reasoning.
-    #
-    # Sampled LIVE here (not looked up from configs/fitted/ecosystem_ground_truth_2019.yaml) --
-    # a real bug caught before it could silently fire: that file's lookup is keyed by exact
-    # lat/lon match against the 78-point grid it was built from, so at any other grid density
-    # (e.g. the real 1044-point dense grid) every lookup would miss and this exclusion would
-    # silently never apply, leaving only WDPA active with no error or warning. Calling
-    # sample_class_fractions directly makes this correct at whatever real grid is passed in.
-    try:
-        from integrate_ecosystem_map import sample_class_fractions, HUMAN_MODIFIED_CLASSES
-        class_fractions = sample_class_fractions(lats, lons)
-        not_human_modified = np.ones(len(lats), dtype=bool)
-        for i, cf in enumerate(class_fractions):
-            if cf is not None:
-                human_modified_frac = sum(cf.get(c, 0.0) for c in HUMAN_MODIFIED_CLASSES)
-                not_human_modified[i] = human_modified_frac <= 0.5
-        return not_protected & not_human_modified
-    except rasterio.errors.RasterioIOError:
-        print("  (ecosystem map raster not found locally -- human-modified exclusion skipped, "
-              "WDPA-only eligibility)", flush=True)
-        return not_protected
+
+def load_eligibility(lats, lons):
+    """Eligible = inside Armenia AND not protected (WDPA) AND not mostly human-modified or water.
+
+    The first condition was missing until 2026-10-05: the study grid is a rectangle that Armenia
+    fills only ~37% of, and a foreign cell has no protected-area flag and no mapped human-modified
+    land, so it passed every other test -- the portfolio was recommending planting in Georgia,
+    Azerbaijan, Turkey and Iran. (Found while building the UI.)
+
+    The ecosystem-map exclusion is sampled LIVE here (not looked up from a file keyed to the 78-point
+    grid's exact coordinates, which would silently miss at any other grid density)."""
+    inside = inside_armenia(lats, lons)
+
+    protected = None
+    for attempt in range(3):
+        try:
+            token = get_access_token()
+            url = drive_vsicurl_url(LAND_TENURE_FILE_ID)
+            with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
+                with rasterio.open(url) as src:
+                    xs, ys = warp_transform("EPSG:4326", src.crs, lons.tolist(), lats.tolist())
+                    protected = np.array(list(src.sample(zip(xs, ys))))[:, 0]
+            break
+        except rasterio.errors.RasterioIOError as e:
+            print(f"  WDPA read failed (attempt {attempt + 1}/3): {e}", flush=True)
+            time.sleep(5 * (attempt + 1))
+    if protected is None:
+        raise RuntimeError("WDPA protected-area raster unreadable after retries -- refusing to assume 'not protected'")
+    not_protected = protected < 0.5
+
+    # Deliberately does NOT exclude already-forested cells -- 3 of the 8 real intervention methods
+    # (coppicing_oak, pine_thinning, wildfire_prevention) target existing forest, so that would wrongly
+    # zero out the options that most need it. See integrate_ecosystem_map.py's docstring.
+    from integrate_ecosystem_map import sample_class_fractions, HUMAN_MODIFIED_CLASSES
+    class_fractions = sample_class_fractions(lats, lons)
+    plantable = np.ones(len(lats), dtype=bool)
+    for i, cf in enumerate(class_fractions):
+        if cf is not None:
+            plantable[i] = sum(cf.get(c, 0.0) for c in HUMAN_MODIFIED_CLASSES + [WATER_CLASS]) <= 0.5
+    print(f"  eligibility: {int(inside.sum())} inside Armenia | {int((inside & not_protected).sum())} also not protected "
+          f"| {int((inside & not_protected & plantable).sum())} also plantable (not human-modified / water)", flush=True)
+    return inside & not_protected & plantable
 
 
 def load_refugium_only():
@@ -183,16 +195,24 @@ def main():
         print("=== future_projections.yaml not ready yet -- real single-scenario (2019) fallback, "
               "C=1, CVaR degenerate -- stated in output, not hidden ===", flush=True)
 
+    # Foreign cells are not candidate units at all: drop them rather than merely mark them ineligible,
+    # so the reported unit count and every benefit total refer to Armenia only.
+    in_arm = inside_armenia(lats, lons)
+    n_total = len(lats)
+    lats, lons = lats[in_arm], lons[in_arm]
+    viability = {g: v[in_arm] for g, v in viability.items()}
+    print(f"=== {int(in_arm.sum())}/{n_total} sampled cells are inside Armenia; the other "
+          f"{n_total - int(in_arm.sum())} (Georgia/Azerbaijan/Turkey/Iran/Nakhchivan) are dropped ===", flush=True)
+
     n = len(lats)
     C = len(scenario_names)
     J = len(group_names) * len(INTERVENTIONS)
     print(f"=== {n} real units, {J} options ({len(group_names)} groups x {len(INTERVENTIONS)} methods), "
           f"{C} scenarios ===", flush=True)
 
-    print("=== Real eligibility: WDPA (streamed) + Ecosystem Map of Armenia human-modified "
-          "exclusion ===", flush=True)
+    print("=== Eligibility: inside Armenia + not protected (WDPA) + not human-modified/water ===", flush=True)
     eligible_mask = load_eligibility(lats, lons)
-    print(f"  {eligible_mask.sum()}/{n} real units eligible (not protected, not human-modified)", flush=True)
+    print(f"  {eligible_mask.sum()}/{n} real units eligible (inside Armenia, not protected, plantable)", flush=True)
 
     benefit = np.zeros((n, J, C))
     cost = np.zeros((n, J))
@@ -215,6 +235,8 @@ def main():
         "n_scenarios": C,
         "scenario_names": scenario_names,
         "n_units": n,
+        "n_sampled_cells_total": n_total,
+        "n_cells_dropped_outside_armenia": n_total - n,
         "value_per_ha_year_usd": VALUE_PER_HA_YEAR,
         "option_labels": option_labels,
         "scope_note": ("Benefit varies only by functional group (real, REFUGIUM); cost varies "

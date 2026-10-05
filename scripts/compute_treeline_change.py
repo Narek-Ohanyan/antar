@@ -158,7 +158,7 @@ def main():
 
     result = {
         "run_date": datetime.date.today().isoformat(),
-        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
+        "grid": "dense_armenia_stride7" if dense else "validation_80pt_stride40",
         "thermal_threshold_c": 6.45,
         "gamma_growing_season_k_per_km": gamma_gs * 1000,
         "growing_season_t0_c": GROWING_SEASON_T0_C,

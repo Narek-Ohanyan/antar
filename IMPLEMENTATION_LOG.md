@@ -1734,3 +1734,24 @@ did not deliver what was promised. Reading the logs after the fact:
 **Honest status of the "dense" work as of this entry:** no valid dense-grid result exists yet.
 The only valid results are the 78-point ones (XYLEM / REFUGIUM / future-projections / AEGIS), which
 remain correct and in place.
+
+## 2026-10-05 -- the study grid is two-thirds foreign territory; sampling frame corrected (IN PROGRESS)
+
+Found while building the UI: the CHELSA rectangle (lon 43.4-46.7, lat 38.8-41.4) is only 36.7% Armenia.
+Measured against the national Ecosystem Map, just **25 of the 80 stride-40 "validation" cells are inside
+Armenia** (17 outside the map's extent, 38 more over Georgia/Azerbaijan/Turkey/Iran/Nakhchivan). So every
+earlier headline mean, the ecosystem-map validation (rho 0.26-0.33, n=61 -- which included foreign cells where
+mapped cover is zero by construction) and the AEGIS "58 eligible units" included foreign land; the portfolio
+could recommend planting in neighbouring countries. The old stride-11 dense grid (1044 cells) would have had
+only ~330 Armenian cells.
+
+Done: `scripts/build_armenia_mask.py` + `configs/armenia_mask_chelsa_312x396.npz` + `antar.io.armenia_mask`
+(45,322 cells = 29,680 km2 vs official 29,743 km2; 4 tests pass). Dense grid redefined as stride-7 over Armenia-only
+cells (921 cells, verified all inside). AEGIS eligibility now requires inside-Armenia and drops foreign units;
+ecosystem validation restricted to inside-Armenia cells (code patched, compiles).
+
+NOT yet done (outputs below are STALE and still contain foreign cells): re-run `integrate_ecosystem_map.py` and
+`fit_aegis_portfolio.py`; subset `ui/build_data.py` summaries/headlines to inside-Armenia cells and add an
+`in_armenia` layer/toggle; re-launch the dense chain (`scripts/run_dense_chain.sh`) on the new grid; update
+`DENSE_N` and grid labels in `ui/build_data.py`. The existing 78-point per-cell results remain valid for their
+25 Armenian cells (cells are computed independently). No dense result exists yet.

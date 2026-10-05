@@ -70,7 +70,7 @@ from antar.validation.splits import spatial_block_ids  # noqa: E402
 
 OUT_PATH = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "mneme_hazard_panel_2010_2019.yaml"
 CHECKPOINT_PATH = Path(__file__).resolve().parent.parent / "data" / "_mneme_panel_checkpoint.json"
-# Real 2026-10-01 densification: --dense runs against the 1044-point DENSE_GRID, with its own
+# Real 2026-10-01 densification: --dense runs against the Armenia-only DENSE_GRID, with its own
 # output/checkpoint paths so the original 80-point validation-grid result stays intact.
 OUT_PATH_DENSE = Path(__file__).resolve().parent.parent / "configs" / "fitted" / "mneme_hazard_panel_2010_2019_dense.yaml"
 CHECKPOINT_PATH_DENSE = Path(__file__).resolve().parent.parent / "data" / "_mneme_panel_checkpoint_dense.json"
@@ -91,7 +91,7 @@ def extract_vitality_and_disturbance(token, row_px, col_px):
     """Real kNDVI (per tile) + real no_disturbance (single file), vectorized via rasterio
     .sample() across all points per band and retried with a fresh token on failure -- the
     original per-point-per-year Window-read loop (25 read() calls per point per source) was fine
-    at 78 points but genuinely impractical at the real 1044-point dense grid (tens of thousands
+    at 78 points but genuinely impractical at the Armenia-only dense grid (tens of thousands
     of serial small reads), and tonight's real network conditions have shown repeated transient
     vsicurl failures that need a retry, not just a timeout bound. Same pattern already proven in
     compute_real_cwd_for_meristem.py's extract_era5land_vectorized."""
@@ -179,7 +179,7 @@ def main():
     out_path = OUT_PATH_DENSE if dense else OUT_PATH
     checkpoint_path = CHECKPOINT_PATH_DENSE if dense else CHECKPOINT_PATH
 
-    print(f"=== Static grid inputs ({'DENSE 1044-point' if dense else '80-point validation'} grid, "
+    print(f"=== Static grid inputs ({'DENSE Armenia-only (stride 7)' if dense else '80-point validation'} grid, "
           f"terrain/soil streamed, reused across years) ===", flush=True)
     static = extract_static_grid_inputs(grid_rows=grid_rows, grid_cols=grid_cols)
     lats, lons = static["lats"], static["lons"]
@@ -244,7 +244,7 @@ def main():
 
     result = {
         "run_date": __import__("datetime").date.today().isoformat(),
-        "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
+        "grid": "dense_armenia_stride7" if dense else "validation_80pt_stride40",
         "panel_years": PANEL_YEARS,
         "n_points": int(n), "n_points_valid_kndvi": n_valid_kndvi,
         "n_person_years": int(len(panel)), "n_events": int(panel["event"].sum()),

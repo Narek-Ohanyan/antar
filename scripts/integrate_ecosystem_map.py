@@ -44,6 +44,9 @@ from rasterio.warp import transform as warp_transform
 from rasterio.windows import Window
 from scipy.stats import spearmanr
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+from antar.io.armenia_mask import inside_armenia  # noqa: E402
+
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "configs"
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "ecosystem_map"
 RASTER_PATH = DATA_DIR / "Ecosystem_Map_of_Armenia.tif"
@@ -134,7 +137,13 @@ def main():
 
     print("=== Real validation: REFUGIUM predicted viability vs. real observed forest cover "
           "(in-bounds cells only) ===", flush=True)
-    in_bounds = np.array([not c["outside_real_armenia_raster_extent"] for c in cells_out])
+    # Validate only on cells INSIDE Armenia. The earlier "in-bounds" test only excluded cells outside the
+    # map's rectangle; 38 more sat inside the rectangle over foreign land, where mapped forest cover is
+    # zero by construction (class 0 = unmapped) -- those cells were dragging the correlation around.
+    in_arm = inside_armenia(lats, lons)
+    for i, c in enumerate(cells_out):
+        c["inside_armenia"] = bool(in_arm[i])
+    in_bounds = np.array([(not c["outside_real_armenia_raster_extent"]) and c["inside_armenia"] for c in cells_out])
     validation = {}
     for g in viability:
         obs_all = np.array([c["forest_cover_fraction_by_group"][g] if not c["outside_real_armenia_raster_extent"]
@@ -165,7 +174,8 @@ def main():
                         "(the project's rectangular BBOX extends past it) and have no coverage here "
                         "-- left unset, not zero-filled."),
         "n_cells_total": n,
-        "n_cells_outside_armenia_border": n_outside,
+        "n_cells_outside_armenia_border": int(n - in_arm.sum()),
+        "n_cells_inside_armenia": int(in_arm.sum()),
         "validation_viability_vs_observed_forest_cover": validation,
         "human_modified_fraction_threshold_for_aegis": 0.5,
         "n_cells_human_modified": n_human_modified,

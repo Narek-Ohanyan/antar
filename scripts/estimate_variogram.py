@@ -6,7 +6,7 @@ CWD's real large-scale spatial trend in this data -- the variogram should charac
 residual spatial-autocorrelation structure, not the trend itself, matching cv.yaml's own wording
 ("variogram practical range of residuals").
 
---dense reads the real 1044-point dense grid (configs/fitted/topohydro_grid_run_2019_dense.yaml,
+--dense reads the Armenia-only dense grid (configs/fitted/topohydro_grid_run_2019_dense.yaml,
 written by `python3 scripts/run_topohydro_grid.py --dense`) instead of the original 78-point one --
 the real follow-up the user asked for once a denser real sample existed, specifically to find out
 whether the original run's "no clear sill within 24-186km, real practical range ~523km, but can't
@@ -26,7 +26,7 @@ dense = "--dense" in sys.argv
 path = "configs/fitted/topohydro_grid_run_2019_dense.yaml" if dense else "configs/fitted/topohydro_grid_run_2019.yaml"
 d = yaml.safe_load(open(path))
 pts = [p for p in d["points"] if p.get("status") == "ok"]
-print(f"=== real {'DENSE (1044-point)' if dense else '78-point'} grid: {len(pts)} real ok points ===")
+print(f"=== real {'DENSE (Armenia-only, stride 7)' if dense else '78-point'} grid: {len(pts)} real ok points ===")
 lats = np.array([p["lat"] for p in pts])
 lons = np.array([p["lon"] for p in pts])
 elev = np.array([p["elevation_m"] for p in pts])
@@ -78,7 +78,7 @@ def exp_model(h, nugget, sill, rng):
 
 result = {
     "run_date": __import__("datetime").date.today().isoformat(),
-    "grid": "dense_1044pt_stride11" if dense else "validation_80pt_stride40",
+    "grid": "dense_armenia_stride7" if dense else "validation_80pt_stride40",
     "variable": "CWD (pm_fao56), OLS-detrended against elevation",
     "n_points": int(n),
     "n_pairs": int(len(dists)),
@@ -118,7 +118,7 @@ try:
         "nugget": float(nugget), "sill": float(sill), "range_param_km": float(rng),
         "practical_range_km": float(practical_range_km), "r2": float(r2_exp),
     }
-    result["linear_fit"] = {"slope": float(coef_lin[0]), "r2": float(r2_lin)}
+    result["linear_fit"] = {"slope": float(coef_lin[0]), "intercept": float(coef_lin[1]), "r2": float(r2_lin)}
     result["plateau_visible"] = plateau_visible
     result["verdict"] = verdict
 except Exception as e:
