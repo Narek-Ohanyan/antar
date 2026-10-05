@@ -89,8 +89,8 @@ label { display: block; font-size: .8rem; font-weight: 600; color: var(--muted);
 .legend { margin-top: 10px; }
 .legend .bar { height: 12px; border-radius: 6px; border: 1px solid var(--border); }
 .legend .ends { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); margin-top: 3px; }
-.legend .swatch { display: inline-flex; align-items: center; gap: 6px; margin-right: 12px; font-size: .82rem; }
-.legend .swatch i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); display: inline-block; }
+.swatch { display: inline-flex; align-items: center; gap: 6px; margin-right: 12px; font-size: .82rem; }
+.swatch i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); display: inline-block; }
 .side h3 { margin-top: 0; }
 .kv { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; font-size: .86rem; }
 .kv span:nth-child(odd) { color: var(--muted); }
@@ -127,3 +127,8 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .map-img { image-rendering: auto; }
 #map { background: var(--surface-2); }
 #map .leaflet-control-attribution { font-size: 10px; max-width: 70%; }
+.xhair { background: none; border: 0; }
+.xhair i { position: absolute; inset: 0; }
+.xhair i::before, .xhair i::after { content: ""; position: absolute; background: var(--text); box-shadow: 0 0 0 1.5px var(--surface); }
+.xhair i::before { left: 12px; top: 3px; width: 2px; height: 20px; }
+.xhair i::after { top: 12px; left: 3px; height: 2px; width: 20px; }

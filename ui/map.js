@@ -5,7 +5,6 @@
      surface   the chosen model quantity interpolated from the model nodes over the WHOLE country (Interp, IDW)
      hatch     optional hatching where forest stands today
      lines     marz borders and the national outline
-     nodes     optional: the model nodes the surface is interpolated from
 
    The surface is an interpolation, not a model run at every pixel; the panel states the interpolation
    error (leave-one-out at the nodes) for whatever is on screen. Helpers (state, $, fmt, makeScale, ...) come
@@ -149,9 +148,16 @@ function scenarioSource(id) {
 }
 function preferDense(ids) { return ids.slice().sort((a, b) => (b === "dense") - (a === "dense")); }
 
+const hasScen = (q) => !!(q && (q.src || q.scenarioOnly));
 function mapQuantities() {
   const M = state.M, Q = {};
   for (const [id, meta] of Object.entries(M.layers)) if (meta.map !== false) Q[id] = { id, ...meta, src: scenarioSource(id) };
+  // a quantity whose 2019 layer is missing but whose scenario series exists (or the reverse) is still listed
+  for (const pl of M.map_plan || []) {
+    if (Q[pl.id] || pl.id === "treeline_shift") continue;
+    const src = scenarioSource(pl.id);
+    if (src) { const g = state.G[src.gid]; Q[pl.id] = { id: pl.id, label: pl.label, engine: pl.engine, unit: (M.layers[pl.id] || {}).unit || "", grid: src.gid, grid_label: M.grids[src.gid].label, good: pl.good || null, src, noBaseline: true }; }
+  }
   const tl = scenarioSource("treeline_shift");
   if (tl) Q.treeline_shift = { id: "treeline_shift", label: "Treeline shift vs 2019 (scenario)", unit: "m", engine: "Treeline", grid: tl.gid, grid_label: M.grids[tl.gid].label, good: "high", scenarioOnly: true, src: tl };
   return Q;
@@ -159,7 +165,10 @@ function mapQuantities() {
 
 function seriesFor(q, sel) {
   const M = state.M;
-  if (sel.mode === "base" && !q.scenarioOnly) return { gid: q.grid, values: state.G[q.grid].layers[q.id], diverging: false, binary: q.binary };
+  if (sel.mode === "base" && !q.scenarioOnly) {
+    const lay = q.noBaseline ? null : state.G[q.grid].layers[q.id];
+    return lay ? { gid: q.grid, values: lay, diverging: false, binary: q.binary } : null;
+  }
   if (!q.src) return null;
   const g = state.G[q.src.gid], vals = ensembleStat(q.src.members, q.src.mat, g.n_cells, sel);
   const stops = q.good === "low" ? DIV_BAD_HIGH : q.good === "high" ? DIV_GOOD_HIGH : DIV_SHIFT;
@@ -186,13 +195,17 @@ async function renderMap(p) {
     view: p.view === "cover" ? "cover" : "result", cover: COVER_GROUPS[p.cover] ? p.cover : "all",
     q: Q[p.q] ? p.q : "treeline_shift", mode: p.mode || "scen", ssp: p.ssp || "ssp585", hz: +(p.hz || 2100), gcm: p.gcm || "ens",
     stat: p.stat || "mean", diff: p.diff == null ? true : p.diff === "1",
-    borders: p.borders !== "0", nodes: p.nodes === "1", hatch: p.hatch === "1", forestOnly: p.forestOnly === "1", opacity: +(p.op || 0.92),
+    borders: p.borders !== "0", hatch: p.hatch === "1", forestOnly: p.forestOnly === "1", opacity: +(p.op || 0.92),
   };
   if (!Q[sel.q]) sel.q = Object.keys(Q)[0];
-  if (Q[sel.q].scenarioOnly || !Q[sel.q].src) sel.mode = Q[sel.q].scenarioOnly ? "scen" : sel.mode;
-  const byEngine = {};
+  sel.pref = sel.mode === "base" ? "base" : "scen";            // what the user asked for; a quantity without scenario results falls back to 2019
+  const modeOf = (q) => (q.scenarioOnly ? "scen" : !hasScen(q) ? "base" : q.noBaseline ? "scen" : sel.pref);
+  const byEngine = {}, planned = new Set((M.map_plan || []).map((x) => x.id));
   Object.values(Q).forEach((q) => (byEngine[q.engine] = byEngine[q.engine] || []).push(q));
-  const opts = ENGINE_ORDER.filter((e) => byEngine[e]).map((e) => `<optgroup label="${esc(ENGINE_TITLE[e] || e)}">${byEngine[e].map((q) => `<option value="${esc(q.id)}">${esc(q.label)}${q.src ? "" : " (2019 only)"}</option>`).join("")}</optgroup>`).join("");
+  const stub = (pl) => ({ id: "x:" + pl.id, label: pl.label, engine: pl.engine, missing: true });
+  (M.map_plan || []).forEach((pl) => { if (!Q[pl.id] && pl.id !== "treeline_shift") (byEngine[pl.engine] = byEngine[pl.engine] || []).push(stub(pl)); });
+  const tag = (q) => (q.missing ? " — no results yet" : q.scenarioOnly ? "" : q.noBaseline ? " (scenarios only)" : hasScen(q) ? "" : " (2019 only for now)");
+  const opts = ENGINE_ORDER.filter((e) => byEngine[e]).map((e) => `<optgroup label="${esc(ENGINE_TITLE[e] || e)}">${byEngine[e].map((q) => `<option value="${esc(q.id)}"${q.missing ? " disabled" : ""}>${esc(q.label)}${tag(q)}</option>`).join("")}</optgroup>`).join("");
 
   view().innerHTML = `<div class="wrap">${banner()}<div class="maplayout">
     <aside class="card side">
@@ -202,7 +215,6 @@ async function renderMap(p) {
       <div class="opts"><label class="chk"><input type="checkbox" id="o-borders"> Marz borders</label>
         <label class="chk res"><input type="checkbox" id="o-hatch"> Hatch where forest stands today</label>
         <label class="chk res"><input type="checkbox" id="o-forestonly"> Colour only mapped forest &amp; woodland</label>
-        <label class="chk res"><input type="checkbox" id="o-nodes"> Show the model nodes</label>
         <label class="res" for="o-op">Surface opacity</label><input class="res" type="range" id="o-op" min="0.3" max="1" step="0.02"></div>
       <div id="qinfo" class="small" style="margin-top:12px"></div>
       <div class="legend" id="legend"></div>
@@ -220,7 +232,7 @@ async function renderMap(p) {
   L.control.scale({ imperial: false }).addTo(map);
   map.fitBounds(bounds);
   ["base", "surface", "hatch"].forEach((n, i) => { map.createPane(n).style.zIndex = 210 + i * 10; map.getPane(n).style.pointerEvents = "none"; });
-  let baseLayer, surfaceLayer, hatchLayer, bordersLayer, nodesLayer = L.layerGroup().addTo(map);
+  let baseLayer, surfaceLayer, hatchLayer, bordersLayer;
   const overlay = (canvas, pane, opacity) => L.imageOverlay(toUrl(canvas), bounds, { pane, opacity: opacity == null ? 1 : opacity, interactive: false, className: "map-img" }).addTo(map);
   bordersLayer = L.geoJSON(A.borders, { pane: "overlayPane", interactive: false,
     style: (f) => (f.properties.kind === "country" ? { color: cssVar("--map-outline"), weight: 1.8, opacity: 0.95 } : { color: cssVar("--map-line"), weight: 0.9, opacity: 0.8 }) });
@@ -228,22 +240,25 @@ async function renderMap(p) {
   let current = { vals: null, sc: null, q: null, s: null };
 
   function scenControls(q) {
-    if (!q.src && !q.scenarioOnly) { $("#scenctl").innerHTML = `<p class="small muted" style="margin-top:8px">${q.engine === "TOPOHYDRO" || q.engine === "REFUGIUM" || q.engine === "XYLEM" ? "Scenario results for this quantity are not stored yet; they appear once the dense run completes." : "This quantity is computed for 2019 only."}</p>`; return; }
+    if (!hasScen(q)) {
+      const pl = (M.map_plan || []).find((x) => x.id === q.id);
+      $("#scenctl").innerHTML = `<div class="callout" style="margin:10px 0;padding:8px 10px"><strong>2019 only for now.</strong> Scenario results for this map are produced by <code>${esc(pl ? pl.scenario_from : "the next dense run")}</code> and will appear when that run finishes.</div>`; return;
+    }
     $("#scenctl").innerHTML = `
-      ${q.scenarioOnly ? "" : `<label for="mode">Period</label><select id="mode"><option value="base">2019 baseline</option><option value="scen">Future scenario</option></select>`}
+      ${q.scenarioOnly || q.noBaseline ? "" : `<label for="mode">Period</label><select id="mode"><option value="base">2019 baseline</option><option value="scen">Future scenario</option></select>`}
       <div id="scen">
         <label for="ssp">Emissions path</label><select id="ssp">${Object.entries(SSP).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
         <label for="hz">Horizon</label><select id="hz">${HORIZONS.map((h) => `<option value="${h}">${h}</option>`).join("")}</select>
         <label for="gcm">Climate model</label><select id="gcm"><option value="ens">All 5 models</option>${gcms.map((g) => `<option value="${g}">${g}</option>`).join("")}</select>
         <div id="statrow"><label for="stat">Across the 5 models show</label><select id="stat"><option value="mean">Mean</option><option value="min">Lowest model</option><option value="max">Highest model</option><option value="spread">Disagreement (highest − lowest)</option></select></div>
-        ${q.scenarioOnly ? "" : `<label class="chk" style="margin-top:12px"><input type="checkbox" id="diff"> Show change vs 2019</label>`}
+        ${q.scenarioOnly || q.noBaseline ? "" : `<label class="chk" style="margin-top:12px"><input type="checkbox" id="diff"> Show change vs 2019</label>`}
       </div>`;
-    if ($("#mode")) $("#mode").value = sel.mode;
+    if ($("#mode")) $("#mode").value = sel.pref;
     $("#ssp").value = sel.ssp; $("#hz").value = sel.hz; $("#gcm").value = sel.gcm; $("#stat").value = sel.stat;
     if ($("#diff")) $("#diff").checked = sel.diff;
-    const sync = () => { $("#scen").style.display = q.scenarioOnly || sel.mode === "scen" ? "" : "none"; $("#statrow").style.display = sel.gcm === "ens" ? "" : "none"; };
+    const sync = () => { $("#scen").style.display = modeOf(q) === "scen" ? "" : "none"; $("#statrow").style.display = sel.gcm === "ens" ? "" : "none"; };
     sync();
-    ["mode", "ssp", "hz", "gcm", "stat"].forEach((id) => $("#" + id) && $("#" + id).addEventListener("change", (e) => { sel[id] = e.target.value; sync(); refresh(); }));
+    ["mode", "ssp", "hz", "gcm", "stat"].forEach((id) => $("#" + id) && $("#" + id).addEventListener("change", (e) => { if (id === "mode") sel.pref = e.target.value; else sel[id] = e.target.value; sync(); refresh(); }));
     if ($("#diff")) $("#diff").addEventListener("change", (e) => { sel.diff = e.target.checked; refresh(); });
   }
 
@@ -281,11 +296,10 @@ async function renderMap(p) {
     $("#ctl-cover").style.display = sel.view === "cover" ? "" : "none";
     view().querySelectorAll(".res").forEach((e) => (e.style.display = sel.view === "result" ? "" : "none"));
     view().querySelectorAll(".seg button").forEach((b) => b.classList.toggle("on", b.dataset.view === sel.view));
-    $("#o-borders").checked = sel.borders; $("#o-hatch").checked = sel.hatch; $("#o-forestonly").checked = sel.forestOnly; $("#o-nodes").checked = sel.nodes; $("#o-op").value = sel.opacity;
+    $("#o-borders").checked = sel.borders; $("#o-hatch").checked = sel.hatch; $("#o-forestonly").checked = sel.forestOnly; $("#o-op").value = sel.opacity;
     if (bordersLayer) { if (sel.borders && !map.hasLayer(bordersLayer)) bordersLayer.addTo(map); if (!sel.borders && map.hasLayer(bordersLayer)) map.removeLayer(bordersLayer); }
     setLayer("base", drawBase(A, sel.view === "cover" ? sel.cover : "all"));
-    nodesLayer.clearLayers();
-    const params = { view: sel.view, cover: sel.cover, q: sel.q, mode: sel.mode, ssp: sel.ssp, hz: sel.hz, gcm: sel.gcm, stat: sel.stat, diff: sel.diff ? 1 : 0, borders: sel.borders ? 1 : 0, nodes: sel.nodes ? 1 : 0, hatch: sel.hatch ? 1 : 0, forestOnly: sel.forestOnly ? 1 : 0, op: sel.opacity };
+    const params = { view: sel.view, cover: sel.cover, q: sel.q, mode: sel.pref, ssp: sel.ssp, hz: sel.hz, gcm: sel.gcm, stat: sel.stat, diff: sel.diff ? 1 : 0, borders: sel.borders ? 1 : 0, hatch: sel.hatch ? 1 : 0, forestOnly: sel.forestOnly ? 1 : 0, op: sel.opacity };
     setParams(params);
     current = { vals: null, sc: null, q: null, s: null };
 
@@ -301,12 +315,12 @@ async function renderMap(p) {
       return;
     }
 
-    const q = Q[sel.q], s = seriesFor(q, sel);
+    const q = Q[sel.q], s = seriesFor(q, { ...sel, mode: modeOf(q) });
     const meta = [`<div><strong>${esc(q.label)}</strong></div>`, `<div class="muted">${esc(q.engine)} · ${gridChip(s ? s.gid : q.grid)}</div>`];
     if (q.placeholder) meta.push(`<div class="callout" style="margin:8px 0;padding:7px 10px">Placeholder input: ${esc(q.placeholder)}</div>`);
     if (!s || !s.values || !s.values.some(ok)) {
       setLayer("surface", null); setLayer("hatch", null);
-      $("#qinfo").innerHTML = meta.join("") + `<p class="muted">No data for this selection.</p>`; $("#legend").innerHTML = ""; $("#regions").innerHTML = ""; return;
+      $("#qinfo").innerHTML = meta.join("") + `<p class="muted">No results exist for this selection yet${q.noBaseline ? " (its 2019 baseline has not been computed)" : ""}.</p>`; $("#legend").innerHTML = ""; $("#regions").innerHTML = ""; return;
     }
     if (s.noDiff) meta.push(`<div class="callout" style="margin:8px 0;padding:7px 10px">No 2019 baseline exists on this grid, so change cannot be shown.</div>`);
     const g = state.G[s.gid], ip = interpFor(s.gid, A);
@@ -322,18 +336,14 @@ async function renderMap(p) {
     const present = s.values.filter(ok), sd = Math.sqrt(present.reduce((a, v) => a + (v - mean(present)) ** 2, 0) / present.length);
     const skill = loo.r2 >= 0.7 ? ["good", "good"] : loo.r2 >= 0.3 ? ["warn", "moderate"] : ["bad", "weak"];
     const label = s.change ? "change vs 2019" : s.spread ? "disagreement between the 5 models" : "";
-    meta.push(`<div class="kv" style="margin-top:8px"><span>Model nodes</span><span>${present.length} of ${g.n_cells}</span><span>Node range</span><span>${fmt(Math.min(...present), 4)} – ${fmt(Math.max(...present), 4)} ${esc(s.binary ? "" : unit)}</span><span>Node mean</span><span>${fmt(mean(present), 3)}</span></div>
-      <div class="callout ${skill[0] === "good" ? "info" : skill[0] === "bad" ? "bad" : ""}" style="margin:10px 0 0;padding:8px 10px"><strong>Interpolation check:</strong> predicting each node from the others gives R² = ${fmt(loo.r2, 2)}, RMSE ${fa(loo.rmse)} ${esc(s.binary ? "" : unit)} (spread of the nodes: sd ${fa(sd)}). ${chip(skill[0], skill[1])} ${skill[1] === "weak" ? "Between nodes the colours are poorly constrained; read the pattern as indicative only." : skill[1] === "moderate" ? "The surface follows the nodes only partly." : ""}</div>`);
+    meta.push(`<div class="kv" style="margin-top:8px"><span>Model runs behind the surface</span><span>${present.length}</span><span>Range of those runs</span><span>${fa(Math.min(...present))} – ${fa(Math.max(...present))} ${esc(s.binary ? "" : unit)}</span><span>Mean of those runs</span><span>${fa(mean(present))}</span></div>
+      <div class="callout ${skill[0] === "good" ? "info" : skill[0] === "bad" ? "bad" : ""}" style="margin:10px 0 0;padding:8px 10px"><strong>Interpolation check:</strong> predicting each model run from the others gives R² = ${fmt(loo.r2, 2)}, RMSE ${fa(loo.rmse)} ${esc(s.binary ? "" : unit)} (spread of the runs: sd ${fa(sd)}). ${chip(skill[0], skill[1])} ${skill[1] === "weak" ? "Between the model runs the colours are poorly constrained; read the pattern as indicative only." : skill[1] === "moderate" ? "The surface follows the runs only partly." : ""}</div>`);
     $("#qinfo").innerHTML = meta.join("");
     $("#legend").innerHTML = (label ? `<div class="small" style="margin-bottom:4px"><strong>${esc(label)}</strong></div>` : "") + (s.binary
-      ? `<div class="bar" style="background:linear-gradient(90deg,${sc.stops.join(",")})"></div><div class="ends"><span>none of nearby nodes</span><span>share robust</span><span>all</span></div>`
+      ? `<div class="bar" style="background:linear-gradient(90deg,${sc.stops.join(",")})"></div><div class="ends"><span>not robust</span><span>mixed</span><span>robust</span></div>`
       : `<div class="bar" style="background:linear-gradient(90deg,${sc.stops.join(",")})"></div><div class="ends"><span>${fa(sc.lo)}</span><span>${esc(unit)}${s.diverging ? " (centre = 0)" : ""}</span><span>${fa(sc.hi)}</span></div>${sc.widened ? `<p class="small muted" style="margin:4px 0 0"><strong>Scale widened</strong>: the values vary by less than ${fmt(MIN_SPAN[unit] || 0, 3)} ${esc(unit)}, so the colours span at least that much instead of exaggerating a negligible difference.</p>` : ""}`);
-    if (sel.nodes) {
-      const rad = g.n_cells < 200 ? 5 : 2.5;
-      for (let i = 0; i < g.n_cells; i++) L.circleMarker([g.lat[i], g.lon[i]], { radius: rad, weight: 1, color: "#101a14", fillColor: ok(s.values[i]) ? sc.fn(s.values[i]) : "#bbb", fillOpacity: 1, pane: "markerPane" }).bindTooltip(`${g.lat[i].toFixed(3)}°N ${g.lon[i].toFixed(3)}°E · ${fmt(g.elev[i], 0)} m: ${fmt(s.values[i], 4)} ${unit}`).addTo(nodesLayer);
-    }
     $("#regions").innerHTML = regionTable(vals, s.binary ? "" : unit, false);
-    $("#mapnote").textContent = `Surface = inverse-distance interpolation (${IDW_K} nearest of ${g.n_cells} model nodes, power ${IDW_POWER}) clipped to Armenia; it is not a model run at every pixel. Forest cover and borders are the real national map.`;
+    $("#mapnote").textContent = `Surface = inverse-distance interpolation (${IDW_K} nearest of ${g.n_cells} model runs, power ${IDW_POWER}) clipped to Armenia; it is not a model run at every pixel. Forest cover and borders are the real national map.`;
   }
 
   /* pointer read-out */
@@ -350,10 +360,6 @@ async function renderMap(p) {
     if (sel.view === "result" && current.vals) {
       const v = current.vals[info.k];
       h += `<br>${current.s.change ? "Change in " : current.s.spread ? "Model disagreement, " : ""}${esc(current.q.label)}: <strong>${fa(v)}${current.s.binary ? "" : " " + esc(current.unit || "")}</strong>`;
-      const g = state.G[current.s.gid]; let best = -1, bd = Infinity;
-      for (let i = 0; i < g.n_cells; i++) { const d = Math.hypot(Interp.mercX(g.lon[i]) - Interp.mercX(ll.lng), Interp.mercY(g.lat[i]) - Interp.mercY(ll.lat)); if (d < bd) { bd = d; best = i; } }
-      h += `<br>Nearest model node: ${fmt(bd * Math.cos((ll.lat * Math.PI) / 180) / 1000, 1)} km away`;
-      info.node = { gid: current.s.gid, i: best };
     }
     h += `<br>Mapped today: forest ${pct(info.forest, 0)} · woodland ${pct(info.wood, 0)}${info.water > 0.05 ? " · water " + pct(info.water, 0) : ""}`;
     return h;
@@ -365,19 +371,18 @@ async function renderMap(p) {
   });
   map.on("click", (e) => {
     const info = readout(e.latlng); if (!info) return;
-    const h = describe(e.latlng, info) + (info.node ? `<br><a href="#/site?grid=${info.node.gid}&i=${info.node.i}">Open nearest node in site explorer →</a>` : "");
+    const h = describe(e.latlng, info) + `<br><a href="#/site?lat=${e.latlng.lat.toFixed(4)}&lon=${e.latlng.lng.toFixed(4)}">Projections for this place →</a>`;
     L.popup().setLatLng(e.latlng).setContent(h).openOn(map);
   });
 
   /* controls */
   view().querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => { sel.view = b.dataset.view; refresh(); }));
   $("#q").value = sel.q;
-  $("#q").addEventListener("change", (e) => { sel.q = e.target.value; if (Q[sel.q].scenarioOnly) sel.mode = "scen"; scenControls(Q[sel.q]); refresh(); });
+  $("#q").addEventListener("change", (e) => { sel.q = e.target.value; scenControls(Q[sel.q]); refresh(); });
   $("#cg").addEventListener("change", (e) => { sel.cover = e.target.value; refresh(); });
   $("#o-borders").addEventListener("change", (e) => { sel.borders = e.target.checked; refresh(); });
   $("#o-hatch").addEventListener("change", (e) => { sel.hatch = e.target.checked; refresh(); });
   $("#o-forestonly").addEventListener("change", (e) => { sel.forestOnly = e.target.checked; refresh(); });
-  $("#o-nodes").addEventListener("change", (e) => { sel.nodes = e.target.checked; refresh(); });
   $("#o-op").addEventListener("input", (e) => { sel.opacity = +e.target.value; if (surfaceLayer) surfaceLayer.setOpacity(sel.opacity); });
   const mo = new MutationObserver(() => { if (sel.view) refresh(); });          // theme switch: redraw the base in the new palette
   mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });

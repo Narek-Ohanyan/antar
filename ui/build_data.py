@@ -187,6 +187,40 @@ class GridBuilder:
         return out, index
 
 
+def build_map_plan(layers, series_ids):
+    """Every map the UI is meant to offer, with whether its 2019 and scenario results exist yet and which script
+    produces what is missing. This is what the Status page shows, so 'no data' is never unexplained."""
+    FP, XY, RF, TOPO, TL = ("run_future_projections.py", "fit_xylem_mechanistic_hazard.py", "fit_refugium_viability.py",
+                            "run_topohydro_grid.py", "compute_treeline_change.py")
+    plan = []
+
+    def engine_of(lid):
+        pre = lid.split("_")[0]
+        return {"hmech": "XYLEM", "viab": "REFUGIUM", "pviab": "REFUGIUM", "refscore": "REFUGIUM", "robust": "REFUGIUM", "treeline": "Treeline"}.get(pre, "TOPOHYDRO")
+
+    def add(lid, label, group, base_from, scen_from):
+        good = next((d for pre, d in GOOD_DIRECTION if lid.startswith(pre)), None)
+        plan.append({"id": lid, "label": label, "group": group, "engine": engine_of(lid), "good": good,
+                     "baseline": lid in layers, "scenario": lid in series_ids,
+                     "baseline_from": base_from, "scenario_from": scen_from})
+    for lid, label in [("t_mean", "Mean annual temperature"), ("precip", "Annual precipitation"), ("gdd", "Growing degree days"),
+                       ("late_frost", "Late-frost days"), ("gsl", "Growing-season length")]:
+        add(lid, label, None, TOPO, FP)
+    for g, meta in GROUPS.items():
+        short = meta["short"]
+        for lid, label, bf in [("cwd", "Climatic water deficit", RF), ("wsi", "Water-stress integral", RF), ("psimin", "Minimum soil water potential", RF),
+                               ("hmech", "Hydraulic-failure hazard", XY), ("hmech_sd", "Hazard uncertainty (trait-knowledge spread)", XY),
+                               ("viab", "Viability", RF), ("pviab", "Probability that viability stays above the threshold", RF),
+                               ("refscore", "Risk-averse refugium score", RF), ("robust", "Robust refugium (criterion a)", RF)]:
+            add(f"{lid}_{g}", f"{label} — {short}", g, bf, FP)
+    for lid, label in [("treeline_2019", "Potential treeline elevation"), ("treeline_margin", "Headroom below climatic treeline"),
+                       ("treeline_above", "Above own climatic treeline")]:
+        add(lid, label, None, TL, TL)
+    plan.append({"id": "treeline_shift", "label": "Treeline shift vs 2019", "group": None, "engine": "Treeline", "good": "high", "baseline": None,
+                 "scenario": "treeline_shift" in series_ids, "baseline_from": None, "scenario_from": TL})
+    return plan
+
+
 def build():
     OUT.mkdir(parents=True, exist_ok=True)
     grids = {g: GridBuilder(g) for g in GRIDS}
@@ -303,6 +337,9 @@ def build():
         G.scen["treeline_cell_keys"] = cell_keys
         G.scen["tl_series"] = {"treeline_shift": [[r(v, 0) for v in tc["members"][m]["shift_m"]] for m in member_keys],
                                "treeline_2019": [[r(v, 0) for v in tc["members"][m]["potential_treeline_m"]] for m in member_keys]}
+        elev_tl = [c["elevation_m"] for c in tc["cells"]]
+        G.scen["tl_series"]["treeline_margin"] = [[r(z - e, 0) for z, e in zip(tc["members"][m]["potential_treeline_m"], elev_tl)] for m in member_keys]
+        G.scen["tl_series"]["treeline_above"] = [[1 if e > z else 0 for z, e in zip(tc["members"][m]["potential_treeline_m"], elev_tl)] for m in member_keys]
         tl_in = in_arm(tc["cells"])
         tl_summary = {}
         for ssp in ("ssp126", "ssp370", "ssp585"):
@@ -335,11 +372,13 @@ def build():
         series = {}
         # (yaml field, layer-id prefix, decimals); a series is exported only if EVERY member has the field
         for fld, lid, nd in [("viability_mean", "viab", 4), ("h_mech_mean", "hmech", 5), ("p_viable", "pviab", 3),
-                             ("cwd_mm", "cwd", 1), ("wsi", "wsi", 2), ("psi_min_mpa", "psimin", 2)]:
+                             ("cwd_mm", "cwd", 1), ("wsi", "wsi", 2), ("psi_min_mpa", "psimin", 2),
+                             ("h_mech_sd", "hmech_sd", 5), ("refugium_score", "refscore", 4), ("robust_criterion_a", "robust", 0)]:
             for gn in gnames:
                 rows = [fp["members"][m]["groups"][gn]["cells"] for m in member_keys]
                 if all(fld in c for cells in rows for c in cells):
-                    series[f"{lid}_{gn}"] = [[r(c[fld], nd) for c in cells] for cells in rows]
+                    conv = (lambda v: int(bool(v))) if fld == "robust_criterion_a" else (lambda v, nd=nd: r(v, nd))
+                    series[f"{lid}_{gn}"] = [[conv(c[fld]) for c in cells] for cells in rows]
         if all("climate" in fp["members"][m] for m in member_keys):
             for fld, lid, nd in [("t_mean_c", "t_mean", 2), ("precip_mm", "precip", 0), ("gdd", "gdd", 0),
                                  ("late_frost_days", "late_frost", 0), ("gsl_days", "gsl", 0)]:
@@ -471,6 +510,17 @@ def build():
                                     # sampled-window layers are 500 m samples at the nodes, not fields: the real raster is the map
                                     "map": meta.get("engine") != "Ecosystem map"}
 
+    # The generic cwd/wsi/psi layers use one placeholder rooting depth for every species. Once the per-group
+    # versions exist they replace them on the map (they stay in the site/place table).
+    if any(f"cwd_{g}" in layer_catalogue for g in GROUPS):
+        for lid in ("cwd_pm_fao56", "cwd_priestley_taylor", "cwd_energy_only", "wsi", "psi_min"):
+            if lid in layer_catalogue:
+                layer_catalogue[lid]["map"] = False
+    series_ids = set()
+    for gd in (json.loads((OUT / f["file"]).read_text()) for f in grid_files.values()):
+        series_ids |= set(gd["scenarios"].get("fp_series", {})) | set(gd["scenarios"].get("tl_series", {}))
+    map_plan = build_map_plan(layer_catalogue, series_ids)
+
     # ---- references from the dataset manifests ------------------------------------------------
     refs, seen = [], set()
     for mf in sorted(MANIFESTS.glob("*.yaml")):
@@ -507,6 +557,7 @@ def build():
         "groups": {gn: {**meta, "rooting_depth_m": ROOTING_DEPTH_M[gn]} for gn, meta in GROUPS.items()},
         "grids": grid_files,
         "layers": layer_catalogue,
+        "map_plan": map_plan,
         "provenance": provenance,
         "engines": engines,
         "treeline": treeline_summary,

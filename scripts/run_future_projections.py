@@ -54,7 +54,7 @@ from run_topohydro_grid import (  # noqa: E402
     GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
 )
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
-from fit_refugium_viability import V_STAR, RHO  # noqa: E402
+from fit_refugium_viability import V_STAR, RHO, LAM  # noqa: E402
 
 from antar.climate import downscale  # noqa: E402
 from antar.climate.forcing import topoclimate_forcing  # noqa: E402
@@ -282,6 +282,8 @@ def main():
                         "viability_mean": float(v.mean()), "h_mech_mean": float(h.mean()),
                         "viability_p10": float(np.percentile(v, 10)), "viability_p90": float(np.percentile(v, 90)),
                         "p_viable": p_viable, "robust_criterion_a": bool(p_viable >= RHO),
+                        "h_mech_sd": float(h.std()),                                  # outer-loop (trait-knowledge) spread, as in the 2019 run
+                        "refugium_score": float(refugium_score(v[:, None], lam=LAM)[0]),   # median - lam * IQR across the 50 draws
                         # group-specific because w_max_mm (rooting depth) differs per group
                         "cwd_mm": float(cell.cwd_mm[PET_FORMULATION]), "wsi": float(cell.wsi[PET_FORMULATION]),
                         "psi_min_mpa": float(np.min(psi_soil)),

@@ -67,7 +67,7 @@ const PAGES = {
   home: renderHome, map: renderMap, treeline: renderTreeline, site: renderSite, decision: renderDecision,
   models: renderModels, method: renderMethod, status: renderStatus, refs: renderRefs, ack: renderAck,
 };
-const NAV = [["home", "Overview"], ["map", "Map"], ["treeline", "Treeline"], ["site", "Site explorer"], ["decision", "Decision"], ["models", "Models"], ["method", "Method"], ["status", "Status & limits"], ["refs", "References"], ["ack", "Acknowledgments"]];
+const NAV = [["home", "Overview"], ["map", "Map"], ["treeline", "Treeline"], ["site", "Place explorer"], ["decision", "Decision"], ["models", "Models"], ["method", "Method"], ["status", "Status & limits"], ["refs", "References"], ["ack", "Acknowledgments"]];
 
 function route() {
   const page = (location.hash.replace(/^#\//, "").split("?")[0]) || "home";
@@ -140,57 +140,6 @@ function renderTreeline() {
     <div class="callout"><strong>Why a few cells show a drop under warming.</strong> Growing-season temperature is the mean over days that clear 0.9 °C. Warming adds cold early-spring and late-autumn days to that set, which can pull the mean down even though every day warmed. ${pct(tl.frac_pairs_negative, 1)} of cell × model pairs show a negative shift, mostly under low warming. Treat small negative values as roughly "no change".</div>
     <p class="small muted">Method check: the reconstruction reproduces the full pipeline's 2019 growing-season temperature to within ${tl.baseline_check_max_abs_diff_c == null ? "n/a (no overlapping cells)" : fmt(tl.baseline_check_max_abs_diff_c, 4) + " °C"}.</p>
     <p><a class="btn" href="#/map?q=treeline_shift&mode=scen&ssp=ssp585&hz=2100&gcm=ens">See the 2100 SSP5-8.5 shift on the map</a></p></div>`;
-}
-
-/* ---- Site explorer ---- */
-function renderSite(p) {
-  const gid = state.G[p.grid] && state.G[p.grid].scenarios && state.G[p.grid].scenarios.members ? p.grid : scenarioGridId();
-  if (!gid) { view().innerHTML = `<div class="wrap"><p>No scenario results are available.</p></div>`; return; }
-  const g = state.G[gid], sc = g.scenarios, M = state.M;
-  let i = +p.i; if (!(i >= 0 && i < g.n_cells)) i = Math.floor(g.n_cells / 2);
-  const grp = p.group && M.groups[p.group] ? p.group : "mesic_diffuse_porous_broadleaf";
-  const lonMin = Math.min(...g.lon), lonMax = Math.max(...g.lon), latMin = Math.min(...g.lat), latMax = Math.max(...g.lat);
-  const loc = g.lat.map((la, k) => { const x = 10 + ((g.lon[k] - lonMin) / (lonMax - lonMin || 1)) * 280, y = 150 - ((la - latMin) / (latMax - latMin || 1)) * 140; return `<circle data-i="${k}" cx="${x}" cy="${y}" r="${g.n_cells < 200 ? 5.5 : 3.2}" fill="${k === i ? "var(--c3)" : "var(--accent)"}" stroke="var(--bg)" opacity="${k === i ? 1 : 0.65}"><title>${g.lat[k].toFixed(3)}°N ${g.lon[k].toFixed(3)}°E · ${fmt(g.elev[k], 0)} m</title></circle>`; }).join("");
-  const byEngine = {};
-  for (const [id, arr] of Object.entries(g.layers)) { const m = M.layers[id]; if (!m || !ok(arr[i])) continue; (byEngine[m.engine] = byEngine[m.engine] || []).push([m, arr[i]]); }
-  const tbl = ENGINE_ORDER.filter((e) => byEngine[e]).map((e) => `<tr><th colspan="2">${esc(ENGINE_TITLE[e] || e)}</th></tr>` + byEngine[e].map(([m, v]) => `<tr><td>${esc(m.label)}</td><td class="num">${fmt(v, 4)} ${esc(m.binary ? "" : m.unit || "")}</td></tr>`).join("")).join("");
-
-  function perSsp(kind, group, baselineVal) {
-    const members = kind === "treeline" ? sc.treeline_members : sc.members;
-    const mat = kind === "treeline" ? sc.tl_series.treeline_shift : kind === "viab" ? sc.fp_series["viab_" + group] : sc.fp_series["hmech_" + group];
-    if (!mat) return [];
-    return Object.keys(SSP).map((ssp) => ({
-      name: SSP[ssp], color: SSP_COLOR[ssp],
-      points: [[2019, baselineVal, null, null]].concat(HORIZONS.map((h) => {
-        const vs = members.map((m, k) => (m.ssp === ssp && m.horizon === h ? mat[k][i] : null)).filter(ok);
-        return vs.length ? [h, mean(vs), Math.min(...vs), Math.max(...vs)] : [h, null, null, null];
-      })),
-    }));
-  }
-  const xf = (v) => String(v);
-  const viabS = perSsp("viab", grp, g.layers["viab_" + grp] ? g.layers["viab_" + grp][i] : null);
-  const hazS = perSsp("hmech", grp, g.layers["hmech_" + grp] ? g.layers["hmech_" + grp][i] : null);
-  const tlS = sc.treeline_members ? perSsp("treeline", null, 0) : [];
-  view().innerHTML = `<div class="wrap"><h1>Site explorer</h1>${banner()}
-    <div class="grid cols-2" style="grid-template-columns:minmax(260px,330px) 1fr">
-      <div class="card"><h3>Choose a cell</h3><svg class="locator" viewBox="0 0 300 160" style="width:100%;background:var(--surface-2);border-radius:8px">${loc}</svg>
-        <p class="small muted">Click a dot, or pick below. ${gridChip(gid)}</p>
-        <label for="cellsel">Cell</label><select id="cellsel">${g.lat.map((la, k) => `<option value="${k}">${la.toFixed(3)}°N, ${g.lon[k].toFixed(3)}°E · ${fmt(g.elev[k], 0)} m</option>`).join("")}</select>
-        <label for="grp">Functional group</label><select id="grp">${Object.keys(M.groups).map((k) => `<option value="${k}">${esc(M.groups[k].label)}</option>`).join("")}</select>
-        <div class="kv" style="margin-top:12px"><span>Latitude</span><span>${g.lat[i].toFixed(4)}</span><span>Longitude</span><span>${g.lon[i].toFixed(4)}</span><span>Elevation</span><span>${fmt(g.elev[i], 0)} m</span></div></div>
-      <div class="card tablewrap"><h3>Everything computed for this cell</h3><table><tbody>${tbl || "<tr><td>No layers for this cell.</td></tr>"}</tbody></table></div></div>
-    <h2>Trajectories for ${esc(groupLabel(grp))}</h2>
-    <div class="grid cols-2">
-      <div class="card"><h3>Viability</h3>${Charts.line({ series: viabS, xticks: [2019, 2050, 2080, 2100], xlabel: "Horizon", ylabel: "Viability", yfmt: (v) => fmt(v, 3), xfmt: xf, height: 300 })}</div>
-      <div class="card"><h3>Hydraulic-failure hazard</h3>${Charts.line({ series: hazS, xticks: [2019, 2050, 2080, 2100], xlabel: "Horizon", ylabel: "Hazard (probability)", yfmt: (v) => fmt(v, 3), xfmt: xf, height: 300 })}</div>
-    </div>
-    ${tlS.length ? `<div class="card" style="margin-top:14px"><h3>Treeline shift at this cell (+ = uphill)</h3>${Charts.line({ series: tlS, xticks: [2019, 2050, 2080, 2100], xlabel: "Horizon", ylabel: "Shift (m)", yfmt: (v) => fmt(v, 0), xfmt: xf, height: 300 })}</div>` : ""}
-    <p class="small muted">Lines are means across the five climate models; shaded bands span the lowest to the highest model. The 2019 point is the single-year baseline run.</p></div>`;
-  $("#cellsel").value = i; $("#grp").value = grp;
-  const go = (extra) => { location.hash = "#/site?" + new URLSearchParams({ grid: gid, i, group: grp, ...extra }).toString(); };
-  $("#cellsel").addEventListener("change", (e) => go({ i: e.target.value }));
-  $("#grp").addEventListener("change", (e) => go({ group: e.target.value }));
-  view().querySelectorAll("svg.locator circle").forEach((c) => c.addEventListener("click", () => go({ i: c.dataset.i })));
 }
 
 /* ---- Decision ---- */
