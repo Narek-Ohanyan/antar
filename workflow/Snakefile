@@ -6,7 +6,7 @@
 # that does not exist.
 #
 #   snakemake --cores 4 --resources drive_streams=1            # 80-point validation grid
-#   snakemake --cores 4 --resources drive_streams=1 --config dense=true   # 1044-point dense grid
+#   snakemake --cores 4 --resources drive_streams=1 --config dense=true   # Armenia-only dense grid (921 nodes)
 #   snakemake -n                                                # dry run: print the plan only
 #
 # `--resources drive_streams=1` serialises the steps that stream rasters from Google Drive. Running
@@ -16,7 +16,13 @@
 # Raw data pulls (pull_*.py, register_*.py, submit_*.py) are intentionally outside this DAG: they
 # are one-off, network-bound, and several take hours. Their products live under data/ (gitignored)
 # and are declared below as ancient() inputs so they are checked for existence but never trigger
-# a re-pull. See configs/manifests/ for the provenance of each.
+# a re-pull. See configs/manifests/ for the provenance of each. That includes the ISIMIP3a/3b monthly
+# atmosphere (pull_isimip_atmosphere.py), which every water-balance step reads for the seasonal shape and
+# the scenario change of wind, radiation and humidity.
+#
+# The streamed terrain, soil and ERA5-Land inputs are cached per grid in data/_cache/ by the first step that
+# needs them (run_topohydro_grid.py); every later step reads the cache and needs no Drive access. The
+# scenario run checkpoints each of its 45 members (data/_future_ckpt_*/), so an interrupted run resumes.
 configfile: "configs/study_area.yaml"
 
 DENSE = bool(config.get("dense", False))
@@ -50,7 +56,7 @@ rule lapse_rate:        # monthly temperature lapse rate + precipitation gradien
 
 
 rule topohydro:         # gridded downscaled forcing + water balance (CWD, WSI, GDD, growing season)
-    input: f"{FITTED}/topohydro_lapse_rate.yaml", CHELSA_DAILY
+    input: f"{FITTED}/topohydro_lapse_rate.yaml", CHELSA_DAILY, ISIMIP
     output: f"{FITTED}/topohydro_grid_run_2019{SUF}.yaml"
     params: flag=FLAG
     resources: drive_streams=1
@@ -62,7 +68,7 @@ rule topohydro:         # gridded downscaled forcing + water balance (CWD, WSI, 
 rule xylem:             # mechanistic hydraulic-failure hazard, two-level Monte Carlo, per functional group
     input:
         f"{FITTED}/topohydro_lapse_rate.yaml", "configs/species_traits.csv",
-        f"{FITTED}/xylem_trait_hyper_sd.yaml", CHELSA_DAILY,
+        f"{FITTED}/xylem_trait_hyper_sd.yaml", CHELSA_DAILY, ISIMIP,
     output: f"{FITTED}/xylem_mechanistic_hazard_2019{SUF}.yaml"
     params: flag=FLAG
     resources: drive_streams=1
@@ -73,7 +79,7 @@ rule xylem:             # mechanistic hydraulic-failure hazard, two-level Monte 
 rule refugium:          # viability + robust-refugium criterion (a) from XYLEM's hazard ensemble
     input:
         f"{FITTED}/topohydro_lapse_rate.yaml", "configs/species_traits.csv",
-        f"{FITTED}/xylem_trait_hyper_sd.yaml", CHELSA_DAILY,
+        f"{FITTED}/xylem_trait_hyper_sd.yaml", CHELSA_DAILY, ISIMIP,
     output: f"{FITTED}/refugium_viability_2019{SUF}.yaml"
     params: flag=FLAG
     resources: drive_streams=1
@@ -82,7 +88,7 @@ rule refugium:          # viability + robust-refugium criterion (a) from XYLEM's
 
 
 rule mneme:             # person-period dieback panel + stacked hazard fit (reports a null result if events < 2)
-    input: f"{FITTED}/topohydro_lapse_rate.yaml", CHELSA_DAILY
+    input: f"{FITTED}/topohydro_lapse_rate.yaml", CHELSA_DAILY, ISIMIP
     output: f"{FITTED}/mneme_hazard_panel_2010_2019{SUF}.yaml"
     params: flag=FLAG
     resources: drive_streams=1
@@ -116,15 +122,16 @@ rule treeline_change:       # treeline shift across the 45-member ISIMIP3b ensem
 
 
 # --- Future projections, ecosystem-map validation, decision ----------------------------------
-rule future_projections:    # 45-member (5 GCM x 3 SSP x 3 horizon) viability ensemble, delta-method downscaling
+rule future_projections:    # 45-member (5 GCM x 3 SSP x 3 horizon) viability ensemble: monthly change factors on the 2019 year, seasonal atmosphere
     input:
         f"{FITTED}/topohydro_lapse_rate.yaml", "configs/species_traits.csv",
         f"{FITTED}/xylem_trait_hyper_sd.yaml", ISIMIP, CHELSA_DAILY,
     output: f"{FITTED}/future_projections{SUF}.yaml"
     params: flag=FLAG
+    threads: 6                      # members run in parallel worker processes (--workers)
     resources: drive_streams=1
     retries: 5
-    shell: f"{PY} scripts/run_future_projections.py {{params.flag}}"
+    shell: f"{PY} scripts/run_future_projections.py {{params.flag}} --workers {{threads}}"
 
 
 rule ecosystem_ground_truth:    # real Ecosystem Map of Armenia: validation correlations + human-modified exclusion
@@ -161,6 +168,17 @@ rule map_assets:        # forest cover, water, marz ids and borders on one Web-M
     shell: f"{PY} scripts/build_map_assets.py"
 
 
+rule dem_asset:         # 30 m terrain averaged onto the map grid (RGB = 256 R + G metres): the elevation-aware map surface
+    input: ancient("data/ecosystem_map/Ecosystem_Map_of_Armenia.tif"), "ui/assets/map/grid.json"
+    output: "ui/assets/map/elevation.png"
+    shell: f"{PY} scripts/build_dem_asset.py"
+
+
+rule flow_chart:        # the Method page's flow chart of the six engines, coloured by how far each is built
+    output: "ui/assets/architecture.svg"
+    shell: f"{PY} scripts/build_architecture_svg.py"
+
+
 rule ui_data:           # bundle every real fitted output into ui/data/*.json for the static UI
     input:
         f"{FITTED}/topohydro_grid_run_2019{SUF}.yaml",
@@ -173,13 +191,15 @@ rule ui_data:           # bundle every real fitted output into ui/data/*.json fo
         f"{FITTED}/variogram{SUF}.yaml",
         f"{FITTED}/meristem_adult_niche.yaml",
         f"{FITTED}/ecosystem_ground_truth_2019.yaml",
+        "ui/assets/map/grid.json", "ui/assets/map/elevation.png", "ui/assets/architecture.svg",
     output: "ui/data/manifest.json"
     shell: f"{PY} ui/build_data.py"
 
 
-# --- Not yet implemented (deliberately not declared as rules) ---------------------------------
-#  * nested blocked cross-validation per configs/cv.yaml (needs a denser grid and, for MNEME, real events)
-#  * monotone hydraulic emulator surrogate
-#  * Sobol / variance-decomposition uncertainty stage
-#  * full Eq. 7.3 MNEME design (age spline, DLNM cross-basis) -- needs real stand-age / structure data
-#  * MERISTEM attainable-height model fit (needs real height/growth data)
+# --- Built and unit-tested, not applied to results (deliberately not declared as rules) -------
+#  * nested blocked cross-validation per configs/cv.yaml (needs a fitted hazard model, i.e. real events)
+#  * monotone hydraulic emulator surrogate (only needed for a wall-to-wall 30 m run)
+#  * Sobol / variance-decomposition uncertainty stage (needs the emulator and a fitted hazard)
+#  * full MNEME design (age spline, DLNM cross-basis) -- needs real stand-age / structure data
+#  * MERISTEM attainable-height and growth model fits (need real height / tree-ring data)
+#  * ABC pattern-oriented calibration of XYLEM (needs tree-ring chronologies and dieback histories)
