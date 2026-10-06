@@ -32,7 +32,7 @@ def test_foracca_appears_only_in_the_acknowledgments_and_with_its_official_name(
     for f in list(UI.glob("*.html")) + list(UI.glob("*.json")) + list(UI.glob("data/*.json")) + [UI / "map.js", UI / "place.js", UI / "charts.js", UI / "interp.js"]:
         assert "FORACCA" not in f.read_text(), f.name
     app = (UI / "app.js").read_text()
-    start = app.index("function renderAck()")
+    start = app.index("function renderAck(")
     end = app.index("/* ---------- ", start)
     assert "FORACCA" not in app[:start] and "FORACCA" not in app[end:]
     ack = app[start:end]

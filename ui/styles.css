@@ -72,7 +72,7 @@ body:not(.is-home) .topbar, .topbar.solid { background: color-mix(in srgb, var(-
 body.is-home .topbar:not(.solid) { background: linear-gradient(to bottom, rgba(254, 254, 254, .95), rgba(254, 254, 254, 0)); --text: #15201c; --muted: #4a5750; --accent: #0f6b61; --border: #cfd6cc; --border-strong: #8d968f; --surface: #fff; --surface-2: #eef0ea; --bg: #fefefe; color: #15201c; }
 .brand { display: inline-flex; align-items: center; text-decoration: none; flex: none; }
 .brand-logo { height: 34px; width: auto; display: block; background: #fff; border-radius: 4px; padding: 2px 8px; }
-nav { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: clamp(10px, 1.5vw, 24px); min-width: 0; }
+nav { flex: 1; display: flex; justify-content: center; align-items: center; gap: clamp(10px, 1.5vw, 24px); min-width: 0; }
 nav a { position: relative; padding: 10px 1px; color: var(--text); text-decoration: none; font-size: .9rem; font-weight: 700; letter-spacing: .005em; white-space: nowrap; }
 nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .25s var(--ease); }
 nav a:hover::after, nav a.active::after { transform: scaleX(1); }
@@ -237,10 +237,6 @@ footer { margin-top: clamp(56px, 9vw, 112px); border-top: 1px solid var(--border
 @media (max-width: 900px) {
   :root { --nav-h: 56px; }
   .topbar .wrap { gap: 10px; }
-  nav { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
-  nav::-webkit-scrollbar { display: none; }
-  nav a { flex: 0 0 auto; scroll-snap-align: center; min-height: 44px; display: inline-flex; align-items: center; padding: 0 6px; }
-  nav a::after { bottom: 8px; left: 6px; right: 6px; }
   .scroll-cue { display: none; }
 }
 @media (max-width: 900px) { .hero-copy { grid-template-columns: 1fr; } }
@@ -279,5 +275,48 @@ footer { margin-top: clamp(56px, 9vw, 112px); border-top: 1px solid var(--border
 .author-card p { margin-bottom: .6em; }
 @media (max-width: 760px) { .author { grid-template-columns: 1fr; } .author-photo { max-width: 360px; } .author-card { grid-template-columns: 84px minmax(0, 1fr); gap: 16px; } .author-card img { width: 84px; height: 84px; } }
 
-.ack p { max-width: 70ch; font-size: 1.06rem; }
-.ack p:last-child { margin-bottom: 0; }
+
+/* acknowledgments: margin-label rows, then the project fact sheet */
+.ack-rows { margin-top: 4px; }
+.ack-row { display: grid; grid-template-columns: minmax(200px, 300px) minmax(0, 1fr); gap: clamp(20px, 5vw, 72px); padding: clamp(22px, 3.5vw, 40px) 0; border-bottom: 1px solid var(--border); }
+.ack-row:last-child { border-bottom: 0; }
+.ack-label { display: flex; gap: 14px; align-items: baseline; }
+.ack-no { font: 500 .8rem/1 var(--mono); letter-spacing: .1em; color: var(--accent); }
+.ack-label h2 { margin: 0; font-size: 1.22rem; line-height: 1.25; }
+.ack-text p { max-width: 68ch; margin: 0; font-size: 1.12rem; line-height: 1.7; text-wrap: pretty; hyphens: auto; }
+.foracca { padding-top: clamp(40px, 6vw, 80px); }
+.foracca-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: clamp(24px, 5vw, 64px); align-items: start; }
+.foracca-lead { font: 400 clamp(1.3rem, 1rem + .9vw, 1.65rem)/1.4 var(--serif); margin: 0 0 1.4em; max-width: 36ch; }
+.foracca-text h3 { font: 700 .72rem/1 var(--font); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 1.8em 0 .8em; }
+.foracca-text p { max-width: 64ch; text-wrap: pretty; }
+.foracca-aims { list-style: none; margin: 0; padding: 0; max-width: 64ch; }
+.foracca-aims li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 12px 0; border-top: 1px solid var(--border); }
+.foracca-aims li:last-child { border-bottom: 1px solid var(--border); }
+.foracca-aims li span { font: 500 .85rem/1.7 var(--mono); color: var(--accent); }
+.factsheet { margin: 0; background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px 22px; }
+.factsheet > div { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.factsheet > div:last-child { border-bottom: 0; }
+.factsheet dt { font: 700 .72rem/1 var(--font); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 6px; }
+.factsheet dd { margin: 0; font-size: 1rem; line-height: 1.5; }
+.ack-foot { margin-top: 28px; }
+@media (max-width: 900px) { .ack-row { grid-template-columns: 1fr; gap: 12px; } .foracca-grid { grid-template-columns: 1fr; } .foracca-lead { max-width: none; } }
+
+/* navbar: brand left, items centred on the page, theme button right (wide screens); narrower screens centre the items between the two */
+@media (min-width: 1200px) {
+  .topbar .wrap { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr); }
+  .topbar .brand { justify-self: start; }
+  .topbar nav { flex: none; justify-content: center; }
+  .topbar .theme-btn { justify-self: end; }
+}
+/* hyphenation helps a long measure but fragments words in a narrow phone column */
+.ack-text p { hyphens: manual; }
+@media (min-width: 901px) { .ack-text p { hyphens: auto; hyphenate-limit-chars: 7 3 3; } }
+
+/* below 1100 px the items no longer fit on one line: a single scrolling row, centred when it fits ("safe" falls back to the start when it does not) */
+@media (max-width: 1100px) {
+  .topbar .wrap { gap: 10px; }
+  nav { gap: 9px; justify-content: flex-start; justify-content: safe center; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
+  nav::-webkit-scrollbar { display: none; }
+  nav a { flex: 0 0 auto; scroll-snap-align: center; min-height: 44px; display: inline-flex; align-items: center; padding: 0 4px; font-size: .84rem; }
+  nav a::after { bottom: 8px; left: 4px; right: 4px; }
+}

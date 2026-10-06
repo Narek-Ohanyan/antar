@@ -1971,3 +1971,18 @@ NGOs led by Shen NGO, WSL and FAO) were checked on that page (https://www.wsl.ch
 own words: "provides new climate services for Armenia, including high-resolution climate scenarios and local climate impact profiles for every
 municipality" (the WSL page speaks only of "improved climate services"). The standing rule that FORACCA appears nowhere in the UI is narrowed by
 `tests/test_ui_name.py`: it may appear only inside the Acknowledgments page, with its official name and without "Recreation".
+
+## 2026-10-06 (cont.) -- Acknowledgments redesign, FORACCA section, centred navbar
+
+* **Acknowledgments page.** The two paragraphs sat in the left half of a wide card. They are now margin-label rows (Swiss-editorial: label left, text
+  right, hairline between rows) with a 68-character measure and 1.7 line height (the skill's 65-75 characters, 1.5-1.75), left-aligned with
+  `text-wrap: pretty`; full justification was not used (uneven word gaps hurt readability, WCAG 1.4.8 advises against it), and automatic hyphenation
+  is on only above 900 px because it fragmented words in a phone column. A new section "About the FORACCA project" has a lead statement, the three aims
+  as a numbered list, a "Climate services" line and a fact sheet (full name, SDC, programme 10 years 2023-2033 CHF 10 million, main phase 2025-2028,
+  implementers), with the sources linked and the check date shown. Facts verified 2026-10-06 against the WSL project page (name, funder, implementers,
+  2025-2028) and Armenpress (10 million CHF, 2023-2033, three aims). NOT verified anywhere and kept in the author's words: "high-resolution climate
+  scenarios and local climate impact profiles for every municipality".
+* **Navbar:** items centred on the page at >= 1200 px (grid: brand | nav | theme button; measured centre 713 px = page centre 713 px at 1440 px).
+  Between 1100 and 1200 px the items are centred between brand and button; below 1100 px (previously 900) they form one scrolling row, centred when
+  they fit ("safe center"), because at 1024 px ten items overflowed their box and ran under the theme button -- a defect that predates this change.
+  Tests: `tests/test_acknowledgments.py`.

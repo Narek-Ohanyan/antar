@@ -362,13 +362,49 @@ function renderAuthor() {
 }
 
 /* ---- Acknowledgments ---- */
-function renderAck() {
+function renderAck(p) {
+  const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text}<span class="sr-only"> (opens in a new tab)</span></a>`;
   view().innerHTML = `<div class="wrap"><h1>Acknowledgments</h1>
-    <div class="card ack">
-      <p>The author would like to express sincere gratitude to the Swiss Federal Institute for Forest, Snow and Landscape Research WSL, and in particular to Franziska Zilker, Tobias Kühnhanss and Dr. Michael James McCarthy of the Dynamic Macroecology group, for providing datasets and bias-corrected environmental data and for their technical feedback on the methodology. The author also thanks his supervisor, PD Dr. Marco Pütz, and the coordinator, Dr. Dominik Braunschweiger, for making his guest scientist visit at WSL possible.</p>
-      <p>The author further acknowledges Alen Amirkhanian, Director of the AUA Acopian Center for the Environment, and the wider team of the <a href="https://www.wsl.ch/en/projects/foracca/" target="_blank" rel="noopener">Forest Restoration and Climate Change in Armenia (FORACCA)<span class="sr-only"> (opens in a new tab)</span></a> project for their logistical support and collaborative insights during the conceptualization of ANTAR. FORACCA is funded by the Swiss Agency for Development and Cooperation (SDC) and implemented by the Forest Alliance, a consortium of Armenian NGOs led by Shen NGO, together with WSL and the Food and Agriculture Organization of the United Nations (FAO). The project provides new climate services for Armenia, including high-resolution climate scenarios and local climate impact profiles for every municipality.</p>
-    </div>
-    <p class="muted small">Data providers and their licences are listed on the <a href="#/refs">References</a> page.</p></div>`;
+    <section class="ack-rows" aria-label="Acknowledgments">
+      <article class="ack-row">
+        <header class="ack-label"><span class="ack-no">01</span><h2>Data, methodology and the research visit</h2></header>
+        <div class="ack-text"><p>The author would like to express sincere gratitude to the Swiss Federal Institute for Forest, Snow and Landscape Research WSL, and in particular to Franziska Zilker, Tobias Kühnhanss and Dr. Michael James McCarthy of the Dynamic Macroecology group, for providing datasets and bias-corrected environmental data and for their technical feedback on the methodology. The author also thanks his supervisor, PD Dr. Marco Pütz, and the coordinator, Dr. Dominik Braunschweiger, for making his guest scientist visit at WSL possible.</p></div>
+      </article>
+      <article class="ack-row">
+        <header class="ack-label"><span class="ack-no">02</span><h2>Conceptualization and logistics</h2></header>
+        <div class="ack-text"><p>The author further acknowledges Alen Amirkhanian, Director of the AUA Acopian Center for the Environment, and the wider team of the Forest Restoration and Climate Change in Armenia (FORACCA) project for their logistical support and collaborative insights during the conceptualization of ANTAR. <a href="#/ack?s=foracca" data-scroll="foracca">About the project ↓</a></p></div>
+      </article>
+    </section>
+
+    <section class="foracca" id="foracca" aria-labelledby="foracca-h">
+      <div class="sec-head"><span class="sec-no">03</span><h2 id="foracca-h">About the FORACCA project</h2></div>
+      <div class="foracca-grid">
+        <div class="foracca-text">
+          <p class="foracca-lead">Forest Restoration and Climate Change in Armenia (FORACCA) is a Swiss-funded programme that supports reforestation on community lands, climate-smart forest management and climate-resilient development in Armenia.</p>
+          <h3>What it sets out to do</h3>
+          <ol class="foracca-aims">
+            <li><span>1</span>Advance scientific understanding of Armenia’s capacity to address climate change and sustainably manage its forests.</li>
+            <li><span>2</span>Promote climate-smart practices in rural areas.</li>
+            <li><span>3</span>Ensure evidence-based policymaking for climate adaptation and efficient forest management.</li>
+          </ol>
+          <h3>Climate services</h3>
+          <p>The project provides new climate services for Armenia, including high-resolution climate scenarios and local climate impact profiles for every municipality.</p>
+          <p class="small muted">Facts as published by ${ext("https://www.wsl.ch/en/projects/foracca/", "WSL")} and ${ext("https://armenpress.am/en/article/1126549", "Armenpress")}; checked 2026-10-06.</p>
+        </div>
+        <dl class="factsheet">
+          <div><dt>Full name</dt><dd>Forest Restoration and Climate Change in Armenia (FORACCA)</dd></div>
+          <div><dt>Funder</dt><dd>Swiss Agency for Development and Cooperation (SDC)</dd></div>
+          <div><dt>Programme</dt><dd>10 years, 2023–2033, CHF 10 million</dd></div>
+          <div><dt>Main phase</dt><dd>2025–2028</dd></div>
+          <div><dt>Implemented by</dt><dd>The Forest Alliance, a consortium of Armenian NGOs led by Shen NGO; the Swiss Federal Research Institute WSL; and the Food and Agriculture Organization of the United Nations (FAO)</dd></div>
+          <div><dt>More</dt><dd>${ext("https://www.wsl.ch/en/projects/foracca/", "WSL project page")}</dd></div>
+        </dl>
+      </div>
+    </section>
+    <p class="muted small ack-foot">Data providers and their licences are listed on the <a href="#/refs">References</a> page.</p></div>`;
+  const go = () => $("#foracca").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  view().querySelectorAll("[data-scroll]").forEach((l) => l.addEventListener("click", (e) => { e.preventDefault(); go(); }));
+  if (p && p.s === "foracca") go();
 }
 
 /* ---------- footer: copy the reference ---------- */
