@@ -65,7 +65,7 @@ const ENGINE_TITLE = { TOPOHYDRO: "Climate & water balance (TOPOHYDRO)", XYLEM: 
 /* ---------- pages ---------- */
 const PAGES = {
   home: renderHome, map: renderMap, treeline: renderTreeline, site: renderSite, decision: renderDecision,
-  models: renderModels, method: renderMethod, status: renderStatus, refs: renderRefs, ack: renderAck,
+  models: renderModels, method: renderMethod, status: renderStatus, refs: renderRefs, ack: renderAck, author: renderAuthor,
 };
 const NAV = [["home", "Overview"], ["map", "Map"], ["treeline", "Treeline"], ["site", "Place explorer"], ["decision", "Decision"], ["models", "Models"], ["method", "Method"], ["status", "Status & limits"], ["refs", "References"], ["ack", "Acknowledgments"]];
 
@@ -149,6 +149,15 @@ function renderHome() {
         <div class="card eng"><span class="eng-no">MAP</span><h3>Map</h3><p class="small">Pick any vulnerability, probability or climate quantity, a climate model, an emissions path and a horizon, and see it coloured across the whole country, with today's forest cover and marz borders.</p><a class="btn secondary" href="#/map">Open the map</a></div>
         <div class="card eng"><span class="eng-no">TREELINE</span><h3>Treeline</h3><p class="small">How far uphill the climatic treeline moves in each of 45 climate-model × scenario × horizon members.</p><a class="btn secondary" href="#/treeline">See treeline change</a></div>
         <div class="card eng"><span class="eng-no">DECISION</span><h3>Decision</h3><p class="small">A budget-constrained, scenario-robust planting portfolio and its efficient frontier.</p><a class="btn secondary" href="#/decision">See the portfolio</a></div>
+      </div>
+    </section>
+    <section class="sec reveal">
+      <div class="sec-head"><span class="sec-no">05</span><h2>About the author</h2></div>
+      <div class="author-card">
+        <img src="assets/author.jpg" width="720" height="720" alt="Portrait of Narek Ohanyan" loading="lazy">
+        <div><p class="author-name">Narek Ohanyan</p>
+          <p>Narek Ohanyan is a young climate leader from Armenia and a climate &amp; environmental researcher at the AUA Acopian Center for the Environment. His current research focuses on modeling forest climate resilience.</p>
+          <p><a href="#/author">Read the full biography →</a></p></div>
       </div>
     </section>
   </div>`;
@@ -334,6 +343,22 @@ function renderRefs() {
     $("#rl").innerHTML = f.length ? f.map((r) => `<div class="refitem"><div class="t">${esc(r.dataset || "")}</div><div class="small">${esc(r.citation)}</div><div class="small muted">${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a> · ` : ""}${r.license ? "Licence: " + esc(r.license) + " · " : ""}${r.accessed ? "accessed " + esc(r.accessed) : ""}</div></div>`).join("") : `<p class="muted">No matches.</p>`;
   };
   draw(""); $("#rq").addEventListener("input", (e) => draw(e.target.value));
+}
+
+/* ---- About the author ---- */
+function renderAuthor() {
+  view().innerHTML = `<div class="wrap"><h1>About the author</h1>
+    <div class="author">
+      <figure class="author-photo"><img src="assets/author.jpg" width="720" height="720" alt="Portrait of Narek Ohanyan"></figure>
+      <div class="author-bio">
+        <h2>Narek Ohanyan</h2>
+        <p class="author-role">Climate &amp; environmental researcher, AUA Acopian Center for the Environment</p>
+        <p>Narek Ohanyan is a young climate leader from Armenia. He is a climate &amp; environmental researcher at the AUA Acopian Center for the Environment. He has also served as a Guest Scientist at the Swiss Federal Institute for Forest, Snow and Landscape Research WSL. His current research focuses on modeling forest climate resilience.</p>
+        <p>Focusing on climate analytics and resilience, he authored the book <em>The Overshoot: Life After the 1.5°C Limit</em>. Across 10 years of dedication and activism, he has managed 50+ projects and secured tens of thousands of dollars in grants, empowering 10k+ Youth for Climate Action.</p>
+        <p>Nationally, Narek serves as the Lead Organizer for LCOY Armenia (2025-2026). He advises the Ministry of Environment and UNICEF through the Youth Climate Council, and previously served as a UNFCCC COP27 Party Delegate and UN Youth and Children High-Level Climate Champion. Narek holds a BS in Computer Science (’26) from the American University of Armenia.</p>
+        <p><a class="btn" href="https://www.narekohanyan.com" target="_blank" rel="noopener">Learn more at www.narekohanyan.com<span class="sr-only"> (opens in a new tab)</span></a></p>
+      </div>
+    </div></div>`;
 }
 
 /* ---- Acknowledgments ---- */

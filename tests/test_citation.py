@@ -26,7 +26,9 @@ def test_licence_is_all_rights_reserved_not_mit():
 def test_citation_file_names_the_work_exactly():
     c = yaml.safe_load((ROOT / "CITATION.cff").read_text())
     assert c["title"] == NAME and c["preferred-citation"]["title"] == NAME
-    assert c["authors"] == [{"family-names": "Ohanyan", "given-names": "Narek"}]
+    assert len(c["authors"]) == 1
+    assert (c["authors"][0]["family-names"], c["authors"][0]["given-names"]) == ("Ohanyan", "Narek")
+    assert c["authors"][0]["website"] == "https://www.narekohanyan.com"
     assert c["preferred-citation"]["year"] == 2026 and c["repository-code"] == REPO and c["url"] == URL and c["preferred-citation"]["url"] == URL
     assert "2.0.0" in c["version"]
 

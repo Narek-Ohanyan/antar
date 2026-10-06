@@ -91,6 +91,11 @@ Citing the work needs no permission. Please cite it as:
 
 GitHub's "Cite this repository" button reads `CITATION.cff`. Please also cite the datasets your use depends on (see the References page).
 
+## Author
+
+Narek Ohanyan — climate & environmental researcher at the AUA Acopian Center for the Environment, working on modelling forest climate
+resilience. Full biography on the web interface ("About the author") and at https://www.narekohanyan.com.
+
 ## Acknowledgments
 
 <!-- prior project name/attribution to be filled in by hand -->

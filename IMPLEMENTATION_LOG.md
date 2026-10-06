@@ -1943,3 +1943,12 @@ User: add "copyright Narek Ohanyan, 2026, all rights reserved" and how the work 
   "source code": reference text in the footer and README, BibTeX `url` + `note`, and `CITATION.cff` (`url` = site, `repository-code` = GitHub).
   Nothing else assumes the site is live yet (no canonical or Open Graph tags were added, and no `CNAME` file, since the hosting method is not
   decided). A persistent identifier would be a Zenodo snapshot of a tagged release; none has been created, so none is cited.
+
+## 2026-10-06 -- About the author
+
+Biography and portrait supplied by the author. `#/author` (linked from the footer, not the top nav, which already has ten items) carries the
+portrait (`ui/assets/author.jpg`, resized from 2000 px to 720 px, 110 kB, alt text, declared size) and the bio as supplied, split into three
+paragraphs without changing a word, with a link to https://www.narekohanyan.com (new tab, announced to screen readers). The home page gets a
+short card (section 05) pointing to it; the README has an Author section; `CITATION.cff` carries the website on the author entry. No
+institutional affiliation is attached to the software itself, and no ORCID or other identifier was invented. `tests/test_author.py` pins the
+bio sentences, the link, the portrait's alt text and size. The portrait is now in the public repository.
