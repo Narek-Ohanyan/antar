@@ -64,9 +64,10 @@ async function renderSite(p) {
       let aSum = 0, zBar = 0;
       for (let k = 0; k < A.n; k++) {
         if (A.region[A.inIdx[k]] !== sel.marz) continue;
+        const land = A.area[k] * (1 - A.water[A.inIdx[k]] / 255);          // marz means are over land: no model result exists over open water
         let sw = 0; for (let j = 0; j < it.k; j++) sw += it.w[k * it.k + j];
-        for (let j = 0; j < it.k; j++) W[it.idx[k * it.k + j]] += (A.area[k] * it.w[k * it.k + j]) / sw;
-        aSum += A.area[k]; if (A.z) zBar += A.area[k] * A.z[k];
+        for (let j = 0; j < it.k; j++) W[it.idx[k * it.k + j]] += (land * it.w[k * it.k + j]) / sw;
+        aSum += land; if (A.z) zBar += land * A.z[k];
       }
       for (let j = 0; j < W.length; j++) W[j] /= aSum;
       zBar /= aSum;
@@ -75,7 +76,7 @@ async function renderSite(p) {
       ev = (row) => {
         if (row.every(ok) && nz.every(ok)) { let v = 0; for (let j = 0; j < W.length; j++) v += W[j] * row[j]; return clamp(md === "elev" ? v + Interp.olsSlope(nz, row) * (zBar - wz) : v); }
         const vals = surfaceFor(md, gid, A, row); let s = 0, a = 0;                  // missing node values: exact pixel mean instead
-        for (let k = 0; k < A.n; k++) if (A.region[A.inIdx[k]] === sel.marz && isFinite(vals[k])) { s += A.area[k] * vals[k]; a += A.area[k]; }
+        for (let k = 0; k < A.n; k++) if (A.region[A.inIdx[k]] === sel.marz && isFinite(vals[k])) { const land = A.area[k] * (1 - A.water[A.inIdx[k]] / 255); s += land * vals[k]; a += land; }
         return a ? clamp(s / a) : null;
       };
     }

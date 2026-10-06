@@ -156,6 +156,7 @@ function drawSurface(A, vals, sc, forestOnly) {
   for (let k = 0; k < A.n; k++) {
     const v = vals[k], f = A.inIdx[k];
     if (!isFinite(v)) continue;
+    if (A.water[f] >= 128) continue;                                  // no model result exists over open water (Lake Sevan): leave it as water
     if (forestOnly && (A.forest[f] + A.woodland[f]) / 255 < 0.25) continue;
     const t = Math.min(255, Math.max(0, Math.round(((v - sc.lo) / (sc.hi - sc.lo || 1)) * 255)));
     d[f * 4] = lut[t * 3]; d[f * 4 + 1] = lut[t * 3 + 1]; d[f * 4 + 2] = lut[t * 3 + 2]; d[f * 4 + 3] = 255;
@@ -322,7 +323,7 @@ async function renderMap(p) {
     const aS = new Float64Array(NR), vS = new Float64Array(NR), fS = new Float64Array(NR), wS = new Float64Array(NR), cvS = new Float64Array(NR), cS = new Float64Array(NR);
     const covF = isCover && sel.cover !== "all" ? A["forest_" + sel.cover] : null;
     for (let k = 0; k < A.n; k++) {
-      const f = A.inIdx[k], r = A.region[f], a = A.area[k];
+      const f = A.inIdx[k], r = A.region[f], a = isCover ? A.area[k] : A.area[k] * (1 - A.water[f] / 255);   // results: land only
       const fo = (covF ? covF[f] : A.forest[f]) / 255, wo = covF ? 0 : A.woodland[f] / 255, cov = Math.min(1, fo + wo);
       const ok_ = vals && isFinite(vals[k]);
       for (const R of [r, 0]) {
@@ -332,12 +333,12 @@ async function renderMap(p) {
     }
     const rows = [[0, "Armenia"]].concat(A.grid.regions.map((r) => [r.id, r.name === "Yerevan" ? "Yerevan (city)" : r.name]));
     if (isCover) {
-      return `<div class="card tablewrap"><h3 style="margin-top:0">Cover by marz</h3><table><thead><tr><th>Marz</th><th class="num">Land (km²)</th><th class="num">${covF ? "Cover" : "Forest"} (km²)</th><th class="num">${covF ? "" : "Woodland (km²)"}</th><th class="num">Share of land</th></tr></thead><tbody>${rows.map(([id, nm]) => `<tr${id === 0 ? ' style="font-weight:600"' : ""}><td>${esc(nm)}</td><td class="num">${fmt(aS[id], 0)}</td><td class="num">${fmt(fS[id], 0)}</td><td class="num">${covF ? "" : fmt(wS[id], 0)}</td><td class="num">${pct((fS[id] + wS[id]) / aS[id], 1)}</td></tr>`).join("")}</tbody></table>
+      return `<div class="card tablewrap"><h3 style="margin-top:0">Cover by marz</h3><table><thead><tr><th>Marz</th><th class="num">Area (km²)</th><th class="num">${covF ? "Cover" : "Forest"} (km²)</th><th class="num">${covF ? "" : "Woodland (km²)"}</th><th class="num">Share of land</th></tr></thead><tbody>${rows.map(([id, nm]) => `<tr${id === 0 ? ' style="font-weight:600"' : ""}><td>${esc(nm)}</td><td class="num">${fmt(aS[id], 0)}</td><td class="num">${fmt(fS[id], 0)}</td><td class="num">${covF ? "" : fmt(wS[id], 0)}</td><td class="num">${pct((fS[id] + wS[id]) / aS[id], 1)}</td></tr>`).join("")}</tbody></table>
         <p class="small muted" style="margin:8px 0 0">Forest = classes 31–37 (closed forests and plantations). Woodland = classes 39, 41, 43, 44 (open plantation, subalpine, mixed and juniper woodland). Areas are from the 10 m Ecosystem Map averaged to 500 m cells.</p></div>`;
     }
     const u = esc(unit || "");
     return `<div class="card tablewrap"><h3 style="margin-top:0">By marz</h3><table><thead><tr><th>Marz</th><th class="num">Mean over all land</th><th class="num">Mean over forest &amp; woodland</th><th class="num">Forest &amp; woodland share</th></tr></thead><tbody>${rows.map(([id, nm]) => `<tr${id === 0 ? ' style="font-weight:600"' : ""}><td>${esc(nm)}</td><td class="num">${fa(vS[id] / aS[id])} ${u}</td><td class="num">${cS[id] > 0 ? fa(cvS[id] / cS[id]) + " " + u : "—"}</td><td class="num">${pct((fS[id] + wS[id]) / aS[id], 1)}</td></tr>`).join("")}</tbody></table>
-      <p class="small muted" style="margin:8px 0 0">Area-weighted means of the interpolated surface. "Forest &amp; woodland" weights each pixel by the cover mapped there today.</p></div>`;
+      <p class="small muted" style="margin:8px 0 0">Land-area-weighted means of the interpolated surface (open water excluded). "Forest &amp; woodland" weights each pixel by the cover mapped there today.</p></div>`;
   }
 
   function setLayer(kind, canvas, opacity) {

@@ -1875,3 +1875,17 @@ User: the video must be fullscreen with the navbar on it, and the whole design c
   hairline border); the secondary button gets the same translucent fill. Checked at the deepest zoom frame (5.9 s) on desktop and at
   phone width. Ink text over the darkest teal behind the pane is above 10:1, the descriptor above 5.5:1; browsers without
   `backdrop-filter` get a 94% white pane instead.
+
+## 2026-10-05/06 -- dense TOPOHYDRO complete; the Mac slept for 17 hours
+
+* **Dense TOPOHYDRO (Armenia-only, stride 7) finished 2026-10-05 19:00** after 2 h of streaming: 857 of 921 cells (93.1%) have output,
+  above the UI's 90% completeness bar. The 64 without output lack soil or ERA5-Land data: 37 lie over water (Lake Sevan; no
+  soil or land-reanalysis value exists there) and 26 are low-elevation land cells (738-1,013 m, a few higher), most likely built-up
+  or masked land where SoilGrids has no value. Surfaces interpolate across them; the map no longer paints model values over open
+  water, and regional means are weighted by land area.
+* **What the dense grid buys (temperature, leave-one-out):** 25 nodes: plain IDW R2 = -0.23, elevation-adjusted R2 = 0.99
+  (RMSE 0.37 C). 857 nodes: plain IDW R2 = 0.82, elevation-adjusted R2 = 1.00 (RMSE 0.09 C, spread of the runs sd 3.83 C).
+* **Sleep:** dense XYLEM failed at 19:03 with a DNS error (`NameResolutionError` for oauth2.googleapis.com) as the network went
+  away, and the machine then slept until 2026-10-06 ~12:45 (the first scenario members report 1,058 minutes of wall time).
+  `caffeinate -dims` does not hold a MacBook awake with the lid closed or off power. Nothing was lost: the chain's retry loop and the
+  per-member checkpoints resumed on wake. To avoid the gap: keep the lid open and the charger connected during runs.
