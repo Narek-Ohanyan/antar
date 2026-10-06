@@ -1939,3 +1939,7 @@ User: add "copyright Narek Ohanyan, 2026, all rights reserved" and how the work 
   the README and `CITATION.cff` (GitHub's "Cite this repository"). No DOI is invented; `tests/test_citation.py` fails if the three disagree,
   if the name differs, or if a DOI string appears.
 * Footer fix found while checking: `.foot` and `.cite` used a `padding` shorthand that removed the page gutter; now `padding-block`.
+* Citation now leads with the web interface (https://antar.narekohanyan.com, the address the user will host it on) and gives the repository as
+  "source code": reference text in the footer and README, BibTeX `url` + `note`, and `CITATION.cff` (`url` = site, `repository-code` = GitHub).
+  Nothing else assumes the site is live yet (no canonical or Open Graph tags were added, and no `CNAME` file, since the hosting method is not
+  decided). A persistent identifier would be a Zenodo snapshot of a tagged release; none has been created, so none is cited.

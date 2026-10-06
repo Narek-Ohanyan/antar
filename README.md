@@ -74,8 +74,8 @@ Version 2.0.0-alpha.
 
 Citing the work needs no permission. Please cite it as:
 
-> Ohanyan, N. (2026). *ANTAR — Assessment of Niche, Treeline & Analogue Refugia* (Version 2.0.0-alpha) [Computer software]. GitHub.
-> https://github.com/Narek-Ohanyan/antar
+> Ohanyan, N. (2026). *ANTAR — Assessment of Niche, Treeline & Analogue Refugia* (Version 2.0.0-alpha) [Computer software and web interface].
+> https://antar.narekohanyan.com (source code: https://github.com/Narek-Ohanyan/antar)
 
 ```bibtex
 @misc{ohanyan2026antar,
@@ -83,8 +83,9 @@ Citing the work needs no permission. Please cite it as:
   title        = {{ANTAR} --- Assessment of Niche, Treeline \& Analogue Refugia},
   year         = {2026},
   version      = {2.0.0-alpha},
-  howpublished = {Computer software},
-  url          = {https://github.com/Narek-Ohanyan/antar}
+  howpublished = {Computer software and web interface},
+  url          = {https://antar.narekohanyan.com},
+  note         = {Source code: https://github.com/Narek-Ohanyan/antar}
 }
 ```
 

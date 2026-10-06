@@ -7,7 +7,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 NAME = "ANTAR — Assessment of Niche, Treeline & Analogue Refugia"
-URL = "https://github.com/Narek-Ohanyan/antar"
+URL = "https://antar.narekohanyan.com"
+REPO = "https://github.com/Narek-Ohanyan/antar"
 
 
 def text_of(path):
@@ -26,14 +27,14 @@ def test_citation_file_names_the_work_exactly():
     c = yaml.safe_load((ROOT / "CITATION.cff").read_text())
     assert c["title"] == NAME and c["preferred-citation"]["title"] == NAME
     assert c["authors"] == [{"family-names": "Ohanyan", "given-names": "Narek"}]
-    assert c["preferred-citation"]["year"] == 2026 and c["repository-code"] == URL
+    assert c["preferred-citation"]["year"] == 2026 and c["repository-code"] == REPO and c["url"] == URL and c["preferred-citation"]["url"] == URL
     assert "2.0.0" in c["version"]
 
 
 def test_footer_and_readme_carry_the_same_reference():
     footer = text_of("ui/index.html")
     readme = (ROOT / "README.md").read_text()
-    ref = f"Ohanyan, N. (2026). {NAME} (Version 2.0.0-alpha) [Computer software]. GitHub. {URL}"
+    ref = f"Ohanyan, N. (2026). {NAME} (Version 2.0.0-alpha) [Computer software and web interface]. {URL} (source code: {REPO})"
     assert ref in re.sub(r"\s+", " ", footer)
     assert ref.replace("*", "") in re.sub(r"\s+", " ", readme.replace("\n> ", " ").replace("*", ""))
     assert "© 2026 Narek Ohanyan. All rights reserved." in footer
