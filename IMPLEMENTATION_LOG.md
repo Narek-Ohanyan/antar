@@ -1952,3 +1952,12 @@ paragraphs without changing a word, with a link to https://www.narekohanyan.com 
 short card (section 05) pointing to it; the README has an Author section; `CITATION.cff` carries the website on the author entry. No
 institutional affiliation is attached to the software itself, and no ORCID or other identifier was invented. `tests/test_author.py` pins the
 bio sentences, the link, the portrait's alt text and size. The portrait is now in the public repository.
+
+## 2026-10-06 (cont.) -- validation-grid baseline recomputed with the seasonal atmosphere
+
+TOPOHYDRO, XYLEM and REFUGIUM on the 80-point grid (25 Armenian cells) finished 13:34-13:40 from the cached inputs (no Drive access after the first
+step). Checks: temperature, precipitation and GDD identical to the previous run (max difference 0, as they must be); generic Penman-Monteith water
+deficit 166 -> 353 mm, minimum soil potential -1.03 -> -1.31 MPa; XYLEM mean hazard over the 23 Armenian cells, broadleaf 0.00099 -> 0.00777, oak
+0.0254 -> 0.0608, equal to the offline harness (an independent code path) to the digits shown. The UI now takes water-balance layers from
+whichever TOPOHYDRO file is current, so 40 of 41 planned maps have 2019 results (the 41st, treeline shift, exists only as a scenario). Scenario
+maps return when the ISIMIP3b atmosphere download and the recomputed projections finish.

@@ -1,5 +1,6 @@
-run_date: '2026-10-01'
+run_date: '2026-10-06'
 year: 2019
+grid: validation_80pt_stride40
 n_grid_points: 80
 n_with_real_output: 78
 grid_definition: 8x10 subsample (every 40th pixel) of CHELSA-daily's 312x396 armenia
@@ -22,17 +23,17 @@ points:
   late_frost_days: 26
   growing_season_length_days: 266
   cwd_mm_by_pet_formulation:
-    pm_fao56: 53.49957994368838
-    priestley_taylor: 133.59494906345566
-    energy_only: 541.4233951126307
+    pm_fao56: 220.10695204261557
+    priestley_taylor: 311.9630915979912
+    energy_only: 579.5872873983948
   wsi_by_pet_formulation:
-    pm_fao56: 30.434182160720898
-    priestley_taylor: 55.4700485396345
-    energy_only: 131.03638528006633
+    pm_fao56: 89.41977170828481
+    priestley_taylor: 105.75605236608864
+    energy_only: 163.52264294030465
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.7768738647709931
-    priestley_taylor: -0.8613426615204405
-    energy_only: -1.460735775955458
+    pm_fao56: -0.9942525339433723
+    priestley_taylor: -1.085181820056286
+    energy_only: -1.1631585322731481
 - lat: 41.39583333333333
   lon: 43.7375
   elevation_m: 2125.0
@@ -43,17 +44,17 @@ points:
   late_frost_days: 54
   growing_season_length_days: 225
   cwd_mm_by_pet_formulation:
-    pm_fao56: 15.399016202358002
-    priestley_taylor: 122.2339122868151
-    energy_only: 575.3779867133287
+    pm_fao56: 72.32013830722049
+    priestley_taylor: 204.7699136327602
+    energy_only: 590.4460590831955
   wsi_by_pet_formulation:
-    pm_fao56: 10.541076346935823
-    priestley_taylor: 49.53934758423334
-    energy_only: 118.91211771110733
+    pm_fao56: 50.25035423723718
+    priestley_taylor: 84.68138133544926
+    energy_only: 160.35990805921696
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.5322183780809931
-    priestley_taylor: -0.9347435978414863
-    energy_only: -1.4856979802698063
+    pm_fao56: -0.6995421054587342
+    priestley_taylor: -1.0832057721641823
+    energy_only: -1.1947061049798144
 - lat: 41.39583333333333
   lon: 44.07083333333333
   elevation_m: 1449.0
@@ -64,17 +65,17 @@ points:
   late_frost_days: 26
   growing_season_length_days: 280
   cwd_mm_by_pet_formulation:
-    pm_fao56: 12.502880679978096
-    priestley_taylor: 102.24951577563297
-    energy_only: 438.03392916673556
+    pm_fao56: 42.128079685937806
+    priestley_taylor: 89.0785675210265
+    energy_only: 335.677059323149
   wsi_by_pet_formulation:
-    pm_fao56: 7.374398703300817
-    priestley_taylor: 41.29161922358583
-    energy_only: 102.67954565004862
+    pm_fao56: 35.016012778650534
+    priestley_taylor: 49.75481954898923
+    energy_only: 109.37276085230903
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.519612590353128
-    priestley_taylor: -0.8268997812278588
-    energy_only: -1.3607931254500223
+    pm_fao56: -0.6732451915075122
+    priestley_taylor: -0.747070009861035
+    energy_only: -1.1254928158211914
 - lat: 41.39583333333333
   lon: 44.40416666666667
   elevation_m: 736.0
@@ -85,17 +86,17 @@ points:
   late_frost_days: 4
   growing_season_length_days: 352
   cwd_mm_by_pet_formulation:
-    pm_fao56: 21.711516479244068
-    priestley_taylor: 89.22899938080506
-    energy_only: 310.56904166431576
+    pm_fao56: 109.86289440738419
+    priestley_taylor: 106.10889143673268
+    energy_only: 213.0003210168377
   wsi_by_pet_formulation:
-    pm_fao56: 12.005317082422245
-    priestley_taylor: 37.76832639106811
-    energy_only: 84.32342000572915
+    pm_fao56: 54.49558848533211
+    priestley_taylor: 45.63173719546952
+    energy_only: 77.63781366160057
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.6069860003896257
-    priestley_taylor: -0.7996758682860353
-    energy_only: -1.2594300104672158
+    pm_fao56: -0.9890980595501355
+    priestley_taylor: -0.9986740829426963
+    energy_only: -1.0784721905956072
 - lat: 41.39583333333333
   lon: 44.7375
   elevation_m: 456.0
@@ -106,17 +107,17 @@ points:
   late_frost_days: 15
   growing_season_length_days: 357
   cwd_mm_by_pet_formulation:
-    pm_fao56: 102.12967085236018
-    priestley_taylor: 117.43569393986056
-    energy_only: 342.4579277345451
+    pm_fao56: 293.70526342184775
+    priestley_taylor: 229.2143262133032
+    energy_only: 316.1426285319035
   wsi_by_pet_formulation:
-    pm_fao56: 54.841966703343076
-    priestley_taylor: 49.86605360527137
-    energy_only: 94.18516928264576
+    pm_fao56: 114.67052220462206
+    priestley_taylor: 97.44684584706269
+    energy_only: 122.48829759286339
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.0016027019368223
-    priestley_taylor: -0.9214532148498497
-    energy_only: -1.3260172629618705
+    pm_fao56: -1.3019736479152568
+    priestley_taylor: -1.2571492209075277
+    energy_only: -1.2793385216666602
 - lat: 41.39583333333333
   lon: 45.07083333333333
   elevation_m: 288.0
@@ -127,17 +128,17 @@ points:
   late_frost_days: 5
   growing_season_length_days: 362
   cwd_mm_by_pet_formulation:
-    pm_fao56: 229.54706694548543
-    priestley_taylor: 174.56542282390103
-    energy_only: 407.33590802671944
+    pm_fao56: 428.0417669606509
+    priestley_taylor: 325.3968889878165
+    energy_only: 404.0007013109176
   wsi_by_pet_formulation:
-    pm_fao56: 121.62605999838249
-    priestley_taylor: 73.20698815141878
-    energy_only: 113.20604224302204
+    pm_fao56: 158.25603913484235
+    priestley_taylor: 142.03119644646793
+    energy_only: 164.29843871191235
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2082327291540238
-    priestley_taylor: -1.102719325913217
-    energy_only: -1.3929725204271368
+    pm_fao56: -1.4215560681058366
+    priestley_taylor: -1.383217895301156
+    energy_only: -1.3877436109672263
 - lat: 41.39583333333333
   lon: 45.40416666666667
   elevation_m: 484.0
@@ -148,17 +149,17 @@ points:
   late_frost_days: 13
   growing_season_length_days: 359
   cwd_mm_by_pet_formulation:
-    pm_fao56: 163.2977462778196
-    priestley_taylor: 171.32505612723668
-    energy_only: 433.49038111409806
+    pm_fao56: 359.8276818397793
+    priestley_taylor: 317.3992814466725
+    energy_only: 437.90574551155134
   wsi_by_pet_formulation:
-    pm_fao56: 80.54236361309714
-    priestley_taylor: 65.26296515239676
-    energy_only: 107.49635009131075
+    pm_fao56: 127.34367329425443
+    priestley_taylor: 120.15046615016757
+    energy_only: 149.48485819371828
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1171683269130346
-    priestley_taylor: -1.110717443606501
-    energy_only: -1.3964591706625287
+    pm_fao56: -1.4166291859288649
+    priestley_taylor: -1.3981443135960154
+    energy_only: -1.4089607568842681
 - lat: 41.39583333333333
   lon: 45.737500000000004
   elevation_m: 370.0
@@ -169,17 +170,17 @@ points:
   late_frost_days: 3
   growing_season_length_days: 363
   cwd_mm_by_pet_formulation:
-    pm_fao56: 128.53798001689188
-    priestley_taylor: 155.9706285686384
-    energy_only: 391.77229069509804
+    pm_fao56: 319.87179322386083
+    priestley_taylor: 280.06283669450755
+    energy_only: 360.1727074802544
   wsi_by_pet_formulation:
-    pm_fao56: 62.11346606609221
-    priestley_taylor: 60.10738824446044
-    energy_only: 100.26915020464418
+    pm_fao56: 121.41400093857126
+    priestley_taylor: 112.00226264865296
+    energy_only: 132.44438387220922
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1052425151029521
-    priestley_taylor: -1.0957442879943036
-    energy_only: -1.3778648384971397
+    pm_fao56: -1.415379188331571
+    priestley_taylor: -1.3987364649022505
+    energy_only: -1.4118436547251954
 - lat: 41.39583333333333
   lon: 46.07083333333333
   elevation_m: 641.0
@@ -190,17 +191,17 @@ points:
   late_frost_days: 4
   growing_season_length_days: 353
   cwd_mm_by_pet_formulation:
-    pm_fao56: 53.02667947233877
-    priestley_taylor: 118.0518228708153
-    energy_only: 369.2323453962914
+    pm_fao56: 240.21122591721127
+    priestley_taylor: 276.3370910300943
+    energy_only: 325.0957728857541
   wsi_by_pet_formulation:
-    pm_fao56: 26.39817774631738
-    priestley_taylor: 44.795484202237695
-    energy_only: 89.38449859960122
+    pm_fao56: 93.75379926148894
+    priestley_taylor: 94.32133525720388
+    energy_only: 107.53454294377508
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.8924291229181223
-    priestley_taylor: -1.0293433532483536
-    energy_only: -1.3528669885698157
+    pm_fao56: -1.3602985152752625
+    priestley_taylor: -1.393564335158649
+    energy_only: -1.4090883975453077
 - lat: 41.39583333333333
   lon: 46.40416666666667
   elevation_m: 633.0
@@ -211,17 +212,17 @@ points:
   late_frost_days: 24
   growing_season_length_days: 348
   cwd_mm_by_pet_formulation:
-    pm_fao56: 17.88423060651787
-    priestley_taylor: 61.827808094061176
-    energy_only: 297.68510439143625
+    pm_fao56: 142.8890901607934
+    priestley_taylor: 202.58956326366572
+    energy_only: 254.00456417796357
   wsi_by_pet_formulation:
-    pm_fao56: 8.891687649117925
-    priestley_taylor: 23.651078007900956
-    energy_only: 71.31020804377357
+    pm_fao56: 52.46820339750853
+    priestley_taylor: 63.59281772612624
+    energy_only: 76.45420302147598
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.6079149063831761
-    priestley_taylor: -0.8315260286198234
-    energy_only: -1.2576389803623456
+    pm_fao56: -1.1940478903508942
+    priestley_taylor: -1.2879937859768167
+    energy_only: -1.321620448027407
 - lat: 41.0625
   lon: 43.40416666666667
   elevation_m: 2786.0
@@ -232,17 +233,17 @@ points:
   late_frost_days: 77
   growing_season_length_days: 188
   cwd_mm_by_pet_formulation:
-    pm_fao56: 19.587248772652675
-    priestley_taylor: 210.12268070787354
-    energy_only: 847.6375711685439
+    pm_fao56: 79.75475475798788
+    priestley_taylor: 286.63173987481537
+    energy_only: 827.5364253490386
   wsi_by_pet_formulation:
-    pm_fao56: 16.739410945072393
-    priestley_taylor: 87.46841191382603
-    energy_only: 157.8997598113469
+    pm_fao56: 64.96047800337871
+    priestley_taylor: 120.4076671500146
+    energy_only: 205.69720451885036
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.7279749953320596
-    priestley_taylor: -1.3248718622838522
-    energy_only: -1.4997586658266675
+    pm_fao56: -0.888059661515914
+    priestley_taylor: -1.1423361888783399
+    energy_only: -1.4728797458827605
 - lat: 41.0625
   lon: 43.7375
   elevation_m: 2004.0
@@ -253,17 +254,17 @@ points:
   late_frost_days: 53
   growing_season_length_days: 227
   cwd_mm_by_pet_formulation:
-    pm_fao56: 88.46575434077096
-    priestley_taylor: 215.43755945232144
-    energy_only: 710.7764958044545
+    pm_fao56: 259.71224562166486
+    priestley_taylor: 398.475654077132
+    energy_only: 737.1159751622683
   wsi_by_pet_formulation:
-    pm_fao56: 51.11720427565063
-    priestley_taylor: 88.40499477817932
-    energy_only: 169.95923522199547
+    pm_fao56: 107.77284879236781
+    priestley_taylor: 133.57580856501193
+    energy_only: 194.23858099205705
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.9238148652076895
-    priestley_taylor: -1.0446808776569991
-    energy_only: -1.4801450060434034
+    pm_fao56: -1.08138304103547
+    priestley_taylor: -1.171010252674571
+    energy_only: -1.2522637059611177
 - lat: 41.0625
   lon: 44.07083333333333
   elevation_m: 2228.0
@@ -274,17 +275,17 @@ points:
   late_frost_days: 59
   growing_season_length_days: 213
   cwd_mm_by_pet_formulation:
-    pm_fao56: 30.043990603984124
-    priestley_taylor: 173.9818530654017
-    energy_only: 690.8361946555922
+    pm_fao56: 91.19523602402131
+    priestley_taylor: 258.2957481595965
+    energy_only: 697.270913355974
   wsi_by_pet_formulation:
-    pm_fao56: 21.20024133526812
-    priestley_taylor: 69.85671317881156
-    energy_only: 139.2671171599822
+    pm_fao56: 68.3893225439949
+    priestley_taylor: 107.71901310436832
+    energy_only: 185.74515073755475
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.8508617117148647
-    priestley_taylor: -1.2888602622638399
-    energy_only: -1.4895876845138387
+    pm_fao56: -0.8377804413513792
+    priestley_taylor: -1.1252606810501067
+    energy_only: -1.2399997945671402
 - lat: 41.0625
   lon: 44.40416666666667
   elevation_m: 1555.0
@@ -295,17 +296,17 @@ points:
   late_frost_days: 48
   growing_season_length_days: 256
   cwd_mm_by_pet_formulation:
-    pm_fao56: 46.791426455967894
-    priestley_taylor: 153.41590153075805
-    energy_only: 590.4106472870317
+    pm_fao56: 209.58248780087507
+    priestley_taylor: 327.9571447503225
+    energy_only: 615.8356954504757
   wsi_by_pet_formulation:
-    pm_fao56: 27.865297606965
-    priestley_taylor: 60.8847025360883
-    energy_only: 138.12472910581636
+    pm_fao56: 94.17436649039584
+    priestley_taylor: 116.18930085327963
+    energy_only: 172.28848931568785
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.7517623867303842
-    priestley_taylor: -0.9881083425762818
-    energy_only: -1.3355648506755444
+    pm_fao56: -1.0890317397825904
+    priestley_taylor: -1.1974805655379657
+    energy_only: -1.269405101557428
 - lat: 41.0625
   lon: 44.7375
   elevation_m: 1593.0
@@ -316,17 +317,17 @@ points:
   late_frost_days: 51
   growing_season_length_days: 251
   cwd_mm_by_pet_formulation:
-    pm_fao56: 46.991313959089716
-    priestley_taylor: 145.38999311087676
-    energy_only: 549.3273009060817
+    pm_fao56: 158.12228614455046
+    priestley_taylor: 248.70565713619726
+    energy_only: 537.6707764939539
   wsi_by_pet_formulation:
-    pm_fao56: 28.518772818464594
-    priestley_taylor: 56.146026021264134
-    energy_only: 118.02235156564623
+    pm_fao56: 78.27063940837732
+    priestley_taylor: 96.99640072901197
+    energy_only: 149.63316001820414
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.7834684318471715
-    priestley_taylor: -1.034131527101429
-    energy_only: -1.414002640861366
+    pm_fao56: -1.0906358977030812
+    priestley_taylor: -1.2669251174458505
+    energy_only: -1.3357330974236137
 - lat: 41.0625
   lon: 45.07083333333333
   elevation_m: 841.0
@@ -337,17 +338,17 @@ points:
   late_frost_days: 5
   growing_season_length_days: 350
   cwd_mm_by_pet_formulation:
-    pm_fao56: 105.24786645409444
-    priestley_taylor: 148.41446302018477
-    energy_only: 428.5215582462288
+    pm_fao56: 282.83589146023536
+    priestley_taylor: 308.3404158146701
+    energy_only: 459.58141492567137
   wsi_by_pet_formulation:
-    pm_fao56: 54.06942776050309
-    priestley_taylor: 57.56784156621616
-    energy_only: 107.25295886421702
+    pm_fao56: 112.40607389115019
+    priestley_taylor: 116.3286685177819
+    energy_only: 148.38328696964325
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.9772058798625182
-    priestley_taylor: -1.0060392100252955
-    energy_only: -1.3375743199019616
+    pm_fao56: -1.3212030242412085
+    priestley_taylor: -1.3317767779065697
+    energy_only: -1.3568714360125544
 - lat: 41.0625
   lon: 45.40416666666667
   elevation_m: 578.0
@@ -358,17 +359,17 @@ points:
   late_frost_days: 3
   growing_season_length_days: 358
   cwd_mm_by_pet_formulation:
-    pm_fao56: 184.0599871202025
-    priestley_taylor: 175.09657887670696
-    energy_only: 459.0672270951068
+    pm_fao56: 369.03906924154563
+    priestley_taylor: 371.8846777637334
+    energy_only: 499.0924160206986
   wsi_by_pet_formulation:
-    pm_fao56: 94.45361119564319
-    priestley_taylor: 67.90010683101568
-    energy_only: 118.71023574930877
+    pm_fao56: 131.4077069728221
+    priestley_taylor: 131.73670580470431
+    energy_only: 159.85240584590764
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.0429475965445318
-    priestley_taylor: -1.0671363448063922
-    energy_only: -1.3551738627013916
+    pm_fao56: -1.3891283886966912
+    priestley_taylor: -1.3873833150695432
+    energy_only: -1.4007102308196397
 - lat: 41.0625
   lon: 45.737500000000004
   elevation_m: 263.0
@@ -379,17 +380,17 @@ points:
   late_frost_days: 2
   growing_season_length_days: 363
   cwd_mm_by_pet_formulation:
-    pm_fao56: 227.52199151464984
-    priestley_taylor: 169.07173622418514
-    energy_only: 410.6428016583716
+    pm_fao56: 418.35614602077726
+    priestley_taylor: 369.53888879897454
+    energy_only: 460.27673727665956
   wsi_by_pet_formulation:
-    pm_fao56: 118.88481775460644
-    priestley_taylor: 66.72068858740302
-    energy_only: 110.66221555125918
+    pm_fao56: 148.25771627459568
+    priestley_taylor: 138.5909808335766
+    energy_only: 162.49194500375867
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.136921192728863
-    priestley_taylor: -1.0615650333913231
-    energy_only: -1.3607777001208377
+    pm_fao56: -1.4502068568099444
+    priestley_taylor: -1.4405836242049905
+    energy_only: -1.444215892616636
 - lat: 41.0625
   lon: 46.07083333333333
   elevation_m: 309.0
@@ -400,17 +401,17 @@ points:
   late_frost_days: 0
   growing_season_length_days: 365
   cwd_mm_by_pet_formulation:
-    pm_fao56: 185.02932770053567
-    priestley_taylor: 140.0440530975019
-    energy_only: 367.3991002126001
+    pm_fao56: 368.50143836130997
+    priestley_taylor: 341.7376492161434
+    energy_only: 432.1249153779349
   wsi_by_pet_formulation:
-    pm_fao56: 92.70699415528294
-    priestley_taylor: 54.643602921355665
-    energy_only: 97.58240745432886
+    pm_fao56: 138.51559333918613
+    priestley_taylor: 128.95039716373822
+    energy_only: 151.88095311957085
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.0814259913775075
-    priestley_taylor: -0.9674879716035797
-    energy_only: -1.2990873435021035
+    pm_fao56: -1.4348504820675312
+    priestley_taylor: -1.4348452681337782
+    energy_only: -1.4429703366508089
 - lat: 41.0625
   lon: 46.40416666666667
   elevation_m: 135.0
@@ -421,17 +422,17 @@ points:
   late_frost_days: 0
   growing_season_length_days: 365
   cwd_mm_by_pet_formulation:
-    pm_fao56: 174.83996202335504
-    priestley_taylor: 139.0233210266914
-    energy_only: 345.6594385170701
+    pm_fao56: 356.3550497929486
+    priestley_taylor: 311.4493256925013
+    energy_only: 381.78842635821366
   wsi_by_pet_formulation:
-    pm_fao56: 84.54068270427753
-    priestley_taylor: 55.18115050893056
-    energy_only: 95.0279159187605
+    pm_fao56: 143.47604299087897
+    priestley_taylor: 132.47742376619615
+    energy_only: 151.51877662786836
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1271949423419594
-    priestley_taylor: -1.022625987647419
-    energy_only: -1.295952564665847
+    pm_fao56: -1.4202589049450278
+    priestley_taylor: -1.4140920926654743
+    energy_only: -1.4214647698222946
 - lat: 40.729166666666664
   lon: 43.40416666666667
   elevation_m: 1663.0
@@ -442,17 +443,17 @@ points:
   late_frost_days: 49
   growing_season_length_days: 267
   cwd_mm_by_pet_formulation:
-    pm_fao56: 199.10545405033625
-    priestley_taylor: 230.4451336498676
-    energy_only: 619.95547135051
+    pm_fao56: 384.1787871514247
+    priestley_taylor: 426.92973045679923
+    energy_only: 646.3166844590158
   wsi_by_pet_formulation:
-    pm_fao56: 106.03176977765277
-    priestley_taylor: 96.48567258099018
-    energy_only: 161.1847437699684
+    pm_fao56: 144.83028824096365
+    priestley_taylor: 149.51595951397897
+    energy_only: 193.01210658033017
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1332703879730701
-    priestley_taylor: -1.10705593574388
-    energy_only: -1.4597637334749485
+    pm_fao56: -1.2790593210272614
+    priestley_taylor: -1.3149561457552288
+    energy_only: -1.3440842718703938
 - lat: 40.729166666666664
   lon: 43.7375
   elevation_m: 1484.0
@@ -463,17 +464,17 @@ points:
   late_frost_days: 22
   growing_season_length_days: 282
   cwd_mm_by_pet_formulation:
-    pm_fao56: 219.81691831468996
-    priestley_taylor: 227.92052666593474
-    energy_only: 583.8902468258018
+    pm_fao56: 409.4959260603212
+    priestley_taylor: 435.04819483092774
+    energy_only: 616.0004362766481
   wsi_by_pet_formulation:
-    pm_fao56: 116.94773248579219
-    priestley_taylor: 95.54418404322509
-    energy_only: 155.4216040858048
+    pm_fao56: 153.51737616292408
+    priestley_taylor: 155.61619826946665
+    energy_only: 191.71751478610787
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.19042057913227
-    priestley_taylor: -1.0912313858611877
-    energy_only: -1.353570831684851
+    pm_fao56: -1.312308034253006
+    priestley_taylor: -1.338183020164718
+    energy_only: -1.3594268806921224
 - lat: 40.729166666666664
   lon: 44.07083333333333
   elevation_m: 2128.0
@@ -484,17 +485,17 @@ points:
   late_frost_days: 55
   growing_season_length_days: 221
   cwd_mm_by_pet_formulation:
-    pm_fao56: 67.53012891273899
-    priestley_taylor: 172.9506892838221
-    energy_only: 699.0251892417323
+    pm_fao56: 217.1014753128378
+    priestley_taylor: 342.37464497976026
+    energy_only: 707.6286691157779
   wsi_by_pet_formulation:
-    pm_fao56: 41.22028164946113
-    priestley_taylor: 67.72741001208583
-    energy_only: 150.27900804278477
+    pm_fao56: 105.03432052127519
+    priestley_taylor: 126.87137606158858
+    energy_only: 191.76809565640656
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.0961603595750022
-    priestley_taylor: -1.3068310345283998
-    energy_only: -1.4904520512077388
+    pm_fao56: -1.0817555455366565
+    priestley_taylor: -1.2162180190949605
+    energy_only: -1.2958276154578912
 - lat: 40.729166666666664
   lon: 44.40416666666667
   elevation_m: 2250.0
@@ -505,17 +506,17 @@ points:
   late_frost_days: 53
   growing_season_length_days: 214
   cwd_mm_by_pet_formulation:
-    pm_fao56: 51.560001990593264
-    priestley_taylor: 192.92558492944494
-    energy_only: 723.8837216140055
+    pm_fao56: 158.21935227028672
+    priestley_taylor: 306.67690445452314
+    energy_only: 729.9485812435644
   wsi_by_pet_formulation:
-    pm_fao56: 33.50191376147739
-    priestley_taylor: 75.64426635089154
-    energy_only: 144.0958265885876
+    pm_fao56: 87.22276453761779
+    priestley_taylor: 116.7873445357096
+    energy_only: 189.08691754498474
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.016820426848555
-    priestley_taylor: -1.325772492182974
-    energy_only: -1.4950657865602723
+    pm_fao56: -0.9963995046432657
+    priestley_taylor: -1.1928020276153197
+    energy_only: -1.2752149771615118
 - lat: 40.729166666666664
   lon: 44.7375
   elevation_m: 1974.0
@@ -526,17 +527,17 @@ points:
   late_frost_days: 50
   growing_season_length_days: 233
   cwd_mm_by_pet_formulation:
-    pm_fao56: 65.35128769746201
-    priestley_taylor: 202.47234008104158
-    energy_only: 734.3586806764463
+    pm_fao56: 236.4791012854502
+    priestley_taylor: 389.2241829247964
+    energy_only: 752.0804530153689
   wsi_by_pet_formulation:
-    pm_fao56: 38.70387935910144
-    priestley_taylor: 78.13889312932955
-    energy_only: 168.47769089659147
+    pm_fao56: 103.0723641984772
+    priestley_taylor: 128.0526484752053
+    energy_only: 186.7634099812641
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.940308610836153
-    priestley_taylor: -1.2376567575854236
-    energy_only: -1.4858227820628283
+    pm_fao56: -1.1904441743249428
+    priestley_taylor: -1.290482749767336
+    energy_only: -1.3469818412406542
 - lat: 40.729166666666664
   lon: 45.07083333333333
   elevation_m: 1208.0
@@ -547,17 +548,17 @@ points:
   late_frost_days: 5
   growing_season_length_days: 334
   cwd_mm_by_pet_formulation:
-    pm_fao56: 180.7626353344716
-    priestley_taylor: 231.668398016018
-    energy_only: 558.0329146503087
+    pm_fao56: 340.35215395116825
+    priestley_taylor: 413.29306842554354
+    energy_only: 600.1979317147535
   wsi_by_pet_formulation:
-    pm_fao56: 92.55722341055568
-    priestley_taylor: 93.27246190276057
-    energy_only: 152.73664110874154
+    pm_fao56: 128.90054482959852
+    priestley_taylor: 135.8047435397355
+    energy_only: 170.53663842523275
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.0553983916257768
-    priestley_taylor: -1.1628589019088331
-    energy_only: -1.3518777647888536
+    pm_fao56: -1.3161672281076076
+    priestley_taylor: -1.3532880401667167
+    energy_only: -1.3762004133481267
 - lat: 40.729166666666664
   lon: 45.40416666666667
   elevation_m: 1911.0
@@ -568,17 +569,17 @@ points:
   late_frost_days: 48
   growing_season_length_days: 232
   cwd_mm_by_pet_formulation:
-    pm_fao56: 70.85284729421295
-    priestley_taylor: 267.9420530814338
-    energy_only: 824.0374662849019
+    pm_fao56: 249.5022726376292
+    priestley_taylor: 447.7070894990319
+    energy_only: 848.5343892714066
   wsi_by_pet_formulation:
-    pm_fao56: 40.95577502737629
-    priestley_taylor: 104.37927422911193
-    energy_only: 190.86010848104337
+    pm_fao56: 96.88286363015399
+    priestley_taylor: 129.1972587230363
+    energy_only: 191.7344933170885
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.8388196673128077
-    priestley_taylor: -1.1578193700503774
-    energy_only: -1.4856626460064954
+    pm_fao56: -1.3098634653656496
+    priestley_taylor: -1.3948711276811554
+    energy_only: -1.4335537349284846
 - lat: 40.729166666666664
   lon: 45.737500000000004
   elevation_m: 1681.0
@@ -589,17 +590,17 @@ points:
   late_frost_days: 49
   growing_season_length_days: 239
   cwd_mm_by_pet_formulation:
-    pm_fao56: 62.153193712433406
-    priestley_taylor: 222.89716912877338
-    energy_only: 783.9033432709257
+    pm_fao56: 216.7013964960794
+    priestley_taylor: 409.1329756148382
+    energy_only: 808.2571992558703
   wsi_by_pet_formulation:
-    pm_fao56: 36.71933074649825
-    priestley_taylor: 83.03586880229659
-    energy_only: 174.72871732501653
+    pm_fao56: 82.02517698107798
+    priestley_taylor: 113.81147600348699
+    energy_only: 178.08895935057706
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.7438596386103852
-    priestley_taylor: -1.0855396627885154
-    energy_only: -1.4626090547461001
+    pm_fao56: -1.3007137048860482
+    priestley_taylor: -1.403894039326882
+    energy_only: -1.4380089804691047
 - lat: 40.729166666666664
   lon: 46.07083333333333
   elevation_m: 611.0
@@ -610,17 +611,17 @@ points:
   late_frost_days: 3
   growing_season_length_days: 359
   cwd_mm_by_pet_formulation:
-    pm_fao56: 198.4159517793657
-    priestley_taylor: 226.45742419071547
-    energy_only: 547.9665779622219
+    pm_fao56: 379.7796920683803
+    priestley_taylor: 429.2600293003515
+    energy_only: 591.7688325583841
   wsi_by_pet_formulation:
-    pm_fao56: 96.61449780737232
-    priestley_taylor: 83.44456728052799
-    energy_only: 135.8614313676193
+    pm_fao56: 128.16158855097524
+    priestley_taylor: 128.50763065844203
+    energy_only: 162.95504103430963
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.014231134564562
-    priestley_taylor: -1.17010541193922
-    energy_only: -1.3803250622794114
+    pm_fao56: -1.3637957992740004
+    priestley_taylor: -1.3973358045130462
+    energy_only: -1.4128436351738596
 - lat: 40.729166666666664
   lon: 46.40416666666667
   elevation_m: 300.0
@@ -631,17 +632,17 @@ points:
   late_frost_days: 0
   growing_season_length_days: 365
   cwd_mm_by_pet_formulation:
-    pm_fao56: 304.32268069750376
-    priestley_taylor: 258.86009297355224
-    energy_only: 539.0874257084223
+    pm_fao56: 488.42576244801677
+    priestley_taylor: 460.3330802604403
+    energy_only: 585.0991662882551
   wsi_by_pet_formulation:
-    pm_fao56: 142.6169025796532
-    priestley_taylor: 97.65025084417309
-    energy_only: 142.88643007288184
+    pm_fao56: 165.79559561733862
+    priestley_taylor: 156.81746018880722
+    energy_only: 182.81070753535272
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1498678887425504
-    priestley_taylor: -1.2297975775831176
-    energy_only: -1.3913036185301286
+    pm_fao56: -1.3649528285012051
+    priestley_taylor: -1.3796588147668092
+    energy_only: -1.389410995541539
 - lat: 40.39583333333333
   lon: 43.40416666666667
   elevation_m: 1804.0
@@ -652,17 +653,17 @@ points:
   late_frost_days: 58
   growing_season_length_days: 251
   cwd_mm_by_pet_formulation:
-    pm_fao56: 176.9081019928766
-    priestley_taylor: 219.64397482425815
-    energy_only: 640.7149063568545
+    pm_fao56: 383.345117971633
+    priestley_taylor: 440.8204239513921
+    energy_only: 671.3689631171607
   wsi_by_pet_formulation:
-    pm_fao56: 93.10303822626832
-    priestley_taylor: 88.51852432195386
-    energy_only: 161.2492806698603
+    pm_fao56: 138.37287225422085
+    priestley_taylor: 145.95749789421035
+    energy_only: 188.81831826225357
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.126317280742324
-    priestley_taylor: -1.1566153646205728
-    energy_only: -1.4821438760651158
+    pm_fao56: -1.3645089007216133
+    priestley_taylor: -1.3864816579275032
+    energy_only: -1.4060795496712397
 - lat: 40.39583333333333
   lon: 43.7375
   elevation_m: 1480.0
@@ -673,17 +674,17 @@ points:
   late_frost_days: 39
   growing_season_length_days: 285
   cwd_mm_by_pet_formulation:
-    pm_fao56: 232.16638779256257
-    priestley_taylor: 229.37673907776195
-    energy_only: 583.3725311029594
+    pm_fao56: 447.86907589347754
+    priestley_taylor: 463.3472107437128
+    energy_only: 622.9595374737893
   wsi_by_pet_formulation:
-    pm_fao56: 124.5565469837779
-    priestley_taylor: 96.15662300583288
-    energy_only: 162.55392589364408
+    pm_fao56: 158.77004727929798
+    priestley_taylor: 159.9499215570304
+    energy_only: 189.7614405533128
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2135995422749983
-    priestley_taylor: -1.1943207373495688
-    energy_only: -1.3891719735957042
+    pm_fao56: -1.4189291470709804
+    priestley_taylor: -1.4261162514299455
+    energy_only: -1.435066539110276
 - lat: 40.39583333333333
   lon: 44.07083333333333
   elevation_m: 2240.0
@@ -694,17 +695,17 @@ points:
   late_frost_days: 63
   growing_season_length_days: 213
   cwd_mm_by_pet_formulation:
-    pm_fao56: 160.04722378862954
-    priestley_taylor: 258.871976178079
-    energy_only: 808.563831128499
+    pm_fao56: 383.457424282755
+    priestley_taylor: 489.17614838055226
+    energy_only: 812.0323215114523
   wsi_by_pet_formulation:
-    pm_fao56: 89.63025227545211
-    priestley_taylor: 100.34400884471225
-    energy_only: 183.11509754206617
+    pm_fao56: 151.822100582967
+    priestley_taylor: 166.2542669711489
+    energy_only: 216.85699150371812
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.3533877587153627
-    priestley_taylor: -1.4367157493533549
-    energy_only: -1.4982637526768305
+    pm_fao56: -1.3291992193801223
+    priestley_taylor: -1.3727062021815613
+    energy_only: -1.4022360487183578
 - lat: 40.39583333333333
   lon: 44.40416666666667
   elevation_m: 1681.0
@@ -715,17 +716,17 @@ points:
   late_frost_days: 42
   growing_season_length_days: 258
   cwd_mm_by_pet_formulation:
-    pm_fao56: 104.23759115097971
-    priestley_taylor: 148.96130135735922
-    energy_only: 553.8370300778017
+    pm_fao56: 370.60010659332545
+    priestley_taylor: 431.40754382357153
+    energy_only: 603.4998994834639
   wsi_by_pet_formulation:
-    pm_fao56: 52.795283538909075
-    priestley_taylor: 56.87363309464737
-    energy_only: 140.52930180055185
+    pm_fao56: 123.08913948899166
+    priestley_taylor: 131.5353514205588
+    energy_only: 161.75261621196358
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.0032719584350527
-    priestley_taylor: -1.0355080897864475
-    energy_only: -1.4447744906242337
+    pm_fao56: -1.3086281655582528
+    priestley_taylor: -1.3276944544247793
+    energy_only: -1.3453051342260152
 - lat: 40.39583333333333
   lon: 44.7375
   elevation_m: 1950.0
@@ -736,17 +737,17 @@ points:
   late_frost_days: 49
   growing_season_length_days: 233
   cwd_mm_by_pet_formulation:
-    pm_fao56: 54.23101588627105
-    priestley_taylor: 133.65241093120517
-    energy_only: 560.0017971515404
+    pm_fao56: 267.7197540823455
+    priestley_taylor: 380.2588744664154
+    energy_only: 591.9896465823457
   wsi_by_pet_formulation:
-    pm_fao56: 30.420576717335038
-    priestley_taylor: 50.250234789538155
-    energy_only: 112.23289385140214
+    pm_fao56: 87.04963297616251
+    priestley_taylor: 101.22421578535118
+    energy_only: 142.33990604097718
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.7845313572590439
-    priestley_taylor: -1.0830835397867409
-    energy_only: -1.4905362173475056
+    pm_fao56: -1.223816068661823
+    priestley_taylor: -1.2876692811741184
+    energy_only: -1.3273445101073404
 - lat: 40.39583333333333
   lon: 45.07083333333333
   elevation_m: 2106.0
@@ -757,17 +758,17 @@ points:
   late_frost_days: 46
   growing_season_length_days: 226
   cwd_mm_by_pet_formulation:
-    pm_fao56: 80.77705529320642
-    priestley_taylor: 219.6528011495829
-    energy_only: 766.007839020162
+    pm_fao56: 257.4065798525794
+    priestley_taylor: 423.60079433943713
+    energy_only: 787.9642766584184
   wsi_by_pet_formulation:
-    pm_fao56: 45.53353133466092
-    priestley_taylor: 82.01387591005519
-    energy_only: 169.9177939421869
+    pm_fao56: 99.74754823684049
+    priestley_taylor: 123.42856970873999
+    energy_only: 183.34538927360833
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.9694375251890065
-    priestley_taylor: -1.2266252701519993
-    energy_only: -1.4936148786241688
+    pm_fao56: -1.2108725740144348
+    priestley_taylor: -1.3197720921396117
+    energy_only: -1.3770893786053677
 - lat: 40.39583333333333
   lon: 45.40416666666667
   elevation_m: 1898.0
@@ -782,17 +783,17 @@ points:
   late_frost_days: 60
   growing_season_length_days: 212
   cwd_mm_by_pet_formulation:
-    pm_fao56: 88.92820396018772
-    priestley_taylor: 321.3504615139343
-    energy_only: 1009.7572661630456
+    pm_fao56: 279.4978424186842
+    priestley_taylor: 521.1541898994772
+    energy_only: 1019.8265972180377
   wsi_by_pet_formulation:
-    pm_fao56: 53.82217222729294
-    priestley_taylor: 119.9147876544958
-    energy_only: 210.038219662036
+    pm_fao56: 102.3834847636836
+    priestley_taylor: 142.12611549484006
+    energy_only: 214.56527650014345
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.0208192869481005
-    priestley_taylor: -1.3531022664355636
-    energy_only: -1.4980215895641482
+    pm_fao56: -1.3014776223715396
+    priestley_taylor: -1.3961253268119977
+    energy_only: -1.4391823105166757
 - lat: 40.39583333333333
   lon: 46.07083333333333
   elevation_m: 2080.0
@@ -803,17 +804,17 @@ points:
   late_frost_days: 53
   growing_season_length_days: 216
   cwd_mm_by_pet_formulation:
-    pm_fao56: 65.43499790857041
-    priestley_taylor: 369.4395489524328
-    energy_only: 1100.7669078050626
+    pm_fao56: 245.20665736914756
+    priestley_taylor: 553.4840297074794
+    energy_only: 1108.1159291484237
   wsi_by_pet_formulation:
-    pm_fao56: 43.99864330735981
-    priestley_taylor: 135.551811246927
-    energy_only: 222.74469224156667
+    pm_fao56: 96.2240648019681
+    priestley_taylor: 146.2506127184525
+    energy_only: 220.9988843079965
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.9016716801249081
-    priestley_taylor: -1.3389846907507925
-    energy_only: -1.4944553434619043
+    pm_fao56: -1.1527452004507857
+    priestley_taylor: -1.3304847841251877
+    energy_only: -1.3985972730799978
 - lat: 40.39583333333333
   lon: 46.40416666666667
   elevation_m: 1803.0
@@ -824,17 +825,17 @@ points:
   late_frost_days: 54
   growing_season_length_days: 230
   cwd_mm_by_pet_formulation:
-    pm_fao56: 28.082513172145596
-    priestley_taylor: 302.69697364540895
-    energy_only: 1016.3775192390178
+    pm_fao56: 165.08073891815187
+    priestley_taylor: 490.36544836753586
+    energy_only: 1031.0951470005516
   wsi_by_pet_formulation:
-    pm_fao56: 22.954246715042668
-    priestley_taylor: 106.29249578167008
-    energy_only: 198.70750898814447
+    pm_fao56: 62.18264300972456
+    priestley_taylor: 119.5642796857153
+    energy_only: 197.5483671449742
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.6080272822631271
-    priestley_taylor: -1.2175457308452593
-    energy_only: -1.4892574264700358
+    pm_fao56: -1.0678090382371608
+    priestley_taylor: -1.3152179634886878
+    energy_only: -1.3946087204573143
 - lat: 40.0625
   lon: 43.40416666666667
   elevation_m: 2072.0
@@ -845,17 +846,17 @@ points:
   late_frost_days: 60
   growing_season_length_days: 226
   cwd_mm_by_pet_formulation:
-    pm_fao56: 157.85477460189097
-    priestley_taylor: 244.40855135006035
-    energy_only: 750.4542363431456
+    pm_fao56: 396.61879062850204
+    priestley_taylor: 476.86977304858556
+    energy_only: 771.5600341957826
   wsi_by_pet_formulation:
-    pm_fao56: 81.52780392686039
-    priestley_taylor: 93.48755470889749
-    energy_only: 178.92546264530523
+    pm_fao56: 134.04280823352292
+    priestley_taylor: 144.50865153226613
+    energy_only: 199.5485707741102
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.035211347588206
-    priestley_taylor: -1.2083395002960804
-    energy_only: -1.4945158875529827
+    pm_fao56: -1.4043287305917496
+    priestley_taylor: -1.4185920472050408
+    energy_only: -1.4356802257502363
 - lat: 40.0625
   lon: 43.7375
   elevation_m: 998.0
@@ -866,17 +867,17 @@ points:
   late_frost_days: 14
   growing_season_length_days: 337
   cwd_mm_by_pet_formulation:
-    pm_fao56: 287.2461767326187
-    priestley_taylor: 201.2893861380107
-    energy_only: 473.5635661511011
+    pm_fao56: 497.61720721103734
+    priestley_taylor: 443.75030343419843
+    energy_only: 527.6883361893595
   wsi_by_pet_formulation:
-    pm_fao56: 154.88559609716876
-    priestley_taylor: 86.34882105243365
-    energy_only: 136.17040900024068
+    pm_fao56: 170.38865910004992
+    priestley_taylor: 161.06418923733253
+    energy_only: 180.33414889057008
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1979287109504508
-    priestley_taylor: -1.0386343397494768
-    energy_only: -1.274313564167928
+    pm_fao56: -1.436597987550567
+    priestley_taylor: -1.4267472134982222
+    energy_only: -1.4269710873999875
 - lat: 40.0625
   lon: 44.07083333333333
   elevation_m: 858.0
@@ -887,17 +888,17 @@ points:
   late_frost_days: 16
   growing_season_length_days: 344
   cwd_mm_by_pet_formulation:
-    pm_fao56: 288.24266929741043
-    priestley_taylor: 193.90984994236925
-    energy_only: 448.6231341751976
+    pm_fao56: 518.1168781014655
+    priestley_taylor: 455.4064967877762
+    energy_only: 528.3837003446796
   wsi_by_pet_formulation:
-    pm_fao56: 166.5308488305393
-    priestley_taylor: 88.064133497558
-    energy_only: 138.87200669959546
+    pm_fao56: 177.22974976398163
+    priestley_taylor: 169.98703967202385
+    energy_only: 186.778104552342
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1825885028836538
-    priestley_taylor: -1.0120358915113452
-    energy_only: -1.253231124487941
+    pm_fao56: -1.445307420589957
+    priestley_taylor: -1.4321791471394851
+    energy_only: -1.431054303366956
 - lat: 40.0625
   lon: 44.40416666666667
   elevation_m: 831.0
@@ -912,17 +913,17 @@ points:
   late_frost_days: 40
   growing_season_length_days: 285
   cwd_mm_by_pet_formulation:
-    pm_fao56: 110.50388337452087
-    priestley_taylor: 84.25895928322127
-    energy_only: 450.49357683668916
+    pm_fao56: 388.9836390675368
+    priestley_taylor: 439.9779862584946
+    energy_only: 554.0360625457056
   wsi_by_pet_formulation:
-    pm_fao56: 54.234003124420894
-    priestley_taylor: 30.931945956468564
-    energy_only: 122.68904349775131
+    pm_fao56: 119.68265115479693
+    priestley_taylor: 125.56624994395293
+    energy_only: 145.16951549669557
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.8384761950073699
-    priestley_taylor: -0.8723855478152324
-    energy_only: -1.2635210078256969
+    pm_fao56: -1.413823224417209
+    priestley_taylor: -1.4253122589026526
+    energy_only: -1.4308928976077813
 - lat: 40.0625
   lon: 45.07083333333333
   elevation_m: 2665.0
@@ -933,17 +934,17 @@ points:
   late_frost_days: 67
   growing_season_length_days: 195
   cwd_mm_by_pet_formulation:
-    pm_fao56: 93.0978617054006
-    priestley_taylor: 292.86166652998776
-    energy_only: 1013.9059139963174
+    pm_fao56: 273.3068622440968
+    priestley_taylor: 488.97220675819193
+    energy_only: 987.1068336326498
   wsi_by_pet_formulation:
-    pm_fao56: 56.685316674510005
-    priestley_taylor: 109.44520650954553
-    energy_only: 186.8776987575925
+    pm_fao56: 101.0148016243802
+    priestley_taylor: 139.24607818126478
+    energy_only: 208.39044006103546
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.0454715212033585
-    priestley_taylor: -1.366032211141204
-    energy_only: -1.4998588197715865
+    pm_fao56: -1.2953593825134821
+    priestley_taylor: -1.379071684802895
+    energy_only: -1.477657444777211
 - lat: 40.0625
   lon: 45.40416666666667
   elevation_m: 2569.0
@@ -954,17 +955,17 @@ points:
   late_frost_days: 54
   growing_season_length_days: 204
   cwd_mm_by_pet_formulation:
-    pm_fao56: 87.84490956522825
-    priestley_taylor: 310.13012793314135
-    energy_only: 1034.5932780314897
+    pm_fao56: 269.51388957452866
+    priestley_taylor: 494.61519923574525
+    energy_only: 1010.7766515778243
   wsi_by_pet_formulation:
-    pm_fao56: 52.99370520744724
-    priestley_taylor: 113.77438039587216
-    energy_only: 194.6191033244118
+    pm_fao56: 98.75894021015415
+    priestley_taylor: 139.0321173809376
+    energy_only: 209.87221566246703
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1063157452243522
-    priestley_taylor: -1.4091604221279126
-    energy_only: -1.4999055358020832
+    pm_fao56: -1.2887674629282286
+    priestley_taylor: -1.3916688759709723
+    energy_only: -1.4793832912520932
 - lat: 40.0625
   lon: 45.737500000000004
   elevation_m: 2696.0
@@ -975,17 +976,17 @@ points:
   late_frost_days: 72
   growing_season_length_days: 187
   cwd_mm_by_pet_formulation:
-    pm_fao56: 131.10362026238602
-    priestley_taylor: 419.0474563998147
-    energy_only: 1272.143806318347
+    pm_fao56: 317.0469514846492
+    priestley_taylor: 604.9436532023707
+    energy_only: 1252.6915878237403
   wsi_by_pet_formulation:
-    pm_fao56: 80.8129961440474
-    priestley_taylor: 154.41892689950345
-    energy_only: 232.73084935219669
+    pm_fao56: 128.17183397253007
+    priestley_taylor: 174.94632230158294
+    energy_only: 244.57733928581513
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.222418425620894
-    priestley_taylor: -1.4559096847207378
-    energy_only: -1.4999689491196988
+    pm_fao56: -1.2952706033123964
+    priestley_taylor: -1.4056627770156966
+    energy_only: -1.4932673248890838
 - lat: 40.0625
   lon: 46.07083333333333
   elevation_m: 2554.0
@@ -996,17 +997,17 @@ points:
   late_frost_days: 70
   growing_season_length_days: 196
   cwd_mm_by_pet_formulation:
-    pm_fao56: 16.090223012075334
-    priestley_taylor: 310.6301177981686
-    energy_only: 1196.4566314224535
+    pm_fao56: 180.27495400728682
+    priestley_taylor: 497.58125963261193
+    energy_only: 1199.5164341602144
   wsi_by_pet_formulation:
-    pm_fao56: 14.233248787238367
-    priestley_taylor: 113.33327325849052
-    energy_only: 211.41391531290833
+    pm_fao56: 63.945477737856294
+    priestley_taylor: 131.89665184227218
+    energy_only: 223.5423335074458
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.6385416871524121
-    priestley_taylor: -1.3947911793359853
-    energy_only: -1.4999438907716245
+    pm_fao56: -1.162785544646835
+    priestley_taylor: -1.3486833613696758
+    energy_only: -1.490521234400151
 - lat: 40.0625
   lon: 46.40416666666667
   elevation_m: 1814.0
@@ -1017,17 +1018,17 @@ points:
   late_frost_days: 60
   growing_season_length_days: 230
   cwd_mm_by_pet_formulation:
-    pm_fao56: 0.4552055734102156
-    priestley_taylor: 162.08960346975115
-    energy_only: 867.324745046473
+    pm_fao56: 165.12723063160948
+    priestley_taylor: 388.45430734296383
+    energy_only: 885.7957282783427
   wsi_by_pet_formulation:
-    pm_fao56: 0.18898159740693338
-    priestley_taylor: 57.526238527104255
-    energy_only: 169.8683573945368
+    pm_fao56: 39.943023656369384
+    priestley_taylor: 74.34640800552461
+    energy_only: 164.52949848455086
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.30209639122296145
-    priestley_taylor: -1.1408237611415442
-    energy_only: -1.4881018103309218
+    pm_fao56: -1.2067501284278845
+    priestley_taylor: -1.3622773541103257
+    energy_only: -1.4178378247032544
 - lat: 39.729166666666664
   lon: 43.40416666666667
   elevation_m: 2316.0
@@ -1038,17 +1039,17 @@ points:
   late_frost_days: 63
   growing_season_length_days: 209
   cwd_mm_by_pet_formulation:
-    pm_fao56: 111.17095578676376
-    priestley_taylor: 229.80811302034408
-    energy_only: 741.3895166470186
+    pm_fao56: 294.5460457208221
+    priestley_taylor: 412.52923541438076
+    energy_only: 708.9585758352389
   wsi_by_pet_formulation:
-    pm_fao56: 59.074767901695644
-    priestley_taylor: 84.53403755515156
-    energy_only: 139.8158672679877
+    pm_fao56: 92.45033620693768
+    priestley_taylor: 109.93830337729831
+    energy_only: 166.4379245182746
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.8895576367867789
-    priestley_taylor: -1.2928904023867769
-    energy_only: -1.4951432114943064
+    pm_fao56: -1.3731622326099646
+    priestley_taylor: -1.4131424973693163
+    energy_only: -1.4338720732460295
 - lat: 39.729166666666664
   lon: 43.7375
   elevation_m: 1919.0
@@ -1059,17 +1060,17 @@ points:
   late_frost_days: 50
   growing_season_length_days: 242
   cwd_mm_by_pet_formulation:
-    pm_fao56: 154.8005711448971
-    priestley_taylor: 237.3811024041467
-    energy_only: 721.7518795017787
+    pm_fao56: 401.2728110210629
+    priestley_taylor: 491.36859923851
+    energy_only: 758.1624048088297
   wsi_by_pet_formulation:
-    pm_fao56: 74.77519371058837
-    priestley_taylor: 90.14365570355713
-    energy_only: 170.053754216022
+    pm_fao56: 124.56653466409027
+    priestley_taylor: 133.29112395120228
+    energy_only: 181.25648202708123
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.9652280964151747
-    priestley_taylor: -1.1024138367663479
-    energy_only: -1.4915855751030167
+    pm_fao56: -1.4008495798101972
+    priestley_taylor: -1.423233909895068
+    energy_only: -1.4367352868162595
 - lat: 39.729166666666664
   lon: 44.07083333333333
   elevation_m: 2305.0
@@ -1080,17 +1081,17 @@ points:
   late_frost_days: 62
   growing_season_length_days: 208
   cwd_mm_by_pet_formulation:
-    pm_fao56: 269.26483857808273
-    priestley_taylor: 421.9279635181204
-    energy_only: 1035.411518580687
+    pm_fao56: 481.845387323748
+    priestley_taylor: 644.2690026241195
+    energy_only: 1043.1924525489756
   wsi_by_pet_formulation:
-    pm_fao56: 133.0788245901446
-    priestley_taylor: 172.26678875350183
-    energy_only: 244.86707724036114
+    pm_fao56: 167.12751866984567
+    priestley_taylor: 186.78240782581267
+    energy_only: 241.96280390870626
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.3165618541031712
-    priestley_taylor: -1.4356648467953046
-    energy_only: -1.4966643068825294
+    pm_fao56: -1.4383861298055869
+    priestley_taylor: -1.4574815965820058
+    energy_only: -1.4673890159308693
 - lat: 39.729166666666664
   lon: 44.40416666666667
   elevation_m: 2152.0
@@ -1101,17 +1102,17 @@ points:
   late_frost_days: 60
   growing_season_length_days: 221
   cwd_mm_by_pet_formulation:
-    pm_fao56: 222.59307791115168
-    priestley_taylor: 355.7354726390998
-    energy_only: 912.3620683686963
+    pm_fao56: 440.478800322005
+    priestley_taylor: 575.24553479532
+    energy_only: 923.4695499138971
   wsi_by_pet_formulation:
-    pm_fao56: 109.95267102699172
-    priestley_taylor: 142.43025546906404
-    energy_only: 220.73906990277186
+    pm_fao56: 151.94664710002806
+    priestley_taylor: 166.6753547142249
+    energy_only: 220.45334877139854
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.270676555632386
-    priestley_taylor: -1.4055222481194296
-    energy_only: -1.4962405861019747
+    pm_fao56: -1.4507882515327375
+    priestley_taylor: -1.4690359229491001
+    energy_only: -1.4772042895455075
 - lat: 39.729166666666664
   lon: 44.7375
   elevation_m: 800.0
@@ -1122,17 +1123,17 @@ points:
   late_frost_days: 0
   growing_season_length_days: 357
   cwd_mm_by_pet_formulation:
-    pm_fao56: 252.9100937078403
-    priestley_taylor: 180.92135853732057
-    energy_only: 415.7400329149822
+    pm_fao56: 467.04772960196203
+    priestley_taylor: 461.2672056513678
+    energy_only: 532.9926843892619
   wsi_by_pet_formulation:
-    pm_fao56: 146.62165903005356
-    priestley_taylor: 77.46454727511889
-    energy_only: 131.80009113345272
+    pm_fao56: 164.89225926297667
+    priestley_taylor: 158.68252925930102
+    energy_only: 174.90508096913194
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1584730912095718
-    priestley_taylor: -1.021231147001711
-    energy_only: -1.2474739250345703
+    pm_fao56: -1.4778539735369784
+    priestley_taylor: -1.4786691901821505
+    energy_only: -1.478312005872183
 - lat: 39.729166666666664
   lon: 45.07083333333333
   elevation_m: 1616.0
@@ -1143,17 +1144,17 @@ points:
   late_frost_days: 55
   growing_season_length_days: 272
   cwd_mm_by_pet_formulation:
-    pm_fao56: 283.8694157461566
-    priestley_taylor: 372.2242188777374
-    energy_only: 809.3523615280138
+    pm_fao56: 524.8578911887356
+    priestley_taylor: 632.206521655572
+    energy_only: 854.7898259958686
   wsi_by_pet_formulation:
-    pm_fao56: 144.32960372994017
-    priestley_taylor: 178.3788060457596
-    energy_only: 241.81442855620006
+    pm_fao56: 166.8884567401301
+    priestley_taylor: 175.8372732485425
+    energy_only: 208.70212523244658
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1906843637158637
-    priestley_taylor: -1.2805135709244118
-    energy_only: -1.4265219312574393
+    pm_fao56: -1.4774129992077816
+    priestley_taylor: -1.4844988998371043
+    energy_only: -1.4865105325102186
 - lat: 39.729166666666664
   lon: 45.40416666666667
   elevation_m: 1179.0
@@ -1164,17 +1165,17 @@ points:
   late_frost_days: 22
   growing_season_length_days: 320
   cwd_mm_by_pet_formulation:
-    pm_fao56: 327.3497517901033
-    priestley_taylor: 406.10986748281823
-    energy_only: 791.083137424042
+    pm_fao56: 550.985099648969
+    priestley_taylor: 658.8680129155206
+    energy_only: 839.5918858391224
   wsi_by_pet_formulation:
-    pm_fao56: 164.72777510016843
-    priestley_taylor: 186.8868996594278
-    energy_only: 239.47507597065695
+    pm_fao56: 174.25551181112402
+    priestley_taylor: 182.31622033030106
+    energy_only: 210.21479249594518
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.214490463172365
-    priestley_taylor: -1.2851431100266433
-    energy_only: -1.413242113367948
+    pm_fao56: -1.4584655719863726
+    priestley_taylor: -1.4713218414741114
+    energy_only: -1.4743590189856453
 - lat: 39.729166666666664
   lon: 45.737500000000004
   elevation_m: 2448.0
@@ -1185,17 +1186,17 @@ points:
   late_frost_days: 70
   growing_season_length_days: 204
   cwd_mm_by_pet_formulation:
-    pm_fao56: 177.36700646512836
-    priestley_taylor: 405.0046745015501
-    energy_only: 1123.7489116467825
+    pm_fao56: 377.3027836073542
+    priestley_taylor: 609.6152155482303
+    energy_only: 1119.573982312802
   wsi_by_pet_formulation:
-    pm_fao56: 91.52958661552444
-    priestley_taylor: 145.25185642409113
-    energy_only: 215.76882359460865
+    pm_fao56: 124.92468717672214
+    priestley_taylor: 158.72992720616924
+    energy_only: 222.7979404894661
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.227351143921117
-    priestley_taylor: -1.431512536741102
-    energy_only: -1.4988350760432196
+    pm_fao56: -1.3521762535713813
+    priestley_taylor: -1.4260336257052897
+    energy_only: -1.459079249031745
 - lat: 39.729166666666664
   lon: 46.07083333333333
   elevation_m: 3189.0
@@ -1206,17 +1207,17 @@ points:
   late_frost_days: 95
   growing_season_length_days: 159
   cwd_mm_by_pet_formulation:
-    pm_fao56: 24.914002308895512
-    priestley_taylor: 288.3300270550178
-    energy_only: 1327.577561514753
+    pm_fao56: 106.71343456872154
+    priestley_taylor: 421.3614159540686
+    energy_only: 1279.817998910638
   wsi_by_pet_formulation:
-    pm_fao56: 17.59342436772469
-    priestley_taylor: 111.25442604130347
-    energy_only: 204.21917445634082
+    pm_fao56: 32.45908221363834
+    priestley_taylor: 124.73576769518233
+    energy_only: 227.7474493099773
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.6835611301542585
-    priestley_taylor: -1.4583311844850408
-    energy_only: -1.499999589299606
+    pm_fao56: -1.1063992893607981
+    priestley_taylor: -1.3756936858449007
+    energy_only: -1.49993962237592
 - lat: 39.729166666666664
   lon: 46.40416666666667
   elevation_m: 1442.0
@@ -1227,17 +1228,17 @@ points:
   late_frost_days: 37
   growing_season_length_days: 266
   cwd_mm_by_pet_formulation:
-    pm_fao56: 78.44019049099063
-    priestley_taylor: 245.63098939425464
-    energy_only: 791.1252459512643
+    pm_fao56: 326.87047751432146
+    priestley_taylor: 491.2959275707399
+    energy_only: 822.179479016717
   wsi_by_pet_formulation:
-    pm_fao56: 39.247315376277484
-    priestley_taylor: 97.31151768931258
-    energy_only: 187.00370466854068
+    pm_fao56: 71.63556592903981
+    priestley_taylor: 97.67715049797627
+    energy_only: 156.96750488244436
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -0.7860660784596181
-    priestley_taylor: -1.0603185339262253
-    energy_only: -1.335039849543175
+    pm_fao56: -1.421796478213957
+    priestley_taylor: -1.4540541413676757
+    energy_only: -1.4689913580130363
 - lat: 39.39583333333333
   lon: 43.40416666666667
   elevation_m: 2708.0
@@ -1248,17 +1249,17 @@ points:
   late_frost_days: 75
   growing_season_length_days: 190
   cwd_mm_by_pet_formulation:
-    pm_fao56: 189.3864320266817
-    priestley_taylor: 346.0262261389005
-    energy_only: 991.6726576983991
+    pm_fao56: 379.7272865499211
+    priestley_taylor: 534.8328054172737
+    energy_only: 942.5416084704882
   wsi_by_pet_formulation:
-    pm_fao56: 99.02579442268028
-    priestley_taylor: 126.72411479942885
-    energy_only: 187.11597244037017
+    pm_fao56: 126.87654660712553
+    priestley_taylor: 149.29596331367546
+    energy_only: 208.25443236527613
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1916549059763248
-    priestley_taylor: -1.4188041827260862
-    energy_only: -1.499906088431056
+    pm_fao56: -1.4152019964399978
+    priestley_taylor: -1.4432973814530308
+    energy_only: -1.4743988705081907
 - lat: 39.39583333333333
   lon: 43.7375
   elevation_m: 2678.0
@@ -1269,17 +1270,17 @@ points:
   late_frost_days: 72
   growing_season_length_days: 194
   cwd_mm_by_pet_formulation:
-    pm_fao56: 204.4512489791083
-    priestley_taylor: 363.87907766552433
-    energy_only: 1028.8389825197578
+    pm_fao56: 405.682189923769
+    priestley_taylor: 573.8703197765418
+    energy_only: 1004.0632318534691
   wsi_by_pet_formulation:
-    pm_fao56: 104.89322911677914
-    priestley_taylor: 134.88711022104815
-    energy_only: 202.09773433100037
+    pm_fao56: 139.35147884566643
+    priestley_taylor: 162.92626430268982
+    energy_only: 221.35162919587805
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2329107333845297
-    priestley_taylor: -1.4244761384536626
-    energy_only: -1.4998914211289816
+    pm_fao56: -1.4056951177710932
+    priestley_taylor: -1.4350837649678658
+    energy_only: -1.4742659188869935
 - lat: 39.39583333333333
   lon: 44.07083333333333
   elevation_m: 2208.0
@@ -1290,17 +1291,17 @@ points:
   late_frost_days: 59
   growing_season_length_days: 225
   cwd_mm_by_pet_formulation:
-    pm_fao56: 314.8745572757047
-    priestley_taylor: 430.0970703632603
-    energy_only: 987.9086031606712
+    pm_fao56: 529.1010604565106
+    priestley_taylor: 662.2517883055766
+    energy_only: 1009.0492244071165
   wsi_by_pet_formulation:
-    pm_fao56: 149.95858598729106
-    priestley_taylor: 182.44677697810096
-    energy_only: 250.72236310662572
+    pm_fao56: 169.2063349658926
+    priestley_taylor: 184.16758646811013
+    energy_only: 235.25000101080454
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1969666461699922
-    priestley_taylor: -1.2724605561868723
-    energy_only: -1.49686990562518
+    pm_fao56: -1.461748301211822
+    priestley_taylor: -1.4713884803904758
+    energy_only: -1.4766584889287668
 - lat: 39.39583333333333
   lon: 44.40416666666667
   elevation_m: 1403.0
@@ -1311,17 +1312,17 @@ points:
   late_frost_days: 18
   growing_season_length_days: 311
   cwd_mm_by_pet_formulation:
-    pm_fao56: 362.04884098098387
-    priestley_taylor: 354.63677950894913
-    energy_only: 696.2049041385561
+    pm_fao56: 566.5452765498608
+    priestley_taylor: 596.8483372370765
+    energy_only: 754.7675615420552
   wsi_by_pet_formulation:
-    pm_fao56: 180.09985230818347
-    priestley_taylor: 172.06627295439552
-    energy_only: 222.39571363883041
+    pm_fao56: 185.974430285749
+    priestley_taylor: 185.53133928867538
+    energy_only: 211.46792092953228
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2134375906932475
-    priestley_taylor: -1.2316472319464904
-    energy_only: -1.3816628352948268
+    pm_fao56: -1.4539815492170372
+    priestley_taylor: -1.4585324307446712
+    energy_only: -1.460524287717442
 - lat: 39.39583333333333
   lon: 44.7375
   elevation_m: 1704.0
@@ -1332,17 +1333,17 @@ points:
   late_frost_days: 54
   growing_season_length_days: 263
   cwd_mm_by_pet_formulation:
-    pm_fao56: 324.0029804470056
-    priestley_taylor: 399.3860280226535
-    energy_only: 839.7406063714145
+    pm_fao56: 521.3343026379655
+    priestley_taylor: 617.7146100413851
+    energy_only: 866.4466332502561
   wsi_by_pet_formulation:
-    pm_fao56: 156.98441667877626
-    priestley_taylor: 178.52594407135888
-    energy_only: 236.05469256726022
+    pm_fao56: 168.3381765787983
+    priestley_taylor: 179.703044343348
+    energy_only: 216.9223988425112
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2054978236623637
-    priestley_taylor: -1.2945134111767134
-    energy_only: -1.4401693207507456
+    pm_fao56: -1.4607979117487129
+    priestley_taylor: -1.467959992566394
+    energy_only: -1.472194429281506
 - lat: 39.39583333333333
   lon: 45.07083333333333
   elevation_m: 846.0
@@ -1353,17 +1354,17 @@ points:
   late_frost_days: 5
   growing_season_length_days: 358
   cwd_mm_by_pet_formulation:
-    pm_fao56: 365.45602608892773
-    priestley_taylor: 329.7838645437177
-    energy_only: 601.3241216045099
+    pm_fao56: 572.6197339044514
+    priestley_taylor: 566.9598751808035
+    energy_only: 657.3860087102727
   wsi_by_pet_formulation:
-    pm_fao56: 199.15064781745212
-    priestley_taylor: 177.54566370281663
-    energy_only: 222.3883937262725
+    pm_fao56: 192.36689486062738
+    priestley_taylor: 191.1309023583555
+    energy_only: 210.29613383701485
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2911660891772883
-    priestley_taylor: -1.2711236128567922
-    energy_only: -1.3934377823760615
+    pm_fao56: -1.486351702228511
+    priestley_taylor: -1.4855135826099275
+    energy_only: -1.4849226562005255
 - lat: 39.39583333333333
   lon: 45.40416666666667
   elevation_m: 1188.0
@@ -1374,17 +1375,17 @@ points:
   late_frost_days: 9
   growing_season_length_days: 342
   cwd_mm_by_pet_formulation:
-    pm_fao56: 311.1812358699902
-    priestley_taylor: 370.56347374028826
-    energy_only: 734.0515017314593
+    pm_fao56: 530.5010305506491
+    priestley_taylor: 611.3914261614289
+    energy_only: 774.7561347681476
   wsi_by_pet_formulation:
-    pm_fao56: 154.20719267408307
-    priestley_taylor: 170.8249324638967
-    energy_only: 225.09190203586186
+    pm_fao56: 169.58388958658
+    priestley_taylor: 178.66547467967973
+    energy_only: 205.88454033181517
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2537995328928542
-    priestley_taylor: -1.3107927176170016
-    energy_only: -1.4267133813795814
+    pm_fao56: -1.479281267428944
+    priestley_taylor: -1.4828809897258348
+    energy_only: -1.4837938155783565
 - lat: 39.39583333333333
   lon: 45.737500000000004
   elevation_m: 2346.0
@@ -1395,17 +1396,17 @@ points:
   late_frost_days: 60
   growing_season_length_days: 214
   cwd_mm_by_pet_formulation:
-    pm_fao56: 231.966537005359
-    priestley_taylor: 429.222626260904
-    energy_only: 1109.956396674983
+    pm_fao56: 463.44049501194803
+    priestley_taylor: 656.2912968092302
+    energy_only: 1112.6841347915508
   wsi_by_pet_formulation:
-    pm_fao56: 108.8801676580639
-    priestley_taylor: 152.96947413677685
-    energy_only: 224.83996357822835
+    pm_fao56: 137.19174016894786
+    priestley_taylor: 160.81123887075745
+    energy_only: 223.48120891958337
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1010900761307032
-    priestley_taylor: -1.3095054435917455
-    energy_only: -1.498114875182043
+    pm_fao56: -1.4336739906811025
+    priestley_taylor: -1.4654691925018655
+    energy_only: -1.4802241112262116
 - lat: 39.39583333333333
   lon: 46.07083333333333
   elevation_m: 2671.0
@@ -1416,17 +1417,17 @@ points:
   late_frost_days: 71
   growing_season_length_days: 193
   cwd_mm_by_pet_formulation:
-    pm_fao56: 148.74300245626554
-    priestley_taylor: 420.2981526129019
-    energy_only: 1275.7863252954278
+    pm_fao56: 338.67280019626276
+    priestley_taylor: 608.5995199248089
+    energy_only: 1253.824431383714
   wsi_by_pet_formulation:
-    pm_fao56: 79.77855600042336
-    priestley_taylor: 149.43093557360066
-    energy_only: 229.90260930558145
+    pm_fao56: 100.59836212896084
+    priestley_taylor: 150.675327418317
+    energy_only: 229.75868454267902
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1390192105600334
-    priestley_taylor: -1.4199585767229226
-    energy_only: -1.4999428956669734
+    pm_fao56: -1.4090811613725793
+    priestley_taylor: -1.4610199937597093
+    energy_only: -1.4877725536819457
 - lat: 39.39583333333333
   lon: 46.40416666666667
   elevation_m: 1499.0
@@ -1437,17 +1438,17 @@ points:
   late_frost_days: 34
   growing_season_length_days: 276
   cwd_mm_by_pet_formulation:
-    pm_fao56: 198.72317865976123
-    priestley_taylor: 334.29093039215445
-    energy_only: 844.4893099756307
+    pm_fao56: 456.7593325942519
+    priestley_taylor: 619.2370247791673
+    energy_only: 882.6135084763177
   wsi_by_pet_formulation:
-    pm_fao56: 94.70204891441524
-    priestley_taylor: 136.4536091743515
-    energy_only: 217.662611802012
+    pm_fao56: 111.6287946903179
+    priestley_taylor: 132.73464831116635
+    energy_only: 172.50461076622514
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2261147845681974
-    priestley_taylor: -1.2617806252584842
-    energy_only: -1.3607626834930981
+    pm_fao56: -1.4837015690468405
+    priestley_taylor: -1.4907469421576627
+    energy_only: -1.4939641236320256
 - lat: 39.0625
   lon: 43.40416666666667
   elevation_m: 1845.0
@@ -1458,17 +1459,17 @@ points:
   late_frost_days: 18
   growing_season_length_days: 288
   cwd_mm_by_pet_formulation:
-    pm_fao56: 217.40631443264544
-    priestley_taylor: 170.46881817752157
-    energy_only: 518.7458977320603
+    pm_fao56: 516.0547987954056
+    priestley_taylor: 569.6947526764158
+    energy_only: 722.4796768531565
   wsi_by_pet_formulation:
-    pm_fao56: 101.2171766681153
-    priestley_taylor: 98.31327101514682
-    energy_only: 184.34501945968202
+    pm_fao56: 144.30521377455688
+    priestley_taylor: 148.67353262267622
+    energy_only: 171.3538821102778
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.20871432847237
-    priestley_taylor: -1.0555348204961663
-    energy_only: -1.2347714706460795
+    pm_fao56: -1.4611454360048666
+    priestley_taylor: -1.4650147833852816
+    energy_only: -1.466665533006668
 - lat: 39.0625
   lon: 43.7375
   elevation_m: 1996.0
@@ -1479,17 +1480,17 @@ points:
   late_frost_days: 38
   growing_season_length_days: 258
   cwd_mm_by_pet_formulation:
-    pm_fao56: 240.3191197504332
-    priestley_taylor: 264.19293617369505
-    energy_only: 691.2092011505549
+    pm_fao56: 513.7295013390759
+    priestley_taylor: 595.4693029152137
+    energy_only: 785.262889757932
   wsi_by_pet_formulation:
-    pm_fao56: 110.04138039403415
-    priestley_taylor: 118.23669196502723
-    energy_only: 205.3748152856867
+    pm_fao56: 142.19986827190132
+    priestley_taylor: 149.0480101029681
+    energy_only: 175.27655838551502
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1395457959750857
-    priestley_taylor: -1.1131375623959539
-    energy_only: -1.4825893137351356
+    pm_fao56: -1.4529735109764295
+    priestley_taylor: -1.4598484339433022
+    energy_only: -1.4632897910216487
 - lat: 39.0625
   lon: 44.07083333333333
   elevation_m: 2237.0
@@ -1500,17 +1501,17 @@ points:
   late_frost_days: 58
   growing_season_length_days: 222
   cwd_mm_by_pet_formulation:
-    pm_fao56: 288.5695843557624
-    priestley_taylor: 379.9639003974659
-    energy_only: 941.2192970877862
+    pm_fao56: 497.9967422782167
+    priestley_taylor: 617.5028926723318
+    energy_only: 968.1975420233956
   wsi_by_pet_formulation:
-    pm_fao56: 134.36755032296105
-    priestley_taylor: 150.63762795719472
-    energy_only: 229.45271088878087
+    pm_fao56: 151.70483144244773
+    priestley_taylor: 162.67054467878475
+    energy_only: 217.92500945903558
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.1350434205568163
-    priestley_taylor: -1.2210344149707637
-    energy_only: -1.4967803006515061
+    pm_fao56: -1.4464942185624203
+    priestley_taylor: -1.4574370170823958
+    energy_only: -1.4636516886408268
 - lat: 39.0625
   lon: 44.40416666666667
   elevation_m: 1877.0
@@ -1521,17 +1522,17 @@ points:
   late_frost_days: 43
   growing_season_length_days: 251
   cwd_mm_by_pet_formulation:
-    pm_fao56: 377.23177433766534
-    priestley_taylor: 440.653581875487
-    energy_only: 891.3482837199871
+    pm_fao56: 573.7913032198645
+    priestley_taylor: 656.1630728269241
+    energy_only: 919.792905707016
   wsi_by_pet_formulation:
-    pm_fao56: 174.0728314311762
-    priestley_taylor: 193.9898791830378
-    energy_only: 248.7210799823493
+    pm_fao56: 182.6713624365353
+    priestley_taylor: 188.67279227672626
+    energy_only: 227.10823704761236
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2053386135053077
-    priestley_taylor: -1.278638204212892
-    energy_only: -1.4702110665927983
+    pm_fao56: -1.4468013503409918
+    priestley_taylor: -1.45801470853381
+    energy_only: -1.4642968308329276
 - lat: 39.0625
   lon: 44.7375
   elevation_m: 2604.0
@@ -1542,17 +1543,17 @@ points:
   late_frost_days: 66
   growing_season_length_days: 202
   cwd_mm_by_pet_formulation:
-    pm_fao56: 284.7040497916318
-    priestley_taylor: 462.0083164697825
-    energy_only: 1135.4227100726516
+    pm_fao56: 471.4268887905694
+    priestley_taylor: 656.6007835135832
+    energy_only: 1136.8434979732024
   wsi_by_pet_formulation:
-    pm_fao56: 137.90578669997961
-    priestley_taylor: 173.88889400749926
-    energy_only: 239.5571703449164
+    pm_fao56: 156.28550673955144
+    priestley_taylor: 181.40080260936864
+    energy_only: 240.64494830567514
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.3318518034504818
-    priestley_taylor: -1.4607063289960407
-    energy_only: -1.4998948662740463
+    pm_fao56: -1.4125610806017022
+    priestley_taylor: -1.445210745368344
+    energy_only: -1.478116738853477
 - lat: 39.0625
   lon: 45.07083333333333
   elevation_m: 1025.0
@@ -1563,17 +1564,17 @@ points:
   late_frost_days: 2
   growing_season_length_days: 352
   cwd_mm_by_pet_formulation:
-    pm_fao56: 374.70842794652435
-    priestley_taylor: 342.701541927347
-    energy_only: 635.7774492864461
+    pm_fao56: 581.5008852011495
+    priestley_taylor: 578.3517799595792
+    energy_only: 688.493237710155
   wsi_by_pet_formulation:
-    pm_fao56: 187.0248051525436
-    priestley_taylor: 174.41197121583585
-    energy_only: 220.39560017307133
+    pm_fao56: 178.85140071279525
+    priestley_taylor: 175.73408520928947
+    energy_only: 198.21798024270996
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2552001208311954
-    priestley_taylor: -1.2529015427686265
-    energy_only: -1.388191415194978
+    pm_fao56: -1.4839137783384058
+    priestley_taylor: -1.4827274797765264
+    energy_only: -1.4825538346985143
 - lat: 39.0625
   lon: 45.40416666666667
   elevation_m: 877.0
@@ -1584,17 +1585,17 @@ points:
   late_frost_days: 0
   growing_season_length_days: 355
   cwd_mm_by_pet_formulation:
-    pm_fao56: 395.35737898734124
-    priestley_taylor: 374.88790943426034
-    energy_only: 664.6083532691378
+    pm_fao56: 601.6529843534578
+    priestley_taylor: 604.7491014872057
+    energy_only: 706.6444738565256
   wsi_by_pet_formulation:
-    pm_fao56: 194.95552725721194
-    priestley_taylor: 182.7256333303841
-    energy_only: 224.94671774467446
+    pm_fao56: 187.69306724005642
+    priestley_taylor: 186.60999993992692
+    energy_only: 207.47368675213275
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.3000236725830796
-    priestley_taylor: -1.3207838598920623
-    energy_only: -1.4248079167359464
+    pm_fao56: -1.492463026529829
+    priestley_taylor: -1.4924113707502418
+    energy_only: -1.4922761252860561
 - lat: 39.0625
   lon: 45.737500000000004
   elevation_m: 977.0
@@ -1605,17 +1606,17 @@ points:
   late_frost_days: 0
   growing_season_length_days: 351
   cwd_mm_by_pet_formulation:
-    pm_fao56: 341.41746887304134
-    priestley_taylor: 344.70199658839607
-    energy_only: 652.7440527546275
+    pm_fao56: 571.569099919075
+    priestley_taylor: 598.1622874920721
+    energy_only: 711.2614580300219
   wsi_by_pet_formulation:
-    pm_fao56: 163.22267475720713
-    priestley_taylor: 162.47045646775854
-    energy_only: 212.57122712170224
+    pm_fao56: 173.45236499735134
+    priestley_taylor: 173.17035428199227
+    energy_only: 194.2236736852557
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.2341676903209267
-    priestley_taylor: -1.2736037869264714
-    energy_only: -1.3991520885692486
+    pm_fao56: -1.4765506936860786
+    priestley_taylor: -1.4786117142361515
+    energy_only: -1.4794156780750527
 - lat: 39.0625
   lon: 46.07083333333333
   elevation_m: 3630.0
@@ -1626,17 +1627,17 @@ points:
   late_frost_days: 110
   growing_season_length_days: 149
   cwd_mm_by_pet_formulation:
-    pm_fao56: 94.941360369057
-    priestley_taylor: 446.12124264955185
-    energy_only: 1590.7192194247566
+    pm_fao56: 241.72237417928673
+    priestley_taylor: 597.3762765117374
+    energy_only: 1511.227738549554
   wsi_by_pet_formulation:
-    pm_fao56: 69.13841473076826
-    priestley_taylor: 165.92393459932
-    energy_only: 249.19742301132453
+    pm_fao56: 97.13755699310005
+    priestley_taylor: 169.6566110486738
+    energy_only: 252.72365607820834
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.023915423083116
-    priestley_taylor: -1.4518685415974775
-    energy_only: -1.4999938915774165
+    pm_fao56: -1.3857064343300185
+    priestley_taylor: -1.4681350777036903
+    energy_only: -1.4985070586605718
 - lat: 39.0625
   lon: 46.40416666666667
   elevation_m: 1384.0
@@ -1647,14 +1648,14 @@ points:
   late_frost_days: 41
   growing_season_length_days: 313
   cwd_mm_by_pet_formulation:
-    pm_fao56: 250.4993531150988
-    priestley_taylor: 285.2817419595506
-    energy_only: 711.553872501972
+    pm_fao56: 513.1815644383887
+    priestley_taylor: 621.4188387498682
+    energy_only: 791.1957234864769
   wsi_by_pet_formulation:
-    pm_fao56: 114.5326614101179
-    priestley_taylor: 121.38435765742757
-    energy_only: 207.26996218175626
+    pm_fao56: 131.71056391556442
+    priestley_taylor: 141.20299407892588
+    energy_only: 167.42463719226186
   psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: -1.307766703243254
-    priestley_taylor: -1.1960078277497477
-    energy_only: -1.3443091030424725
+    pm_fao56: -1.4947552685110783
+    priestley_taylor: -1.496655170814239
+    energy_only: -1.4975366007307063

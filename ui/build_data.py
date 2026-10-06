@@ -248,6 +248,16 @@ def build_map_plan(layers, series_ids):
     return plan
 
 
+def add_water_layers(G, k, p, pets):
+    """Climatic water deficit (3 PET formulations), water-stress integral and minimum soil potential for one TOPOHYDRO point."""
+    for pet, v in p["cwd_mm_by_pet_formulation"].items():
+        if pet not in pets:
+            pets.append(pet)
+        G.set(f"cwd_{pet}", k, r(v, 1), {"label": f"Climatic water deficit ({pet}, generic rooting depth)", "unit": "mm", "engine": "TOPOHYDRO", "pet": pet})
+    G.set("wsi", k, r(p["wsi_by_pet_formulation"].get("pm_fao56"), 2), {"label": "Water-stress integral (PM-FAO56, generic rooting depth)", "unit": "", "engine": "TOPOHYDRO"})
+    G.set("psi_min", k, r(p["psi_soil_mpa_annual_min_by_pet_formulation"].get("pm_fao56"), 2), {"label": "Minimum soil water potential (PM-FAO56, generic rooting depth)", "unit": "MPa", "engine": "TOPOHYDRO"})
+
+
 def build():
     OUT.mkdir(parents=True, exist_ok=True)
     grids = {g: GridBuilder(g) for g in GRIDS}
@@ -274,16 +284,17 @@ def build():
             G.set("gdd", k, r(p["gdd_cumulative_annual"], 0), {"label": "Growing degree days (base 5 °C)", "unit": "°C·d", "engine": "TOPOHYDRO"})
             G.set("late_frost", k, p["late_frost_days"], {"label": "Late-frost days (after budburst GDD)", "unit": "days", "engine": "TOPOHYDRO", "placeholder": "budburst GDD = 200 (placeholder)"})
             G.set("gsl", k, p["growing_season_length_days"], {"label": "Growing-season length", "unit": "days", "engine": "TOPOHYDRO"})
-            for pet, v in (p["cwd_mm_by_pet_formulation"].items() if water_ok else []):
-                if pet not in pets:
-                    pets.append(pet)
-                G.set(f"cwd_{pet}", k, r(v, 1), {"label": f"Climatic water deficit ({pet}, generic rooting depth)", "unit": "mm", "engine": "TOPOHYDRO", "pet": pet})
-            wsi = p["wsi_by_pet_formulation"].get("pm_fao56")
             if water_ok:
-                G.set("wsi", k, r(wsi, 2), {"label": "Water-stress integral (PM-FAO56, generic rooting depth)", "unit": "", "engine": "TOPOHYDRO"})
-            psi = p["psi_soil_mpa_annual_min_by_pet_formulation"].get("pm_fao56")
-            if water_ok:
-                G.set("psi_min", k, r(psi, 2), {"label": "Minimum soil water potential (PM-FAO56, generic rooting depth)", "unit": "MPa", "engine": "TOPOHYDRO"})
+                add_water_layers(G, k, p, pets)
+        if not water_ok:
+            # the chosen (dense) file predates the seasonal forcing: take the water-balance layers from the other file if it is current
+            alt = load("topohydro_grid_run_2019.yaml" if gid == "dense" else "topohydro_grid_run_2019_dense.yaml")
+            alt_gid = "validation" if gid == "dense" else "dense"
+            if alt is not None and forcing_current(alt):
+                for p in alt["points"]:
+                    if p.get("status") == "ok":
+                        add_water_layers(grids[alt_gid], grids[alt_gid].touch(p["lat"], p["lon"], p["elevation_m"]), p, pets)
+                info["withheld"].append(f"water-balance layers taken from the {alt_gid} grid file, which is current")
         engines["topohydro"] = {"grid": gid, "n_cells": info["n_cells"], "pet_formulations": pets,
                                 "placeholders": topo.get("placeholders")}
 
