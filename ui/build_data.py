@@ -107,10 +107,27 @@ def key(lat, lon):
 # --------------------------------------------------------------------------------------------
 # Dataset selection: prefer dense only when complete
 # --------------------------------------------------------------------------------------------
-def choose(label, base_name, dense_name, coverage_fn):
-    """Return (data, grid_id, info). `coverage_fn(data)` -> number of cells the dataset covers."""
-    info = {"dataset": label, "files_considered": [], "rejected": []}
+SEASONAL_FORCING_FROM = "2026-10-06"      # date the seasonal ISIMIP atmosphere replaced the constant annual means
+
+
+def forcing_current(doc, strict=False):
+    """True if a result file was produced with the seasonal, scenario-dependent atmosphere. New files say so in `atmosphere`;
+    older ones are judged by run_date (strict: a missing `atmosphere` key means superseded)."""
+    if doc is None:
+        return False
+    if "atmosphere" in doc:
+        return str(doc["atmosphere"]).startswith("seasonal")
+    return (not strict) and str(doc.get("run_date", "")) >= SEASONAL_FORCING_FROM
+
+
+def choose(label, base_name, dense_name, coverage_fn, gate=None):
+    """Return (data, grid_id, info). `coverage_fn(data)` -> number of cells the dataset covers. `gate(doc)` -> bool: a file that
+    fails it is WITHHELD (listed in info["withheld"], shown on the Status page, never drawn)."""
+    info = {"dataset": label, "files_considered": [], "rejected": [], "withheld": []}
     dense = load(dense_name) if dense_name else None
+    if dense is not None and gate is not None and not gate(dense):
+        info["withheld"].append(f"{dense_name}: computed with the earlier constant annual-mean wind, radiation and humidity; withheld until recomputed")
+        dense = None
     if dense is not None:
         cov = coverage_fn(dense)
         info["files_considered"].append({"file": dense_name, "n_cells": cov})
@@ -121,6 +138,9 @@ def choose(label, base_name, dense_name, coverage_fn):
             f"{dense_name}: covers {cov}/{DENSE_N} cells ({100 * cov / DENSE_N:.0f}%), below the "
             f"{int(100 * DENSE_MIN_COVERAGE)}% completeness bar -- not used")
     base = load(base_name)
+    if base is not None and gate is not None and not gate(base):
+        info["withheld"].append(f"{base_name}: computed with the earlier constant annual-mean wind, radiation and humidity; withheld until recomputed")
+        base = None
     if base is None:
         return None, None, info
     cov = coverage_fn(base)
@@ -240,6 +260,10 @@ def build():
     provenance["topohydro"] = info
     pets = []
     if topo:
+        # temperature, rain, degree days, season length and frost do not depend on wind, radiation or humidity; the water balance does
+        water_ok = forcing_current(topo)
+        if not water_ok:
+            info["withheld"].append(f"{info['file']}: climatic water deficit, water-stress integral and soil potential were computed with the earlier constant annual-mean wind, radiation and humidity; withheld until recomputed")
         G = grids[gid]
         for p in topo["points"]:
             if p.get("status") != "ok":
@@ -250,20 +274,22 @@ def build():
             G.set("gdd", k, r(p["gdd_cumulative_annual"], 0), {"label": "Growing degree days (base 5 °C)", "unit": "°C·d", "engine": "TOPOHYDRO"})
             G.set("late_frost", k, p["late_frost_days"], {"label": "Late-frost days (after budburst GDD)", "unit": "days", "engine": "TOPOHYDRO", "placeholder": "budburst GDD = 200 (placeholder)"})
             G.set("gsl", k, p["growing_season_length_days"], {"label": "Growing-season length", "unit": "days", "engine": "TOPOHYDRO"})
-            for pet, v in p["cwd_mm_by_pet_formulation"].items():
+            for pet, v in (p["cwd_mm_by_pet_formulation"].items() if water_ok else []):
                 if pet not in pets:
                     pets.append(pet)
                 G.set(f"cwd_{pet}", k, r(v, 1), {"label": f"Climatic water deficit ({pet}, generic rooting depth)", "unit": "mm", "engine": "TOPOHYDRO", "pet": pet})
             wsi = p["wsi_by_pet_formulation"].get("pm_fao56")
-            G.set("wsi", k, r(wsi, 2), {"label": "Water-stress integral (PM-FAO56, generic rooting depth)", "unit": "", "engine": "TOPOHYDRO"})
+            if water_ok:
+                G.set("wsi", k, r(wsi, 2), {"label": "Water-stress integral (PM-FAO56, generic rooting depth)", "unit": "", "engine": "TOPOHYDRO"})
             psi = p["psi_soil_mpa_annual_min_by_pet_formulation"].get("pm_fao56")
-            G.set("psi_min", k, r(psi, 2), {"label": "Minimum soil water potential (PM-FAO56, generic rooting depth)", "unit": "MPa", "engine": "TOPOHYDRO"})
+            if water_ok:
+                G.set("psi_min", k, r(psi, 2), {"label": "Minimum soil water potential (PM-FAO56, generic rooting depth)", "unit": "MPa", "engine": "TOPOHYDRO"})
         engines["topohydro"] = {"grid": gid, "n_cells": info["n_cells"], "pet_formulations": pets,
                                 "placeholders": topo.get("placeholders")}
 
     # ---- XYLEM -------------------------------------------------------------------------------
     xy, gid, info = choose("XYLEM mechanistic hazard", "xylem_mechanistic_hazard_2019.yaml",
-                           "xylem_mechanistic_hazard_2019_dense.yaml", _min_group_cells)
+                           "xylem_mechanistic_hazard_2019_dense.yaml", _min_group_cells, gate=forcing_current)
     provenance["xylem"] = info
     xylem_summary = {}
     if xy:
@@ -290,7 +316,7 @@ def build():
 
     # ---- REFUGIUM ----------------------------------------------------------------------------
     rf, gid, info = choose("REFUGIUM viability", "refugium_viability_2019.yaml",
-                           "refugium_viability_2019_dense.yaml", _min_group_cells)
+                           "refugium_viability_2019_dense.yaml", _min_group_cells, gate=forcing_current)
     provenance["refugium"] = info
     baseline_viab = {}
     refugium_arm = {}
@@ -364,7 +390,8 @@ def build():
                             "frac_pairs_negative": r(float(np.mean([v < 0 for m in tc["members"].values() for v, i in zip(m["shift_m"], tl_in) if i])), 4)}
 
     # ---- Future projections --------------------------------------------------------------------
-    fp, gid, info = choose("Future projections", "future_projections.yaml", "future_projections_dense.yaml", _future_cells)
+    fp, gid, info = choose("Future projections", "future_projections.yaml", "future_projections_dense.yaml", _future_cells,
+                           gate=lambda d: forcing_current(d, strict=True))
     provenance["future_projections"] = info
     scen_summary = None
     if fp:
@@ -433,7 +460,7 @@ def build():
 
     # ---- AEGIS --------------------------------------------------------------------------------
     ae, gid, info = choose("AEGIS portfolio", "aegis_portfolio.yaml", "aegis_portfolio_dense.yaml",
-                           lambda d: d.get("n_units", 0))
+                           lambda d: d.get("n_units", 0), gate=forcing_current)       # built from the scenario viabilities, so it inherits their forcing
     provenance["aegis"] = info
     aegis = None
     if ae:

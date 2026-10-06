@@ -44,7 +44,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
-    compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP,
+    compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP, atmosphere_label,
     GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
 )
 
@@ -117,6 +117,7 @@ def main():
         "run_date": __import__("datetime").date.today().isoformat(),
         "year": 2019,
         "grid": "dense_armenia_stride7" if dense else "validation_80pt_stride40",
+        "atmosphere": atmosphere_label(),
         "pet_formulation": PET_FORMULATION,
         "outer_draws": OUTER_DRAWS,
         "inner_draws": INNER_DRAWS,

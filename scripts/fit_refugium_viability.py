@@ -46,7 +46,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
-    compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP,
+    compute_grid_forcing_multi_group, ROOTING_DEPTH_MM_BY_GROUP, atmosphere_label,
     GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
 )
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
@@ -86,6 +86,7 @@ def main():
         "run_date": __import__("datetime").date.today().isoformat(),
         "year": 2019,
         "grid": "dense_armenia_stride7" if dense else "validation_80pt_stride40",
+        "atmosphere": atmosphere_label(),
         "v_star": V_STAR, "rho": RHO, "lam": LAM,
         "scope_note": ("Viability = one-year hydraulic survival only (p_height_ok=1.0 -- "
                         "MERISTEM's growth/attainable-height model is not fit against real "

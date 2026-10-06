@@ -128,14 +128,13 @@ function renderHome() {
       <div class="sec-head"><span class="sec-no">01</span><h2>Overview</h2></div>
       <div class="about">
         <p class="lead">A hybrid process-statistical framework for finding climate-resilient places to restore forest in Armenia: it models water stress, hydraulic failure, species niches, treeline and scenario-robust planting decisions, and reports each result with the caveats that came with it.</p>
-        <div>${banner()}
-    <div class="callout"><strong>Under revision.</strong> The water-balance and hazard numbers shown here were computed with wind, radiation and humidity held at annual means, repeated every day and unchanged across scenarios. A test showed this removes most of the summer water deficit and flattens the climate-change response, so the earlier finding that viability stays near its 2019 level is largely an artefact. They are being recomputed with real seasonal data that changes with the scenario. See <a href="#/status">Status &amp; limits</a>.</div></div>
+        <div>${banner()}</div>
       </div>
     </section>
     <section class="sec reveal">
       <div class="sec-head"><span class="sec-no">02</span><h2>Headline results</h2></div>
       <div class="grid cols-4">
-      ${Object.keys(M.groups).map((g) => stat(pct(base[g], 1), `${esc(M.groups[g].short)} — mean 2019 viability`, worst[g] ? `SSP5-8.5, 2100 ensemble mean: ${pct(worst[g].mean, 1)} (GCM range ${pct(worst[g].min, 1)}–${pct(worst[g].max, 1)})` : "")).join("")}
+      ${Object.keys(M.groups).filter((g) => ok(base[g])).map((g) => stat(pct(base[g], 1), `${esc(M.groups[g].short)} — mean 2019 viability`, worst[g] ? `SSP5-8.5, 2100 ensemble mean: ${pct(worst[g].mean, 1)} (GCM range ${pct(worst[g].min, 1)}–${pct(worst[g].max, 1)})` : "")).join("")}
       ${t585 ? stat(`+${fmt(t585.ensemble_mean_shift_m, 0)} m`, "Climatic treeline shift, SSP5-8.5 by 2100", `GCM range +${fmt(t585.ensemble_min_shift_m, 0)} to +${fmt(t585.ensemble_max_shift_m, 0)} m` + (t126 ? ` · SSP1-2.6: +${fmt(t126.ensemble_mean_shift_m, 0)} m` : "")) : ""}
       ${ae ? stat(String(ae.n_units), "planting units evaluated", `${ae.n_scenarios} scenarios · price of robustness ${fmt(ae.frontier.price_of_robustness, 2)}`) : ""}
     </div>
@@ -314,7 +313,7 @@ function mapAvailability() {
 
 function renderStatus() {
   const m = state.meth, M = state.M;
-  const prov = Object.entries(M.provenance).map(([k, p]) => `<tr><td>${esc(p.dataset)}</td><td><code>${esc(p.file || "missing")}</code></td><td>${p.grid ? gridChip(p.grid) : "—"}</td><td class="num">${p.n_cells ?? "—"}</td><td>${(p.rejected || []).map((r) => `<span class="small">${esc(r)}</span>`).join("<br>")}</td></tr>`).join("");
+  const prov = Object.entries(M.provenance).map(([k, p]) => `<tr><td>${esc(p.dataset)}</td><td><code>${esc(p.file || "missing")}</code></td><td>${p.grid ? gridChip(p.grid) : "—"}</td><td class="num">${p.n_cells ?? "—"}</td><td>${(p.rejected || []).concat(p.withheld || []).map((r) => `<span class="small">${esc(r)}</span>`).join("<br>")}</td></tr>`).join("");
   view().innerHTML = `<div class="wrap"><h1>Status &amp; limits</h1><p class="muted" style="max-width:760px">What is fitted, what is reduced in scope, and what is still a placeholder. Nothing is hidden because it is incomplete.</p>
     <h2>Engines</h2><div class="card tablewrap"><table><thead><tr><th>Engine</th><th>State</th></tr></thead><tbody>${m.engines.map((e) => `<tr><td><a href="#/method" data-jump="${e.id}">${esc(e.name)}</a></td><td>${esc(e.status)}</td></tr>`).join("")}</tbody></table></div>
     ${mapAvailability()}

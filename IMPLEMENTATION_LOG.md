@@ -1917,3 +1917,10 @@ behaviour. Tests: `tests/test_atmosphere.py`, `tests/test_forcing_atmosphere.py`
 grid; every later step reads the cache). Dense TOPOHYDRO of 2026-10-05 and the validation-grid XYLEM/REFUGIUM/scenario results used the
 constant forcing; they are being recomputed. The constant-forcing scenario file is archived as `future_projections_constant_atmosphere.yaml`.
 Temperature, precipitation, GDD, season length and treeline do not depend on these inputs and are unaffected.
+* **Home-page note removed (user request), and superseded numbers no longer shown.** Without the note the pages would have drawn the
+  old constant-forcing water-balance numbers with no caveat, so `ui/build_data.py` now WITHHOLDS them: XYLEM, REFUGIUM, scenario and AEGIS
+  files, and TOPOHYDRO's water-deficit / stress-integral / soil-potential layers, are used only if they were produced with the seasonal
+  forcing (new files record `atmosphere`; older ones are judged by run_date >= 2026-10-06; the scenario file must say it). Withheld files
+  are listed on the Status page's lineage table; temperature, rain, degree days, season length, frost and treeline are unaffected. The
+  constant-forcing scenario file is kept at `configs/fitted/archive/future_projections_constant_atmosphere.yaml`. Maps return as the
+  recomputed runs finish. Home stat cards without a result are hidden. The "Known gaps" entry on the Status page still records the finding.

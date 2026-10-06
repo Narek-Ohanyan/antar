@@ -57,7 +57,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
     DATA_DIR, extract_static_grid_inputs, extract_era5land, _load_chelsa_arrays,
     saturation_vapour_pressure, wind_speed_2m, ROOTING_DEPTH_MM_BY_GROUP,
-    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS, ROOTING_DEPTH_MM_PLACEHOLDER, constant_atmosphere_requested,
+    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS, ROOTING_DEPTH_MM_PLACEHOLDER, constant_atmosphere_requested, atmosphere_label,
 )
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
 from fit_refugium_viability import V_STAR, RHO, LAM  # noqa: E402
@@ -405,7 +405,7 @@ def main():
         "baseline_year": BASELINE_YEAR,
         "baseline_window": list(BASELINE_WINDOW),
         "horizons": {str(k): list(v) for k, v in HORIZONS.items()},
-        "atmosphere": "constant annual means (ANTAR_CONSTANT_ATMOSPHERE=1)" if constant_atmosphere_requested() else "seasonal ISIMIP3a shape x ISIMIP3b monthly change (rsds, rlds, sfcwind, vapour pressure)",
+        "atmosphere": atmosphere_label(),
         "method": "delta/change-factor downscaling: real monthly ISIMIP3b anomaly (additive "
                   "temperature, multiplicative precipitation) applied to the real 2019 CHELSA-daily "
                   "reference series, run through the unchanged real topoclimate_forcing pipeline, "

@@ -501,6 +501,12 @@ def atmosphere_shape():
     return _ATMOS["a"]
 
 
+def atmosphere_label():
+    """Recorded in every result file so the UI can tell which forcing produced it."""
+    return ("constant annual means (ANTAR_CONSTANT_ATMOSPHERE=1)" if constant_atmosphere_requested()
+            else "seasonal ISIMIP3a shape x ISIMIP3b monthly change (rsds, rlds, sfcwind, vapour pressure)")
+
+
 def constant_atmosphere_requested():
     """ANTAR_CONSTANT_ATMOSPHERE=1 reproduces the earlier behaviour (annual-mean wind, radiation and humidity repeated every day)."""
     return os.environ.get("ANTAR_CONSTANT_ATMOSPHERE", "") == "1"
@@ -717,6 +723,7 @@ def main():
         "run_date": datetime.date.today().isoformat(),
         "year": YEAR,
         "grid": DENSE_GRID_ID if dense else "validation_80pt_stride40",
+        "atmosphere": atmosphere_label(),
         "n_grid_points": int(n),
         "n_with_real_output": int(n_ok),
         "grid_definition": ("29x36 subsample (every 11th pixel) of CHELSA-daily's 312x396 armenia "
