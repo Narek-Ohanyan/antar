@@ -1,58 +1,71 @@
 run_date: '2026-10-06'
 grid: dense_armenia_stride7
 variable: CWD (pm_fao56), OLS-detrended against elevation
-n_points: 857
-n_pairs: 366796
+n_points: 854
+n_pairs: 364231
 detrend:
-  slope_mm_per_m: .nan
-  intercept_mm: .nan
+  slope_mm_per_m: -0.09159960188199301
+  intercept_mm: 493.21960858734855
 empirical_semivariogram:
 - lag_km: 4.3
-  semivariance: .nan
-  n_pairs: 3000
+  semivariance: 548.9
+  n_pairs: 2977
 - lag_km: 12.8
-  semivariance: .nan
-  n_pairs: 7554
+  semivariance: 1205.3
+  n_pairs: 7496
 - lag_km: 21.3
-  semivariance: .nan
-  n_pairs: 10090
+  semivariance: 1934.51
+  n_pairs: 9966
 - lag_km: 29.8
-  semivariance: .nan
-  n_pairs: 14640
+  semivariance: 2946.83
+  n_pairs: 14574
 - lag_km: 38.3
-  semivariance: .nan
-  n_pairs: 15892
+  semivariance: 3661.75
+  n_pairs: 15770
 - lag_km: 46.9
-  semivariance: .nan
-  n_pairs: 17341
+  semivariance: 4539.06
+  n_pairs: 17217
 - lag_km: 55.4
-  semivariance: .nan
-  n_pairs: 20385
+  semivariance: 5657.39
+  n_pairs: 20166
 - lag_km: 63.9
-  semivariance: .nan
-  n_pairs: 20796
+  semivariance: 6722.93
+  n_pairs: 20686
 - lag_km: 72.4
-  semivariance: .nan
-  n_pairs: 20212
-- lag_km: 81.0
-  semivariance: .nan
-  n_pairs: 21145
-- lag_km: 89.5
-  semivariance: .nan
-  n_pairs: 19636
+  semivariance: 7625.04
+  n_pairs: 20066
+- lag_km: 80.9
+  semivariance: 9524.13
+  n_pairs: 20966
+- lag_km: 89.4
+  semivariance: 10731.49
+  n_pairs: 19624
 - lag_km: 98.0
-  semivariance: .nan
-  n_pairs: 19515
+  semivariance: 11552.32
+  n_pairs: 19348
 - lag_km: 106.5
-  semivariance: .nan
-  n_pairs: 18957
+  semivariance: 12716.6
+  n_pairs: 18834
 - lag_km: 115.0
-  semivariance: .nan
-  n_pairs: 17595
-- lag_km: 123.6
-  semivariance: .nan
-  n_pairs: 15772
-- lag_km: 132.1
-  semivariance: .nan
-  n_pairs: 14223
-fit_error: array must not contain infs or NaNs
+  semivariance: 13765.04
+  n_pairs: 17477
+- lag_km: 123.5
+  semivariance: 15035.44
+  n_pairs: 15739
+- lag_km: 132.0
+  semivariance: 15628.47
+  n_pairs: 14051
+exponential_fit:
+  nugget: 1.2601905863716607e-18
+  sill: 31256.93796436327
+  range_param_km: 218.00824043948404
+  practical_range_km: 654.0247213184521
+  r2: 0.955749212818662
+linear_fit:
+  slope: 124.76462593775008
+  intercept: -765.7110507559635
+  r2: 0.9936641272057609
+plateau_visible: false
+verdict: still no clear plateau -- the exponential fit doesn't meaningfully beat a
+  straight line. The practical-range number remains an upper-bound-ish signal, not
+  a confident estimate.

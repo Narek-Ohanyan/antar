@@ -1,8 +1,10 @@
 run_date: '2026-10-06'
 year: 2019
 grid: dense_armenia_stride7
+atmosphere: seasonal ISIMIP3a shape x ISIMIP3b monthly change (rsds, rlds, sfcwind,
+  vapour pressure)
 n_grid_points: 921
-n_with_real_output: 857
+n_with_real_output: 854
 grid_definition: 29x36 subsample (every 11th pixel) of CHELSA-daily's 312x396 armenia
   grid
 placeholders:
@@ -3132,24 +3134,7 @@ points:
 - lat: 40.87083333333333
   lon: 43.75416666666666
   elevation_m: 1699.0
-  status: ok
-  t_mean_c_annual_mean: 8.11755932051584
-  p_mm_annual_sum: 391.70726887632827
-  gdd_cumulative_annual: 2067.7497462421934
-  late_frost_days: 39
-  growing_season_length_days: 260
-  cwd_mm_by_pet_formulation:
-    pm_fao56: .nan
-    priestley_taylor: .nan
-    energy_only: .nan
-  wsi_by_pet_formulation:
-    pm_fao56: 365.0
-    priestley_taylor: 365.0
-    energy_only: 365.0
-  psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: .nan
-    priestley_taylor: .nan
-    energy_only: .nan
+  status: skipped_nonfinite_water_balance
 - lat: 40.87083333333333
   lon: 43.8125
   elevation_m: 1734.0
@@ -3972,24 +3957,7 @@ points:
 - lat: 40.8125
   lon: 44.22083333333333
   elevation_m: 1619.0
-  status: ok
-  t_mean_c_annual_mean: 7.926051634915455
-  p_mm_annual_sum: 456.19318034982126
-  gdd_cumulative_annual: 1944.9905655122059
-  late_frost_days: 32
-  growing_season_length_days: 262
-  cwd_mm_by_pet_formulation:
-    pm_fao56: .nan
-    priestley_taylor: .nan
-    energy_only: .nan
-  wsi_by_pet_formulation:
-    pm_fao56: 365.0
-    priestley_taylor: 365.0
-    energy_only: 365.0
-  psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: .nan
-    priestley_taylor: .nan
-    energy_only: .nan
+  status: skipped_nonfinite_water_balance
 - lat: 40.8125
   lon: 44.27916666666667
   elevation_m: 1620.0
@@ -14905,24 +14873,7 @@ points:
 - lat: 39.762499999999996
   lon: 45.62083333333334
   elevation_m: 1794.0
-  status: ok
-  t_mean_c_annual_mean: 7.858718762981591
-  p_mm_annual_sum: 459.473734246185
-  gdd_cumulative_annual: 2015.6393350698208
-  late_frost_days: 48
-  growing_season_length_days: 254
-  cwd_mm_by_pet_formulation:
-    pm_fao56: .nan
-    priestley_taylor: .nan
-    energy_only: .nan
-  wsi_by_pet_formulation:
-    pm_fao56: 365.0
-    priestley_taylor: 365.0
-    energy_only: 365.0
-  psi_soil_mpa_annual_min_by_pet_formulation:
-    pm_fao56: .nan
-    priestley_taylor: .nan
-    energy_only: .nan
+  status: skipped_nonfinite_water_balance
 - lat: 39.762499999999996
   lon: 45.67916666666667
   elevation_m: 2449.0

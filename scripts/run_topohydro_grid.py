@@ -765,6 +765,7 @@ def main():
             }
         summary["points"].append(row)
 
+    summary["n_with_real_output"] = int(sum(1 for r in summary["points"] if r["status"] == "ok"))      # after the non-finite check
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(yaml.dump(summary, sort_keys=False, default_flow_style=False))
     print(f"=== Wrote {out_path} ===", flush=True)
