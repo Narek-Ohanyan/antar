@@ -412,9 +412,10 @@ def main():
                   "once per real functional group using that group's own real rooting depth "
                   f"({ROOTING_DEPTH_MM_BY_GROUP}, Canadell et al. 1996) rather than one generic "
                   "value shared across all species, plus once with the generic 1000 mm rooting depth "
-                  "(the scenario counterpart of the species-agnostic 2019 TOPOHYDRO layers). wind/"
-                  "radiation/dewpoint/pressure held at real 2019 ERA5-Land values -- no real future "
-                  "projection exists for these. Per cell and group: 50 trait-knowledge draws x 200 "
+                  "(the scenario counterpart of the species-agnostic 2019 TOPOHYDRO layers). Wind, shortwave, "
+                  "longwave and vapour pressure are the ERA5-Land annual cell mean times the ISIMIP3a seasonal shape "
+                  "times the ISIMIP3b monthly future/baseline ratio (see 'atmosphere'); air pressure stays the 2019 "
+                  "annual mean and CO2 is held at its present value. Per cell and group: 50 trait-knowledge draws x 200 "
                   "individual draws; viability mean, P10/P90, P[V >= V*], robust-refugium criterion (a), "
                   "risk-averse score, outer-loop hazard spread.",
         "members": {k: results[k] for k in sorted(results)},
