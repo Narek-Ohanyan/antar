@@ -349,7 +349,7 @@ function renderAck() {
 async function init() {
   view().innerHTML = `<div class="loading">Loading results…</div>`;
   try {
-    const get = async (u) => { const r = await fetch(u); if (!r.ok) throw new Error(u + " → HTTP " + r.status); return r.json(); };
+    const get = async (u) => { const r = await fetch(u + "?v=" + (window.ANTAR_BUILD || "dev")); if (!r.ok) throw new Error(u + " → HTTP " + r.status); return r.json(); };
     state.M = await get("data/manifest.json");
     state.meth = await get("data/methodology.json");
     for (const [gid, info] of Object.entries(state.M.grids)) state.G[gid] = await get("data/" + info.file);

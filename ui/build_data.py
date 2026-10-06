@@ -18,6 +18,7 @@ Run:  python3 ui/build_data.py        (also the `ui_data` rule in workflow/Snake
 """
 import datetime
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -580,11 +581,39 @@ def build():
     total = sum(f["bytes"] for f in grid_files.values()) + (OUT / "manifest.json").stat().st_size
     print(f"wrote {len(grid_files)} grid file(s) + manifest.json  ({total / 1e3:.0f} kB total); "
           f"{len(layer_catalogue)} layers; {len(refs)} references")
+    print(f"index.html stamped with build {stamp_index()}")
     for name, info in provenance.items():
         grid = info.get("grid", "-")
         print(f"  {name:20s} -> {info.get('file', 'MISSING'):52s} grid={grid}")
         for rej in info.get("rejected", []):
             print(f"      REJECTED {rej}")
+
+
+
+def stamp_index():
+    """Give every asset URL in index.html a content hash, so a browser can never keep serving a stale script, style or data
+    file after they change (a cached app.js showed an outdated warning after it had been corrected)."""
+    import hashlib
+    ui = Path(__file__).resolve().parent
+    files = [ui / n for n in ("styles.css", "charts.js", "interp.js", "map.js", "place.js", "app.js")] + sorted((ui / "data").glob("*.json")) + sorted((ui / "assets" / "map").glob("*"))
+    h = hashlib.sha1()
+    for f in files:
+        if not f.is_file():
+            continue
+        h.update(f.name.encode())
+        if f.name == "manifest.json":                       # drop the build timestamp so an unchanged result keeps its hash
+            m = json.loads(f.read_text()); m.pop("generated", None)
+            h.update(json.dumps(m, sort_keys=True).encode())
+        else:
+            h.update(f.read_bytes())
+    build = h.hexdigest()[:10]
+    idx = ui / "index.html"
+    html = idx.read_text()
+    new = re.sub(r"\?v=[A-Za-z0-9]+", f"?v={build}", html)
+    new = re.sub(r'window\.ANTAR_BUILD = "[A-Za-z0-9]+"', f'window.ANTAR_BUILD = "{build}"', new)
+    if new != html:
+        idx.write_text(new)
+    return build
 
 
 if __name__ == "__main__":
