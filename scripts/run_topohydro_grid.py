@@ -68,7 +68,9 @@ consistent with this project's minimize-local-footprint convention. Nothing is
 left on disk by this script.
 """
 import datetime
+import hashlib
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -81,6 +83,7 @@ from rasterio.windows import Window
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from antar.climate import downscale
+from antar.climate.atmosphere import AtmosphereShape
 from antar.io.armenia_mask import load_mask as load_armenia_mask
 from antar.climate.forcing import topoclimate_forcing
 from antar.climate.radiation import net_radiation_from_era5
@@ -117,6 +120,22 @@ YEAR = 2019
 
 TERRAIN_DRIVE_ID = "17zOkIKhKZiDQaRtF2SwPhk3XOa37hpbe"
 SOILS_DRIVE_ID = "18LRnI4Nsnlj6ks1UClGDe4BdufqUG24n"
+CACHE_DIR = Path(__file__).resolve().parent.parent / "data" / "_cache"
+
+
+def _points_key(a, b):
+    """Stable key for a set of grid points (rounded so float noise cannot split a cache)."""
+    h = hashlib.sha1(np.round(np.concatenate([np.asarray(a, float), np.asarray(b, float)]), 6).tobytes()).hexdigest()[:14]
+    return f"{len(a)}_{h}"
+
+
+def _save_npz(path, arrays):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.stem + ".tmp.npz")
+    np.savez_compressed(tmp, **arrays)
+    os.replace(tmp, path)
+
+
 ERA5LAND_TILE_SIZE_PX = 3072  # GEE shard size confirmed against terrain.tif's own pixel grid
 
 CALM_CLEAR_NIGHT_FRAC_PLACEHOLDER = 0.3
@@ -337,6 +356,13 @@ def extract_era5land(token, row_px, col_px, year=YEAR):
     request that fails fast and needs a retry; see compute_real_cwd_for_meristem.py's
     extract_era5land_vectorized, which already had this pattern, for the precedent."""
     n = len(row_px)
+    cache = CACHE_DIR / f"era5_{year}_{_points_key(row_px, col_px)}.npz"
+    if cache.exists():
+        z = np.load(cache)
+        print(f"=== ERA5-Land {year} for {n} points loaded from {cache.name} (no Drive access) ===", flush=True)
+        return z["wind10"], z["ssrd"], z["strd"], z["dewpoint_k"], z["pressure_pa"]
+    if token is None:
+        token = get_access_token()
     wind10, ssrd, strd, dewpoint_k, pressure_pa = (np.full(n, np.nan) for _ in range(5))
     tile_row = (row_px // ERA5LAND_TILE_SIZE_PX) * ERA5LAND_TILE_SIZE_PX
     tile_col = (col_px // ERA5LAND_TILE_SIZE_PX) * ERA5LAND_TILE_SIZE_PX
@@ -390,6 +416,9 @@ def extract_era5land(token, row_px, col_px, year=YEAR):
             f"{failed_tiles}) -- refusing to continue with a badly degraded sample")
     if failed_tiles:
         print(f"  === {len(failed_tiles)} tile(s) failed all retries: {failed_tiles} ===", flush=True)
+    else:                                   # only a complete read is cached; a degraded one is re-read next time
+        _save_npz(cache, {"wind10": wind10, "ssrd": ssrd, "strd": strd, "dewpoint_k": dewpoint_k, "pressure_pa": pressure_pa})
+        print(f"=== cached ERA5-Land {year} -> {cache.name} ===", flush=True)
     return wind10, ssrd, strd, dewpoint_k, pressure_pa
 
 
@@ -412,6 +441,19 @@ def extract_static_grid_inputs(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
     n = len(lats)
     print(f"=== {n} grid points ({len(grid_rows)}x{len(grid_cols)}) ===", flush=True)
 
+    # Terrain, soils and the ERA5 pixel indices take ~1-2 h to stream for the dense grid and never change, so they are
+    # cached once per grid; every later step (XYLEM, REFUGIUM, scenarios, MNEME) reads the cache instead of Drive.
+    cache = CACHE_DIR / f"static_{_points_key(lats, lons)}.npz"
+    if cache.exists():
+        z = np.load(cache)
+        print(f"=== static inputs for {n} points loaded from {cache.name} (no Drive access) ===", flush=True)
+        return {
+            "lats": lats, "lons": lons, "chelsa_row": chelsa_row, "chelsa_col": chelsa_col, "token": None,
+            "elevation": z["elevation"], "slope": z["slope"], "aspect": z["aspect"], "concavity": z["concavity"],
+            "z_ref_m": z["z_ref_m"], "row_px": z["row_px"], "col_px": z["col_px"],
+            "soil": {k[6:]: z[k] for k in z.files if k.startswith("soil__")}, "valid_soil": z["valid_soil"],
+        }
+
     token = get_access_token()
 
     print("=== Terrain: elevation/slope/aspect/concavity/coarse-ref-elevation (streamed) ===", flush=True)
@@ -425,12 +467,16 @@ def extract_static_grid_inputs(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
     print(f"  {valid_soil.sum()}/{n} points have real soil data", flush=True)
     soil = soil_hydraulic_parameters(sand_pct, clay_pct, soc_g_kg)
 
-    return {
+    out = {
         "lats": lats, "lons": lons, "chelsa_row": chelsa_row, "chelsa_col": chelsa_col,
         "token": token, "elevation": elevation, "slope": slope, "aspect": aspect,
         "concavity": concavity, "z_ref_m": z_ref_m, "row_px": row_px, "col_px": col_px,
         "soil": soil, "valid_soil": valid_soil,
     }
+    _save_npz(cache, {"elevation": elevation, "slope": slope, "aspect": aspect, "concavity": concavity, "z_ref_m": z_ref_m,
+                      "row_px": row_px, "col_px": col_px, "valid_soil": valid_soil, **{f"soil__{k}": v for k, v in soil.items()}})
+    print(f"=== cached static inputs -> {cache.name} ===", flush=True)
+    return out
 
 
 _CHELSA_CACHE: dict = {}
@@ -443,6 +489,21 @@ def _load_chelsa_arrays():
         _CHELSA_CACHE["tasmin"] = np.load(DATA_DIR / "chelsa" / "CHELSA_tasmin_2000_2024_armenia_daily.npz")["data"]
         _CHELSA_CACHE["pr"] = np.load(DATA_DIR / "chelsa" / "CHELSA_pr_2000_2019_armenia_daily.npz")["data"]
     return _CHELSA_CACHE
+
+
+_ATMOS = {}
+
+
+def atmosphere_shape():
+    """The monthly ISIMIP files (scripts/pull_isimip_atmosphere.py), loaded once per process."""
+    if "a" not in _ATMOS:
+        _ATMOS["a"] = AtmosphereShape(DATA_DIR / "isimip3b")
+    return _ATMOS["a"]
+
+
+def constant_atmosphere_requested():
+    """ANTAR_CONSTANT_ATMOSPHERE=1 reproduces the earlier behaviour (annual-mean wind, radiation and humidity repeated every day)."""
+    return os.environ.get("ANTAR_CONSTANT_ATMOSPHERE", "") == "1"
 
 
 def extract_year_climate_inputs(static, year):
@@ -489,7 +550,17 @@ def extract_year_climate_inputs(static, year):
     precip_gradient_per_m = np.array([lapse["precipitation"]["gradient_per_m_by_month"][m] for m in month_order])
 
     valid_mask = static["valid_soil"] & valid_era5 & pr_available
+
+    # seasonal shape of shortwave, longwave, humidity and wind (annual mean of each cell unchanged); see antar.climate.atmosphere
+    if constant_atmosphere_requested():
+        print("=== ANTAR_CONSTANT_ATMOSPHERE=1: annual-mean wind/radiation/humidity repeated every day (old behaviour) ===", flush=True)
+        atmos_factors = None
+    else:
+        atm = atmosphere_shape()
+        atmos_factors = [atm.baseline_factors(lats[i], lons[i], doy) if valid_mask[i] else None for i in range(len(lats))]
+
     return {
+        "atmos_factors": atmos_factors,
         "doy": doy, "month": month, "valid_mask": valid_mask,
         "ea_ref_kpa": ea_ref_kpa, "u2_m_s": u2_m_s, "ssrd": ssrd, "strd": strd,
         "pressure_kpa_era5": pressure_kpa_era5,
@@ -515,13 +586,15 @@ def _forcing_cell(static, climate, w_max_mm, i):
 
     gamma_of_day = climate["gamma_k_per_m"][month - 1]
     t_mean_c_for_rn = downscale.downscale_temperature(t_mean_ref_c, elevation[i], z_ref_m[i], gamma_of_day)
-    rn_mj_m2 = net_radiation_from_era5(np.full(n_days, climate["ssrd"][i]), np.full(n_days, climate["strd"][i]), t_mean_c_for_rn)
+    af = climate.get("atmos_factors")
+    f = af[i] if af is not None else AtmosphereShape.constant_factors(n_days)
+    rn_mj_m2 = net_radiation_from_era5(climate["ssrd"][i] * f["rs"], climate["strd"][i] * f["rl"], t_mean_c_for_rn)
 
     return topoclimate_forcing(
         doy=doy, month=month,
         t_mean_ref_c=t_mean_ref_c, t_max_ref_c=t_max_ref_c, t_min_ref_c=t_min_ref_c,
-        p_ref_mm=p_ref_mm, ea_ref_kpa=np.full(n_days, climate["ea_ref_kpa"][i]),
-        u2_m_s=np.full(n_days, climate["u2_m_s"][i]), rn_mj_m2=rn_mj_m2,
+        p_ref_mm=p_ref_mm, ea_ref_kpa=climate["ea_ref_kpa"][i] * f["ea"],
+        u2_m_s=climate["u2_m_s"][i] * f["wind"], rn_mj_m2=rn_mj_m2,
         z_cell_m=elevation[i], z_ref_m=z_ref_m[i], lat_deg=lats[i],
         slope_deg=slope[i], aspect_deg=aspect[i],
         gamma_k_per_m=climate["gamma_k_per_m"], precip_gradient_per_m=climate["precip_gradient_per_m"],

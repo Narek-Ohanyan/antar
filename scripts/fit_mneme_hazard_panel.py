@@ -183,7 +183,8 @@ def main():
           f"terrain/soil streamed, reused across years) ===", flush=True)
     static = extract_static_grid_inputs(grid_rows=grid_rows, grid_cols=grid_cols)
     lats, lons = static["lats"], static["lons"]
-    row_px, col_px, token = static["row_px"], static["col_px"], static["token"]
+    row_px, col_px = static["row_px"], static["col_px"]
+    token = static["token"] or get_access_token()      # None when the static inputs came from the cache
     n = len(lats)
 
     print("=== Real vitality (kNDVI) + disturbance, 2000-2024 (streamed) ===", flush=True)

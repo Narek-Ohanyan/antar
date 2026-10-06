@@ -57,12 +57,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
     DATA_DIR, extract_static_grid_inputs, extract_era5land, _load_chelsa_arrays,
     saturation_vapour_pressure, wind_speed_2m, ROOTING_DEPTH_MM_BY_GROUP,
-    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS, ROOTING_DEPTH_MM_PLACEHOLDER,
+    GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS, ROOTING_DEPTH_MM_PLACEHOLDER, constant_atmosphere_requested,
 )
 from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION, OUTER_DRAWS, INNER_DRAWS  # noqa: E402
 from fit_refugium_viability import V_STAR, RHO, LAM  # noqa: E402
 
 from antar.climate import downscale  # noqa: E402
+from antar.climate.atmosphere import AtmosphereShape  # noqa: E402
 from antar.climate.forcing import topoclimate_forcing  # noqa: E402
 from antar.climate.radiation import net_radiation_from_era5  # noqa: E402
 from antar.hydraulics.monte_carlo import two_level_failure_probability  # noqa: E402
@@ -145,7 +146,9 @@ def compute_deltas(lats, lons, gcm, scenario):
 
 
 def build_future_cell(static, deltas, horizon, i, elevation, z_ref_m, slope, aspect, concavity,
-                       soil, w_max_mm, lapse, lats, era5_2019, chelsa_ref):
+                       soil, w_max_mm, lapse, lats, era5_2019, chelsa_ref, atmos=None):
+    """``atmos``: daily multiplicative factors {rs, rl, wind, ea} for this cell and scenario (antar.climate.atmosphere); None =
+    the old behaviour (ERA5-Land annual means repeated every day, unchanged across scenarios)."""
     t_mean_ref_c, t_max_ref_c, t_min_ref_c, p_ref_mm, doy, month = chelsa_ref
     # deltas[(horizon, var)] is shaped (12 months, n_points) -- index the point axis with [:, i],
     # not [i] (which would index into the month axis and crash once i >= 12).
@@ -165,15 +168,16 @@ def build_future_cell(static, deltas, horizon, i, elevation, z_ref_m, slope, asp
     t_mean_c_for_rn = downscale.downscale_temperature(future_t_mean, elevation[i], z_ref_m[i], gamma_of_day)
     wind10_i, ssrd_i, strd_i, dewpoint_k_i, pressure_pa_i = era5_2019
     n_days = len(doy)
-    rn_mj_m2 = net_radiation_from_era5(np.full(n_days, ssrd_i[i]), np.full(n_days, strd_i[i]), t_mean_c_for_rn)
+    f = atmos if atmos is not None else AtmosphereShape.constant_factors(n_days)
+    rn_mj_m2 = net_radiation_from_era5(ssrd_i[i] * f["rs"], strd_i[i] * f["rl"], t_mean_c_for_rn)
     u2_m_s_i = wind_speed_2m(wind10_i[i], z_m=10.0)
     ea_ref_kpa_i = saturation_vapour_pressure(dewpoint_k_i[i] - 273.15)
 
     return topoclimate_forcing(
         doy=doy, month=month,
         t_mean_ref_c=future_t_mean, t_max_ref_c=future_t_max, t_min_ref_c=future_t_min,
-        p_ref_mm=future_p, ea_ref_kpa=np.full(n_days, ea_ref_kpa_i),
-        u2_m_s=np.full(n_days, u2_m_s_i), rn_mj_m2=rn_mj_m2,
+        p_ref_mm=future_p, ea_ref_kpa=ea_ref_kpa_i * f["ea"],
+        u2_m_s=u2_m_s_i * f["wind"], rn_mj_m2=rn_mj_m2,
         z_cell_m=elevation[i], z_ref_m=z_ref_m[i], lat_deg=lats[i],
         slope_deg=slope[i], aspect_deg=aspect[i],
         gamma_k_per_m=gamma_k_per_m, precip_gradient_per_m=precip_gradient_per_m,
@@ -207,12 +211,14 @@ def run_member_horizon(c, deltas, gcm, scenario, horizon):
             continue
         chelsa_ref_i = (c["t_mean_ref_all"][:, i], c["t_max_ref_all"][:, i], c["t_min_ref_all"][:, i],
                         c["p_ref_all"][:, i], c["doy"], c["month"])
+        atmos = (c["atmos"].scenario_factors(lats[i], c["lons"][i], c["doy"], gcm, scenario, horizon)
+                 if c.get("atmos") is not None else None)
         cell = None
         for gname, g in c["groups"].items():
             # each group's own w_max_mm (its own rooting depth) gives its own CWD / WSI / soil-potential signal
             cell = build_future_cell({}, deltas, horizon, i, c["elevation"], c["z_ref_m"], c["slope"], c["aspect"],
                                      c["concavity"], c["soil"], c["w_max_mm_by_group"][gname], c["lapse"], lats,
-                                     c["era5_2019"], chelsa_ref_i)
+                                     c["era5_2019"], chelsa_ref_i, atmos)
             psi_soil = cell.psi_soil_mpa[PET_FORMULATION]
 
             def simulate(traits, psi_soil=psi_soil, cell=cell):
@@ -237,7 +243,7 @@ def run_member_horizon(c, deltas, gcm, scenario, horizon):
         # TOPOHYDRO layers, with all three PET formulations
         gcell = build_future_cell({}, deltas, horizon, i, c["elevation"], c["z_ref_m"], c["slope"], c["aspect"],
                                   c["concavity"], c["soil"], c["w_max_mm_generic"], c["lapse"], lats,
-                                  c["era5_2019"], chelsa_ref_i)
+                                  c["era5_2019"], chelsa_ref_i, atmos)
         generic_rows.append({"lat": float(lats[i]), "lon": float(lons[i]),
                              "cwd_mm_by_pet": {k: _r(v, 3) for k, v in gcell.cwd_mm.items()},
                              "wsi": _r(gcell.wsi[PET_FORMULATION], 4),
@@ -267,6 +273,7 @@ def _init_worker(ctx_path):
     with open(ctx_path, "rb") as f:
         _CTX = pickle.load(f)
     _CTX["delta_cache"] = {}
+    _CTX["atmos"] = AtmosphereShape(_CTX["atmos_dir"]) if _CTX.get("atmos_dir") else None
 
 
 def _run_task(task):
@@ -361,7 +368,8 @@ def main():
            "slope": slope, "aspect": aspect, "concavity": concavity, "soil": soil, "lapse": lapse,
            "era5_2019": era5_2019, "t_mean_ref_all": t_mean_ref_all, "t_max_ref_all": t_max_ref_all,
            "t_min_ref_all": t_min_ref_all, "p_ref_all": p_ref_all, "doy": doy, "month": month,
-           "groups": real_groups, "w_max_mm_by_group": w_max_mm_by_group, "w_max_mm_generic": w_max_mm_generic}
+           "groups": real_groups, "w_max_mm_by_group": w_max_mm_by_group, "w_max_mm_generic": w_max_mm_generic,
+           "atmos_dir": None if constant_atmosphere_requested() else str(ISIMIP_DIR)}
 
     def keep(mkey, rec, secs):
         results[mkey] = rec
@@ -379,7 +387,7 @@ def main():
         finally:
             ctx_path.unlink(missing_ok=True)
     elif todo:
-        _init_ctx = dict(ctx, delta_cache={})
+        _init_ctx = dict(ctx, delta_cache={}, atmos=AtmosphereShape(ctx["atmos_dir"]) if ctx["atmos_dir"] else None)
         for g, s, h in todo:
             if (g, s) not in _init_ctx["delta_cache"]:
                 _init_ctx["delta_cache"][(g, s)] = compute_deltas(lats, lons, g, s)
@@ -397,6 +405,7 @@ def main():
         "baseline_year": BASELINE_YEAR,
         "baseline_window": list(BASELINE_WINDOW),
         "horizons": {str(k): list(v) for k, v in HORIZONS.items()},
+        "atmosphere": "constant annual means (ANTAR_CONSTANT_ATMOSPHERE=1)" if constant_atmosphere_requested() else "seasonal ISIMIP3a shape x ISIMIP3b monthly change (rsds, rlds, sfcwind, vapour pressure)",
         "method": "delta/change-factor downscaling: real monthly ISIMIP3b anomaly (additive "
                   "temperature, multiplicative precipitation) applied to the real 2019 CHELSA-daily "
                   "reference series, run through the unchanged real topoclimate_forcing pipeline, "
