@@ -129,7 +129,7 @@ function renderHome() {
       <div class="about">
         <p class="lead">A hybrid process-statistical framework for finding climate-resilient places to restore forest in Armenia: it models water stress, hydraulic failure, species niches, treeline and scenario-robust planting decisions, and reports each result with the caveats that came with it.</p>
         <div>${banner()}
-    <div class="callout"><strong>Read these with care.</strong> Viability stays near its 2019 level across scenarios because the future projections change temperature and precipitation but hold wind, radiation and humidity at 2019 values; that is a limitation of the method, not evidence that climate change is harmless. See <a href="#/status">Status &amp; limits</a>.</div></div>
+    <div class="callout"><strong>Under revision.</strong> The water-balance and hazard numbers shown here were computed with wind, radiation and humidity held at annual means, repeated every day and unchanged across scenarios. A test showed this removes most of the summer water deficit and flattens the climate-change response, so the earlier finding that viability stays near its 2019 level is largely an artefact. They are being recomputed with real seasonal data that changes with the scenario. See <a href="#/status">Status &amp; limits</a>.</div></div>
       </div>
     </section>
     <section class="sec reveal">

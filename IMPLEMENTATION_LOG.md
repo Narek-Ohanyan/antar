@@ -1889,3 +1889,31 @@ User: the video must be fullscreen with the navbar on it, and the whole design c
   away, and the machine then slept until 2026-10-06 ~12:45 (the first scenario members report 1,058 minutes of wall time).
   `caffeinate -dims` does not hold a MacBook awake with the lid closed or off power. Nothing was lost: the chain's retry loop and the
   per-member checkpoints resumed on wake. To avoid the gap: keep the lid open and the charger connected during runs.
+
+## 2026-10-06 -- the "viability stays flat" finding was an artefact of constant atmospheric inputs; forcing rebuilt
+
+User question: why are wind, radiation and humidity held at 2019 in the scenarios, and could that change?
+
+**What was actually wrong (worse than the banner said).** The ERA5-Land exports on Drive hold ONE value per cell and year for wind,
+shortwave, longwave and dew point. The pipeline repeated that annual mean on all 365 days (`np.full(n_days, ...)`) and left it
+unchanged in every scenario. So the model had no seasonal cycle in evaporative demand (July shortwave is ~1.6x its annual mean) and
+no humidity or radiation response to warming. My 2026-10-01 note that "XYLEM evidently derives its sensitivity from the variables held
+fixed" was a guess that I never tested.
+
+**Test** (`scripts/sensitivity_atmospheric_forcing.py`, 23 Armenian cells, same traits, 50 x 200 Monte Carlo, same seeds; the harness
+reproduces the stored 2019 viability to 1e-16): mean climatic water deficit, broadleaf, 2019: 13.8 mm constant, 113.9 mm with the real
+ISIMIP3a seasonal cycle (153 mm with my first approximation from Tmin; cell-wise r = 0.99 between the two). Its change under GFDL-ESM4
+SSP5-8.5 by 2100: +3.6 mm constant vs +212 mm seasonal-and-scenario. Oak hazard change +0.003 vs +0.046; 23 of 23 oak cells exceed 1%
+hazard by 2100 (19 under constant forcing). Minimum soil water potential -0.28 -> -0.65 MPa in 2019.
+
+**Fix.** `scripts/pull_isimip_atmosphere.py` pulls, through the same ISIMIP Files API and Armenia bbox, monthly shortwave (rsds),
+longwave (rlds), wind (sfcwind) and vapour pressure (hurs/100 x es(tas), built daily) from ISIMIP3a obsclim GSWP3-W5E5 (the 2015-2019
+baseline shape) and ISIMIP3b (5 GCMs x 3 SSPs, the monthly change). `src/antar/climate/atmosphere.py` turns them into a daily factor
+(mean exactly 1 over the baseline year, so ERA5-Land's cell-level annual mean is untouched) times the model's future/baseline monthly
+ratio. Pressure stays an annual mean (its seasonal and scenario variation is about 1%). `ANTAR_CONSTANT_ATMOSPHERE=1` reproduces the old
+behaviour. Tests: `tests/test_atmosphere.py`, `tests/test_forcing_atmosphere.py`.
+
+**Also changed:** streamed terrain, soil and ERA5 inputs are now cached per grid in `data/_cache/` (they took 1-2 h per step on the dense
+grid; every later step reads the cache). Dense TOPOHYDRO of 2026-10-05 and the validation-grid XYLEM/REFUGIUM/scenario results used the
+constant forcing; they are being recomputed. The constant-forcing scenario file is archived as `future_projections_constant_atmosphere.yaml`.
+Temperature, precipitation, GDD, season length and treeline do not depend on these inputs and are unaffected.
