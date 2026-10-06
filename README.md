@@ -63,7 +63,32 @@ audit). Figures 3 and 4 use placeholder traits and synthetic data by design.
 
 ## Status
 
-Version 2.0.0-alpha. MIT licensed (see `LICENSE`).
+Version 2.0.0-alpha.
+
+## Copyright
+
+© 2026 Narek Ohanyan. All rights reserved. See `LICENSE`. Third-party data, fonts and libraries keep their own licences (listed in
+`configs/manifests/` and on the References page of the web interface).
+
+## How to cite
+
+Citing the work needs no permission. Please cite it as:
+
+> Ohanyan, N. (2026). *ANTAR — Assessment of Niche, Treeline & Analogue Refugia* (Version 2.0.0-alpha) [Computer software]. GitHub.
+> https://github.com/Narek-Ohanyan/antar
+
+```bibtex
+@misc{ohanyan2026antar,
+  author       = {Ohanyan, Narek},
+  title        = {{ANTAR} --- Assessment of Niche, Treeline \& Analogue Refugia},
+  year         = {2026},
+  version      = {2.0.0-alpha},
+  howpublished = {Computer software},
+  url          = {https://github.com/Narek-Ohanyan/antar}
+}
+```
+
+GitHub's "Cite this repository" button reads `CITATION.cff`. Please also cite the datasets your use depends on (see the References page).
 
 ## Acknowledgments
 

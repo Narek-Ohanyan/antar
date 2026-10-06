@@ -344,6 +344,25 @@ function renderAck() {
     <p class="muted small">Data providers and their licences are listed on the <a href="#/refs">References</a> page.</p></div></div>`;
 }
 
+/* ---------- footer: copy the reference ---------- */
+function initCite() {
+  const status = document.querySelector(".cite-status");
+  document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+    const src = document.getElementById(b.dataset.copy);
+    if (!src) return;
+    const text = src.innerText.trim();
+    let done = false;
+    try { await navigator.clipboard.writeText(text); done = true; } catch (e) { /* clipboard blocked: select the text instead */ }
+    if (!done) {
+      const sel = getSelection(), range = document.createRange();
+      range.selectNodeContents(src); sel.removeAllRanges(); sel.addRange(range);
+      try { done = document.execCommand("copy"); } catch (e) { done = false; }
+    }
+    status.textContent = done ? (b.dataset.copy === "cite-bib" ? "BibTeX copied" : "Reference copied") : "Press Ctrl/Cmd+C to copy the selected text";
+    setTimeout(() => { status.textContent = ""; }, 3000);
+  }));
+}
+
 /* ---------- boot ---------- */
 async function init() {
   view().innerHTML = `<div class="loading">Loading results…</div>`;
@@ -367,4 +386,4 @@ function toggleTheme() {
   try { localStorage.setItem("antar_theme", next); } catch (e) { /* ignore */ }
 }
 try { const t = localStorage.getItem("antar_theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) { /* ignore */ }
-document.addEventListener("DOMContentLoaded", () => { $("#theme").addEventListener("click", toggleTheme); init(); });
+document.addEventListener("DOMContentLoaded", () => { $("#theme").addEventListener("click", toggleTheme); initCite(); init(); });

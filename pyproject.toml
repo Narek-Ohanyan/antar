@@ -6,7 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "antar"
 version = "2.0.0a0"
 description = "ANTAR — Assessment of Niche, Treeline & Analogue Refugia: hybrid process-statistical framework for predicting climate-resilient reforestation refugia in Armenia"
-license = "MIT"
+license = "LicenseRef-All-Rights-Reserved"
+license-files = ["LICENSE"]
+authors = [{ name = "Narek Ohanyan" }]
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.26", "scipy>=1.11", "pandas>=2.0", "scikit-learn>=1.4", "pyyaml"]
 

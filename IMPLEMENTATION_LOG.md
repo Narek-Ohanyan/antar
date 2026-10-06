@@ -1924,3 +1924,18 @@ Temperature, precipitation, GDD, season length and treeline do not depend on the
   are listed on the Status page's lineage table; temperature, rain, degree days, season length, frost and treeline are unaffected. The
   constant-forcing scenario file is kept at `configs/fitted/archive/future_projections_constant_atmosphere.yaml`. Maps return as the
   recomputed runs finish. Home stat cards without a result are hidden. The "Known gaps" entry on the Status page still records the finding.
+
+## 2026-10-06 -- copyright and citation
+
+User: add "copyright Narek Ohanyan, 2026, all rights reserved" and how the work should be cited.
+
+* `LICENSE` replaced: the MIT licence added on 2026-10-01 contradicted "all rights reserved", so it is now "Copyright (c) 2026 Narek Ohanyan. All
+  rights reserved.", with three clarifications: citing needs no permission; viewing and forking on GitHub is allowed to the extent GitHub's terms
+  allow; third-party data, fonts (SIL OFL 1.1) and Leaflet keep their own licences. It also states that copies obtained under MIT between
+  2026-10-01 and 2026-10-06 stay MIT -- a licence already granted cannot be withdrawn by changing the file. `pyproject.toml` now says
+  `LicenseRef-All-Rights-Reserved` and names the author; the README's "MIT licensed" line is gone.
+* Citation (one string, used everywhere): Ohanyan, N. (2026). ANTAR — Assessment of Niche, Treeline & Analogue Refugia (Version 2.0.0-alpha)
+  [Computer software]. GitHub. https://github.com/Narek-Ohanyan/antar -- in the web footer (with copy buttons for the reference and the BibTeX),
+  the README and `CITATION.cff` (GitHub's "Cite this repository"). No DOI is invented; `tests/test_citation.py` fails if the three disagree,
+  if the name differs, or if a DOI string appears.
+* Footer fix found while checking: `.foot` and `.cite` used a `padding` shorthand that removed the page gutter; now `padding-block`.

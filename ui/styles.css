@@ -221,7 +221,7 @@ main > .wrap > h1:first-child { padding-bottom: .4em; border-bottom: 1px solid v
 
 /* ---------- footer ---------- */
 footer { margin-top: clamp(56px, 9vw, 112px); border-top: 1px solid var(--border-strong); background: var(--surface); }
-.foot { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 56px); padding: 44px 0 52px; font-size: .92rem; }
+.foot { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 56px); padding-block: 44px 52px; font-size: .92rem; }
 .foot-name { font: 600 1.25rem/1.2 var(--serif); margin: 0 0 10px; max-width: 24ch; }
 .foot p { color: var(--muted); max-width: 44ch; }
 .foot h4 { font: 700 .72rem/1 var(--font); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 4px 0 12px; }
@@ -250,3 +250,17 @@ footer { margin-top: clamp(56px, 9vw, 112px); border-top: 1px solid var(--border
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* citation and copyright */
+.cite { padding-block: 8px 36px; border-top: 1px solid var(--border); }
+.cite-main { padding-top: 28px; max-width: 920px; }
+.cite h4 { font: 700 .72rem/1 var(--font); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 12px; }
+.cite-text { font-family: var(--serif); font-size: 1.12rem; line-height: 1.5; margin: 0 0 14px; max-width: 78ch; overflow-wrap: anywhere; }
+.cite-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+.small-btn { min-height: 40px; padding: 0 14px; font-size: .88rem; }
+.cite-bibtex { margin: 6px 0 10px; }
+.cite-bibtex summary { cursor: pointer; font-weight: 700; font-size: .9rem; padding: 6px 0; }
+.cite-bibtex pre { margin: 6px 0 0; padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; }
+.cite-bibtex code { background: none; padding: 0; font-size: .84rem; line-height: 1.55; }
+.legal { border-top: 1px solid var(--border); background: var(--bg); font-size: .85rem; color: var(--muted); }
+.legal .wrap { padding-top: 16px; padding-bottom: 20px; }
