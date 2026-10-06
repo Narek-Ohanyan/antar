@@ -1961,3 +1961,13 @@ deficit 166 -> 353 mm, minimum soil potential -1.03 -> -1.31 MPa; XYLEM mean haz
 0.0254 -> 0.0608, equal to the offline harness (an independent code path) to the digits shown. The UI now takes water-balance layers from
 whichever TOPOHYDRO file is current, so 40 of 41 planned maps have 2019 results (the 41st, treeline shift, exists only as a scenario). Scenario
 maps return when the ISIMIP3b atmosphere download and the recomputed projections finish.
+
+## 2026-10-06 (cont.) -- Acknowledgments written
+
+Text drafted with the author, third person, two paragraphs, on the Acknowledgments page and in the README (replacing the hand-fill placeholder). The
+project is named with its official name from the WSL project page, "Forest Restoration and Climate Change in Armenia (FORACCA)" -- the author's
+draft said "Recreation"; funder "Swiss Agency for Development and Cooperation (SDC)" and the implementers (Forest Alliance, a consortium of Armenian
+NGOs led by Shen NGO, WSL and FAO) were checked on that page (https://www.wsl.ch/en/projects/foracca/). NOT found online and kept in the author's
+own words: "provides new climate services for Armenia, including high-resolution climate scenarios and local climate impact profiles for every
+municipality" (the WSL page speaks only of "improved climate services"). The standing rule that FORACCA appears nowhere in the UI is narrowed by
+`tests/test_ui_name.py`: it may appear only inside the Acknowledgments page, with its official name and without "Recreation".

@@ -98,4 +98,6 @@ resilience. Full biography on the web interface ("About the author") and at http
 
 ## Acknowledgments
 
-<!-- prior project name/attribution to be filled in by hand -->
+The author would like to express sincere gratitude to the Swiss Federal Institute for Forest, Snow and Landscape Research WSL, and in particular to Franziska Zilker, Tobias Kühnhanss and Dr. Michael James McCarthy of the Dynamic Macroecology group, for providing datasets and bias-corrected environmental data and for their technical feedback on the methodology. The author also thanks his supervisor, PD Dr. Marco Pütz, and the coordinator, Dr. Dominik Braunschweiger, for making his guest scientist visit at WSL possible.
+
+The author further acknowledges Alen Amirkhanian, Director of the AUA Acopian Center for the Environment, and the wider team of the [Forest Restoration and Climate Change in Armenia (FORACCA)](https://www.wsl.ch/en/projects/foracca/) project for their logistical support and collaborative insights during the conceptualization of ANTAR. FORACCA is funded by the Swiss Agency for Development and Cooperation (SDC) and implemented by the Forest Alliance, a consortium of Armenian NGOs led by Shen NGO, together with WSL and the Food and Agriculture Organization of the United Nations (FAO). The project provides new climate services for Armenia, including high-resolution climate scenarios and local climate impact profiles for every municipality.

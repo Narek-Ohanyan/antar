@@ -278,3 +278,6 @@ footer { margin-top: clamp(56px, 9vw, 112px); border-top: 1px solid var(--border
 .author-name { font: 600 1.35rem/1.2 var(--serif); margin: 0 0 6px; }
 .author-card p { margin-bottom: .6em; }
 @media (max-width: 760px) { .author { grid-template-columns: 1fr; } .author-photo { max-width: 360px; } .author-card { grid-template-columns: 84px minmax(0, 1fr); gap: 16px; } .author-card img { width: 84px; height: 84px; } }
+
+.ack p { max-width: 70ch; font-size: 1.06rem; }
+.ack p:last-child { margin-bottom: 0; }

@@ -364,9 +364,11 @@ function renderAuthor() {
 /* ---- Acknowledgments ---- */
 function renderAck() {
   view().innerHTML = `<div class="wrap"><h1>Acknowledgments</h1>
-    <!-- prior project name/attribution to be filled in by hand -->
-    <div class="card"><p>This section is intentionally left to be completed by the author.</p>
-    <p class="muted small">Data providers and their licences are listed on the <a href="#/refs">References</a> page.</p></div></div>`;
+    <div class="card ack">
+      <p>The author would like to express sincere gratitude to the Swiss Federal Institute for Forest, Snow and Landscape Research WSL, and in particular to Franziska Zilker, Tobias Kühnhanss and Dr. Michael James McCarthy of the Dynamic Macroecology group, for providing datasets and bias-corrected environmental data and for their technical feedback on the methodology. The author also thanks his supervisor, PD Dr. Marco Pütz, and the coordinator, Dr. Dominik Braunschweiger, for making his guest scientist visit at WSL possible.</p>
+      <p>The author further acknowledges Alen Amirkhanian, Director of the AUA Acopian Center for the Environment, and the wider team of the <a href="https://www.wsl.ch/en/projects/foracca/" target="_blank" rel="noopener">Forest Restoration and Climate Change in Armenia (FORACCA)<span class="sr-only"> (opens in a new tab)</span></a> project for their logistical support and collaborative insights during the conceptualization of ANTAR. FORACCA is funded by the Swiss Agency for Development and Cooperation (SDC) and implemented by the Forest Alliance, a consortium of Armenian NGOs led by Shen NGO, together with WSL and the Food and Agriculture Organization of the United Nations (FAO). The project provides new climate services for Armenia, including high-resolution climate scenarios and local climate impact profiles for every municipality.</p>
+    </div>
+    <p class="muted small">Data providers and their licences are listed on the <a href="#/refs">References</a> page.</p></div>`;
 }
 
 /* ---------- footer: copy the reference ---------- */
