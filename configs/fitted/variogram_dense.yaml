@@ -1,0 +1,58 @@
+run_date: '2026-10-06'
+grid: dense_armenia_stride7
+variable: CWD (pm_fao56), OLS-detrended against elevation
+n_points: 857
+n_pairs: 366796
+detrend:
+  slope_mm_per_m: .nan
+  intercept_mm: .nan
+empirical_semivariogram:
+- lag_km: 4.3
+  semivariance: .nan
+  n_pairs: 3000
+- lag_km: 12.8
+  semivariance: .nan
+  n_pairs: 7554
+- lag_km: 21.3
+  semivariance: .nan
+  n_pairs: 10090
+- lag_km: 29.8
+  semivariance: .nan
+  n_pairs: 14640
+- lag_km: 38.3
+  semivariance: .nan
+  n_pairs: 15892
+- lag_km: 46.9
+  semivariance: .nan
+  n_pairs: 17341
+- lag_km: 55.4
+  semivariance: .nan
+  n_pairs: 20385
+- lag_km: 63.9
+  semivariance: .nan
+  n_pairs: 20796
+- lag_km: 72.4
+  semivariance: .nan
+  n_pairs: 20212
+- lag_km: 81.0
+  semivariance: .nan
+  n_pairs: 21145
+- lag_km: 89.5
+  semivariance: .nan
+  n_pairs: 19636
+- lag_km: 98.0
+  semivariance: .nan
+  n_pairs: 19515
+- lag_km: 106.5
+  semivariance: .nan
+  n_pairs: 18957
+- lag_km: 115.0
+  semivariance: .nan
+  n_pairs: 17595
+- lag_km: 123.6
+  semivariance: .nan
+  n_pairs: 15772
+- lag_km: 132.1
+  semivariance: .nan
+  n_pairs: 14223
+fit_error: array must not contain infs or NaNs

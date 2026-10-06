@@ -55,6 +55,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import (  # noqa: E402
+    era5_complete,
     DATA_DIR, extract_static_grid_inputs, extract_era5land, _load_chelsa_arrays,
     saturation_vapour_pressure, wind_speed_2m, ROOTING_DEPTH_MM_BY_GROUP,
     GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS, ROOTING_DEPTH_MM_PLACEHOLDER, constant_atmosphere_requested, atmosphere_label,
@@ -311,7 +312,7 @@ def main():
     print("=== Real 2019 ERA5-Land (held constant for all future scenarios -- see docstring) ===", flush=True)
     wind10, ssrd, strd, dewpoint_k, pressure_pa = extract_era5land(static["token"], static["row_px"], static["col_px"], year=2019)
     era5_2019 = (wind10, ssrd, strd, dewpoint_k, pressure_pa)
-    valid_era5 = ~np.isnan(wind10)
+    valid_era5 = era5_complete(wind10, ssrd, strd, dewpoint_k, pressure_pa)
     valid_mask = valid_soil & valid_era5
 
     print("=== Real 2019 CHELSA-daily reference series (the baseline every delta perturbs) ===", flush=True)

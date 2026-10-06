@@ -241,7 +241,7 @@ def main():
     print("=== ERA5-Land 2019 (streamed, vectorized per-tile) ===", flush=True)
     token = get_access_token()  # refresh -- the terrain/soils download above can take a while
     wind10, ssrd, strd, dewpoint_k, pressure_pa = extract_era5land_vectorized(token, row_px, col_px)
-    valid_era5 = ~np.isnan(wind10)
+    valid_era5 = np.isfinite(wind10) & np.isfinite(ssrd) & np.isfinite(strd) & np.isfinite(dewpoint_k) & np.isfinite(pressure_pa)
     print(f"  {valid_era5.sum()}/{n} points have real ERA5-Land values", flush=True)
     u2_m_s = wind_speed_2m(wind10, z_m=10.0)
     ea_ref_kpa = saturation_vapour_pressure(dewpoint_k - 273.15)

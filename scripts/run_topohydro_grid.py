@@ -348,6 +348,13 @@ def extract_soils(token, lats, lons):
     return clay_pct, sand_pct, soc_g_kg
 
 
+def era5_complete(wind10, ssrd, strd, dewpoint_k, pressure_pa):
+    """True where every ERA5-Land band the water balance needs is finite. Wind alone is not enough: three dense-grid nodes had a wind value
+    but no radiation or dew point, so their water balance was NaN and, because NaN >= 1 is False, XYLEM reported a hazard of exactly 0
+    (perfect viability) for them. A node with any band missing is skipped, never run."""
+    return (np.isfinite(wind10) & np.isfinite(ssrd) & np.isfinite(strd) & np.isfinite(dewpoint_k) & np.isfinite(pressure_pa))
+
+
 def extract_era5land(token, row_px, col_px, year=YEAR):
     """Per-tile ERA5-Land read with retry-on-exception (fresh token each attempt). A real
     transient vsicurl read failure crashed this function's pre-retry version mid-XYLEM-run
@@ -529,7 +536,7 @@ def extract_year_climate_inputs(static, year):
 
     print(f"=== ERA5-Land {year} (streamed per-tile) ===", flush=True)
     wind10, ssrd, strd, dewpoint_k, pressure_pa = extract_era5land(token, row_px, col_px, year=year)
-    valid_era5 = ~np.isnan(wind10)
+    valid_era5 = era5_complete(wind10, ssrd, strd, dewpoint_k, pressure_pa)
     u2_m_s = wind_speed_2m(wind10, z_m=10.0)
     dewpoint_c = dewpoint_k - 273.15
     ea_ref_kpa = saturation_vapour_pressure(dewpoint_c)
@@ -742,6 +749,8 @@ def main():
         row = {"lat": float(lats[i]), "lon": float(lons[i]), "elevation_m": float(elevation[i])}
         if out is None:
             row["status"] = "skipped_missing_soil_or_era5land"
+        elif not all(np.isfinite(v) for v in out.cwd_mm.values()):
+            row["status"] = "skipped_nonfinite_water_balance"
         else:
             row["status"] = "ok"
             row["t_mean_c_annual_mean"] = float(np.mean(out.t_mean_c))

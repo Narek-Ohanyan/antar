@@ -2010,3 +2010,16 @@ municipality" (the WSL page speaks only of "improved climate services"). The sta
   site scripts, the README and CITATION.cff. Third-party datasets whose own version is called v1 are in the data manifest and are not affected.
 * `ui/data/methodology.json` is hand-written but had been ignored by git through the broad `data/` rule; it is now tracked (the generated
   data bundle next to it still is not).
+
+## 2026-10-06 (cont.) -- scenario run recomputed; three nodes had a NaN water balance and reported hazard 0
+
+* **Recomputed with the seasonal atmosphere:** the ISIMIP3a/3b atmosphere download finished (54 of 54) and the 45-member scenario run on the validation grid
+  completed (`configs/fitted/future_projections.yaml`, `atmosphere` recorded; all 40+ map quantities now have scenario results). The method text stored in
+  that file still said wind, radiation and humidity were held at 2019 values; corrected in the script and in the file.
+* **A silent fault found while checking the dense variogram (it came out NaN):** three dense-grid nodes (lat/lon 40.871/43.754, 40.813/44.221,
+  39.762/45.621) had an ERA5-Land wind value but no radiation or dew point. The validity mask tested only wind, so they ran with NaN inputs, their
+  CWD/WSI/psi were NaN, and because `NaN >= 1` is False XYLEM reported a hazard of exactly 0 (viability 1.0) for them. TOPOHYDRO still wrote them as status
+  `ok`. Fix: `era5_complete()` requires all five bands; the writer refuses to call a non-finite water balance `ok`
+  (`skipped_nonfinite_water_balance`); `tests/test_era5_mask.py`. The validation grid and the validation-grid scenario file contain no NaN, so they are
+  unaffected. The dense TOPOHYDRO, XYLEM and REFUGIUM outputs committed earlier today contain the three bad nodes; they are being recomputed (dense chain
+  restarted, MNEME dense with it) together with the dense scenario run, which was restarted from scratch with the fixed mask.
