@@ -124,10 +124,11 @@ def build():
     f.box(5.8, yb, 5.0, 2.15, [("t", "MERISTEM — niche, treeline, growth"),
                                 ("x", "niche per species and treeline z_{tl}: run"),
                                 ("x", "height H*, growth, establishment:"),
-                                ("x", "built, not fitted")], "reduced")
+                                ("x", "built, not fitted"),
+                                ("s", "niche inputs: CHELSA-BIOCLIM+, GBIF, soils")], "reduced")
     f.arrow([(-3.4, -2.48), (-3.4, -2.8), (-5.8, -2.8), (-5.8, -3.67)], label="ψ_{s}, VPD, T", label_at=(-5.7, -2.7))
-    f.arrow([(0, -2.48), (0, -3.67)], label="CWD, WSI, VPD, lags", label_at=(0.1, -3.05))
-    f.arrow([(3.4, -2.48), (3.4, -2.8), (5.8, -2.8), (5.8, -3.67)], label="GDD, CWD, frost, GST", label_at=(5.9, -2.7))
+    f.arrow([(0, -2.48), (0, -3.67)], label="annual CWD, VPD, GDD, T", label_at=(0.1, -3.05))
+    f.arrow([(3.4, -2.48), (3.4, -2.8), (5.8, -2.8), (5.8, -3.67)], label="GST (treeline only)", label_at=(5.9, -2.7))
     f.box(0, -7.1, 5.4, 1.15, [("t", "Area-of-applicability gate"), ("x", "h = w h^{stat} + (1 − w) h^{mech}  (link scale)"), ("s", "built; inactive until h^{stat} exists")], "built", dashed=True)
     f.arrow([(0, -5.83), (0, -6.5)], dashed=True)
     f.arrow([(-3.4, -5.83), (-3.4, -7.1), (-2.7, -7.1)], dashed=True)
