@@ -18,6 +18,7 @@ Storage-minimal: each job's zip is read, aggregated to MONTHLY means (year, mont
 import concurrent.futures
 import json
 import os
+import re
 import shutil
 import sys
 import zipfile
@@ -51,6 +52,15 @@ def dataset_paths(sim_round, forcing, scenario, var):
     paths = [f["path"] for f in res[0]["files"]]
     if sim_round == "ISIMIP3a":                           # only the file that holds 2015-2019
         paths = [p for p in paths if p.endswith("_2011_2019.nc")]
+    else:                                                 # only the decade files that overlap a window we use (6 of 9 files)
+        from antar.climate.atmosphere import BASELINE_WINDOW, HORIZON_WINDOWS
+        windows = [BASELINE_WINDOW] + list(HORIZON_WINDOWS.values())
+        keep = []
+        for p in paths:
+            m = re.search(r"_(\d{4})_(\d{4})\.nc$", p)
+            if m is None or any(int(m.group(1)) <= w1 and int(m.group(2)) >= w0 for w0, w1 in windows):
+                keep.append(p)
+        paths = keep
     return paths
 
 
@@ -118,8 +128,11 @@ def process(task):
                     tpaths = dataset_paths("ISIMIP3a", "gswp3-w5e5", "obsclim", "tas")
                     tdates, tas = fetch_daily(tpaths, "tas", key + "_tas")
                     tas = tas - 273.15
-                if not np.array_equal(np.asarray(tdates), np.asarray(dates)):
-                    raise ValueError(f"{key}: tas and hurs calendars differ ({len(tdates)} vs {len(dates)} days)")
+                index = {d: j for j, d in enumerate(np.asarray(tdates).tolist())}
+                missing = [d for d in np.asarray(dates).tolist() if d not in index]
+                if missing:
+                    raise ValueError(f"{key}: {len(missing)} hurs days have no tas day (first {missing[0]}): calendars differ")
+                tas = tas[[index[d] for d in np.asarray(dates).tolist()]]
                 vals = np.clip(vals, 0, 100) / 100.0 * saturation_vapour_pressure(tas)       # kPa
             mdates, mvals = monthly(dates, vals)
             return key, (mdates, mvals), None
@@ -139,7 +152,7 @@ def main():
     done = json.loads(prog_path.read_text()) if prog_path.exists() else {}
     todo = [t for t in tasks if f"{t[0]}_{t[1]}__{t[2]}__{t[3]}" not in done or done[f"{t[0]}_{t[1]}__{t[2]}__{t[3]}"].get("status") != "done"]
     print(f"=== {len(tasks)} jobs, {len(tasks) - len(todo)} done, {len(todo)} to fetch ===", flush=True)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:
         futs = {ex.submit(process, t): t for t in todo}
         for i, fut in enumerate(concurrent.futures.as_completed(futs), 1):
             key, res, err = fut.result()
