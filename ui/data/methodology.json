@@ -109,13 +109,13 @@
    "name": "Budburst GDD threshold",
    "value": "200 °C·d (base 5 °C)",
    "effect": "Sets the late-frost-day count.",
-   "state": "Placeholder. A cited species-specific threshold could not be verified: the primary source uses a non-linear growing-degree-hours model and no simple threshold exists in it."
+   "state": "Placeholder. A cited species-specific threshold could not be verified: the primary source uses a non-linear growing-degree-hours model and no simple threshold exists in it. Measured: sweeping it from 100 to 400 °C·d changes the late-frost day count by less than half a day (48.8 to 48.4 days in 2019, unchanged at 29.7 in 2100) and nothing else. The count includes every frost day after the threshold is reached, late-autumn frosts too, so it mostly measures winter frost: the definition, not the number, is the weak point."
   },
   {
    "name": "Calm-clear-night fraction",
    "value": "0.3",
    "effect": "Scales cold-air pooling.",
-   "state": "Placeholder. ERA5-Land has no cloud-cover band (checked directly), so the planned fix does not exist."
+   "state": "Placeholder. ERA5-Land has no cloud-cover band (checked directly), so the planned fix does not exist. Measured: sweeping it from 0 to 0.6 changes the hydraulic hazard by at most 0.0002 (oak 0.0608 to 0.0607 in 2019; 0.1018 to 0.1017 for SSP5-8.5 in 2100) and the late-frost count by about 1.5 days."
   },
   {
    "name": "Individual-tree spread",

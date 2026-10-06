@@ -1,0 +1,144 @@
+run_date: '2026-10-06'
+n_cells: 23
+base:
+  gdd_budburst: 200.0
+  calm_frac: 0.3
+note: Mean over the Armenian cells of the grid; atmosphere = ISIMIP3a seasonal shape
+  (+ ISIMIP3b change for the member).
+periods:
+  '2019':
+    gdd_budburst:
+    - value: 100.0
+      late_frost_days: 48.78260869565217
+      vpd24_summer: 0.9680602533187666
+      tmin_mean: 1.0524528761156715
+      hazard: {}
+    - value: 150.0
+      late_frost_days: 48.43478260869565
+      vpd24_summer: 0.9680602533187666
+      tmin_mean: 1.0524528761156715
+      hazard: {}
+    - value: 200.0
+      late_frost_days: 48.43478260869565
+      vpd24_summer: 0.9680602533187666
+      tmin_mean: 1.0524528761156715
+      hazard: {}
+    - value: 300.0
+      late_frost_days: 48.43478260869565
+      vpd24_summer: 0.9680602533187666
+      tmin_mean: 1.0524528761156715
+      hazard: {}
+    - value: 400.0
+      late_frost_days: 48.43478260869565
+      vpd24_summer: 0.9680602533187666
+      tmin_mean: 1.0524528761156715
+      hazard: {}
+    calm_frac:
+    - value: 0.0
+      late_frost_days: 47.26086956521739
+      vpd24_summer: 0.976488288455767
+      tmin_mean: 1.2236485282896021
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.007791304347826085
+        ring_porous_oak: 0.060830434782608696
+        pine: 0.0
+    - value: 0.15
+      late_frost_days: 47.869565217391305
+      vpd24_summer: 0.9722261621437831
+      tmin_mean: 1.1380507022026372
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.007778260869565215
+        ring_porous_oak: 0.06080434782608696
+        pine: 0.0
+    - value: 0.3
+      late_frost_days: 48.43478260869565
+      vpd24_summer: 0.9680602533187666
+      tmin_mean: 1.0524528761156715
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.007769565217391303
+        ring_porous_oak: 0.060778260869565226
+        pine: 0.0
+    - value: 0.45
+      late_frost_days: 48.69565217391305
+      vpd24_summer: 0.9639871973429092
+      tmin_mean: 0.9668550500287059
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.0077608695652173895
+        ring_porous_oak: 0.06073913043478261
+        pine: 0.0
+    - value: 0.6
+      late_frost_days: 48.82608695652174
+      vpd24_summer: 0.9600049577783831
+      tmin_mean: 0.8812572239417407
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.007734782608695651
+        ring_porous_oak: 0.06070869565217392
+        pine: 0.0
+  gfdl-esm4_ssp585_2100:
+    gdd_budburst:
+    - value: 100.0
+      late_frost_days: 29.73913043478261
+      vpd24_summer: 1.6024094266379463
+      tmin_mean: 4.996644481284298
+      hazard: {}
+    - value: 150.0
+      late_frost_days: 29.695652173913043
+      vpd24_summer: 1.6024094266379463
+      tmin_mean: 4.996644481284298
+      hazard: {}
+    - value: 200.0
+      late_frost_days: 29.695652173913043
+      vpd24_summer: 1.6024094266379463
+      tmin_mean: 4.996644481284298
+      hazard: {}
+    - value: 300.0
+      late_frost_days: 29.695652173913043
+      vpd24_summer: 1.6024094266379463
+      tmin_mean: 4.996644481284298
+      hazard: {}
+    - value: 400.0
+      late_frost_days: 29.695652173913043
+      vpd24_summer: 1.6024094266379463
+      tmin_mean: 4.996644481284298
+      hazard: {}
+    calm_frac:
+    - value: 0.0
+      late_frost_days: 29.0
+      vpd24_summer: 1.6134879759670264
+      tmin_mean: 5.16784013345823
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.021356521739130437
+        ring_porous_oak: 0.10182608695652175
+        pine: 8.260869565217393e-05
+    - value: 0.15
+      late_frost_days: 29.26086956521739
+      vpd24_summer: 1.607889067261597
+      tmin_mean: 5.082242307371264
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.021343478260869568
+        ring_porous_oak: 0.10178260869565219
+        pine: 8.260869565217393e-05
+    - value: 0.3
+      late_frost_days: 29.695652173913043
+      vpd24_summer: 1.6024094266379463
+      tmin_mean: 4.996644481284298
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.02133913043478261
+        ring_porous_oak: 0.10174347826086957
+        pine: 8.260869565217393e-05
+    - value: 0.45
+      late_frost_days: 30.08695652173913
+      vpd24_summer: 1.5970465592995158
+      tmin_mean: 4.9110466551973335
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.021326086956521745
+        ring_porous_oak: 0.1017304347826087
+        pine: 8.260869565217393e-05
+    - value: 0.6
+      late_frost_days: 30.565217391304348
+      vpd24_summer: 1.591798016039409
+      tmin_mean: 4.8254488291103685
+      hazard:
+        mesic_diffuse_porous_broadleaf: 0.02131739130434783
+        ring_porous_oak: 0.1016913043478261
+        pine: 8.260869565217393e-05

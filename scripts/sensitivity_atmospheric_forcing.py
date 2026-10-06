@@ -55,7 +55,7 @@ def fit_k(tmin_c, ea_target_kpa):
     return 0.5 * (lo + hi)
 
 
-def forcing(c, i, deltas, horizon, w_max, variant):
+def forcing(c, i, deltas, horizon, w_max, variant, gdd_budburst=200.0, calm_frac=0.3):
     t_ref, tx_ref, tn_ref, p_ref = (c[k][:, i] for k in ("t_mean_ref_all", "t_max_ref_all", "t_min_ref_all", "p_ref_all"))
     doy, month = c["doy"], c["month"]
     wind10, ssrd, strd, dewpoint_k, pressure_pa = (a[i] for a in c["era5_2019"])
@@ -99,7 +99,7 @@ def forcing(c, i, deltas, horizon, w_max, variant):
         slope_deg=c["slope"][i], aspect_deg=c["aspect"][i], gamma_k_per_m=gamma_k_per_m,
         precip_gradient_per_m=precip_gradient_per_m, w_max_mm=w_max[i], theta_sat=s["theta_sat"][i],
         psi_sat_mpa=s["psi_sat_mpa"][i], b_clapp_hornberger=s["b_clapp_hornberger"][i], theta_fc=s["theta_fc"][i],
-        theta_lim=s["theta_lim"][i], gdd_budburst=200.0, concavity_index=c["concavity"][i], calm_clear_night_frac=0.3,
+        theta_lim=s["theta_lim"][i], gdd_budburst=gdd_budburst, concavity_index=c["concavity"][i], calm_clear_night_frac=calm_frac,
         pressure_kpa=pressure_pa / 1000.0)
 
 
