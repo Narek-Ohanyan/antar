@@ -33,3 +33,56 @@ Seven harmonisation rules are written into the workflow because each corresponds
 \item \textbf{Every dataset enters through a manifest} (source, version, checksum, licence), and every export script is versioned.
 \end{enumerate}
 Minimum data for the work plan's first gate (\S\ref{sec:plan}) are: daily forcing 1981--2024; annual dieback labels for $\ge10^5$ forest pixels over $\ge10$ years; $\ge200$ tree-ring series; trait priors for four functional groups; and a stratified validation sample of $\ge300$ plots (sample-size logic in \S\ref{sec:design-based}).
+
+\FloatBarrier
+\subsection{The full variable inventory}\label{sec:vars}
+Table~\ref{tab:data} states what each \emph{source} is for. v1 conditioned its forest on three variables, the climate deltas of Table~\ref{tab:audit}; drawn out at the level of individual \emph{variables} rather than sources, v2 uses on the order of thirty, across categories, such as wind, phenology and land tenure, that v1 never touched. Table~\ref{tab:vars} lists them.
+
+\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash\bfseries\sffamily}p{3.4cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}X@{}}
+\caption{The full variable inventory: individual variables behind Table~\ref{tab:data}'s sources, plus the categories added for this specification.}\label{tab:vars}\\
+\toprule
+Variable & Representative source & Primary use\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\itshape Table~\ref{tab:vars} continued}\\
+\toprule
+Variable & Representative source & Primary use\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\multicolumn{3}{@{}l}{\bfseries\sffamily Atmospheric forcing (daily, per ensemble member)}\\
+$T_{\max}$, $T_{\min}$, $T_{\text{mean}}$ & ERA5-Land, CHELSA, ISIMIP3b/NEX-GDDP & topoclimate (\S\ref{sec:A}), all $\VPD$ terms, GDD, late frost, growing-season length\\
+Precipitation & as above & QDM bias-adjustment target, soil-bucket input\\
+Actual vapour pressure / dew point & ERA5-Land, stations & dew-point downscaling and $\VPD$ (\S\ref{sec:A}); relative humidity is never interpolated directly\\
+Wind speed, 2~m & ERA5-Land, stations & PET aerodynamic term $g_a$ (Eq.~\eqref{eq:pm}); fire-weather index; winter-desiccation covariate at the treeline (\S\ref{sec:D})\\
+Shortwave \& longwave radiation & ERA5-Land & slope-radiation partition (Eq.~\eqref{eq:rad}), PET energy term\\
+Surface pressure & elevation-derived & psychrometric constant; $\VPD_{24}/P_{\text{atm}}$ (Eq.~\eqref{eq:massbal})\\
+Atmospheric CO$_2$ trajectory & SSP concentration pathways & the $g_{s,\max}$ scenario knob (Eq.~\eqref{eq:pm})\\
+\multicolumn{3}{@{}l}{\bfseries\sffamily Cryosphere}\\
+Snow-cover fraction \& duration & MODIS MOD10A1 & checks the simulated snow--melt partition; establishment covariate\\
+\multicolumn{3}{@{}l}{\bfseries\sffamily Terrain (see also Table~\ref{tab:data})}\\
+DEM, slope, aspect, horizon angle, sky-view factor, TWI/TPI, cold-air-pooling index & Copernicus GLO-30 (derived) & radiation, lapse, $\delta_{\text{CAP}}$; elevation for the treeline diagnostic $z_{\text{tl}}$ (\S\ref{sec:D})\\
+\multicolumn{3}{@{}l}{\bfseries\sffamily Soils}\\
+Texture, organic carbon, plant-available water & SoilGrids 2.0, pedotransfer functions & bucket size, $\psi_s$ (Eqs.~\eqref{eq:bucket}--\eqref{eq:psi})\\
+Root-zone (10~cm) soil temperature & loggers, air-to-soil transfer model, where available & cross-checks the growing-season definition against the soil-temperature convention used in the treeline literature\\
+\multicolumn{3}{@{}l}{\bfseries\sffamily Vegetation state and structure}\\
+Canopy height & GEDI, Sentinel-2 canopy-height models & attainable-height training (Eq.~\eqref{eq:qr})\\
+Canopy / tree-cover fraction & Hansen GFC, ESA WorldCover & forest mask, competing-event definition\\
+Leaf area index & MODIS LAI/FPAR & checks the stand-coupling term $g_c$ (Eq.~\eqref{eq:pm})\\
+kNDVI / NDVI time series & HLS, Landsat & dieback-event segmentation (\S\ref{sec:C})\\
+Forest type / dominant species & national inventory, tree-type land-cover layers where available & stratifies the hazard and growth models by functional group\\
+Land-surface phenology (start/end of season) & MODIS MCD12Q2 & cross-checks growing-season length (\S\ref{sec:A}, \S\ref{sec:D})\\
+\multicolumn{3}{@{}l}{\bfseries\sffamily Disturbance and land use}\\
+Burned area, harvest & MODIS MCD64A1, Hansen GFC & competing events (\S\ref{sec:E})\\
+Insect \& pathogen outbreak records & national forest-health survey, where one exists & baseline for $h_{\text{bio}}$ (Eq.~\eqref{eq:htot})\\
+Grazing \& livestock pressure & land-use layers, agricultural records & browsing-protection covariate (Eq.~\eqref{eq:est})\\
+Land tenure, protected-area boundaries & national cadastre, WDPA & eligibility $e_{uj}$ in the decision layer (Eq.~\eqref{eq:mip})\\
+Road network / accessibility & OpenStreetMap, national infrastructure data & planting-cost proxy $c_{uj}$ (Eq.~\eqref{eq:mip})\\
+\multicolumn{3}{@{}l}{\bfseries\sffamily Biological and trait data (see also Table~\ref{tab:data})}\\
+Provenance / genetic-trial locations & forestry research stations, where they exist & tests the space-for-time bracket (Eq.~\eqref{eq:bracket}) directly instead of by assumption\\
+\multicolumn{3}{@{}l}{\bfseries\sffamily Ground truth (see also Table~\ref{tab:data})}\\
+Treeline elevation transects & field survey, repeat photography, historical topographic maps & direct validation target for $z_{\text{tl}}$ (\S\ref{sec:D})\\
+\end{xltabular}
+
+Not every row is available at the start: the manifest rule above applies here too, each variable enters versioned and its absence is a documented gap, not a silent zero.

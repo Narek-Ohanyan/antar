@@ -26,7 +26,7 @@ where $h^{\mathrm{tot}}$ is the annual probability that a member of the cohort d
 \end{enumerate}
 
 \section{Architecture}\label{sec:arch}
-Figure~\ref{fig:arch} shows the five modules. \textbf{A} converts climate and terrain into daily water and energy balance at 30~m for each ensemble member. \textbf{B} turns those indicators into a mechanistic annual failure probability for each species group. \textbf{C} fits observed-dieback hazards using the same indicators as covariates and hands over to B outside its area of applicability. \textbf{D} supplies attainable height, growth in physiological age and the establishment hazard. \textbf{E} combines competing hazards into $V$, derives robust refugia and analogues, and passes ensemble distributions to the decision layer. Uncertainty propagation and validation are cross-cutting, not final steps. Table~\ref{tab:coverage} states which processes each family of approaches represents.
+Figure~\ref{fig:arch} shows the five modules. \textbf{A} converts climate and terrain into daily water and energy balance at 30~m for each ensemble member. \textbf{B} turns those indicators into a mechanistic annual failure probability for each species group. \textbf{C} fits observed-dieback hazards using the same indicators as covariates and hands over to B outside its area of applicability. \textbf{D} supplies attainable height, growth in physiological age together with the thermal treeline limit, and the establishment hazard. \textbf{E} combines competing hazards into $V$, derives robust refugia and analogues, and passes ensemble distributions to the decision layer. Uncertainty propagation and validation are cross-cutting, not final steps. Table~\ref{tab:coverage} states which processes each family of approaches represents.
 
 \begin{figure}[t]
 \centering
@@ -79,6 +79,7 @@ Calibration to observed mortality & \cno & \cpart & \cno & \cyes\\
 Drought legacies and lags & \cno & \cno & \cno & \cyes\\
 Establishment bottleneck after planting & \cno & \cno & \cno & \cyes\\
 Growth to canopy height (time to function) & \cno & \cno & \cno & \cyes\\
+Upper (cold) elevation limit: thermal treeline & \cno & \cpart & \cno & \cyes\\
 Defined behaviour outside the training climate & \cno & \cno & \cyes & \cyes\\
 Uncertainty partitioned by source & \cno & \cpart & \cpart & \cyes\\
 Robust decision layer & \cno & \cno & \cno & \cyes\\

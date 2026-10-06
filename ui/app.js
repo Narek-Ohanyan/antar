@@ -293,15 +293,22 @@ function renderModels() {
 }
 
 /* ---- Methodology ---- */
+/* One card per engine, with an everyday-analogy toggle. Formulas in the technical text are written as $...$ and typeset (ui/math.js). */
 function renderMethod() {
   let plain = false; try { plain = localStorage.getItem("antar_plain") === "1"; } catch (e) { /* ignore */ }
   const m = state.meth;
-  const body = () => `<div class="callout info"><strong>${plain ? "Plain-language view." : "Technical view."}</strong> ${esc(plain ? m.intro.plain : m.intro.technical)}</div>` +
-    m.engines.map((e) => `<section class="card engine" id="${e.id}" style="margin-bottom:14px"><h2 style="margin-top:0">${esc(e.name)}</h2><p>${chip("neutral", "status")} <span class="small">${esc(e.status)}</span></p><ul class="${plain ? "plainbox" : ""}">${(plain ? e.plain : e.technical).map((t) => `<li>${esc(t)}</li>`).join("")}</ul></section>`).join("");
+  const flow = `<figure class="flow" aria-label="Flow chart of the six engines"><div class="flow-svg" id="flowsvg"></div><figcaption>How the engines connect. Arrows carry indicators or hazards; uncertainty and validation apply to every arrow. The fill shows how far each engine is built in this release, and a dashed arrow is not active.</figcaption></figure>`;
+  const body = () => `<div class="callout info"><strong>${plain ? "Plain-language view." : "Technical view."}</strong> ${esc(plain ? m.intro.plain : m.intro.technical)}</div>` + flow +
+    m.engines.map((e) => `<section class="card engine" id="${e.id}" style="margin-bottom:14px"><h2 style="margin-top:0">${esc(e.name)}</h2><p>${chip("neutral", "status")} <span class="small">${esc(e.status)}</span></p><ul class="${plain ? "plainbox" : ""}">${(plain ? e.plain : e.technical).map((t) => `<li>${plain ? esc(t) : Tex.text(t)}</li>`).join("")}</ul></section>`).join("");
   view().innerHTML = `<div class="wrap"><h1>Methodology</h1><p class="muted" style="max-width:760px">What is actually implemented, engine by engine. Switch to the plain-language view for an everyday-analogy explanation of each mechanism; the technical view keeps the equations and parameters.</p>
     <label class="toggle"><input type="checkbox" id="plain"> Explain it simply</label><div id="mbody" style="margin-top:14px"></div></div>`;
   $("#plain").checked = plain;
-  const draw = () => { $("#mbody").innerHTML = body(); };
+  const draw = () => {
+    $("#mbody").innerHTML = body();
+    if (!plain) Tex.load().then(() => Tex.typeset($("#mbody"))).catch(() => {});
+    if (!state.flowSvg) state.flowSvg = fetch("assets/architecture.svg?v=" + window.ANTAR_BUILD).then((r) => (r.ok ? r.text() : "")).catch(() => "");
+    state.flowSvg.then((svg) => { const box = $("#flowsvg"); if (box) box.innerHTML = svg || '<p class="muted small">The flow chart could not be loaded.</p>'; });
+  };
   draw();
   $("#plain").addEventListener("change", (e) => { plain = e.target.checked; try { localStorage.setItem("antar_plain", plain ? "1" : "0"); } catch (x) { /* ignore */ } draw(); });
   let j = null; try { j = sessionStorage.getItem("jump"); sessionStorage.removeItem("jump"); } catch (e) { /* ignore */ }

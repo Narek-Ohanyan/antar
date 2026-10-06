@@ -1,0 +1,158 @@
+{
+ "intro": {
+  "technical": "ANTAR chains six engines. TOPOHYDRO turns coarse climate into a per-node daily water balance; XYLEM converts that water stress into a mechanistic probability that trees suffer hydraulic failure; MNEME is the statistical counterpart fitted to satellite-observed dieback; MERISTEM asks where each species' climate niche and thermal treeline lie; REFUGIUM combines hazard into multi-scenario viability and robust-refugium scores; AEGIS chooses what to plant where under a budget, hedging against the worst plausible futures. This page describes what is implemented, which in several deliberate and logged ways differs from the original concept note.",
+  "plain": "Think of six helpers passing a baton. The first works out how wet or dry each hillside really is. The second asks how much dryness a tree can take before it fails. The third looks at satellite pictures for trees that actually died. The fourth asks where each species is comfortable and how high up trees can grow. The fifth asks which places stay safe across many possible futures. The sixth uses all of that to suggest where a limited budget does the most good."
+ },
+ "engines": [
+  {
+   "id": "topohydro",
+   "name": "TOPOHYDRO — climate and water balance",
+   "status": "Fitted on real data. Two inputs are still flagged placeholders: budburst GDD (200) and the calm-clear-night fraction (0.3).",
+   "technical": [
+    "Temperature is moved from the reference pixel's elevation to the node's own elevation, $T(x,d)=T_{\\text{ref}}(d)+\\Gamma_{m}\\,[z(x)-z_{\\text{ref}}]+\\delta_{\\text{CAP}}(x,d)$. $\\Gamma_m$ is a monthly lapse rate fitted to Armenian GHCN-D stations (roughly $-7.6$ K/km in summer and $-4.9$ K/km in winter); $\\delta_{\\text{CAP}}\\le0$ is a cold-air-pooling term on $T_{\\min}$ driven by terrain concavity.",
+    "Precipitation uses a monthly log-linear elevation gradient, so it cannot go negative; elevation explains at most about 1% of its variance, so the correction is small. The reference year is 2019 from CHELSA-daily (about 1 km). Wind, shortwave, longwave and dew point are ERA5-Land annual cell means, each given the seasonal cycle of the observation-based ISIMIP3a GSWP3-W5E5 product (2015–2019, 0.5°), $x(d)=\\bar x_{\\text{cell}}\\,s_x(d)\\,\\rho_x(d)$, where $s_x$ has mean 1 and $\\rho_x$ is the model's monthly future/baseline ratio in a scenario. Until 2026-10-06 these four were repeated unchanged on every day of the year, which removed most of the summer water deficit; that has been replaced. Pressure is still the annual mean.",
+    "Potential evapotranspiration is carried as three formulations (FAO-56 Penman–Monteith, the default shown; Priestley–Taylor; energy-only). Actual evapotranspiration comes from a single-bucket soil model with capacity $W_{\\max}=(\\theta_{\\text{fc}}-\\theta_{\\text{lim}})\\,z_{\\text{root}}$, with soil parameters from SoilGrids via the Saxton–Rawls pedotransfer functions and matric potential $\\psi_s=\\psi_{\\text{sat}}(\\theta/\\theta_{\\text{sat}})^{-b}$ (Clapp–Hornberger).",
+    "Indices: $\\mathrm{CWD}=\\sum_d(\\mathrm{PET}_d-\\mathrm{AET}_d)$; $\\mathrm{WSI}=\\sum_d\\max\\{0,(\\mathrm{REW}_{\\text{crit}}-\\mathrm{REW}_d)/\\mathrm{REW}_{\\text{crit}}\\}$; $\\mathrm{GDD}=\\sum_d\\max(T_d-5,0)$; growing season = days with daily mean $\\ge0.9\\,^\\circ$C; GST = mean temperature over those days.",
+    "Rooting depth is species-specific (2.9 m deciduous forest, 3.9 m conifer forest, 9.5 m arid juniper; Canadell et al. 1996), so each functional group experiences its own water-stress signal rather than one shared value."
+   ],
+   "plain": [
+    "Imagine each patch of ground as a bucket of soil water. Rain fills it; sun and wind empty it. How deep a tree's roots reach decides how big its bucket is — a deep-rooted juniper has a far bigger bucket than a shallow-rooted beech.",
+    "The 'climatic water deficit' is simply how much extra water the tree would have drunk if the bucket hadn't run dry. Mountains are cooler — every 100 metres uphill is roughly half a degree to three-quarters of a degree colder — so we take a coarse weather record and slide it up or down the slope to fit each spot."
+   ]
+  },
+  {
+   "id": "xylem",
+   "name": "XYLEM — mechanistic hydraulic-failure hazard",
+   "status": "P50 and slope are real values from congeneric XFT records. Other traits (stomatal-closure potential, phase-transition temperature, lethal PLC, capacitance) are order-of-magnitude placeholders. Juniper is skipped: only one XFT record exists, so no variance can be estimated.",
+   "technical": [
+    "A two-phase time-to-failure model. Phase 1: the soil dries until its water potential reaches the group's stomatal-closure potential. Phase 2: with stomata shut, the tree drains its own water store through the cuticle. The buffer $B=C\\,(\\psi_{\\text{close}}-\\psi_{\\text{crit}})$ is consumed at $E_{\\min}=g_{\\min}(T)\\,\\mathrm{VPD}_{24}/P_{\\text{atm}}$, and the hydraulic-failure index $\\mathrm{HFI}=\\sum_{\\text{closed days}}86400\\,E_{\\min}/B$ reaches 1 at $\\psi_{\\text{crit}}$ (P88 for angiosperms, P50 for conifers). $\\mathrm{HFI}\\ge1$ is the model's definition of hydraulic failure.",
+    "Uncertainty is carried explicitly with a two-level Monte Carlo: 50 outer draws of group-level $P_{50}$ and slope (spread from the between-record variation in XFT) $\\times$ 200 inner draws of individual trees. $h^{\\text{mech}}$ is the share of individuals that fail per outer draw; the map shows its mean and the spread across outer draws is the trait-knowledge uncertainty.",
+    "No individual-level variance exists in the pulled data, so individual spread is set to 0.5$\\times$ the group-level spread, a documented placeholder rather than a measurement. Only $P_{50}$ and slope are sampled; closure potential, capacitance, $g_{25}$, $T_p$ and the lethal loss of conductivity are held at placeholder values."
+   ],
+   "plain": [
+    "A tree is a straw drawing water from the soil up to its leaves. In a drought the water in the straw is pulled so hard that air bubbles form and the straw stops working. Each species' straw fails at a different level of suction.",
+    "First the tree shuts its leaf pores to save water. After that it can only leak a little through its leaf skin, slowly draining a reserve tank. The model asks whether the dry spell lasts longer than the tank. Because we don't know every tree's exact straw, we simulate thousands of slightly different trees and count how many fail."
+   ]
+  },
+  {
+   "id": "mneme",
+   "name": "MNEME — statistical hazard from observed dieback",
+   "status": "No fitted model so far: the sampled person-years contained no observed dieback events, so there is nothing to fit (the Models page shows the current counts). A denser sample is being computed.",
+   "technical": [
+    "Dieback labels come from a standardised annual kNDVI anomaly, $z_t=(k_t-\\tilde k)/s$ with the median $\\tilde k$ and standard deviation $s$ of the preceding ten years. An event fires when $z_t<-2$, no harvest or fire is recorded that year (Hansen GFC loss, MODIS burned area), and $z$ stays at or below $-1$ in the two following seasons.",
+    "The person-year panel carries climate covariates ($\\mathrm{CWD}$, $\\mathrm{VPD}_{24}$, GDD, mean temperature) split into within-place deviations and between-place means (a Mundlak decomposition). The intended fit is a complementary log-log hazard model, $\\operatorname{cloglog}(h)=\\ln\\Delta+\\eta$, stacking a GLM and a monotone gradient-boosted model, validated with spatial block cross-validation.",
+    "The full design in the concept note (age spline, drought-legacy cross-basis, stand terms) cannot be applied: no real stand-age, structure or tree-ring data has been obtained. The components are built and unit-tested."
+   ],
+   "plain": [
+    "Satellites photograph the forest every year. A tree stand whose greenness drops far below its own recent normal, stays low for several seasons, and wasn't logged or burned is a likely dieback. The model would then ask which unusually dry or hot years came before those events.",
+    "So far, in the places we looked, no such event has been found at all — which is genuinely informative but means there is nothing to learn from yet."
+   ]
+  },
+  {
+   "id": "meristem",
+   "name": "MERISTEM — climate niche and treeline",
+   "status": "Adult-niche model fitted for 6 of 7 species (Pinus kochiana skipped: 8 presences). Cross-validated skill is modest. The attainable-height / growth model is not fitted. The CWD input is a simple proxy, not the real water-balance CWD.",
+   "technical": [
+    "A penalised logistic presence–background model is fitted per species (pooling disparate species gave an unstable result and was rejected). Presences are GBIF records; background is target-group. Predictors: winter minimum temperature, GDD5, VPD, a CWD proxy (PET − precipitation), and clay, sand, silt, organic carbon (0–30 cm).",
+    "Skill is the Boyce index under spatial block cross-validation (0.25° blocks). The per-species values are on the Models page; several species are near zero and some folds are negative, so the niche scores are a rough guide only.",
+    "Potential treeline elevation inverts the lapse relation for the elevation at which growing-season mean temperature equals the thermal threshold, $z_{\\text{tl}}=z+(T_{\\text{tl}}-\\mathrm{GST})/\\Gamma$, with $T_{\\text{tl}}=6.45\\,^\\circ$C (the global Körner–Paulsen value) and $\\Gamma=-6.89$ K/km the April–September fitted lapse rate."
+   ],
+   "plain": [
+    "The niche model asks: where do these trees already grow, and what do those places have in common? Then it scores every other place by how much it resembles a place where the tree grows. The scores are a rough guide, not a precise map.",
+    "Treeline is simpler. Trees stop where summers are too cold to grow wood. Because it gets colder as you go up, there is a height above which it is always too cold. Warming moves that height upward."
+   ]
+  },
+  {
+   "id": "treeline",
+   "name": "Treeline change",
+   "status": "Climatic ceiling only — not a forecast of where forests will stand. Global threshold, not an Armenia calibration. One representative year per horizon.",
+   "technical": [
+    "For every GCM × SSP × horizon member, the real monthly ISIMIP3b temperature change (5-year future window minus 2015–2019) is added to the daily 2019 reference series. Growing-season temperature is then recomputed from the shifted daily series with the pipeline's own functions and inverted for treeline elevation. The 2019 reconstruction matches the full pipeline's stored value exactly (max difference 0.0000 °C).",
+    "GST is a mean over the days that clear 0.9 °C. Warming adds cold shoulder-season days to that set, which can pull the mean down even though every day warmed. A measurable share of cell–member pairs therefore show a treeline drop under warming, mostly in low-warming members (the Treeline page states the current figure). This is a property of the growing-season definition, not a prediction that treelines fall; it is reported rather than hidden."
+   ],
+   "plain": [
+    "We ask how far uphill the 'too cold for trees' line moves under each climate model and emissions path. For the strongest warming it moves several hundred metres.",
+    "One quirk worth knowing: if warming merely lengthens the season, the extra early-spring and late-autumn days are cold, and they drag the season's average temperature down. In a few cool-ish cases the model's ceiling therefore appears to sink a little. That is an artefact of how 'season average' is defined, so treat small negative values as 'roughly no change'."
+   ]
+  },
+  {
+   "id": "refugium",
+   "name": "REFUGIUM — viability and robust refugia",
+   "status": "Reduced scope: one year of hydraulic survival only (the growth/height term is not fitted, so it is fixed at 1), and robust-refugium criterion (a) only — buffer index (b) and area of applicability (c) are not computed.",
+   "technical": [
+    "Viability is $V=\\prod_y(1-h_y)\\cdot\\mathbb{P}[\\text{height ok}]$. With one year and no growth model, $V^{(1)}=1-h^{\\text{mech}}$ for each of the 50 outer draws.",
+    "The risk-averse score is $\\operatorname{median}(V)-\\lambda\\,\\mathrm{IQR}(V)$ across the ensemble ($\\lambda=0.5$). A cell is a robust refugium on criterion (a) when $\\mathbb{P}_\\omega[V\\ge v^\\ast]\\ge\\rho$ with $v^\\ast=0.6$ and $\\rho=0.8$.",
+    "Future viability uses the same engines on the delta-method climates: 5 GCMs (GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0, UKESM1-0-LL) × 3 SSPs (126, 370, 585) × 3 horizons (2050, 2080, 2100). Temperature and precipitation use the ISIMIP3b monthly change applied to 2019 CHELSA-daily; shortwave, longwave, wind and vapour pressure use the ISIMIP3b monthly ratio (future 5-year mean over the model's own 2015–2019 mean) applied to their seasonal shape, so humidity, radiation and wind change with the scenario. Cloudiness changes only as far as the model's own shortwave does; pressure and CO2 are held at present values."
+   ],
+   "plain": [
+    "A refugium is a spot where trees are likely to make it through even if our knowledge of the physics is a bit off. So we don't trust the average alone; we check whether a spot looks safe across many plausible versions of the model.",
+    "The future runs take a real recent year and ask 'what if every month were as much warmer or drier as each climate model projects?'. Because humidity and wind are not changed, the model sees only part of the change, which is a likely reason viability barely moves across scenarios."
+   ]
+  },
+  {
+   "id": "aegis",
+   "name": "AEGIS — robust planting portfolio",
+   "status": "Real inputs, with stated simplifications: benefit varies only by species group and cost only by method (no real data links method to survival); 4 of 8 method costs use a blended average; water limits are not applied.",
+   "technical": [
+    "At most one option (functional group $\\times$ intervention method) is chosen per unit to maximise $(1-\\lambda)\\,\\mathbb{E}[B]+\\lambda\\,\\mathrm{CVaR}_\\alpha[B]$ ($\\alpha=0.8$) subject to total cost $\\le$ budget (Rockafellar–Uryasev linear programme). Benefit = viability $\\times$ 417 USD/ha/yr (World Bank national ecosystem-services value); costs per hectare come from World Bank 2023 / Armenia's Landscape Restoration Strategy; budgets run from 9.3 M to 663 M USD.",
+    "Eligibility excludes protected areas (WDPA) and cells with more than 50% human-modified land within 500 m (settlements, cropland, buildings, quarries; Ecosystem Map of Armenia). Already-forested cells are deliberately not excluded because three of the eight methods act on existing forest.",
+    "Sweeping $\\lambda$ from 0 to 1 traces the mean–CVaR frontier; the distance between its ends is the price of robustness."
+   ],
+   "plain": [
+    "It works like building an investment portfolio, but for planting sites. Given a budget, which mix of species and methods should go where so that even the unlucky futures still turn out acceptably, not just the average one?",
+    "In the results so far every budget level selects the same sites, because the sample is small and even the most expensive option is affordable across all of it — so money isn't the limiting factor here, and the choice doesn't change with the budget."
+   ]
+  }
+ ],
+ "placeholders": [
+  {
+   "name": "Budburst GDD threshold",
+   "value": "200 °C·d (base 5 °C)",
+   "effect": "Sets the late-frost-day count.",
+   "state": "Placeholder. A cited species-specific threshold could not be verified: the primary source uses a non-linear growing-degree-hours model and no simple threshold exists in it."
+  },
+  {
+   "name": "Calm-clear-night fraction",
+   "value": "0.3",
+   "effect": "Scales cold-air pooling.",
+   "state": "Placeholder. ERA5-Land has no cloud-cover band (checked directly), so the planned fix does not exist."
+  },
+  {
+   "name": "Individual-tree spread",
+   "value": "0.5 × group-level spread",
+   "effect": "Width of the inner Monte Carlo loop.",
+   "state": "Placeholder. No individual-level variance exists in the pulled data."
+  },
+  {
+   "name": "Stomatal-closure potential, phase-transition temperature, lethal PLC, capacitance",
+   "value": "order-of-magnitude values",
+   "effect": "Shape XYLEM's time to failure.",
+   "state": "Placeholders. No unit-compatible XFT field exists for them."
+  },
+  {
+   "name": "Rooting depth",
+   "value": "2.9 / 3.9 / 9.5 m by group",
+   "effect": "Soil water capacity.",
+   "state": "Sourced (Canadell et al. 1996), but biome-level rather than species-level."
+  },
+  {
+   "name": "Treeline thermal threshold",
+   "value": "6.45 °C",
+   "effect": "Where the treeline sits.",
+   "state": "Global Körner–Paulsen default, not calibrated to Armenia."
+  }
+ ],
+ "known_gaps": [
+  "Atmospheric inputs (2026-10-06 correction): until this date wind, shortwave, longwave and humidity were ERA5-Land annual means repeated on every day and held in every scenario. A test on 23 Armenian cells showed this removed most of the summer water deficit (broadleaf: 14 mm vs 114 mm with the real seasonal cycle) and flattened the scenario response (change in deficit under SSP5-8.5 by 2100: +4 mm vs +212 mm). The earlier 'viability stays flat across scenarios' result was largely this artefact. Results are being recomputed with the seasonal, scenario-dependent forcing; until the Status page lists a quantity as recomputed, treat its water-stress and hazard values as superseded.",
+  "Scenario results are being recomputed with the seasonal, scenario-dependent atmosphere. Until a quantity is listed as recomputed on the Status page, its scenario maps are withheld, and nothing should be concluded from older numbers about how much viability changes between scenarios.",
+  "Sample size: the core fits were run on a coarse grid (25 Armenian nodes). A denser 921-node Armenia-only grid is being computed; every layer in the UI is labelled with the grid it comes from, and a dense result is only used once it covers the grid almost completely.",
+  "MNEME has no fitted hazard model (zero observed dieback events in the sample).",
+  "Against mapped forest cover at the 23 sampled cells inside Armenia, predicted viability shows only weak positive rank correlation (broadleaf ρ = 0.28, p = 0.19; oak ρ = 0.19, p = 0.38), which is not statistically significant at n = 23. An earlier 'significant' result (n = 61) included cells over neighbouring countries and has been retracted. Pine could not be tested because no mapped pine cover falls in the sampled windows.",
+  "The spatial range of correlation could not be pinned down with the available points (the semivariogram shows no clear plateau), so the spatial cross-validation block size in the validation design is unresolved.",
+  "Blocked cross-validation for the hazard model, the hydraulic emulator and the variance-decomposition stage are built and unit-tested but have not been applied to results: they need a fitted hazard model and a wall-to-wall run.",
+  "TRY plant-trait data and CORDEX regional projections are deferred to version 2.1.",
+  "Map colouring: the surface is an inverse-distance interpolation between model nodes, not a model run at every pixel. With 25 nodes the leave-one-out R² is near zero for most quantities, so colours between nodes are not informative yet; each selection shows its own leave-one-out score, and the surface becomes meaningful only with the dense grid.",
+  "Map borders: marz borders come from geoBoundaries (Wikimedia-derived, 2005) and are approximate to kilometres; the national outline, forest, woodland and water come from the national Ecosystem Map. An official cadastral boundary would replace the marz lines.",
+  "Forest cover on the map is today's mapped cover (Ecosystem Map classes 31–37 forest, 39/41/43/44 woodland). It is not projected forward: the model gives where conditions stay viable, not where forest will stand."
+ ]
+}

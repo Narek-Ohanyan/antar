@@ -16,7 +16,7 @@ python -m pytest             # a few seconds
 
 Optional extras: `.[geo]` (rasters, zarr), `.[bayes]` (PyMC), `.[ml]` (boosting, SHAP, conformal), `.[workflow]` (Snakemake, DVC).
 
-## The five engines
+## The six engines
 
 | Engine | Package | What it holds |
 |---|---|---|
@@ -41,22 +41,20 @@ Supporting, cross-cutting packages:
 never committed: they live in a local, gitignored `data/` directory and are tracked by manifest
 (`antar.io.manifest`) rather than by path.
 
-## Reproducing the v1 audit and the figures
+## Reproducing the figures
 
 ```bash
-python scripts/audit_v1.py --parquet <path to Armenia_ML_Training_Data.parquet> --out docs/audit_v1.json   # ~2 min
-python scripts/make_figures.py --audit docs/audit_v1.json --out docs/figures
+python scripts/make_figures.py --out docs/figures  # the hydraulic-engine and extrapolation-experiment figures
 ```
 
-`audit_v1.py` re-runs a prior-project random forest and the checks behind Table 1 and Fig. 1 of the concept
-note (random vs. blocked CV, coordinates-only baseline, features predicting location, flat extrapolation, unit
-audit). Figures 3 and 4 use placeholder traits and synthetic data by design.
+The figures of the hydraulic engine and of the controlled extrapolation experiment use placeholder traits and synthetic
+data by design: they demonstrate mechanisms, not skill.
 
 ## Conventions
 
 * Every formula lives in tested code; tests include closed-form checks (two-phase engine against `B / E_min`, Ishigami
   function for Sobol' indices, mass balance to machine precision), physical bounds (e.g. `ΔVPD/ΔTmax`) and regression
-  tests that encode known prior-project errors.
+  tests that encode known construction errors.
 * Validation is specified before fitting (`configs/cv.yaml`); every fitted quantity, including the AOA threshold and
   stacking weights, is fitted inside the training fold only.
 * Data enter through manifests (source, version, checksum, licence); nothing is downloaded implicitly.

@@ -320,3 +320,18 @@ footer { margin-top: clamp(56px, 9vw, 112px); border-top: 1px solid var(--border
   nav a { flex: 0 0 auto; scroll-snap-align: center; min-height: 44px; display: inline-flex; align-items: center; padding: 0 4px; font-size: .84rem; }
   nav a::after { bottom: 8px; left: 4px; right: 4px; }
 }
+
+/* ---------- Method: typeset formulas (ui/math.js) ---------- */
+.engine .katex { font-size: 1.04em; }
+.tex:not(.done) { font-family: var(--mono); font-size: .88em; color: var(--muted); }
+.tex-fail { color: var(--bad); }
+.flow { margin: 20px 0 22px; }
+.flow-svg { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 10px; aspect-ratio: 888 / 780; }
+.flow-svg svg { display: block; width: 100%; height: auto; }
+.flow figcaption { font-size: .9rem; color: var(--muted); margin: .7em 0 0; max-width: 80ch; }
+.fig-arch {
+  --svg-run: var(--good-bg); --svg-reduced: var(--warn-bg); --svg-built: #e8eef6; --svg-none: var(--bad-bg); --svg-drv: var(--surface-2);
+  --svg-paper: var(--surface); --svg-ink: var(--text); --svg-mute: var(--muted); --svg-line: var(--c4);
+}
+:root[data-theme="dark"] .fig-arch { --svg-built: #22314a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fig-arch { --svg-built: #22314a; } }

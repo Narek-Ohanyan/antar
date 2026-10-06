@@ -1986,3 +1986,27 @@ municipality" (the WSL page speaks only of "improved climate services"). The sta
   Between 1100 and 1200 px the items are centred between brand and button; below 1100 px (previously 900) they form one scrolling row, centred when
   they fit ("safe center"), because at 1024 px ten items overflowed their box and ran under the theme button -- a defect that predates this change.
   Tests: `tests/test_acknowledgments.py`.
+
+## 2026-10-06 (cont.) -- Method page: formulas typeset, text matched to what was built
+
+* **Formulas.** The engine cards on the Method page write their formulas as LaTeX between dollar signs (`ui/data/methodology.json`) and typeset
+  them with KaTeX 0.19 (MIT), self-hosted in `ui/assets/katex` (woff2 fonts only, no third-party request), loaded only when the page is opened
+  (`ui/math.js`). `tests/test_method_page.py` checks that every formula parses in KaTeX's strict mode (needs node; skipped without it) and that no
+  Greek letter or pseudo-formula is left in plain text.
+* **Text matched to the implementation** (author's request that the methodology describe what was done): the cards now say that scenarios use monthly
+  change factors on the 2019 reference year (no quantile mapping), that the atmosphere is the ERA5-Land annual mean times an ISIMIP3a seasonal shape
+  and the ISIMIP3b monthly ratio, that PET is three formulations, only $P_{50}$ and slope are sampled in XYLEM, and what is built but not applied.
+  Two stale "known gaps" (viability nearly flat across scenarios; only temperature and precipitation perturbed) were removed because the constant-
+  atmosphere artefact behind them was corrected today, and replaced by one entry saying scenario maps are withheld until the recomputed runs finish.
+* **A full as-built specification page was written and then removed** at the author's request (LaTeX sources, converter, KaTeX-rendered numbered
+  equations, tables and figures). Only the engine cards remain, with one addition the author asked for: the flow chart of the six engines
+  (`scripts/build_architecture_svg.py` -> `ui/assets/architecture.svg`, inlined so it follows the light/dark theme), each box filled by how far
+  the engine is built and inactive flows dashed. While reading the concept note for it, two facts were found and kept: the copy in
+  `docs/concept_v2` was the 21 September draft, not the final 22 September note (the final one adds the thermal-treeline modifier, Eq. for f_tl, and
+  the variable inventory); it has been refreshed from `foracca2_repo_skeleton.zip`, whose PDF is byte-identical to `FORACCA_2.0_Technical_Concept_v2.pdf`.
+  And the concept note's stomatal-closure curve had the exponent's sign reversed (it would close stomata as water potential rises); the code uses
+  the correct, increasing form.
+* **Standing instruction (author): the methodology never mentions the earlier model or its version.** Enforced by a test over the Method text, the
+  site scripts, the README and CITATION.cff. Third-party datasets whose own version is called v1 are in the data manifest and are not affected.
+* `ui/data/methodology.json` is hand-written but had been ignored by git through the broad `data/` rule; it is now tracked (the generated
+  data bundle next to it still is not).

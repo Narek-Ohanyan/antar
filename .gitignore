@@ -1,5 +1,9 @@
 # Raw/derived climate and geospatial data: pulled per configs/ + manifests, never committed.
 data/
+# the Method page's text is a source, not derived climate data
+!ui/data/
+ui/data/*
+!ui/data/methodology.json
 
 # Python
 __pycache__/
