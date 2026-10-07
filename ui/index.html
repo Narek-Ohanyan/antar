@@ -10,7 +10,7 @@
   <link rel="preload" href="assets/fonts/source-sans-3-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="icon" href="assets/antar_logo.jpeg">
-  <link rel="stylesheet" href="styles.css?v=2fb19d936e">
+  <link rel="stylesheet" href="styles.css?v=782f204555">
 </head>
 <body>
   <a class="skip" href="#view">Skip to main content</a>
@@ -18,12 +18,18 @@
     <div class="wrap">
       <a class="brand" href="#/home" aria-label="ANTAR — home"><img class="brand-logo" src="assets/antar_logo.jpeg" alt="ANTAR"></a>
       <nav id="mainnav" aria-label="Main"></nav>
+      <div class="tools">
+      <button class="search-btn" id="search" type="button" aria-haspopup="dialog" aria-label="Search the site and jump to a page, a map layer or a place" title="Search (Ctrl K or ⌘K)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+        <span class="search-text">Search</span><kbd id="search-kbd">Ctrl K</kbd>
+      </button>
       <button class="menu-btn" id="menu" type="button" aria-expanded="false" aria-controls="mainnav" aria-label="Open the menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="m-open" d="M4 7h16M4 12h16M4 17h16"/><path class="m-close" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
       <button class="theme-btn" id="theme" type="button" title="Switch light / dark theme" aria-label="Switch light or dark theme">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor" stroke="none"/></svg>
       </button>
+      </div>
     </div>
   </header>
   <main id="view" tabindex="-1"></main>
@@ -57,15 +63,17 @@
         <p class="small muted">Please also cite the datasets your use depends on (see <a href="#/refs">References</a>).</p>
       </div>
     </div>
-    <div class="legal"><div class="wrap">© 2026 Narek Ohanyan. All rights reserved. Third-party data, fonts and libraries keep their own licences.</div></div>
+    <div class="legal"><div class="wrap">© 2026 Narek Ohanyan. All rights reserved. Third-party data, fonts and libraries keep their own licences. Photographs belong to their authors and are shown under the Creative Commons licences named beside each image; see <a href="#/ack">Acknowledgments</a>.</div></div>
   </footer>
-  <script>window.ANTAR_BUILD = "2fb19d936e";</script>
+  <script>window.ANTAR_BUILD = "782f204555";</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="charts.js?v=2fb19d936e"></script>
-  <script src="interp.js?v=2fb19d936e"></script>
-  <script src="map.js?v=2fb19d936e"></script>
-  <script src="place.js?v=2fb19d936e"></script>
-  <script src="math.js?v=2fb19d936e"></script>
-  <script src="app.js?v=2fb19d936e"></script>
+  <script src="charts.js?v=782f204555"></script>
+  <script src="interp.js?v=782f204555"></script>
+  <script src="map.js?v=782f204555"></script>
+  <script src="place.js?v=782f204555"></script>
+  <script src="home.js?v=782f204555"></script>
+  <script src="palette.js?v=782f204555"></script>
+  <script src="math.js?v=782f204555"></script>
+  <script src="app.js?v=782f204555"></script>
 </body>
 </html>

@@ -10,10 +10,17 @@ on its own.
 from __future__ import annotations
 
 import html
+import json
 import re
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent.parent / "ui" / "assets" / "architecture.svg"
+METHODOLOGY = Path(__file__).resolve().parent.parent / "ui" / "data" / "methodology.json"
+
+
+def engine_states():
+    """The state of each engine (run / reduced / built) is written once, in ui/data/methodology.json; the home page cards and this chart both read it."""
+    return {e["id"]: e["state"] for e in json.loads(METHODOLOGY.read_text())["engines"]}
 
 S = 52.0                  # px per cm
 X0, Y0 = 444.0, 44.0      # pixel position of the origin (x = 0 cm, y = 0 cm)
@@ -105,27 +112,28 @@ text{font-family:'Source Sans 3',system-ui,-apple-system,'Segoe UI',sans-serif}
 
 def build():
     f = Fig()
+    st = engine_states()
     f.box(0, 0, 13.2, 0.95, [("t", "Drivers"), ("x", "CHELSA-daily 2019 · ISIMIP3a/3b · ERA5-Land · SRTM 30 m · SoilGrids · stations")], "driver")
     f.box(0, -1.85, 9.4, 1.25, [("t", "TOPOHYDRO — topoclimate and water balance"),
                                  ("x", "T, VPD, R_{n}, PET × 3, snow, soil bucket per species group"),
-                                 ("x", "→ CWD, WSI, ψ_{s}, GDD, late frost, GST")], "run")
+                                 ("x", "→ CWD, WSI, ψ_{s}, GDD, late frost, GST")], st["topohydro"])
     f.arrow([(0, -0.48), (0, -1.22)])
     yb = -4.75
     f.box(-5.8, yb, 5.0, 2.15, [("t", "XYLEM — hydraulic failure"),
                                  ("x", "vulnerability curve, stomatal closure,"),
                                  ("x", "g_{min}(T) heat transition, HFI"),
                                  ("x", "50 × 200 trait draws → h^{mech}"),
-                                 ("s", "traits: XFT P_{50}, S; others placeholder")], "run")
+                                 ("s", "traits: XFT P_{50}, S; others placeholder")], st["xylem"])
     f.box(0, yb, 5.0, 2.15, [("t", "MNEME — mortality hazard"),
                               ("x", "cloglog panel model, within/between,"),
                               ("x", "lags; GLM + monotone GBM stack → h^{stat}"),
                               ("s", "dieback labels built; 0 events in the"),
-                              ("s", "sampled panel, so not fitted")], "built")
+                              ("s", "sampled panel, so not fitted")], st["mneme"])
     f.box(5.8, yb, 5.0, 2.15, [("t", "MERISTEM — niche, treeline, growth"),
                                 ("x", "niche per species and treeline z_{tl}: run"),
                                 ("x", "height H*, growth, establishment:"),
                                 ("x", "built, not fitted"),
-                                ("s", "niche inputs: CHELSA-BIOCLIM+, GBIF, soils")], "reduced")
+                                ("s", "niche inputs: CHELSA-BIOCLIM+, GBIF, soils")], st["meristem"])
     f.arrow([(-3.4, -2.48), (-3.4, -2.8), (-5.8, -2.8), (-5.8, -3.67)], label="ψ_{s}, VPD, T", label_at=(-5.7, -2.7))
     f.arrow([(0, -2.48), (0, -3.67)], label="annual CWD, VPD, GDD, T", label_at=(0.1, -3.05))
     f.arrow([(3.4, -2.48), (3.4, -2.8), (5.8, -2.8), (5.8, -3.67)], label="GST (treeline only)", label_at=(5.9, -2.7))
@@ -134,11 +142,11 @@ def build():
     f.arrow([(-3.4, -5.83), (-3.4, -7.1), (-2.7, -7.1)], dashed=True)
     f.box(0, -9.1, 9.4, 1.25, [("t", "REFUGIUM — viability, refugia, analogues"),
                                 ("x", "V^{(1)} = 1 − h^{mech}; robust refugium, criterion (a); risk-averse score"),
-                                ("s", "other hazards, height factor, criteria (b), (c), analogues: not computed")], "reduced")
+                                ("s", "other hazards, height factor, criteria (b), (c), analogues: not computed")], st["refugium"])
     f.arrow([(-5.8, -5.83), (-5.8, -8.1), (-4.0, -8.1), (-4.0, -8.47)], label="h^{mech} (used)", label_at=(-5.7, -7.35))
     f.arrow([(0, -7.68), (0, -8.47)], dashed=True, label="h^{hyd}", label_at=(0.1, -8.1))
     f.arrow([(5.8, -5.83), (5.8, -8.1), (4.0, -8.1), (4.0, -8.47)], dashed=True, label="H*, growth, h^{est}", label_at=(5.9, -7.35))
-    f.box(0, -10.85, 9.4, 1.0, [("t", "AEGIS — decision layer"), ("x", "CVaR-robust species × method portfolio (MILP), 45 members")], "reduced")
+    f.box(0, -10.85, 9.4, 1.0, [("t", "AEGIS — decision layer"), ("x", "CVaR-robust species × method portfolio (MILP), 45 members")], st["aegis"])
     f.arrow([(0, -9.73), (0, -10.35)])
     f.box(-4.45, -12.5, 8.1, 1.15, [("t", "Uncertainty"), ("x", "SSP × GCM × horizon × traits: carried (run)"), ("x", "ANOVA and Sobol' partition: built, not applied")], "cross")
     f.box(4.45, -12.5, 8.1, 1.15, [("t", "Validation"), ("x", "niche block CV, synthetic extrapolation test: run"), ("x", "hazard CV, conformal, design-based: built")], "cross")

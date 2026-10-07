@@ -21,7 +21,7 @@ def test_cards_are_keyboard_reachable_buttons_that_open_the_dialog():
 def test_dialog_is_native_closes_on_escape_button_and_backdrop_and_restores_focus():
     charts = (UI / "charts.js").read_text()
     assert 'document.createElement("dialog")' in charts and "showModal()" in charts
-    assert "e.target === dlg" in charts and 'aria-label="Close the enlarged chart"' in charts
+    assert "e.target === dlg" in charts and 'aria-label="Close the enlarged view"' in charts
     assert "o.focus(" in charts                                            # focus returns to the chart that was opened
     css = (UI / "styles.css").read_text()
     assert "dialog.zoom" in css and "dialog.zoom::backdrop" in css and "html:has(dialog.zoom[open])" in css

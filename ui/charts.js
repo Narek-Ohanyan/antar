@@ -135,7 +135,7 @@ const Charts = (() => {
       dlg.addEventListener("click", (e) => { if (e.target === dlg) closeZoom(dlg); });              // a click on the backdrop
     }
     dlg._opener = opener || document.activeElement;
-    dlg.innerHTML = `<div class="zoom-head"><h3 id="zoomttl">${esc(title)}</h3><button type="button" class="zoom-x" aria-label="Close the enlarged chart">&times;</button></div><div class="zoom-body">${body}</div>`;
+    dlg.innerHTML = `<div class="zoom-head"><h3 id="zoomttl">${esc(title)}</h3><button type="button" class="zoom-x" aria-label="Close the enlarged view">&times;</button></div><div class="zoom-body">${body}</div>`;
     dlg.querySelector(".zoom-x").addEventListener("click", () => closeZoom(dlg));
     if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
     dlg.scrollTop = 0;

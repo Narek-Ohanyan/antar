@@ -50,6 +50,18 @@ python scripts/make_figures.py --out docs/figures  # the hydraulic-engine and ex
 The figures of the hydraulic engine and of the controlled extrapolation experiment use placeholder traits and synthetic
 data by design: they demonstrate mechanisms, not skill.
 
+## The web interface: artwork and photographs
+
+* `ui/assets/relief.svg` (the contour lines behind page titles, the footer and the home page) is drawn from the project's own terrain raster by
+  `python scripts/build_relief_art.py`; it is terrain, not a model result.
+* `ui/assets/photos/` holds four third-party landscape photographs from Wikimedia Commons (CC BY-SA 3.0/4.0), resized to 800 and 1600 px wide.
+  `credits.json` records author, licence, date and source page for each; the build refuses a photograph without an entry, and the credit is shown on
+  the image, in the enlarged view, on the Acknowledgments page and (as a general notice) in the footer. To add one, put `name-800.jpg` and
+  `name-1600.jpg` next to it, add its entry to `credits.json`, and run `python ui/build_data.py`; `tests/test_photo_credits.py` checks the rest.
+* The state of each engine (run, reduced scope, built but not applied) is written once, in `ui/data/methodology.json`; the home-page cards and the flow
+  chart on the Method page (`scripts/build_architecture_svg.py`) both read it.
+* Ctrl K or ⌘K (or `/`) opens a search box that jumps to any page, map layer or marz.
+
 ## Conventions
 
 * Every formula lives in tested code; tests include closed-form checks (two-phase engine against `B / E_min`, Ishigami

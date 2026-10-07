@@ -6,6 +6,7 @@
  "engines": [
   {
    "id": "topohydro",
+   "state": "run",
    "name": "TOPOHYDRO — climate and water balance",
    "status": "Fitted on real data. Two inputs are still flagged placeholders: budburst GDD (200) and the calm-clear-night fraction (0.3).",
    "technical": [
@@ -22,6 +23,7 @@
   },
   {
    "id": "xylem",
+   "state": "run",
    "name": "XYLEM — mechanistic hydraulic-failure hazard",
    "status": "P50 and slope are real values from congeneric XFT records. Other traits (stomatal-closure potential, phase-transition temperature, lethal PLC, capacitance) are order-of-magnitude placeholders. Juniper is skipped: only one XFT record exists, so no variance can be estimated.",
    "technical": [
@@ -36,6 +38,7 @@
   },
   {
    "id": "mneme",
+   "state": "built",
    "name": "MNEME — statistical hazard from observed dieback",
    "status": "No fitted model so far: the sampled person-years contained no observed dieback events, so there is nothing to fit (the Models page shows the current counts). A denser sample is being computed.",
    "technical": [
@@ -50,6 +53,7 @@
   },
   {
    "id": "meristem",
+   "state": "reduced",
    "name": "MERISTEM — climate niche and treeline",
    "status": "Adult-niche model fitted for 6 of 7 species (Pinus kochiana skipped: 8 presences). Cross-validated skill is modest. The attainable-height / growth model is not fitted. The CWD input is a simple proxy, not the real water-balance CWD.",
    "technical": [
@@ -64,6 +68,7 @@
   },
   {
    "id": "treeline",
+   "state": "run",
    "name": "Treeline change",
    "status": "Climatic ceiling only — not a forecast of where forests will stand. Global threshold, not an Armenia calibration. One representative year per horizon.",
    "technical": [
@@ -77,6 +82,7 @@
   },
   {
    "id": "refugium",
+   "state": "reduced",
    "name": "REFUGIUM — viability and robust refugia",
    "status": "Reduced scope: one year of hydraulic survival only (the growth/height term is not fitted, so it is fixed at 1), and robust-refugium criterion (a) only — buffer index (b) and area of applicability (c) are not computed.",
    "technical": [
@@ -86,11 +92,12 @@
    ],
    "plain": [
     "A refugium is a spot where trees are likely to make it through even if our knowledge of the physics is a bit off. So we don't trust the average alone; we check whether a spot looks safe across many plausible versions of the model.",
-    "The future runs take a real recent year and ask 'what if every month were as much warmer or drier as each climate model projects?'. Because humidity and wind are not changed, the model sees only part of the change, which is a likely reason viability barely moves across scenarios."
+    "The future runs take a real recent year and ask 'what if every month were as much warmer or drier as each climate model projects?'. Humidity, wind and sunshine change with the scenario too, following each model's own monthly change; only air pressure and CO2 are held at today's values."
    ]
   },
   {
    "id": "aegis",
+   "state": "reduced",
    "name": "AEGIS — robust planting portfolio",
    "status": "Real inputs, with stated simplifications: benefit varies only by species group and cost only by method (no real data links method to survival); 4 of 8 method costs use a blended average; water limits are not applied.",
    "technical": [

@@ -1,0 +1,74 @@
+[
+ {
+  "file": "dilijan-beech",
+  "caption": "Broadleaf forest interior",
+  "place": "Dilijan National Park, Tavush Province",
+  "kind": "closed forest",
+  "alt": "Tall broadleaf trees on a leaf-littered forest floor, with ferns at the edge of the track.",
+  "date": "2021-06-14",
+  "author": "Dminasyan",
+  "licence": "CC BY-SA 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source_page": "https://commons.wikimedia.org/wiki/File:DAP-10.jpg",
+  "source": "Wikimedia Commons",
+  "original_px": [
+   4160,
+   3120
+  ],
+  "changes": "resized to 1600 px and 800 px wide; cropped only by the page layout"
+ },
+ {
+  "file": "dilijan-ridge",
+  "caption": "Forested ridges",
+  "place": "Dilijan National Park, Tavush Province",
+  "kind": "mountain forest",
+  "alt": "A conifer-covered ridge in the foreground; forested mountain ranges fade into cloud behind it.",
+  "date": "2014-05-06",
+  "author": "H-dayan",
+  "licence": "CC BY-SA 3.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source_page": "https://commons.wikimedia.org/wiki/File:%22Dilijan%22_national_park.jpg",
+  "source": "Wikimedia Commons",
+  "original_px": [
+   5202,
+   3465
+  ],
+  "changes": "resized to 1600 px and 800 px wide; cropped only by the page layout"
+ },
+ {
+  "file": "aragats",
+  "caption": "Mount Aragats in winter",
+  "place": "Mount Aragats",
+  "kind": "upper mountain zone",
+  "alt": "Snow-covered Mount Aragats on the horizon above a snowy upland; dry grass slopes in the foreground.",
+  "date": "2021-01-05",
+  "author": "Soghomon Matevosyan",
+  "licence": "CC BY-SA 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source_page": "https://commons.wikimedia.org/wiki/File:.Aragats.jpg",
+  "source": "Wikimedia Commons",
+  "original_px": [
+   5472,
+   3648
+  ],
+  "changes": "resized to 1600 px and 800 px wide; cropped only by the page layout"
+ },
+ {
+  "file": "khosrov",
+  "caption": "Shrubland and rock slopes along a valley track",
+  "place": "Khosrov Forest State Reserve, Ararat Province",
+  "kind": "dry shrubland",
+  "alt": "A gravel track runs up a valley with green shrubs on the slopes and bare rock cliffs above.",
+  "date": "2016-05-01",
+  "author": "Soghomon Matevosyan",
+  "licence": "CC BY-SA 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source_page": "https://commons.wikimedia.org/wiki/File:.%D4%BD%D5%B8%D5%BD%D6%80%D5%B8%D5%BE%D5%AB_%D5%BA%D5%A5%D5%BF%D5%A1%D5%AF%D5%A1%D5%B6_%D5%A1%D6%80%D5%A3%D5%A5%D5%AC%D5%B8%D6%81_05.jpg",
+  "source": "Wikimedia Commons",
+  "original_px": [
+   4608,
+   3456
+  ],
+  "changes": "resized to 1600 px and 800 px wide; cropped only by the page layout"
+ }
+]

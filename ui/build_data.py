@@ -595,6 +595,14 @@ def build():
                      "url": s["app_url"], "license": "CC BY 4.0 (per the app page; the zip's own README carries an unfilled licence placeholder)",
                      "accessed": s["downloaded"], "manifest": "ecosystem_map_armenia.yaml"})
 
+    # photographs on the home page: every image file must have a credit entry (author, licence, source), and every entry a file
+    photo_dir = Path(__file__).resolve().parent / "assets" / "photos"
+    photos = json.loads((photo_dir / "credits.json").read_text()) if (photo_dir / "credits.json").exists() else []
+    for ph in photos:
+        for w in (800, 1600):
+            if not (photo_dir / f"{ph['file']}-{w}.jpg").exists():
+                raise SystemExit(f"photo {ph['file']}-{w}.jpg listed in credits.json is missing")
+
     manifest = {
         "generated": datetime.datetime.now().isoformat(timespec="seconds"),
         "groups": {gn: {**meta, "rooting_depth_m": ROOTING_DEPTH_M[gn]} for gn, meta in GROUPS.items()},
@@ -612,6 +620,7 @@ def build():
         "mneme": mneme,
         "variogram": variogram,
         "references": refs,
+        "photos": photos,
         "dense_min_coverage": DENSE_MIN_COVERAGE,
     }
     dump(manifest, OUT / "manifest.json")
@@ -632,8 +641,8 @@ def stamp_index():
     file after they change (a cached app.js showed an outdated warning after it had been corrected)."""
     import hashlib
     ui = Path(__file__).resolve().parent
-    files = ([ui / n for n in ("styles.css", "charts.js", "interp.js", "map.js", "place.js", "math.js", "app.js")] + sorted((ui / "data").glob("*.json"))
-             + sorted((ui / "assets" / "map").glob("*")) + [ui / "assets" / "architecture.svg"] + sorted((ui / "assets" / "katex").glob("*.*")))
+    files = ([ui / n for n in ("styles.css", "charts.js", "interp.js", "map.js", "place.js", "math.js", "home.js", "palette.js", "app.js")] + sorted((ui / "data").glob("*.json"))
+             + sorted((ui / "assets" / "map").glob("*")) + [ui / "assets" / "architecture.svg", ui / "assets" / "relief.svg"] + sorted((ui / "assets" / "photos").glob("*.*")) + sorted((ui / "assets" / "katex").glob("*.*")))
     h = hashlib.sha1()
     for f in files:
         if not f.is_file():

@@ -2052,3 +2052,20 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
   computed and stored; the placeholder entry on the Status page states the measurement and what is needed (a species-specific budburst threshold).
 * **Maps:** the "Interpolation check" block (leave-one-out R2 and RMSE per selection) is removed from the map panel on the user's request; the note under the map still says the surface is an
   interpolation. The Status & limits page no longer lists "Which maps have results" or "Data lineage", and Treeline change no longer carries the method-check sentence.
+
+## 2026-10-07 (cont.) -- visual refresh of the web interface
+
+* **Home page.** The "Headline results" are now a dark findings band with an emissions-path and a horizon selector. For the chosen pair each card shows the mean
+  one-year hydraulic survival of a species group (or the treeline shift), the change against 2019 in percentage points (sign and glyph, not colour alone), the range
+  across the five climate models, and a trend line for all three paths (the chosen one solid with its range shaded). Every number is read from the manifest
+  (`Home.headlineModel`, tested); the trend charts have a minimum visible span, as the map colour scale does, so a rounding-level difference is not drawn as a drop.
+  The lead sentence is generated from the same numbers. A relief of Armenia (contours every 250 m from the project's terrain raster) carries two highlighted
+  contours: the mean potential treeline elevation over the model nodes today and after the chosen shift. It is labelled as an illustration of the relief the models run on.
+  The evidence base (nodes, climate members, species groups, engines, datasets) is a ruled line under the overview text.
+* **Photographs.** Four Wikimedia Commons photographs (user-approved, CC BY-SA), captioned neutrally (no species is named that the photograph does not establish),
+  credited on the image, in the enlarged view and on the Acknowledgments page. Resized only; cropped by the page layout.
+* **Palette and surfaces.** Deeper spruce/navy "ink" for the band and footer, warm paper for pages, 8 px radius; the emissions paths keep their chart colours everywhere.
+* **Search.** Ctrl K / ⌘K / `/` opens a palette (pages, map layers, marz, two actions); ranking is a pure tested function.
+* **Corrections found on the way.** The Method page's plain-language text still said humidity and wind were not changed in the scenarios, which contradicted the
+  technical text and the corrected pipeline; fixed. The home page said "seven engines" because the list included Treeline change, which is part of MERISTEM; it now
+  lists the six engines. Engine states are stored once in `methodology.json` and read by both the cards and the flow chart.

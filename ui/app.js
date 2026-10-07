@@ -114,13 +114,34 @@ function banner() {
 }
 
 /* ---- Home ---- */
+/* The state of an engine in this release, as the flow chart on the Method page draws it (both read it from data/methodology.json). */
+const ENGINE_STATE = { run: ["good", "Run"], reduced: ["warn", "Reduced scope"], built: ["neutral", "Built, not applied"] };
+const engineState = (k) => (ENGINE_STATE[k] ? chip(ENGINE_STATE[k][0], ENGINE_STATE[k][1]) : "");
+const ICON = (() => {
+  const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg>`;
+  return {
+    map: svg('<path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 7 9 4z"/><path d="M9 4v13M15 7v12.5"/>'),
+    pin: svg('<path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/>'),
+    peak: svg('<path d="m3 19 6.5-11 3.5 5.5 2-3L21 19H3z"/><path d="M9.5 8 8.2 10.2l1.3-.7 1.3.9L9.5 8z"/>'),
+    scale: svg('<path d="M12 4v16M7 20h10"/><path d="M5 8h14"/><path d="m5 8-3 7a3.4 3 0 0 0 6 0L5 8zM19 8l-3 7a3.4 3 0 0 0 6 0l-3-7z"/>'),
+  };
+})();
+
 function renderHome() {
-  const M = state.M, ss = M.scenario_summary, tl = M.treeline, ae = M.aegis;
-  const base = M.baseline_viability_2019 || {};
-  const worst = ss ? Object.fromEntries(Object.keys(ss).map((g) => [g, ss[g].ssp585["2100"]])) : {};
-  const t585 = tl && tl.summary["ssp585__2100"], t126 = tl && tl.summary["ssp126__2100"];
-  const eng = state.meth.engines;
-  const stat = (num, cap, sub) => `<div class="card stat"><div class="num">${num}</div><div class="cap">${cap}</div><div class="sub">${sub || ""}</div></div>`;
+  const M = state.M;
+  const engines = state.meth.engines.filter((e) => e.id !== "treeline");        // treeline change is part of MERISTEM, not a seventh engine
+  const photos = M.photos || [];
+  const sgid = scenarioGridId(), tgid = treelineGridId();
+  const tlv = tgid && state.G[tgid].layers.treeline_2019 ? state.G[tgid].layers.treeline_2019.filter(ok) : [];
+  const treelineMean = tlv.length ? mean(tlv) : null;
+  const nMembers = M.scenario_summary ? Object.values(M.scenario_summary).reduce((n, g) => Math.max(n, Object.values(g).reduce((m, s) => m + Object.values(s).reduce((k, h) => k + (h.n_gcms || 0), 0), 0)), 0) : 0;
+  const ledger = `<dl class="ledger">
+    <div><dt>Model nodes</dt><dd>${sgid ? M.grids[sgid].n_cells : "\u2014"}<small>${sgid === "dense" ? "dense grid" : "validation grid"}</small></dd></div>
+    <div><dt>Climate members</dt><dd>${nMembers || "\u2014"}<small>5 models \u00D7 3 paths \u00D7 3 horizons</small></dd></div>
+    <div><dt>Species groups</dt><dd>${Object.keys(M.groups).length}<small>hydraulic traits</small></dd></div>
+    <div><dt>Engines</dt><dd>${engines.length}<small>chained, each tested</small></dd></div>
+    <div><dt>Datasets cited</dt><dd>${(M.references || []).length}<small>with licence and date</small></dd></div>
+  </dl>`;
   view().innerHTML = `
   <section class="hero-full" aria-labelledby="hero-title">
     <div class="hero-media"><div class="hero-frame">
@@ -146,40 +167,45 @@ function renderHome() {
       <div class="sec-head"><span class="sec-no">01</span><h2>Overview</h2></div>
       <div class="about">
         <p class="lead">A hybrid process-statistical framework for finding climate-resilient places to restore forest in Armenia: it models water stress, hydraulic failure, species niches, treeline and scenario-robust planting decisions, and reports each result with the caveats that came with it.</p>
+        ${ledger}
         <div>${banner()}</div>
       </div>
     </section>
+  </div>
+  <section class="band reveal" id="results" aria-labelledby="res-h"></section>
+  <div class="wrap">
+    ${photos.length ? `<section class="sec reveal" id="landscapes" aria-labelledby="land-h">
+      <div class="sec-head"><span class="sec-no">03</span><h2 id="land-h">Landscapes</h2></div>
+      <p class="lead">Four kinds of Armenian landscape that the results speak about, from closed broadleaf forest to the open mountain above it. The photographs illustrate these landscape types: they are not model outputs, and none was used as model input.</p>
+      <div class="landscapes">${photos.map((ph, i) => Home.photoFigure(ph, i)).join("")}</div>
+      <p class="small muted">Third-party photographs under Creative Commons licences, resized for the page. The author, licence and source are under each image and listed on the <a href="#/ack">Acknowledgments</a> page.</p>
+    </section>` : ""}
     <section class="sec reveal">
-      <div class="sec-head"><span class="sec-no">02</span><h2>Headline results</h2></div>
-      <div class="grid cols-4">
-      ${Object.keys(M.groups).filter((g) => ok(base[g])).map((g) => stat(pct(base[g], 1), `${esc(M.groups[g].short)} — mean 2019 viability`, worst[g] ? `SSP5-8.5, 2100 ensemble mean: ${pct(worst[g].mean, 1)} (GCM range ${pct(worst[g].min, 1)}–${pct(worst[g].max, 1)})` : "")).join("")}
-      ${t585 ? stat(`+${fmt(t585.ensemble_mean_shift_m, 0)} m`, "Climatic treeline shift, SSP5-8.5 by 2100", `GCM range +${fmt(t585.ensemble_min_shift_m, 0)} to +${fmt(t585.ensemble_max_shift_m, 0)} m` + (t126 ? ` · SSP1-2.6: +${fmt(t126.ensemble_mean_shift_m, 0)} m` : "")) : ""}
-      ${ae ? stat(String(ae.n_units), "planting units evaluated", `${ae.n_scenarios} scenarios · price of robustness ${fmt(ae.frontier.price_of_robustness, 2)}`) : ""}
-    </div>
+      <div class="sec-head"><span class="sec-no">04</span><h2>The ${["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][engines.length] || engines.length} engines</h2></div>
+      <div class="grid cols-3 engines-grid">${engines.map((e, i) => { const [ttl, sub] = e.name.split(" \u2014 "); return `<div class="card eng"><div class="eng-top"><span class="eng-no">E${i + 1}</span>${engineState(e.state)}</div><h3>${esc(ttl)}</h3>${sub ? `<p class="eng-sub">${esc(sub)}</p>` : ""}<p class="small">${esc(e.status)}</p><a href="#/method" data-jump="${e.id}">How it works \u2192</a></div>`; }).join("")}</div>
     </section>
     <section class="sec reveal">
-      <div class="sec-head"><span class="sec-no">03</span><h2>The ${["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][eng.length] || eng.length} engines</h2></div>
-      <div class="grid cols-3">${eng.map((e, i) => `<div class="card eng"><span class="eng-no">E${i + 1}</span><h3>${esc(e.name)}</h3><p class="small">${esc(e.status)}</p><a href="#/method" data-jump="${e.id}">How it works →</a></div>`).join("")}</div>
-    </section>
-    <section class="sec reveal">
-      <div class="sec-head"><span class="sec-no">04</span><h2>Where to look</h2></div>
-      <div class="grid cols-3">
-        <div class="card eng"><span class="eng-no">MAP</span><h3>Map</h3><p class="small">Pick any vulnerability, probability or climate quantity, a climate model, an emissions path and a horizon, and see it coloured across the whole country, with today's forest cover and marz borders.</p><a class="btn secondary" href="#/map">Open the map</a></div>
-        <div class="card eng"><span class="eng-no">TREELINE</span><h3>Treeline</h3><p class="small">How far uphill the climatic treeline moves in each of 45 climate-model × scenario × horizon members.</p><a class="btn secondary" href="#/treeline">See treeline change</a></div>
-        <div class="card eng"><span class="eng-no">DECISION</span><h3>Decision</h3><p class="small">A budget-constrained, scenario-robust planting portfolio and its efficient frontier.</p><a class="btn secondary" href="#/decision">See the portfolio</a></div>
+      <div class="sec-head"><span class="sec-no">05</span><h2>Where to look</h2></div>
+      <div class="grid cols-4 look-grid">
+        <a class="card look" href="#/map"><span class="look-ic">${ICON.map}</span><h3>Map</h3><p class="small">Pick any quantity, a climate model, an emissions path and a horizon, and see it coloured across the whole country, with today's forest cover and marz borders.</p><span class="look-go">Open the map \u2192</span></a>
+        <a class="card look" href="#/site"><span class="look-ic">${ICON.pin}</span><h3>Place explorer</h3><p class="small">Click anywhere in Armenia, or choose a marz, to see every quantity for that place today and under each emissions path.</p><span class="look-go">Explore a place \u2192</span></a>
+        <a class="card look" href="#/treeline"><span class="look-ic">${ICON.peak}</span><h3>Treeline</h3><p class="small">How far uphill the climatic treeline moves in each of 45 climate-model \u00D7 scenario \u00D7 horizon members.</p><span class="look-go">See treeline change \u2192</span></a>
+        <a class="card look" href="#/decision"><span class="look-ic">${ICON.scale}</span><h3>Decision</h3><p class="small">A budget-constrained, scenario-robust planting portfolio and its efficient frontier.</p><span class="look-go">See the portfolio \u2192</span></a>
       </div>
     </section>
     <section class="sec reveal">
-      <div class="sec-head"><span class="sec-no">05</span><h2>About the author</h2></div>
+      <div class="sec-head"><span class="sec-no">06</span><h2>About the author</h2></div>
       <div class="author-card">
         <img src="assets/author.jpg" width="720" height="720" alt="Portrait of Narek Ohanyan" loading="lazy">
         <div><p class="author-name">Narek Ohanyan</p>
           <p>Narek Ohanyan is a young climate leader from Armenia and a climate &amp; environmental researcher at the AUA Acopian Center for the Environment. His current research focuses on modeling forest climate resilience.</p>
-          <p><a href="#/author">Read the full biography →</a></p></div>
+          <p><a href="#/author">Read the full biography \u2192</a></p></div>
       </div>
     </section>
   </div>`;
   view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => { sessionStorageSafe("jump", a.dataset.jump); }));
+  Home.mountBand($("#results"), { M, treelineMean, gridHtml: sgid ? gridChip(sgid) : "" });
+  Home.mountPhotos(view(), photos);
   initHeroVideo();
   initReveal();
 }
@@ -407,6 +433,15 @@ function renderAck(p) {
         </dl>
       </div>
     </section>
+    ${(state.M.photos || []).length ? `<section class="ack-rows photo-credits" aria-label="Photographs">
+      <article class="ack-row">
+        <header class="ack-label"><span class="ack-no">04</span><h2>Photographs</h2></header>
+        <div class="ack-text">
+          <p>The landscape photographs on the Overview page are third-party works, shown under Creative Commons licences. Each copy is resized for the page and is otherwise unchanged apart from cropping by the page layout. They illustrate landscape types; they are not model outputs.</p>
+          <ul>${state.M.photos.map((ph) => `<li><strong>${esc(ph.caption)}</strong>, ${esc(ph.place)} (${esc(ph.date.slice(0, 4))}). Photo: ${esc(ph.author)}; ${ext(ph.licence_url, esc(ph.licence))}; ${ext(ph.source_page, esc(ph.source))}.</li>`).join("")}</ul>
+        </div>
+      </article>
+    </section>` : ""}
     <p class="muted small ack-foot">Data providers and their licences are listed on the <a href="#/refs">References</a> page.</p></div>`;
   const go = () => $("#foracca").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   view().querySelectorAll("[data-scroll]").forEach((l) => l.addEventListener("click", (e) => { e.preventDefault(); go(); }));
@@ -455,4 +490,4 @@ function toggleTheme() {
   try { localStorage.setItem("antar_theme", next); } catch (e) { /* ignore */ }
 }
 try { const t = localStorage.getItem("antar_theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) { /* ignore */ }
-document.addEventListener("DOMContentLoaded", () => { $("#theme").addEventListener("click", toggleTheme); initMenu(); initCite(); init(); });
+document.addEventListener("DOMContentLoaded", () => { $("#theme").addEventListener("click", toggleTheme); initMenu(); initCite(); Palette.init(); init(); });
