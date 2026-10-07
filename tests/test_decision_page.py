@@ -46,6 +46,13 @@ def test_rows_carry_place_area_group_method_cost_and_survival():
 
 
 @needs_node
+def test_rows_use_the_open_land_of_a_cell_when_the_export_has_it():
+    u = dict(UNITS, open_ha=[2000.0, 3190.0, 0.0], forest_share=[0.3, 0.0, 0.9])
+    a = node(f"console.log(JSON.stringify(D.portfolioRows(d.u,d.sel,{CTX})))", {"u": u, "sel": [[0, 0, 0]]})[0]
+    assert a["area_ha"] == 2000.0 and a["cell_area_ha"] == 3200.0 and a["forest_share"] == 0.3 and a["cost_usd"] == 186 * 2000
+
+
+@needs_node
 def test_the_csv_parses_back_quotes_awkward_text_and_leaves_unknowns_empty():
     rows = node(f"const r=D.portfolioRows(d.u,d.sel,{CTX});r[0].marz='Odd, \"marz\"';console.log(JSON.stringify(D.csv(r)))", {"u": UNITS, "sel": [[0, 0, 0], [2, 0, 2]]})
     parsed = list(pycsv.DictReader(io.StringIO(rows)))
@@ -85,7 +92,8 @@ def test_the_exported_cells_add_up_to_the_totals_the_page_shows():
     assert [b["budget_usd"] for b in U["budgets"]] == [r["budget_usd"] for r in M["budget_sweep"]]
     for b, row in zip(U["budgets"], M["budget_sweep"]):
         assert len(b["selected"]) == row["n_units_planted"]
-        area = sum(u["area_ha"][i] for i, _, _ in b["selected"])
-        usd = sum(u["area_ha"][i] * cost[U["intervention_ids"][m]] for i, _, m in b["selected"])
+        treated = u.get("open_ha", u["area_ha"])                                      # restoration acts on a cell's open land
+        area = sum(treated[i] for i, _, _ in b["selected"])
+        usd = sum(treated[i] * cost[U["intervention_ids"][m]] for i, _, m in b["selected"])
         assert area == pytest.approx(row["area_ha"], rel=1e-3) and usd == pytest.approx(row["cost_usd"], rel=1e-3)
         assert usd <= row["budget_usd"] * (1 + 1e-9)                                                  # the plan never spends more than the budget

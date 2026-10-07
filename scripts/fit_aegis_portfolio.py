@@ -56,7 +56,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import get_access_token, drive_vsicurl_url, BBOX, CHELSA_GRID_SHAPE, DENSE_STRIDE  # noqa: E402
 from antar.decision.optimize import robust_portfolio, efficient_frontier  # noqa: E402
-from antar.decision.units import cell_area_ha  # noqa: E402
+from antar.decision.units import cell_area_ha, cell_land_shares  # noqa: E402
+from PIL import Image  # noqa: E402
 from antar.io.armenia_mask import inside_armenia  # noqa: E402
 import time  # noqa: E402
 
@@ -73,8 +74,6 @@ VALUE_PER_HA_YEAR = 417.0  # real, World Bank 2023 -- national-average ecosystem
 # absolute benefit by a third; the ramp is not applied here (all benefits are steady-state, year 6 onward). A constant factor does not change which plan is
 # optimal, only the benefit totals.
 INCREMENTAL_SHARE = 0.75
-AREA_PER_UNIT_HA = 1.0     # the concept note's own convention (Sec. 9): "management units (aggregated 30m cells, roughly 1 ha)"; kept behind --one-ha-units
-                            # to reproduce the earlier result. With one hectare per node no budget below tens of millions ever binds (see the Decision page).
 # Solver settings. Cells are nearly identical in benefit (about 3,200 ha, ~99% survival), so proving a tight gap only separates cells that differ by far less than the
 # uncertainty of the 417 USD/ha/yr value. The budget sweep is accepted within 0.5% of the proven bound; the frontier, whose two ends differ by very little, is solved much more
 # tightly so that the price of robustness can be told from solver noise. Whether each solve reached its gap is recorded.
@@ -104,6 +103,18 @@ INTERVENTIONS = [
     {"name": "windbreaks_hedgerows", "cost_per_ha": 13260.0, "cost_basis": "sourced_most_expensive", "source": "World Bank (2023): the most expensive single option, US$663 million for 50,000 ha."},
     {"name": "mining_site_reclamation", "cost_per_ha": 900.0, "cost_basis": "blended", "source": "World Bank (2023): the average over all eight options; no individual figure found."},
 ]
+
+# What each method acts on. The benefit figure (417 USD/ha/yr x 75%) is the value a RESTORED DEGRADED hectare adds, so only the restoration methods are ranked, and each acts on
+# the open land of a cell (not forest, woodland or water). The three methods that act on existing forest have no benefit figure for maintaining forest, and mining reclamation has
+# no data on where the mine sites are: they are listed but not ranked, which also stops the plan from "restoring" land that is already forest.
+ROLE = {"degraded_forest_planting": "restoration", "natural_regeneration": "restoration", "anti_erosion_plantation": "restoration", "windbreaks_hedgerows": "restoration",
+        "coppicing_oak": "forest_management", "pine_thinning": "forest_management", "wildfire_prevention": "forest_management", "mining_site_reclamation": "site_specific"}
+NOT_RANKED_REASON = {"forest_management": "acts on existing forest, and no figure exists for the benefit of maintaining forest (the 417 USD/ha/yr x 75% value is that of a restored degraded hectare)",
+                     "site_specific": "acts on mine sites, and there is no data on where they are"}
+for _i in INTERVENTIONS:
+    _i["role"] = ROLE[_i["name"]]
+RANKED = [i for i in INTERVENTIONS if i["role"] == "restoration"]
+MIN_OPEN_SHARE = 0.10      # a cell is a candidate only if at least this share of it is open land (a cell that is nearly all forest, woodland or water has nothing to restore)
 
 # Real budget range (World Bank 2023): $9.3M (cheapest real option mix) to $663M (most expensive
 # single real option) for the 50,000 ha NDC target; $45M is the real figure tied to the
@@ -200,7 +211,8 @@ def load_future_projections(dense=False):
 def allocation_summary(plan, area, cost, option_labels):
     """What a plan treats: units, hectares and cost in all, and the share by intervention method and by species group."""
     x = np.asarray(plan["x"]) > 0.5
-    ha, usd = x * area[:, None], x * area[:, None] * cost
+    area = area[:, None] * np.ones((1, x.shape[1])) if np.ndim(area) == 1 else area
+    ha, usd = x * area, x * area * cost
     out = {"n_units_planted": int(x.sum()), "area_ha": float(ha.sum()), "cost_usd": float(usd.sum()), "by_intervention": {}, "by_group": {}}
     groups = list(dict.fromkeys(o["group"] for o in option_labels))
     methods = list(dict.fromkeys(o["intervention"] for o in option_labels))
@@ -243,35 +255,45 @@ def main():
 
     n = len(lats)
     C = len(scenario_names)
-    J = len(group_names) * len(INTERVENTIONS)
-    print(f"=== {n} real units, {J} options ({len(group_names)} groups x {len(INTERVENTIONS)} methods), "
+    J = len(group_names) * len(RANKED)
+    print(f"=== {n} real units, {J} options ({len(group_names)} groups x {len(RANKED)} ranked restoration methods), "
           f"{C} scenarios ===", flush=True)
 
     print("=== Eligibility: inside Armenia + not protected (WDPA) + not human-modified/water ===", flush=True)
     eligible_mask = load_eligibility(lats, lons)
     print(f"  {eligible_mask.sum()}/{n} real units eligible (inside Armenia, not protected, plantable)", flush=True)
 
+    # A unit is the grid cell its node stands for (stride x stride CHELSA pixels of 30 arcseconds), treated whole or not at all; the node's viability and eligibility are
+    # taken to represent the whole cell. Restoration acts on the cell's OPEN land: its area minus forest, woodland and water (national Ecosystem Map, averaged over the cell).
+    stride = DENSE_STRIDE if dense else GRID_STRIDE
+    px_lat, px_lon = (BBOX[3] - BBOX[1]) / CHELSA_GRID_SHAPE[0], (BBOX[2] - BBOX[0]) / CHELSA_GRID_SHAPE[1]
+    cell_ha = cell_area_ha(lats, stride * px_lat, stride * px_lon)
+    mapdir = Path(__file__).resolve().parent.parent / "ui" / "assets" / "map"
+    raster = lambda name: np.asarray(Image.open(mapdir / f"{name}.bin").convert("L"), dtype=float)
+    shares = cell_land_shares(lats, lons, stride * px_lat, stride * px_lon, raster("region"),
+                              {"forest": raster("forest") / 255.0, "woodland": raster("woodland") / 255.0, "water": raster("water") / 255.0}, json.load(open(mapdir / "grid.json")))
+    no_cover = ~np.isfinite(shares["forest"])
+    covered = {k: np.nan_to_num(shares[k], nan=1.0) for k in ("forest", "woodland", "water")}        # a cell the land-cover raster does not cover has no known open land
+    open_share = np.clip(1.0 - covered["forest"] - covered["woodland"] - covered["water"], 0.0, 1.0)
+    open_ha = cell_ha * open_share
+    candidate = eligible_mask & (open_share >= MIN_OPEN_SHARE)
+    print(f"  cell: {cell_ha.min():,.0f} to {cell_ha.max():,.0f} ha; open land {open_ha.sum():,.0f} ha of {cell_ha.sum():,.0f} ha in all cells; {int(no_cover.sum())} cells outside the land-cover raster", flush=True)
+    print(f"  {int(candidate.sum())}/{int(eligible_mask.sum())} eligible cells have at least {MIN_OPEN_SHARE:.0%} open land; candidate open land {open_ha[candidate].sum():,.0f} ha", flush=True)
+
     benefit = np.zeros((n, J, C))
     cost = np.zeros((n, J))
+    area = np.zeros((n, J))                                    # hectares each option acts on in each cell
     eligible = np.zeros((n, J), dtype=bool)
     option_labels = []
     j = 0
     for g in group_names:
-        for interv in INTERVENTIONS:
+        for interv in RANKED:
             benefit[:, j, :] = viability[g] * VALUE_PER_HA_YEAR * INCREMENTAL_SHARE
             cost[:, j] = interv["cost_per_ha"]
-            eligible[:, j] = eligible_mask
+            area[:, j] = open_ha
+            eligible[:, j] = candidate
             option_labels.append({"group": g, "intervention": interv["name"], "cost_basis": interv["cost_basis"]})
             j += 1
-
-    # A unit is the grid cell its node stands for (stride x stride CHELSA pixels of 30 arcseconds), treated whole or not at all; the node's viability and
-    # eligibility are taken to represent the whole cell. --one-ha-units restores the earlier convention of one hectare per node.
-    one_ha = "--one-ha-units" in sys.argv
-    stride = DENSE_STRIDE if dense else GRID_STRIDE
-    px_lat, px_lon = (BBOX[3] - BBOX[1]) / CHELSA_GRID_SHAPE[0], (BBOX[2] - BBOX[0]) / CHELSA_GRID_SHAPE[1]
-    area = np.full(n, AREA_PER_UNIT_HA) if one_ha else cell_area_ha(lats, stride * px_lat, stride * px_lon)
-    print(f"  unit area: {'1 ha per node (--one-ha-units)' if one_ha else f'cell of {stride}x{stride} CHELSA pixels'}; {area.min():,.0f} to {area.max():,.0f} ha, "
-          f"eligible land {area[eligible_mask].sum():,.0f} ha", flush=True)
 
     results = {
         "run_date": __import__("datetime").date.today().isoformat(),
@@ -279,15 +301,19 @@ def main():
         "n_scenarios": C,
         "scenario_names": scenario_names,
         "n_units": n,
-        "n_eligible_units": int(eligible_mask.sum()),
-        "unit_area_ha": {"min": float(area.min()), "mean": float(area.mean()), "max": float(area.max()),
-                         "basis": ("1 ha per node (the concept note's convention)" if one_ha else
-                                   f"the grid cell a node stands for: {stride} x {stride} CHELSA pixels of 30 arcseconds, treated whole or not at all")},
-        "eligible_area_ha": float(area[eligible_mask].sum()),
-        "intervention_ids": [i["name"] for i in INTERVENTIONS],
+        "n_eligible_units": int(candidate.sum()),
+        "n_eligible_before_land_cover": int(eligible_mask.sum()),
+        "min_open_share": MIN_OPEN_SHARE,
+        "unit_area_ha": {"min": float(cell_ha.min()), "mean": float(cell_ha.mean()), "max": float(cell_ha.max()),
+                         "basis": f"the grid cell a node stands for: {stride} x {stride} CHELSA pixels of 30 arcseconds, treated whole or not at all"},
+        "eligible_area_ha": float(open_ha[candidate].sum()),
+        "intervention_ids": [i["name"] for i in RANKED],
+        "not_ranked": [{"name": i["name"], "role": i["role"], "reason": NOT_RANKED_REASON[i["role"]]} for i in INTERVENTIONS if i["role"] != "restoration"],
         "units": {
-            "lat": [round(float(v), 5) for v in lats], "lon": [round(float(v), 5) for v in lons], "area_ha": [round(float(v), 1) for v in area],
-            "eligible": [bool(v) for v in eligible_mask], "group_ids": list(group_names),
+            "lat": [round(float(v), 5) for v in lats], "lon": [round(float(v), 5) for v in lons], "area_ha": [round(float(v), 1) for v in cell_ha],
+            "open_ha": [round(float(v), 1) for v in open_ha], "forest_share": [round(float(v), 3) for v in covered["forest"]],
+            "woodland_share": [round(float(v), 3) for v in covered["woodland"]], "water_share": [round(float(v), 3) for v in covered["water"]],
+            "eligible": [bool(v) for v in candidate], "group_ids": list(group_names),
             "cell_deg": {"dlat": float(stride * px_lat), "dlon": float(stride * px_lon)},
             "viability_mean": {g: [round(float(v), 4) for v in viability[g].mean(axis=1)] for g in group_names},
             "viability_worst20": {g: [round(float(v), 4) for v in np.sort(viability[g], axis=1)[:, :max(int(np.ceil(0.2 * C)), 1)].mean(axis=1)] for g in group_names},
@@ -301,20 +327,15 @@ def main():
         "net_value_per_ha_year_usd": VALUE_PER_HA_YEAR * INCREMENTAL_SHARE,
         "option_labels": option_labels,
         "cost_table": [{k: v for k, v in i.items()} for i in INTERVENTIONS],
-        "scope_note": ("A planting unit is the grid cell around a model node (about 3,000 ha on the dense grid), treated whole or not at all, with the node's viability and eligibility standing for the whole cell. "
-                        "Benefit varies only by functional group (REFUGIUM viability) times one national value, "
-                        "417 USD/ha/yr x 75% (the share a restored degraded hectare adds, World Bank 2023); cost varies "
-                        "only by intervention method -- the "
-                        "two are independent by construction since no real data or model connects "
-                        "method to viability. Planting uses Armenian cost data (range shown); 3 of 8 methods use a blended real "
-                        "average cost (no individual figure was found) and 3 share the cheapest-mix figure -- see cost_table. "
-                        "water_use/water_caps/basin intentionally omitted -- no real figure "
-                        "exists for any planting option's water use. Eligibility = real WDPA "
-                        "(not protected) AND real Ecosystem Map of Armenia human-modified exclusion "
-                        "(not >50% settlements/cropland/buildings/quarries in a local 500m window) "
-                        "-- deliberately does NOT exclude already-forested cells, since 3 of the 8 "
-                        "real methods (coppicing_oak, pine_thinning, wildfire_prevention) target "
-                        "existing forest."),
+        "scope_note": ("A planting unit is the grid cell around a model node (about 3,200 ha on the dense grid), treated whole or not at all, with the node's viability and eligibility "
+                        "standing for the whole cell. Only the four restoration methods are ranked, and each acts on the cell's open land (its area minus forest, woodland and water, from the "
+                        "national Ecosystem Map averaged over the cell); a cell needs at least 10% open land. Benefit varies only by functional group (REFUGIUM viability) times one national "
+                        "value, 417 USD/ha/yr x 75% (the share a restored degraded hectare adds, World Bank 2023); cost varies only by intervention method -- the two are independent by "
+                        "construction since no real data or model connects method to survival. Planting uses Armenian cost data (range shown); the other restoration methods use World Bank "
+                        "2023 figures (cheapest mix, an all-method average, the most expensive option). Coppicing, pine thinning and wildfire prevention act on existing forest and are not "
+                        "ranked: no figure exists for the benefit of maintaining forest. Mining reclamation is not ranked: there is no data on where the sites are. Water use, water caps and "
+                        "basins are omitted: no real figure exists for any option's water use. Eligibility = real WDPA (not protected) AND real Ecosystem Map human-modified exclusion "
+                        "(not >50% settlements/cropland/buildings/quarries in a local 500 m window)."),
         "budget_sweep": {}, "lambda_frontier_at_representative_budget": {},
     }
 

@@ -2145,3 +2145,15 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
   methods, the cell under the pointer, a table by marz) and a CSV of the treated cells; the long text is folded into details. Every sentence about species, method and solver status is computed from the result.
   `data/aegis_units.json` carries the cells and is loaded by this page only. Tests: node tests of the lookup, CSV and marz table, and consistency checks that tie every exported cell to the totals and the budget.
 * **Next for this layer:** apply the MERISTEM niche (after its refit with real per-group water deficit) so that a species is only chosen where it can grow; without it "pine everywhere" is the honest outcome of survival alone.
+
+### Restoration acts on open land only (author's decision, same day)
+
+* **The flaw.** Every method was allowed on every eligible cell, so the plan "restored" cells that are already forest (median forest share of eligible cells 1%, mean 14%; 49 of 424 at least half forest). At 45 M USD 7% of the
+  treated area, and at 9.3 M USD 21%, was already forest.
+* **The fix.** `antar.decision.units.cell_land_shares` averages the national Ecosystem Map's forest, woodland and water over each cell (tested on a synthetic raster with known shares); a cell's open land is its area minus
+  these; only the four restoration methods are ranked, each on the open land of the cell, and a cell needs at least 10% open land (413 of 424 eligible cells; 1,046,564 ha of open land). `robust_portfolio` takes an area per cell and
+  method (tested against the unmodified problem, with and without the presolve). The three methods that act on existing forest (coppicing oak, pine thinning, wildfire prevention) are listed but not ranked: the 417 x 75% value is that of a
+  restored degraded hectare and no figure exists for maintaining forest; mining reclamation is not ranked for want of site data. The earlier `--one-ha-units` convention is gone.
+* **Result.** 9.3 M USD: 23 cells, 49,998 ha (the 50,000 ha programme the budget came from); 45 M: 84 cells, 241,902 ha; 100 M: 202 cells, 537,074 ha; from about 195 M up all 413 candidate cells. Pine and natural regeneration everywhere, as before, for the
+  same structural reasons. Every solve proved optimality; the price of robustness (152 USD/yr) is below the solver's resolution (about 5,000 USD/yr) and is shown as about 0.
+* A bug found on the way: removing the one-hectare constant also removed the solver settings next to it, so the first run crashed on an undefined name; fixed, and a check that no upper-case name is used without a definition now precedes each run.

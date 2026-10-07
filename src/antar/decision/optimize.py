@@ -55,7 +55,8 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
     """Solve the portfolio problem.
 
     benefit : (U, J, C) per-hectare benefit of option j in unit u under scenario c
-    area    : (U,) hectares;  cost : (U, J) per-hectare cost;  budget : total cost cap
+    area    : (U,) hectares of each unit, or (U, J) hectares that option j can act on in unit u (an option may apply to only part of a unit);
+              cost : (U, J) per-hectare cost;  budget : total cost cap
     water_use : (U, J) per-hectare extra water use; water_caps : {basin_id: cap}; basin : (U,) basin id
     eligible : (U, J) boolean mask; options with False can never be selected
     presolve : drop options another option beats or ties (see :func:`non_dominated_options`); exact, and skipped when an option-share cap or water caps couple the options.
@@ -64,9 +65,11 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
     Returns dict(x (U,J) binary, expected, cvar, scenario_benefit (C,), optimal (bool), mip_gap, n_options_solved).
     """
     if presolve and max_share >= 1.0 and not water_caps:
-        keep = non_dominated_options(benefit, cost, eligible)
+        a2 = np.asarray(area, dtype=float)
+        a2 = a2[:, None] if a2.ndim == 1 else a2
+        keep = non_dominated_options(np.asarray(benefit, dtype=float) * a2[:, :, None], np.asarray(cost, dtype=float) * a2, eligible)       # dominance on what a plan gets and pays in total
         if len(keep) < np.asarray(benefit).shape[1]:
-            sub = robust_portfolio(np.asarray(benefit)[:, keep, :], area, np.asarray(cost)[:, keep], budget, scenario_weights=scenario_weights, lam=lam, alpha=alpha,
+            sub = robust_portfolio(np.asarray(benefit)[:, keep, :], np.asarray(area, dtype=float) if np.ndim(area) == 1 else np.asarray(area)[:, keep], np.asarray(cost)[:, keep], budget, scenario_weights=scenario_weights, lam=lam, alpha=alpha,
                                    max_share=max_share, min_area=min_area, eligible=None if eligible is None else np.asarray(eligible)[:, keep], presolve=False,
                                    time_limit=time_limit, mip_rel_gap=mip_rel_gap)
             x = np.zeros(np.asarray(benefit).shape[:2])
@@ -75,6 +78,7 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
     benefit = np.asarray(benefit, dtype=float)
     U, J, C = benefit.shape
     area = np.asarray(area, dtype=float)
+    A = area[:, None] * np.ones((1, J)) if area.ndim == 1 else area          # (U, J) hectares each option acts on
     cost = np.asarray(cost, dtype=float)
     w = np.full(C, 1.0 / C) if scenario_weights is None else np.asarray(scenario_weights, dtype=float) / np.sum(scenario_weights)
 
@@ -84,7 +88,7 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
     is_ = nx + 1
     coef = np.zeros((nx, C))
     for c in range(C):
-        coef[:, c] = (benefit[:, :, c] * area[:, None]).reshape(-1)
+        coef[:, c] = (benefit[:, :, c] * A).reshape(-1)
     exp_coef = coef @ w
     obj = np.zeros(n)
     obj[:nx] = -(1 - lam) * exp_coef
@@ -102,12 +106,12 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
         A_mat[r, iz] = 1.0
         A_mat[r, is_ + c] = -1.0
         lo.append(-np.inf); hi.append(0.0); r += 1
-    A_mat[r, :nx] = (cost * area[:, None]).reshape(-1)   # budget
+    A_mat[r, :nx] = (cost * A).reshape(-1)               # budget
     lo.append(-np.inf); hi.append(budget); r += 1
-    total_area_expr = np.tile(area[:, None], (1, J)).reshape(-1)
+    total_area_expr = A.reshape(-1)
     for j in range(J):                                   # diversity: option share cap (linearised vs total area cap)
         col = np.zeros(nx)
-        col[j::J] = area
+        col[j::J] = A[:, j]
         A_mat[r, :nx] = col - max_share * total_area_expr
         lo.append(-np.inf); hi.append(0.0); r += 1
     if water_caps:
@@ -115,7 +119,7 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
             col = np.zeros(nx)
             for u in range(U):
                 if basin[u] == b:
-                    col[u * J:(u + 1) * J] = np.asarray(water_use)[u] * area[u]
+                    col[u * J:(u + 1) * J] = np.asarray(water_use)[u] * A[u]
             A_mat[r, :nx] = col
             lo.append(-np.inf); hi.append(cap); r += 1
     A_mat = A_mat[:r].tocsr()

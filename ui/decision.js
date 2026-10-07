@@ -22,9 +22,10 @@
   function portfolioRows(u, selected, ctx) {
     return selected.map(([i, gi, mi]) => {
       const g = u.group_ids[gi], method = ctx.methods[mi], cost = ctx.methodCost(method);
+      const treated = u.open_ha ? u.open_ha[i] : u.area_ha[i];                       // restoration acts on the cell's open land only
       return {
-        latitude: u.lat[i], longitude: u.lon[i], marz: ctx.marzOf(i), area_ha: u.area_ha[i], species_group: ctx.groupLabel(g), group_id: g, method,
-        cost_per_ha_usd: cost, cost_usd: cost == null ? null : Math.round(cost * u.area_ha[i]),
+        latitude: u.lat[i], longitude: u.lon[i], marz: ctx.marzOf(i), area_ha: treated, cell_area_ha: u.area_ha[i], forest_share: u.forest_share ? u.forest_share[i] : null,
+        species_group: ctx.groupLabel(g), group_id: g, method, cost_per_ha_usd: cost, cost_usd: cost == null ? null : Math.round(cost * treated),
         viability_mean: u.viability_mean[g][i], viability_worst20pct: u.viability_worst20[g][i],
       };
     });
@@ -112,7 +113,7 @@
       paint(r.budget_usd);
       $("#dbudget").textContent = money(r.budget_usd);
       $("#dslider").setAttribute("aria-valuetext", `${money(r.budget_usd)}: ${r.n_units_planted} cells, ${ha(r.area_ha)}`);
-      $("#dstats").innerHTML = `<div><dt>Cells treated</dt><dd>${r.n_units_planted}<small>of ${ae.n_eligible_units} eligible</small></dd></div><div><dt>Area</dt><dd>${ha(r.area_ha)}</dd></div>
+      $("#dstats").innerHTML = `<div><dt>Cells treated</dt><dd>${r.n_units_planted}<small>of ${ae.n_eligible_units} candidates</small></dd></div><div><dt>Open land treated</dt><dd>${ha(r.area_ha)}</dd></div>
         <div><dt>Cost</dt><dd>${money(r.cost_usd)}<small>of the ${money(r.budget_usd)} budget</small></dd></div><div><dt>Expected benefit</dt><dd>${Math.round(r.expected).toLocaleString("en")}<small>$/yr</small></dd></div>
         <div><dt>Worst 20% of scenarios</dt><dd>${Math.round(r.cvar).toLocaleString("en")}<small>$/yr</small></dd></div>`;
       side();
@@ -121,9 +122,10 @@
 
     function describe(i) {
       if (i < 0) return '<span class="muted">Point at a cell on the map to see what it holds.</span>';
-      const ch = current.chosen.get(i), head = `<strong>${esc(marzOfCell[i])}</strong> · ${u.lat[i].toFixed(3)}°N, ${u.lon[i].toFixed(3)}°E · cell of ${ha(u.area_ha[i])}`;
+      const ch = current.chosen.get(i), land = u.open_ha ? `, ${ha(u.open_ha[i])} of it open land (${Math.round(100 * u.forest_share[i])}% forest, ${Math.round(100 * u.woodland_share[i])}% woodland)` : "";
+      const head = `<strong>${esc(marzOfCell[i])}</strong> · ${u.lat[i].toFixed(3)}°N, ${u.lon[i].toFixed(3)}°E · cell of ${ha(u.area_ha[i])}${land}`;
       const v = u.group_ids.map((g, gi) => `<li><span class="sw" style="background:${GROUP_COLOURS[gi % GROUP_COLOURS.length]}"></span>${esc(short(g))}: survival ${(100 * u.viability_mean[g][i]).toFixed(1)}% on average, ${(100 * u.viability_worst20[g][i]).toFixed(1)}% in the worst 20% of scenarios</li>`).join("");
-      const verdict = !u.eligible[i] ? "Not eligible: protected, or mostly settlements, cropland or quarries." : ch ? `<b>Treated:</b> ${esc(short(u.group_ids[ch[0]]))}, ${esc(methods[ch[1]].replace(/_/g, " "))}.` : "Eligible, not treated at this budget.";
+      const verdict = !u.eligible[i] ? "Not a candidate: protected, mostly settlements, cropland or quarries, or too little open land (mostly forest, woodland or water)." : ch ? `<b>Treated:</b> ${esc(short(u.group_ids[ch[0]]))}, ${esc(methods[ch[1]].replace(/_/g, " "))}.` : "Eligible, not treated at this budget.";
       return `${head}<br>${verdict}<ul class="dv">${v}</ul>`;
     }
     const onMove = (e) => { if (pinned < 0) $("#dcell").innerHTML = describe(cellAt(u, e.latlng.lat, e.latlng.lng)); };
