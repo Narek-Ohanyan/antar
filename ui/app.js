@@ -247,7 +247,6 @@ function renderTreeline() {
       <p class="small muted" style="margin-top:8px">Ensemble mean shift in metres, with the range across the five models in brackets.</p></div>
     <div class="callout"><strong>A climatic ceiling, not a forecast.</strong> This is where temperature would permit trees, not where forest will stand: realised treelines lag climate by decades. The ${tl.threshold_c} °C threshold is the global Körner–Paulsen value, not an Armenia calibration, and the lapse rate used is the fitted April–September value (${fmt(tl.gamma_k_per_km, 2)} K/km).</div>
     <div class="callout"><strong>Why a few cells show a drop under warming.</strong> Growing-season temperature is the mean over days that clear 0.9 °C. Warming adds cold early-spring and late-autumn days to that set, which can pull the mean down even though every day warmed. ${pct(tl.frac_pairs_negative, 1)} of cell × model pairs show a negative shift, mostly under low warming. Treat small negative values as roughly "no change".</div>
-    <p class="small muted">Method check: the reconstruction reproduces the full pipeline's 2019 growing-season temperature to within ${tl.baseline_check_max_abs_diff_c == null ? "n/a (no overlapping cells)" : fmt(tl.baseline_check_max_abs_diff_c, 4) + " °C"}.</p>
     <p><a class="btn" href="#/map?q=treeline_shift&mode=scen&ssp=ssp585&hz=2100&gcm=ens">See the 2100 SSP5-8.5 shift on the map</a></p></div>`;
 }
 
