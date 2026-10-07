@@ -67,6 +67,11 @@ OUT_PATH = CONFIG_DIR / "fitted" / "aegis_portfolio.yaml"
 OUT_PATH_DENSE = CONFIG_DIR / "fitted" / "aegis_portfolio_dense.yaml"
 
 VALUE_PER_HA_YEAR = 417.0  # real, World Bank 2023 -- national-average ecosystem-services value
+# The same note's own cost-benefit analysis assumes degraded land still delivers 25% of a fully restored forest's ecosystem services, so the INCREMENTAL
+# benefit of restoring it is 75% of the 417 (and it phases in: 50% of the increment in years 1-5, 100% from year 6). Using the full 417 overstated every
+# absolute benefit by a third; the ramp is not applied here (all benefits are steady-state, year 6 onward). A constant factor does not change which plan is
+# optimal, only the benefit totals.
+INCREMENTAL_SHARE = 0.75
 AREA_PER_UNIT_HA = 1.0     # real convention stated in the concept note itself (Sec. 9): "management
                             # units (aggregated 30m cells, roughly 1 ha)"
 LAND_TENURE_FILE_ID = "1s9ENmIU67yyi9SJcXoOtrmERYTE-i9zN"
@@ -76,14 +81,20 @@ LAND_TENURE_FILE_ID = "1s9ENmIU67yyi9SJcXoOtrmERYTE-i9zN"
 # "blended" = the report's own all-8-methods average, standing in because no individual real
 # figure exists for that specific method (see module docstring).
 INTERVENTIONS = [
-    {"name": "degraded_forest_planting", "cost_per_ha": 900.0, "cost_basis": "blended"},
-    {"name": "natural_regeneration", "cost_per_ha": 186.0, "cost_basis": "sourced_cheapest_mix"},
-    {"name": "coppicing_oak", "cost_per_ha": 186.0, "cost_basis": "sourced_cheapest_mix"},
-    {"name": "pine_thinning", "cost_per_ha": 900.0, "cost_basis": "blended"},
-    {"name": "wildfire_prevention", "cost_per_ha": 186.0, "cost_basis": "sourced_cheapest_mix"},
-    {"name": "anti_erosion_plantation", "cost_per_ha": 900.0, "cost_basis": "blended"},
-    {"name": "windbreaks_hedgerows", "cost_per_ha": 13260.0, "cost_basis": "sourced_most_expensive"},
-    {"name": "mining_site_reclamation", "cost_per_ha": 900.0, "cost_basis": "blended"},
+    # cost_per_ha is the establishment cost used in the budget constraint; cost_low / cost_high are the range found in the sources (US dollars per hectare).
+    {"name": "degraded_forest_planting", "cost_per_ha": 6800.0, "cost_low": 3300.0, "cost_high": 12600.0, "cost_basis": "sourced_armenian_cost_data",
+     "source": ("Central: 2.6 million AMD per hectare, the Ministry of Environment's average cost to establish a hectare of forest including five years of maintenance, "
+                "mowing, fencing and nursery work (Hetq, 1 December 2025; about US$6,800 at that article's own conversion). Low: EUR 2,945 per hectare, planting with "
+                "survival taken into account, KfW ex-post evaluation of the IKI Caucasus natural-forest programme (2017; about US$3,300, prices of 2013-2016). "
+                "High: about US$12,600 per hectare, the items of an itemised intensive planting site in Armenia's Adaptation Fund proposal (2025), excluding irrigation "
+                "and soil works.")},
+    {"name": "natural_regeneration", "cost_per_ha": 186.0, "cost_basis": "sourced_cheapest_mix", "source": "World Bank (2023): the cheapest real option mix, US$9.3 million for 50,000 ha; the KfW evaluation also finds natural regeneration much cheaper than planting, fencing being the main cost."},
+    {"name": "coppicing_oak", "cost_per_ha": 186.0, "cost_basis": "sourced_cheapest_mix", "source": "World Bank (2023): the cheapest real option mix (shared with natural regeneration and wildfire prevention)."},
+    {"name": "pine_thinning", "cost_per_ha": 900.0, "cost_basis": "blended", "source": "World Bank (2023): the average over all eight options, US$45 million for 50,000 ha; no individual figure found."},
+    {"name": "wildfire_prevention", "cost_per_ha": 186.0, "cost_basis": "sourced_cheapest_mix", "source": "World Bank (2023): the cheapest real option mix (shared with natural regeneration and coppicing)."},
+    {"name": "anti_erosion_plantation", "cost_per_ha": 900.0, "cost_basis": "blended", "source": "World Bank (2023): the average over all eight options; no individual figure found."},
+    {"name": "windbreaks_hedgerows", "cost_per_ha": 13260.0, "cost_basis": "sourced_most_expensive", "source": "World Bank (2023): the most expensive single option, US$663 million for 50,000 ha."},
+    {"name": "mining_site_reclamation", "cost_per_ha": 900.0, "cost_basis": "blended", "source": "World Bank (2023): the average over all eight options; no individual figure found."},
 ]
 
 # Real budget range (World Bank 2023): $9.3M (cheapest real option mix) to $663M (most expensive
@@ -221,7 +232,7 @@ def main():
     j = 0
     for g in group_names:
         for interv in INTERVENTIONS:
-            benefit[:, j, :] = viability[g] * VALUE_PER_HA_YEAR
+            benefit[:, j, :] = viability[g] * VALUE_PER_HA_YEAR * INCREMENTAL_SHARE
             cost[:, j] = interv["cost_per_ha"]
             eligible[:, j] = eligible_mask
             option_labels.append({"group": g, "intervention": interv["name"], "cost_basis": interv["cost_basis"]})
@@ -238,12 +249,16 @@ def main():
         "n_sampled_cells_total": n_total,
         "n_cells_dropped_outside_armenia": n_total - n,
         "value_per_ha_year_usd": VALUE_PER_HA_YEAR,
+        "incremental_share": INCREMENTAL_SHARE,
+        "net_value_per_ha_year_usd": VALUE_PER_HA_YEAR * INCREMENTAL_SHARE,
         "option_labels": option_labels,
-        "scope_note": ("Benefit varies only by functional group (real, REFUGIUM); cost varies "
-                        "only by intervention method (real, World Bank/government source) -- the "
+        "cost_table": [{k: v for k, v in i.items()} for i in INTERVENTIONS],
+        "scope_note": ("Benefit varies only by functional group (REFUGIUM viability) times one national value, "
+                        "417 USD/ha/yr x 75% (the share a restored degraded hectare adds, World Bank 2023); cost varies "
+                        "only by intervention method -- the "
                         "two are independent by construction since no real data or model connects "
-                        "method to viability. 4 of 8 methods use a blended real average cost "
-                        "(not individually sourced) -- see option_labels' cost_basis per entry. "
+                        "method to viability. Planting uses Armenian cost data (range shown); 3 of 8 methods use a blended real "
+                        "average cost (no individual figure was found) and 3 share the cheapest-mix figure -- see cost_table. "
                         "water_use/water_caps/basin intentionally omitted -- no real figure "
                         "exists for any planting option's water use. Eligibility = real WDPA "
                         "(not protected) AND real Ecosystem Map of Armenia human-modified exclusion "
@@ -281,6 +296,23 @@ def main():
     except Exception as e:
         results["lambda_frontier_at_representative_budget"] = {"error": str(e)}
         print(f"  FAILED ({e})", flush=True)
+
+    # How much does the uncertain cost of planting matter? Same problem at the representative budget with planting at its low, central and high cost.
+    print("=== Sensitivity to the cost of planting ===", flush=True)
+    planting_cols = [jj for jj, o in enumerate(option_labels) if o["intervention"] == "degraded_forest_planting"]
+    results["planting_cost_sensitivity"] = {}
+    for label, key in (("low", "cost_low"), ("central", "cost_per_ha"), ("high", "cost_high")):
+        c2 = cost.copy()
+        c2[:, planting_cols] = next(i for i in INTERVENTIONS if i["name"] == "degraded_forest_planting")[key]
+        try:
+            plan = robust_portfolio(benefit, area, c2, REPRESENTATIVE_BUDGET_USD, lam=0.5, eligible=eligible)
+            results["planting_cost_sensitivity"][label] = {
+                "planting_cost_usd_per_ha": float(c2[0, planting_cols[0]]), "expected": plan["expected"], "cvar": plan["cvar"],
+                "n_units_planted": int(plan["x"].sum()), "n_units_planting_option": int(plan["x"][:, planting_cols].sum())}
+            print(f"  planting at ${c2[0, planting_cols[0]]:,.0f}/ha: expected {plan['expected']:.1f}, units planted {int(plan['x'].sum())}, "
+                  f"of which planting {int(plan['x'][:, planting_cols].sum())}", flush=True)
+        except Exception as e:
+            results["planting_cost_sensitivity"][label] = {"error": str(e)}
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(yaml.dump(results, sort_keys=False, default_flow_style=False))

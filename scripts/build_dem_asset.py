@@ -2,7 +2,7 @@
 
 Streams the project's 30 m terrain raster (band 1, elevation) from Drive and averages it onto the same
 Web-Mercator grid as ui/assets/map (grid.json). Nothing is downloaded to disk but the small derived
-raster: ui/assets/map/elevation.png, an 8-bit RGB PNG with elevation in metres = 256*R + G (lossless;
+raster: ui/assets/map/elevation.bin (an 8-bit PNG under a .bin name, so no host converts it), an 8-bit RGB PNG with elevation in metres = 256*R + G (lossless;
 a canvas cannot read 16-bit PNGs), and elevation.json (source, resampling, and a check against the
 elevations the model was actually run at).
 
@@ -33,7 +33,7 @@ def main():
     grid = json.loads((ASSETS / "grid.json").read_text())
     w, h, px = grid["width"], grid["height"], grid["px_m"]
     dst_tf = from_origin(grid["x0"], grid["y_top"], px, px)
-    region = np.array(Image.open(ASSETS / "region.png"))
+    region = np.array(Image.open(ASSETS / "region.bin"))
     dem = np.full((h, w), np.nan, dtype=np.float32)
 
     token = R.get_access_token()
@@ -58,7 +58,7 @@ def main():
     z = np.clip(np.round(np.where(inside, filled, 0)), 0, 65535).astype(np.uint16)
     rgb = np.zeros((h, w, 3), dtype=np.uint8)
     rgb[..., 0], rgb[..., 1] = z >> 8, z & 255
-    Image.fromarray(rgb, mode="RGB").save(ASSETS / "elevation.png", optimize=True)
+    Image.fromarray(rgb, mode="RGB").save(ASSETS / "elevation.bin", format="PNG", optimize=True)
 
     # check against the elevations the model itself used (30 m point values at the node locations)
     checks = {}

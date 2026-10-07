@@ -7,7 +7,8 @@ Sources (see configs/manifests/):
   display grid with bilinear resampling.
 * geoBoundaries gbOpen ARM ADM1: marz polygons, used only to give each in-country pixel a marz id.
 
-Outputs (ui/assets/map/): grid.json, region.png, forest.png, woodland.png, forest_<group>.png, water.png
+Outputs (ui/assets/map/): grid.json, region.bin, forest.bin, woodland.bin, forest_<group>.bin, water.bin (lossless 8-bit PNG data under a .bin name: a
+    host or CDN converts files that look like pictures, which would change the values; run scripts/stamp_map_assets.py afterwards)
 (8-bit, fraction x 255), borders.geojson (smoothed marz borders and country outline).
 """
 from __future__ import annotations
@@ -151,7 +152,7 @@ def main():
 
     def save(name, arr, scale=255):
         a = np.where(region > 0, np.round(arr * scale), 0).astype(np.uint8) if arr.dtype != np.uint8 else arr
-        Image.fromarray(a, mode="L").save(OUT / f"{name}.png", optimize=True)
+        Image.fromarray(a, mode="L").save(OUT / f"{name}.bin", format="PNG", optimize=True)
 
     save("region", region)
     for name in codes:

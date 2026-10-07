@@ -2098,3 +2098,13 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
 * Headline numbers on the dense grid (SSP5-8.5, 2100, ensemble mean, change against 2019): broadleaf 98.0% (-1.2 pp), oak 90.7% (-4.0 pp), pine 100.0% (0.0 pp); on the 25-node grid they were -1.3, -4.7 and 0.0 pp.
   The treeline change is still the 25-node result (`compute_treeline_change.py --dense` needs the Drive terrain), so the cards now name the number of nodes behind each of them.
 * Still open: dense treeline change, dense AEGIS (and its text), the dense MNEME panel, the MERISTEM refit.
+
+### Defect found on the live site: the host converted the map rasters (fixed)
+
+* **What happened.** After the first deployment the relief figure and every map on antar.narekohanyan.com were scrambled. Cause: Hostinger's CDN replaces a PNG by a lossy WebP when the browser announces
+  WebP support (checked with curl: `Accept: */*` returns the PNG, a browser's `Accept` returns a 68 KB `image/webp` from the same URL). The elevation, region and forest-cover rasters hold data (region ids,
+  metres = 256*R + G), so a lossy copy changes every value. It was invisible locally and in the Apache tests, which served the original bytes.
+* **Fix.** The rasters are lossless PNGs stored under `.bin` names (`assets/map/*.bin`), fetched as bytes and decoded without colour conversion (`ui/raster.js`); each is compared with an Adler-32 checksum written at build
+  time (`scripts/stamp_map_assets.py` -> `assets/map/checksums.json`), and a mismatch throws, so an altered image can no longer draw wrong values silently. `deploy/.htaccess` marks them `no-transform`.
+  Tests: checksum equals zlib's; every shipped raster matches; real Apache serves the `.bin` files byte for byte even to a browser that announces WebP support.
+* **Lesson.** A deployment check must request the way a browser does (its `Accept` header) and compare bytes, not only status codes.

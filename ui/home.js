@@ -276,18 +276,12 @@
   function loadRelief() {
     if (reliefPromise) return reliefPromise;
     const build = window.ANTAR_BUILD || "";
-    const img = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src + "?v=" + build; });
-    reliefPromise = Promise.all([fetch("assets/relief.svg?v=" + build).then((r) => (r.ok ? r.text() : null)).catch(() => null), img("assets/map/elevation.png"), img("assets/map/region.png")]).then(([svg, e, r]) => {
-      if (!svg || !e || !r) return null;
-      const W = e.naturalWidth, H = e.naturalHeight, cv = document.createElement("canvas");
-      cv.width = W; cv.height = H;
-      const cx = cv.getContext("2d", { willReadFrequently: true });
-      cx.drawImage(e, 0, 0); const ed = cx.getImageData(0, 0, W, H).data;
-      cx.clearRect(0, 0, W, H); cx.drawImage(r, 0, 0); const rd = cx.getImageData(0, 0, W, H).data;
-      const z = new Float32Array(W * H);
+    reliefPromise = Promise.all([fetch("assets/relief.svg?v=" + build).then((r) => (r.ok ? r.text() : null)).catch(() => null), Raster.load("elevation", 2), Raster.load("region", 1)]).then(([svg, e, r]) => {
+      if (!svg) return null;
+      const W = e.w, H = e.h, ed = e.data, rd = r.data, z = new Float32Array(W * H);
       for (let i = 0; i < W * H; i++) z[i] = rd[i * 4] > 0 ? ed[i * 4] * 256 + ed[i * 4 + 1] : NaN;      // metres inside the country, NaN outside
       return { svg, ds: downsample(z, W, H, 2), k: 2 };
-    }).catch(() => null);
+    }).catch(() => null);                                                        // a missing or altered raster hides the figure; it never draws wrong contours
     return reliefPromise;
   }
 

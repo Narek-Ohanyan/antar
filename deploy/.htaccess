@@ -23,6 +23,7 @@ RewriteRule ^(.*)index\.html$ /$1 [R=301,L]
   AddType application/geo+json .geojson
   AddType image/svg+xml .svg
   AddType video/mp4 .mp4
+  AddType application/octet-stream .bin
 </IfModule>
 
 # 3. caching: the page is always revalidated, so a new build is seen at once; scripts, styles and data carry a ?v= build stamp
@@ -33,6 +34,10 @@ RewriteRule ^(.*)index\.html$ /$1 [R=301,L]
   </FilesMatch>
   <FilesMatch "\.(js|css|json|geojson)$">
     Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+  # the map rasters are data, not pictures (assets/map/*.bin, lossless PNG bytes): a host that converts images must leave them alone
+  <FilesMatch "\.bin$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate, no-transform"
   </FilesMatch>
   <FilesMatch "\.(jpe?g|png|webp|svg|mp4|woff2)$">
     Header set Cache-Control "public, max-age=604800"

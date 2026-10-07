@@ -1,4 +1,4 @@
-"""Draws the contour-line artwork of the site from the project's own terrain raster (ui/assets/map/elevation.png, SRTM-derived, 650 m pixels).
+"""Draws the contour-line artwork of the site from the project's own terrain raster (ui/assets/map/elevation.bin, SRTM-derived, 650 m pixels).
 
 Writes ui/assets/relief.svg: the national outline, minor contours every 250 m and major contours every 1000 m, in the map's own pixel space and cropped to
 the country. Stroke colours are plain black with opacity, because the file is also used as a CSS mask (the page decoration takes its colour from the
@@ -23,9 +23,9 @@ SMOOTH = 2          # block-average the raster 2x2 before contouring: a calmer l
 
 
 def load():
-    e = np.asarray(Image.open(UI / "assets" / "map" / "elevation.png").convert("RGB"), dtype=float)
+    e = np.asarray(Image.open(UI / "assets" / "map" / "elevation.bin").convert("RGB"), dtype=float)
     z = e[..., 0] * 256 + e[..., 1]
-    inside = np.asarray(Image.open(UI / "assets" / "map" / "region.png").convert("L")) > 0
+    inside = np.asarray(Image.open(UI / "assets" / "map" / "region.bin").convert("L")) > 0
     return z, inside
 
 

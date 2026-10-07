@@ -24,7 +24,7 @@ def grid():
 
 
 def load(name):
-    return np.array(Image.open(ASSETS / f"{name}.png"))
+    return np.array(Image.open(ASSETS / f"{name}.bin"))
 
 
 def pixel(grid, lat, lon):
@@ -94,9 +94,9 @@ def test_geometry_helpers():
 
 
 def test_elevation_raster_matches_known_places(grid):
-    if not (ASSETS / "elevation.png").exists():
+    if not (ASSETS / "elevation.bin").exists():
         pytest.skip("elevation raster not built")
-    rgb = np.array(Image.open(ASSETS / "elevation.png")).astype(int)
+    rgb = np.array(Image.open(ASSETS / "elevation.bin")).astype(int)
     z = rgb[..., 0] * 256 + rgb[..., 1]
     at = lambda lat, lon: z[pixel(grid, lat, lon)]
     assert 850 < at(40.18, 44.51) < 1150          # Yerevan, ~900-1000 m

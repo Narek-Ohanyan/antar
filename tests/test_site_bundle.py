@@ -173,3 +173,12 @@ def test_folders_are_not_listed_and_missing_files_are_404(apache):
     s, _, body = get(apache, "/assets/")
     assert s in (403, 404) and b"Index of" not in body and b"hero.mp4" not in body
     assert get(apache, "/nothing-here.html")[0] == 404
+
+
+def test_the_map_rasters_reach_the_browser_byte_for_byte_and_untransformed(apache, bundle):
+    import hashlib
+    for name in ("elevation", "region", "forest"):
+        # even a browser that announces WebP support must get the original bytes: they are data, and a converted image would change the values
+        s, h, body = get(apache, f"/assets/map/{name}.bin?v=x", headers={"Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"})
+        assert s == 200 and h["content-type"] == "application/octet-stream" and "no-transform" in h["cache-control"]
+        assert hashlib.sha256(body).hexdigest() == hashlib.sha256((bundle / "assets" / "map" / f"{name}.bin").read_bytes()).hexdigest()

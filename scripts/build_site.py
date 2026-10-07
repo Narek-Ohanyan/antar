@@ -24,8 +24,8 @@ MAX_BYTES = 16_000_000
 
 # files the scripts fetch at run time (they are not named in index.html)
 FETCHED = ["data/manifest.json", "data/methodology.json", "assets/relief.svg", "assets/architecture.svg", "assets/katex/katex.min.js", "assets/katex/katex.min.css",
-           "assets/map/grid.json", "assets/map/borders.geojson", "assets/map/elevation.png", "assets/map/region.png", "assets/map/forest.png", "assets/map/woodland.png",
-           "assets/map/water.png", "assets/map/forest_broadleaf.png", "assets/map/forest_oak.png", "assets/map/forest_pine.png", "assets/map/forest_juniper.png",
+           "assets/map/grid.json", "assets/map/checksums.json", "assets/map/borders.geojson", "assets/map/elevation.bin", "assets/map/region.bin", "assets/map/forest.bin", "assets/map/woodland.bin",
+           "assets/map/water.bin", "assets/map/forest_broadleaf.bin", "assets/map/forest_oak.bin", "assets/map/forest_pine.bin", "assets/map/forest_juniper.bin",
            "assets/hero.mp4", "assets/hero-poster.jpg", "assets/author.jpg", "assets/antar_logo.jpeg", "assets/photos/credits.json", ".htaccess", "robots.txt"]
 
 

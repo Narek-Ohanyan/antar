@@ -641,7 +641,7 @@ def stamp_index():
     file after they change (a cached app.js showed an outdated warning after it had been corrected)."""
     import hashlib
     ui = Path(__file__).resolve().parent
-    files = ([ui / n for n in ("styles.css", "charts.js", "interp.js", "map.js", "place.js", "math.js", "home.js", "palette.js", "app.js")] + sorted((ui / "data").glob("*.json"))
+    files = ([ui / n for n in ("styles.css", "charts.js", "raster.js", "interp.js", "map.js", "place.js", "math.js", "home.js", "palette.js", "app.js")] + sorted((ui / "data").glob("*.json"))
              + sorted((ui / "assets" / "map").glob("*")) + [ui / "assets" / "architecture.svg", ui / "assets" / "relief.svg"] + sorted((ui / "assets" / "photos").glob("*.*")) + sorted((ui / "assets" / "katex").glob("*.*")))
     h = hashlib.sha1()
     for f in files:

@@ -15,39 +15,23 @@ const IDW_K = 8, IDW_POWER = 2;
 /* decimals follow magnitude: 640.988 m is noise, 0.0123 probability is not */
 const fa = (v) => (ok(v) ? (Math.abs(v) >= 100 ? Math.round(v).toLocaleString("en") : Math.abs(v) >= 10 ? v.toFixed(1) : Math.abs(v) >= 1 ? v.toFixed(2) : v.toFixed(4)) : "—");
 
-function loadPng(url) {
-  return new Promise((resolve, reject) => {
-    const im = new Image();
-    im.onload = () => {
-      const c = document.createElement("canvas"); c.width = im.width; c.height = im.height;
-      const cx = c.getContext("2d", { willReadFrequently: true }); cx.drawImage(im, 0, 0);
-      const d = cx.getImageData(0, 0, im.width, im.height).data, out = new Uint8Array(im.width * im.height);
-      for (let i = 0; i < out.length; i++) out[i] = d[i * 4];
-      resolve(out);
-    };
-    im.onerror = () => reject(new Error("could not load " + url));
-    im.src = url;
-  });
+/* The rasters are read exactly and checked against their build-time checksum (ui/raster.js); a changed image throws instead of drawing wrong values. */
+async function loadPng(url) {
+  const r = await Raster.load(url.split("/").pop().replace(/\.bin$/, ""), 1), out = new Uint8Array(r.w * r.h);
+  for (let i = 0; i < out.length; i++) out[i] = r.data[i * 4];
+  return out;
 }
 
-function loadRgb(url) {
-  return new Promise((resolve) => {
-    const im = new Image();
-    im.onload = () => {
-      const c = document.createElement("canvas"); c.width = im.width; c.height = im.height;
-      const cx = c.getContext("2d", { willReadFrequently: true }); cx.drawImage(im, 0, 0);
-      resolve(cx.getImageData(0, 0, im.width, im.height).data);
-    };
-    im.onerror = () => resolve(null);                       // elevation is optional: without it the surface is plain IDW
-    im.src = url;
-  });
+async function loadRgb(url) {
+  try { return (await Raster.load(url.split("/").pop().replace(/\.bin$/, ""), 2)).data; }
+  catch (e) { if (e.missing) return null; throw e; }       // elevation is optional when the file is absent (the surface is then plain IDW); an altered file is an error
 }
 
 async function loadMapAssets() {
   if (state.mapAssets) return state.mapAssets;
   const [grid, borders, elev, ...rasters] = await Promise.all([
     fetch("assets/map/grid.json").then((r) => r.json()), fetch("assets/map/borders.geojson").then((r) => r.json()),
-    loadRgb("assets/map/elevation.png"), ...MAP_FILES.map((f) => loadPng(`assets/map/${f}.png`)),
+    loadRgb("assets/map/elevation.bin"), ...MAP_FILES.map((f) => loadPng(`assets/map/${f}.bin`)),
   ]);
   const A = { grid, borders, w: grid.width, h: grid.height };
   MAP_FILES.forEach((f, i) => (A[f] = rasters[i]));
