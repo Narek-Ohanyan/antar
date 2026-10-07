@@ -2078,3 +2078,13 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
   number (all paths and horizons, with the model range and the grid); credited photograph banners on four inner pages.
 * **Decision page.** It was a bare line, "No portfolio has been computed", with no title: the AEGIS result is withheld on purpose (it was built on the superseded constant atmosphere).
   It now says so, in plain words, and describes what the page will show; the numbers return after the dense AEGIS rerun.
+
+## 2026-10-07 (cont.) -- deployment to antar.narekohanyan.com
+
+* **Route chosen by the author:** the built site goes into the `antar/` folder of the website repository, whose Hostinger auto-deploy then puts it in `public_html/antar`, the document root of
+  the subdomain the author created. (A separate `deploy` branch with a Hostinger Git deployment was considered and dropped.) The folder is also reachable as `narekohanyan.com/antar/`,
+  so `deploy/.htaccess` redirects every other spelling to https://antar.narekohanyan.com/.
+* **Checked:** a fresh clone of this repository builds an identical site with `python3 ui/build_data.py` alone (numpy and pyyaml); the bundle is 72 files, 7.0 MB; the `.htaccess` rules were
+  tested on a real Apache 2.4 with TLS (`tests/test_site_bundle.py`): redirects keep the query string, `/index.html` goes to `/`, the page is always revalidated, scripts and data are cached
+  for an hour, images and fonts for a week, text is compressed, video supports ranges, folders are not listed. The publisher is guarded and tested on temporary repositories.
+* **Confirmed by the author:** the Acknowledgments sentence about local climate impact profiles for every municipality; AEGIS costs other than planting stay blended averages, labelled as such.

@@ -27,3 +27,6 @@ dist/
 
 # Snakemake working state
 .snakemake/
+
+# the deployable copy of the web interface (scripts/build_site.py)
+_site/

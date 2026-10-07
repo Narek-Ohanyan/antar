@@ -65,6 +65,21 @@ data by design: they demonstrate mechanisms, not skill.
   emissions path and horizon are kept in the address (`#/home?ssp=ssp370&hz=2080`), and a button downloads every headline number as CSV.
 * `tests/test_contrast.py` reads the colour tokens from `ui/styles.css` and checks WCAG contrast for the pairs the pages use, in both themes.
 
+## Publishing the web interface
+
+The site is served at https://antar.narekohanyan.com from the folder `antar/` of the website repository
+(https://github.com/Narek-Ohanyan/narekohanyan.com), which Hostinger deploys on every push to `main` into `public_html/antar`.
+
+```bash
+python scripts/publish_site.py --site-repo <clone of narekohanyan.com>          # builds, checks, shows what would change
+python scripts/publish_site.py --site-repo <clone of narekohanyan.com> --push   # commits only antar/ and pushes: this goes live
+```
+
+`scripts/build_site.py` assembles the bundle (`ui/` without Python files, plus `deploy/.htaccess` and `robots.txt`) and refuses an incomplete one.
+`deploy/.htaccess` keeps one address (https, the subdomain, no `/index.html`; the same folder is also reachable as `narekohanyan.com/antar/`), sets the cache
+rules and compression, and is tested against a real Apache in `tests/test_site_bundle.py`. `tests/test_publish_site.py` checks that the publisher changes only
+`antar/`, never pushes without `--push`, and refuses a dirty, stale or wrong clone.
+
 ## Conventions
 
 * Every formula lives in tested code; tests include closed-form checks (two-phase engine against `B / E_min`, Ishigami
