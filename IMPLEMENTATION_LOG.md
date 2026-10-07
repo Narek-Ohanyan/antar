@@ -2033,3 +2033,22 @@ ran. Real fix: `soil_complete()` requires every raw soil value and every derived
 were computed with the old mask; rather than recompute hours of Monte Carlo, `scripts/drop_invalid_nodes.py` removes the three nodes TOPOHYDRO rejects from them and recomputes the
 summary fields (nodes are independent and seeded by grid index, so the remaining nodes are exactly what a rerun would give). It has been applied to the XYLEM and REFUGIUM
 dense files (854 cells per group now); the dense scenario file gets the same treatment when that run finishes. The dense MNEME panel was restarted so that it uses the fixed mask.
+
+## 2026-10-07 -- late-frost days redefined; the layer is withdrawn; the interpolation score is no longer shown on the maps
+
+* **Definition.** Late-frost days used to be every day below -2 degC from budburst (cumulative GDD >= 200) to the end of the year, so the late-autumn and winter frosts
+  were counted (mean 39 days on the validation grid, 46 on the dense grid). They are now the days below -2 degC between budburst and the warmest day of the year
+  (`indices.warmest_day_index`: the peak of a 15-day centred running mean of the daily mean temperature, ties to the earlier day; `indices.late_frost_days(..., end_day)`).
+  The choice of a 15-day window is mine, not taken from a source.
+* **Recomputed, not rerun.** The count depends on the daily temperatures only, so `scripts/recompute_late_frost.py` rebuilds it from the reference weather with
+  `forcing.late_frost_days_from_reference` (pinned to the full pipeline by `tests/test_late_frost.py`). Before writing, both definitions are computed for every node and each stored
+  count must equal one of them: all 78 validation nodes, all 854 dense nodes and all 3,510 validation-grid scenario rows reproduced the old definition exactly. Applied to
+  `topohydro_grid_run_2019.yaml`, `topohydro_grid_run_2019_dense.yaml` and `future_projections.yaml`; files carry `late_frost_definition: budburst_to_warmest_day`. The dense scenario
+  file gets the same treatment when that run finishes (its workers started before the change and still count the old way).
+* **Result.** With the 200 degC-day placeholder the new count is zero at every validation node in 2019 and at 9 of 854 dense nodes (1-2 days); with the budburst threshold at 25 degC-days
+  261 dense nodes have a frost day. (I first reported "every dense node is zero"; that was wrong, the dense grid has those 9 nodes. The conclusion that the layer carries no
+  information at the placeholder is unchanged.) Measured in `configs/fitted/sensitivity_placeholders.yaml` (`late_frost_budburst_to_warmest_day`, `scripts/sensitivity_late_frost.py`).
+* **Decision (user):** apply the new definition and take "Late-frost days" out of the map menu, because a map that is zero almost everywhere shows nothing. The count is still
+  computed and stored; the placeholder entry on the Status page states the measurement and what is needed (a species-specific budburst threshold).
+* **Maps:** the "Interpolation check" block (leave-one-out R2 and RMSE per selection) is removed from the map panel on the user's request; the note under the map still says the surface is an
+  interpolation. The Status & limits page no longer lists "Which maps have results" or "Data lineage", and Treeline change no longer carries the method-check sentence.

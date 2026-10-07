@@ -51,7 +51,7 @@ HYDRO_FIELDS = [("cwd_mm", "cwd", "Climatic water deficit", "mm", 1), ("wsi", "w
 # For colouring change maps: which direction is favourable for the forest. Matched on the layer-id prefix.
 GOOD_DIRECTION = [("viab_", "high"), ("pviab_", "high"), ("robust_", "high"), ("refscore_", "high"), ("hmech_sd", None),
                   ("hmech_", "low"), ("cwd_", "low"), ("wsi", "low"), ("psimin_", "high"), ("psi_min", "high"),
-                  ("late_frost", "low"), ("treeline_margin", "high"), ("treeline_shift", "high"), ("treeline_2019", "high")]
+                  ("treeline_margin", "high"), ("treeline_shift", "high"), ("treeline_2019", "high")]
 ROOTING_DEPTH_M = {"mesic_diffuse_porous_broadleaf": 2.9, "ring_porous_oak": 2.9, "pine": 3.9,
                    "juniper_arid_conifer": 9.5}
 
@@ -225,7 +225,7 @@ def build_map_plan(layers, series_ids):
                      "baseline": lid in layers, "scenario": lid in series_ids,
                      "baseline_from": base_from, "scenario_from": scen_from})
     for lid, label in [("t_mean", "Mean annual temperature"), ("precip", "Annual precipitation"), ("gdd", "Growing degree days"),
-                       ("late_frost", "Late-frost days"), ("gsl", "Growing-season length")]:
+                       ("gsl", "Growing-season length")]:
         add(lid, label, None, TOPO, FP)
     for lid, label in [("cwd_pm_fao56", "Climatic water deficit (pm_fao56, generic rooting depth)"),
                        ("cwd_priestley_taylor", "Climatic water deficit (priestley_taylor, generic rooting depth)"),
@@ -282,7 +282,6 @@ def build():
             G.set("t_mean", k, r(p["t_mean_c_annual_mean"], 2), {"label": "Mean annual temperature", "unit": "°C", "engine": "TOPOHYDRO"})
             G.set("precip", k, r(p["p_mm_annual_sum"], 0), {"label": "Annual precipitation", "unit": "mm", "engine": "TOPOHYDRO"})
             G.set("gdd", k, r(p["gdd_cumulative_annual"], 0), {"label": "Growing degree days (base 5 °C)", "unit": "°C·d", "engine": "TOPOHYDRO"})
-            G.set("late_frost", k, p["late_frost_days"], {"label": "Late-frost days (after budburst GDD)", "unit": "days", "engine": "TOPOHYDRO", "placeholder": "budburst GDD = 200 (placeholder)"})
             G.set("gsl", k, p["growing_season_length_days"], {"label": "Growing-season length", "unit": "days", "engine": "TOPOHYDRO"})
             if water_ok:
                 add_water_layers(G, k, p, pets)
@@ -426,7 +425,7 @@ def build():
                     series[f"{lid}_{gn}"] = [[conv(c[fld]) for c in cells] for cells in rows]
         if all("climate" in fp["members"][m] for m in member_keys):
             for fld, lid, nd in [("t_mean_c", "t_mean", 2), ("precip_mm", "precip", 0), ("gdd", "gdd", 0),
-                                 ("late_frost_days", "late_frost", 0), ("gsl_days", "gsl", 0)]:
+                                 ("gsl_days", "gsl", 0)]:
                 series[lid] = [[r(c[fld], nd) for c in fp["members"][m]["climate"]] for m in member_keys]
         if all("generic" in fp["members"][m] for m in member_keys):
             for pet in ("pm_fao56", "priestley_taylor", "energy_only"):

@@ -6,8 +6,7 @@
      hatch     optional hatching where forest stands today
      lines     marz borders and the national outline
 
-   The surface is an interpolation, not a model run at every pixel; the panel states the interpolation
-   error (leave-one-out at the nodes) for whatever is on screen. Helpers (state, $, fmt, makeScale, ...) come
+   The surface is an interpolation, not a model run at every pixel; the note under the map says so. Helpers (state, $, fmt, makeScale, ...) come
    from app.js and are used only at call time. */
 
 const MAP_FILES = ["region", "forest", "woodland", "water", "forest_broadleaf", "forest_oak", "forest_pine", "forest_juniper"];
@@ -396,13 +395,9 @@ async function renderMap(p) {
     setLayer("surface", drawSurface(A, vals, sc, sel.forestOnly), sel.opacity);
     setLayer("hatch", sel.hatch ? hatchCanvas : null);
     current = { vals, sc, q, s, unit };
-    const loo = md.method === "elev" ? Interp.leaveOneOutElev(ip.nx, ip.ny, nodeElev(s.gid), s.values, IDW_K, IDW_POWER) : Interp.leaveOneOut(ip.nx, ip.ny, s.values, IDW_K, IDW_POWER);
-    const other = md.method === "elev" ? md.r2_idw : md.r2_elev;
-    const present = s.values.filter(ok), sd = Math.sqrt(present.reduce((a, v) => a + (v - mean(present)) ** 2, 0) / present.length);
-    const skill = loo.r2 >= 0.7 ? ["good", "good"] : loo.r2 >= 0.3 ? ["warn", "moderate"] : ["bad", "weak"];
+    const present = s.values.filter(ok);
     const label = s.change ? "change vs 2019" : s.spread ? "disagreement between the 5 models" : "";
-    meta.push(`<div class="kv" style="margin-top:8px"><span>Model runs behind the surface</span><span>${present.length}</span><span>Range of those runs</span><span>${fa(Math.min(...present))} – ${fa(Math.max(...present))} ${esc(s.binary ? "" : unit)}</span><span>Mean of those runs</span><span>${fa(mean(present))}</span></div>
-      <div class="callout ${skill[0] === "good" ? "info" : skill[0] === "bad" ? "bad" : ""}" style="margin:10px 0 0;padding:8px 10px"><strong>Interpolation check</strong> (${md.method === "elev" ? "elevation-adjusted" : "distance-weighted"}${ok(other) ? `; the ${md.method === "elev" ? "plain" : "elevation-adjusted"} method scores R² = ${fmt(other, 2)}` : ""}): predicting each model run from the others gives R² = ${fmt(loo.r2, 2)}, RMSE ${fa(loo.rmse)} ${esc(s.binary ? "" : unit)} (spread of the runs: sd ${fa(sd)}). ${chip(skill[0], skill[1])} ${skill[1] === "weak" ? "Between the model runs the colours are poorly constrained; read the pattern as indicative only." : skill[1] === "moderate" ? "The surface follows the runs only partly." : ""}</div>`);
+    meta.push(`<div class="kv" style="margin-top:8px"><span>Model runs behind the surface</span><span>${present.length}</span><span>Range of those runs</span><span>${fa(Math.min(...present))} – ${fa(Math.max(...present))} ${esc(s.binary ? "" : unit)}</span><span>Mean of those runs</span><span>${fa(mean(present))}</span></div>`);
     $("#qinfo").innerHTML = meta.join("");
     $("#legend").innerHTML = (label ? `<div class="small" style="margin-bottom:4px"><strong>${esc(label)}</strong></div>` : "") + (s.binary
       ? `<div class="bar" style="background:linear-gradient(90deg,${sc.stops.join(",")})"></div><div class="ends"><span>not robust</span><span>mixed</span><span>robust</span></div>`

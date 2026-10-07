@@ -741,6 +741,7 @@ def main():
         "year": YEAR,
         "grid": DENSE_GRID_ID if dense else "validation_80pt_stride40",
         "atmosphere": atmosphere_label(),
+        "late_frost_definition": "budburst_to_warmest_day",
         "n_grid_points": int(n),
         "n_with_real_output": int(n_ok),
         "grid_definition": ("29x36 subsample (every 11th pixel) of CHELSA-daily's 312x396 armenia "

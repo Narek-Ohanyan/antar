@@ -9,33 +9,27 @@ periods:
   '2019':
     gdd_budburst:
     - value: 100.0
-      late_frost_days: 48.78260869565217
       vpd24_summer: 0.9680602533187666
       tmin_mean: 1.0524528761156715
       hazard: {}
     - value: 150.0
-      late_frost_days: 48.43478260869565
       vpd24_summer: 0.9680602533187666
       tmin_mean: 1.0524528761156715
       hazard: {}
     - value: 200.0
-      late_frost_days: 48.43478260869565
       vpd24_summer: 0.9680602533187666
       tmin_mean: 1.0524528761156715
       hazard: {}
     - value: 300.0
-      late_frost_days: 48.43478260869565
       vpd24_summer: 0.9680602533187666
       tmin_mean: 1.0524528761156715
       hazard: {}
     - value: 400.0
-      late_frost_days: 48.43478260869565
       vpd24_summer: 0.9680602533187666
       tmin_mean: 1.0524528761156715
       hazard: {}
     calm_frac:
     - value: 0.0
-      late_frost_days: 47.26086956521739
       vpd24_summer: 0.976488288455767
       tmin_mean: 1.2236485282896021
       hazard:
@@ -43,7 +37,6 @@ periods:
         ring_porous_oak: 0.060830434782608696
         pine: 0.0
     - value: 0.15
-      late_frost_days: 47.869565217391305
       vpd24_summer: 0.9722261621437831
       tmin_mean: 1.1380507022026372
       hazard:
@@ -51,7 +44,6 @@ periods:
         ring_porous_oak: 0.06080434782608696
         pine: 0.0
     - value: 0.3
-      late_frost_days: 48.43478260869565
       vpd24_summer: 0.9680602533187666
       tmin_mean: 1.0524528761156715
       hazard:
@@ -59,7 +51,6 @@ periods:
         ring_porous_oak: 0.060778260869565226
         pine: 0.0
     - value: 0.45
-      late_frost_days: 48.69565217391305
       vpd24_summer: 0.9639871973429092
       tmin_mean: 0.9668550500287059
       hazard:
@@ -67,7 +58,6 @@ periods:
         ring_porous_oak: 0.06073913043478261
         pine: 0.0
     - value: 0.6
-      late_frost_days: 48.82608695652174
       vpd24_summer: 0.9600049577783831
       tmin_mean: 0.8812572239417407
       hazard:
@@ -77,33 +67,27 @@ periods:
   gfdl-esm4_ssp585_2100:
     gdd_budburst:
     - value: 100.0
-      late_frost_days: 29.73913043478261
       vpd24_summer: 1.6024094266379463
       tmin_mean: 4.996644481284298
       hazard: {}
     - value: 150.0
-      late_frost_days: 29.695652173913043
       vpd24_summer: 1.6024094266379463
       tmin_mean: 4.996644481284298
       hazard: {}
     - value: 200.0
-      late_frost_days: 29.695652173913043
       vpd24_summer: 1.6024094266379463
       tmin_mean: 4.996644481284298
       hazard: {}
     - value: 300.0
-      late_frost_days: 29.695652173913043
       vpd24_summer: 1.6024094266379463
       tmin_mean: 4.996644481284298
       hazard: {}
     - value: 400.0
-      late_frost_days: 29.695652173913043
       vpd24_summer: 1.6024094266379463
       tmin_mean: 4.996644481284298
       hazard: {}
     calm_frac:
     - value: 0.0
-      late_frost_days: 29.0
       vpd24_summer: 1.6134879759670264
       tmin_mean: 5.16784013345823
       hazard:
@@ -111,7 +95,6 @@ periods:
         ring_porous_oak: 0.10182608695652175
         pine: 8.260869565217393e-05
     - value: 0.15
-      late_frost_days: 29.26086956521739
       vpd24_summer: 1.607889067261597
       tmin_mean: 5.082242307371264
       hazard:
@@ -119,7 +102,6 @@ periods:
         ring_porous_oak: 0.10178260869565219
         pine: 8.260869565217393e-05
     - value: 0.3
-      late_frost_days: 29.695652173913043
       vpd24_summer: 1.6024094266379463
       tmin_mean: 4.996644481284298
       hazard:
@@ -127,7 +109,6 @@ periods:
         ring_porous_oak: 0.10174347826086957
         pine: 8.260869565217393e-05
     - value: 0.45
-      late_frost_days: 30.08695652173913
       vpd24_summer: 1.5970465592995158
       tmin_mean: 4.9110466551973335
       hazard:
@@ -135,10 +116,120 @@ periods:
         ring_porous_oak: 0.1017304347826087
         pine: 8.260869565217393e-05
     - value: 0.6
-      late_frost_days: 30.565217391304348
       vpd24_summer: 1.591798016039409
       tmin_mean: 4.8254488291103685
       hazard:
         mesic_diffuse_porous_broadleaf: 0.02131739130434783
         ring_porous_oak: 0.1016913043478261
         pine: 8.260869565217393e-05
+late_frost_budburst_to_warmest_day:
+  run_date: '2026-10-07'
+  definition: frost days (T_min < -2 degC) from budburst to the warmest day of the
+    year
+  n_cells: 854
+  base:
+    gdd_budburst: 200.0
+    calm_frac: 0.3
+  periods:
+    '2019':
+      gdd_budburst:
+      - value: 25.0
+        mean_days: 1.2576112412177987
+        nodes_with_a_frost_day: 261
+        max_days: 13
+      - value: 50.0
+        mean_days: 0.38875878220140514
+        nodes_with_a_frost_day: 108
+        max_days: 10
+      - value: 100.0
+        mean_days: 0.10304449648711944
+        nodes_with_a_frost_day: 41
+        max_days: 7
+      - value: 150.0
+        mean_days: 0.04215456674473068
+        nodes_with_a_frost_day: 24
+        max_days: 3
+      - value: 200.0
+        mean_days: 0.01288056206088993
+        nodes_with_a_frost_day: 9
+        max_days: 2
+      - value: 300.0
+        mean_days: 0.0
+        nodes_with_a_frost_day: 0
+        max_days: 0
+      - value: 400.0
+        mean_days: 0.0
+        nodes_with_a_frost_day: 0
+        max_days: 0
+      calm_frac:
+      - value: 0.0
+        mean_days: 0.00351288056206089
+        nodes_with_a_frost_day: 3
+        max_days: 1
+      - value: 0.15
+        mean_days: 0.00468384074941452
+        nodes_with_a_frost_day: 4
+        max_days: 1
+      - value: 0.3
+        mean_days: 0.01288056206088993
+        nodes_with_a_frost_day: 9
+        max_days: 2
+      - value: 0.45
+        mean_days: 0.02459016393442623
+        nodes_with_a_frost_day: 12
+        max_days: 5
+      - value: 0.6
+        mean_days: 0.03747072599531616
+        nodes_with_a_frost_day: 16
+        max_days: 6
+    gfdl-esm4_ssp585_2100:
+      gdd_budburst:
+      - value: 25.0
+        mean_days: 2.3946135831381734
+        nodes_with_a_frost_day: 492
+        max_days: 16
+      - value: 50.0
+        mean_days: 1.2822014051522248
+        nodes_with_a_frost_day: 313
+        max_days: 10
+      - value: 100.0
+        mean_days: 0.319672131147541
+        nodes_with_a_frost_day: 100
+        max_days: 8
+      - value: 150.0
+        mean_days: 0.0702576112412178
+        nodes_with_a_frost_day: 26
+        max_days: 6
+      - value: 200.0
+        mean_days: 0.02576112412177986
+        nodes_with_a_frost_day: 12
+        max_days: 5
+      - value: 300.0
+        mean_days: 0.00351288056206089
+        nodes_with_a_frost_day: 2
+        max_days: 2
+      - value: 400.0
+        mean_days: 0.0
+        nodes_with_a_frost_day: 0
+        max_days: 0
+      calm_frac:
+      - value: 0.0
+        mean_days: 0.01522248243559719
+        nodes_with_a_frost_day: 8
+        max_days: 2
+      - value: 0.15
+        mean_days: 0.01639344262295082
+        nodes_with_a_frost_day: 9
+        max_days: 2
+      - value: 0.3
+        mean_days: 0.02576112412177986
+        nodes_with_a_frost_day: 12
+        max_days: 5
+      - value: 0.45
+        mean_days: 0.03395784543325527
+        nodes_with_a_frost_day: 15
+        max_days: 6
+      - value: 0.6
+        mean_days: 0.0468384074941452
+        nodes_with_a_frost_day: 17
+        max_days: 8

@@ -84,6 +84,37 @@ class CellTopoclimate:
     growing_season_mean_t_c: float
 
 
+def late_frost_days_from_reference(
+    *,
+    t_mean_ref_c,
+    t_min_ref_c,
+    month,
+    z_cell_m: float,
+    z_ref_m: float,
+    gamma_k_per_m,
+    concavity_index: float,
+    calm_clear_night_frac: float,
+    gdd_budburst: float,
+    k_cap: float = 1.0,
+    gdd_base_c: float = 5.0,
+    late_frost_t_crit_c: float = -2.0,
+    spring_only: bool = True,
+) -> int:
+    """Late-frost days of one cell from its reference temperatures alone, by the same steps as :func:`topoclimate_forcing`.
+
+    Lets the late-frost count be recomputed without the water balance (a few milliseconds a cell). ``spring_only=False`` counts to the end
+    of the record, the definition used before the count was limited to the days up to the warmest day. A test pins both to the full pipeline.
+    """
+    month = np.asarray(month, dtype=int)
+    gamma_of_day = np.asarray(gamma_k_per_m, dtype=float)[month - 1]
+    delta_cap = downscale.cold_air_pooling_index(concavity_index, calm_clear_night_frac, k_cap=k_cap)
+    t_mean_c = downscale.downscale_temperature(np.asarray(t_mean_ref_c, dtype=float), z_cell_m, z_ref_m, gamma_of_day)
+    t_min_c = downscale.downscale_temperature(np.asarray(t_min_ref_c, dtype=float), z_cell_m, z_ref_m, gamma_of_day, delta_cap_k=delta_cap)
+    gdd_cumulative = np.cumsum(indices.growing_degree_days(t_mean_c, base_c=gdd_base_c))
+    end_day = indices.warmest_day_index(t_mean_c) if spring_only else None
+    return indices.late_frost_days(t_min_c, gdd_cumulative, gdd_budburst, t_crit_c=late_frost_t_crit_c, end_day=end_day)
+
+
 def topoclimate_forcing(
     *,
     doy,
@@ -198,9 +229,10 @@ def topoclimate_forcing(
         theta = waterbalance.theta_from_storage(wb["w"], w_max_mm, theta_fc, theta_lim)
         psi_soil_mpa[name] = waterbalance.psi_clapp_hornberger(theta, theta_sat, psi_sat_mpa, b_clapp_hornberger)
 
-    # --- Secs. 5.3 / 8.1: GDD, late frost, growing season --------------------
+    # --- Secs. 5.3 / 8.1: GDD, late frost (budburst to the warmest day), growing season ---
     gdd_cumulative = np.cumsum(indices.growing_degree_days(t_mean_c, base_c=gdd_base_c))
-    n_late_frost = indices.late_frost_days(t_min_c, gdd_cumulative, gdd_budburst, t_crit_c=late_frost_t_crit_c)
+    n_late_frost = indices.late_frost_days(t_min_c, gdd_cumulative, gdd_budburst, t_crit_c=late_frost_t_crit_c,
+                                           end_day=indices.warmest_day_index(t_mean_c))
     lgs = indices.growing_season_length(t_mean_c, t0_c=growing_season_t0_c)
     gst = indices.growing_season_mean_temperature(t_mean_c, t0_c=growing_season_t0_c)
 

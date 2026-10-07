@@ -407,6 +407,7 @@ def main():
         "baseline_window": list(BASELINE_WINDOW),
         "horizons": {str(k): list(v) for k, v in HORIZONS.items()},
         "atmosphere": atmosphere_label(),
+        "late_frost_definition": "budburst_to_warmest_day",
         "method": "delta/change-factor downscaling: real monthly ISIMIP3b anomaly (additive "
                   "temperature, multiplicative precipitation) applied to the real 2019 CHELSA-daily "
                   "reference series, run through the unchanged real topoclimate_forcing pipeline, "
