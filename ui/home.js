@@ -175,6 +175,26 @@
     return v ? `${name}, ${SSP_NAME[ssp]}: ${YEARS.map((y, i) => (fin(v[i]) ? `${y} ${fmtVal(v[i])}` : null)).filter(Boolean).join(", ")}.` : name;
   }
 
+  /* Every number behind the headline cards, for all emissions paths and horizons, as CSV (RFC 4180: comma, double quotes, CRLF). */
+  function headlineCsv(M) {
+    const q = (v) => (/[",\r\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : String(v));
+    const rows = [["quantity", "group", "emissions_path", "horizon", "baseline_2019", "ensemble_mean", "model_min", "model_max", "n_climate_models", "unit", "grid"]];
+    const grid = M.treeline && M.treeline.grid ? M.treeline.grid : "";
+    for (const g of Object.keys(M.groups)) {
+      const base = M.baseline_viability_2019 && M.baseline_viability_2019[g], ss = M.scenario_summary && M.scenario_summary[g];
+      if (!ss || !fin(base)) continue;
+      for (const s of SSPS) for (const h of HORIZONS) {
+        const c = ss[s] && ss[s][h];
+        if (c) rows.push(["one-year hydraulic survival", M.groups[g].short, SSP_NAME[s], h, base.toFixed(4), c.mean.toFixed(4), c.min.toFixed(4), c.max.toFixed(4), c.n_gcms, "fraction", grid]);
+      }
+    }
+    if (M.treeline && M.treeline.summary) for (const s of SSPS) for (const h of HORIZONS) {
+      const c = M.treeline.summary[s + "__" + h];
+      if (c) rows.push(["climatic treeline shift", "all", SSP_NAME[s], h, "0", c.ensemble_mean_shift_m.toFixed(1), c.ensemble_min_shift_m.toFixed(1), c.ensemble_max_shift_m.toFixed(1), c.n_gcms, "m", grid]);
+    }
+    return rows.map((r) => r.map(q).join(",")).join("\r\n") + "\r\n";
+  }
+
   /* ---------------- cards ---------------- */
   function viabilityCard(g, m, hzIndex) {
     const pct = (v) => (100 * v).toFixed(1);
@@ -245,7 +265,7 @@
   }
   function photoZoomBody(p) {
     return `<figure class="photo-big"><img src="assets/photos/${p.file}-1600.jpg" width="${p.original_px[0]}" height="${p.original_px[1]}" alt="${esc(p.alt)}">
-      <figcaption><strong>${esc(p.caption)}</strong>, ${esc(p.place)}, ${esc(p.date.slice(0, 4))}. ${creditLine(p)} The copy shown is resized; the original is on the source page.</figcaption></figure>`;
+      <figcaption>Taken ${esc(p.date.slice(0, 4))}. ${creditLine(p)} The copy shown is resized; the original is on the source page.</figcaption></figure>`;
   }
 
   /* ---------------- the band: markup and behaviour (browser only) ---------------- */
@@ -269,17 +289,17 @@
     return reliefPromise;
   }
 
-  function bandMarkup(M, gridHtml) {
+  function bandMarkup(M, gridHtml, start) {
     const radio = (name, val, text, checked) => `<label class="opt"><input type="radio" name="${name}" value="${val}"${checked ? " checked" : ""}><span>${text}</span></label>`;
     return `<div class="wrap band-grid">
       <div class="band-intro">
         <div class="sec-head on-band"><span class="sec-no">02</span><h2 id="res-h">Headline results</h2></div>
         <p class="band-lead" id="res-lead" aria-live="polite"></p>
         <div class="scen" role="group" aria-label="Choose a scenario">
-          <div class="scen-row"><span class="scen-label" id="l-ssp">Emissions path</span><div class="seg-on-band" role="radiogroup" aria-labelledby="l-ssp">${SSPS.map((s) => radio("ssp", s, SSP_NAME[s], s === "ssp585")).join("")}</div></div>
-          <div class="scen-row"><span class="scen-label" id="l-hz">Horizon</span><div class="seg-on-band" role="radiogroup" aria-labelledby="l-hz">${HORIZONS.map((h) => radio("hz", h, h, h === "2100")).join("")}</div></div>
+          <div class="scen-row"><span class="scen-label" id="l-ssp">Emissions path</span><div class="seg-on-band" role="radiogroup" aria-labelledby="l-ssp">${SSPS.map((s) => radio("ssp", s, SSP_NAME[s], s === start.ssp)).join("")}</div></div>
+          <div class="scen-row"><span class="scen-label" id="l-hz">Horizon</span><div class="seg-on-band" role="radiogroup" aria-labelledby="l-hz">${HORIZONS.map((h) => radio("hz", h, h, h === start.hz)).join("")}</div></div>
         </div>
-        <figure class="relief" id="relief" hidden>
+        <figure class="relief" id="relief">
           <div class="relief-art" id="relief-art"></div>
           <figcaption id="relief-cap"></figcaption>
         </figure>
@@ -289,6 +309,7 @@
         <div class="band-foot">
           <p class="pathkey" aria-hidden="true"><span><i class="s126"></i>SSP1-2.6</span><span><i class="s370"></i>SSP3-7.0</span><span><i class="s585"></i>SSP5-8.5</span><span>solid line and shading: the chosen path and its model range; dashed: the other two</span></p>
           <p class="small">${gridHtml} Means and ranges are taken across 5 climate models for the chosen emissions path and horizon; the 2019 value is the model's own baseline year.</p>
+          <p class="band-dl"><button type="button" class="dl-btn" id="dl-csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>Download these numbers (CSV)</button><span class="small"> all three paths and all horizons, with the model range</span></p>
           <details class="howto"><summary>How to read these numbers</summary>
             <dl>
               <dt>One-year hydraulic survival</dt><dd>One minus the modelled probability that a tree suffers hydraulic failure (xylem embolism) in a single year, averaged over the model nodes and over 50 draws of the uncertain trait values. It is the first, reduced version of viability: growth, frost and other mortality causes are not in it, and it is not a forecast of forest cover.</dd>
@@ -303,8 +324,9 @@
     </div>`;
   }
 
-  function mountBand(host, { M, treelineMean, gridHtml }) {
-    host.innerHTML = bandMarkup(M, gridHtml);
+  function mountBand(host, { M, treelineMean, gridHtml, start, onChange }) {
+    const first = { ssp: SSPS.includes(start && start.ssp) ? start.ssp : "ssp585", hz: HORIZONS.includes(start && start.hz) ? start.hz : "2100" };
+    host.innerHTML = bandMarkup(M, gridHtml, first);
     const cards = sel(host, "#fcards"), lead = sel(host, "#res-lead"), fig = sel(host, "#relief"), art = sel(host, "#relief-art"), cap = sel(host, "#relief-cap");
     const hlCache = new Map();
     let relief = null, hl0 = null, hl1 = null, token = 0;
@@ -328,11 +350,18 @@
           `<br><span class="small muted">Contours every 250 m; the figure is the relief the models run on, not a model result.</span>`;
       }
     }
-    host.addEventListener("change", (e) => { if (e.target.name === "ssp" || e.target.name === "hz") draw(); });
+    host.addEventListener("change", (e) => { if (e.target.name === "ssp" || e.target.name === "hz") { draw(); if (onChange) onChange(current()); } });
+    const dl = sel(host, "#dl-csv");
+    if (dl) dl.addEventListener("click", () => {
+      const url = URL.createObjectURL(new Blob([headlineCsv(M)], { type: "text/csv;charset=utf-8" }));
+      const a = document.createElement("a"); a.href = url; a.download = "antar_headline_results.csv"; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    });
     draw();
     const mine = ++token;
     loadRelief().then((r) => {
-      if (!r || mine !== token || !host.isConnected || treelineMean == null) return;
+      if (mine !== token || !host.isConnected) return;
+      if (!r || treelineMean == null) { fig.hidden = true; return; }
       relief = r;
       art.innerHTML = r.svg;
       const svg = art.querySelector("svg");
@@ -342,7 +371,6 @@
       hl0 = document.createElementNS(ns, "path"); hl0.setAttribute("class", "hl0");
       hl1 = document.createElementNS(ns, "path"); hl1.setAttribute("class", "hl1");
       svg.append(hl0, hl1);
-      fig.hidden = false;
       draw();
     });
   }
@@ -354,6 +382,6 @@
     }));
   }
 
-  const api = { mountBand, mountPhotos, contours, pathD, downsample, groupModel, treelineModel, headlineModel, sparkSvg, viabilityCard, treelineCard, aegisCard, photoFigure, photoZoomBody, signed, SSPS, SSP_NAME, HORIZONS, YEARS };
+  const api = { headlineCsv, mountBand, mountPhotos, contours, pathD, downsample, groupModel, treelineModel, headlineModel, sparkSvg, viabilityCard, treelineCard, aegisCard, photoFigure, photoZoomBody, signed, SSPS, SSP_NAME, HORIZONS, YEARS };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else root.Home = api;
 })(typeof window !== "undefined" ? window : globalThis);

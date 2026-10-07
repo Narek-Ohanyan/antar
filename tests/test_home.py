@@ -164,3 +164,21 @@ def test_search_ignores_case_and_accents_and_lists_everything_for_an_empty_query
 def test_negative_shifts_use_a_proper_minus_in_the_sentence():
     m = node("const M=JSON.parse(JSON.stringify(d.M));M.treeline.summary['ssp126__2050'].ensemble_min_shift_m=-8.4;console.log(JSON.stringify(H.headlineModel(M,'ssp126','2050',2670).lead))", {"M": MANIFEST})
     assert "models: \u22128 to" in m and "-8" not in m
+
+
+def test_the_csv_holds_every_headline_number_and_parses_back():
+    import csv
+    import io
+    text = node("console.log(JSON.stringify(H.headlineCsv(d.M)))", {"M": MANIFEST})
+    assert text.endswith("\r\n") and text.count("\r\n") == 1 + 2 * 9 + 9          # header, 2 groups x 3 paths x 3 horizons, 9 treeline rows
+    rows = list(csv.DictReader(io.StringIO(text)))
+    assert list(rows[0].keys()) == ["quantity", "group", "emissions_path", "horizon", "baseline_2019", "ensemble_mean", "model_min", "model_max", "n_climate_models", "unit", "grid"]
+    a = next(r for r in rows if r["group"] == "alpha" and r["emissions_path"] == "SSP5-8.5" and r["horizon"] == "2100")
+    assert float(a["ensemble_mean"]) == pytest.approx(0.96) and float(a["baseline_2019"]) == pytest.approx(0.99) and a["n_climate_models"] == "5" and a["unit"] == "fraction"
+    t = next(r for r in rows if r["quantity"] == "climatic treeline shift" and r["emissions_path"] == "SSP3-7.0" and r["horizon"] == "2080")
+    assert float(t["ensemble_mean"]) == 200 and float(t["model_min"]) == 180 and float(t["model_max"]) == 230 and t["unit"] == "m"
+
+
+def test_the_csv_quotes_awkward_text():
+    text = node("const M=JSON.parse(JSON.stringify(d.M));M.groups.a.short='odd, \"name\"';console.log(JSON.stringify(H.headlineCsv(M)))", {"M": MANIFEST})
+    assert '"odd, ""name"""' in text

@@ -86,12 +86,34 @@ function initMenu() {
   window.matchMedia("(min-width: 761px)").addEventListener("change", () => setMenu(false));
 }
 
+/* Four inner pages open with a credited photograph behind their title. The page renderers are untouched: once a page has put its title in the
+   view, that title is moved into the banner. Pages whose view is a tool (map, place explorer) and the record pages keep the plain header. */
+const PAGE_PHOTO = { treeline: "aragats", decision: "dilijan-beech", models: "khosrov", method: "dilijan-ridge" };
+function bannerize() {
+  const file = state.pagePhoto, v = view();
+  if (!file || !v || v.querySelector(".pageban")) return;
+  const wrap = v.querySelector(":scope > .wrap"), h1 = wrap && wrap.querySelector(":scope > h1");
+  const ph = (state.M.photos || []).find((x) => x.file === file);
+  if (!h1 || !ph) return;
+  const ban = document.createElement("figure");
+  ban.className = "pageban";
+  ban.innerHTML = `<img src="assets/photos/${ph.file}-800.jpg" srcset="assets/photos/${ph.file}-800.jpg 800w, assets/photos/${ph.file}-1600.jpg 1600w" sizes="100vw" width="${ph.original_px[0]}" height="${ph.original_px[1]}" alt="" decoding="async">
+    <div class="wrap pageban-in"></div>
+    <figcaption class="wrap"><span class="credit">${esc(ph.caption)}, ${esc(ph.place)} \u00B7 Photo: ${esc(ph.author)} \u00B7 <a href="${esc(ph.licence_url)}" target="_blank" rel="noopener">${esc(ph.licence)}</a> \u00B7 <a href="${esc(ph.source_page)}" target="_blank" rel="noopener">${esc(ph.source)}<span class="sr-only"> (opens in a new tab)</span></a> \u00B7 resized</span></figcaption>`;
+  ban.querySelector(".pageban-in").appendChild(h1);
+  v.insertBefore(ban, wrap);
+  document.body.classList.add("has-ban");
+}
+
 function route() {
   setMenu(false);
   const page = (location.hash.replace(/^#\//, "").split("?")[0]) || "home";
   const fn = PAGES[page] || renderHome;
   $("nav").innerHTML = NAV.map(([k, t]) => `<a href="#/${k}" class="${k === page ? "active" : ""}">${t}</a>`).join("");
   const activeLink = $("nav a.active"); if (activeLink) activeLink.scrollIntoView({ inline: "center", block: "nearest" });   // phones: keep the current page visible in the scrolling nav
+  if (state.banCleanup) { state.banCleanup(); state.banCleanup = null; }
+  document.body.classList.remove("has-ban");
+  state.pagePhoto = PAGE_PHOTO[page] || null;
   if (state.revealCleanup) { state.revealCleanup(); state.revealCleanup = null; }
   if (state.heroCleanup) { state.heroCleanup(); state.heroCleanup = null; }
   document.body.classList.toggle("is-home", fn === renderHome);
@@ -100,6 +122,7 @@ function route() {
   window.scrollTo(0, 0);
   syncTopbar();
   fn(pageParams());
+  if (state.pagePhoto) { bannerize(); const mo = new MutationObserver(bannerize); mo.observe(view(), { childList: true }); state.banCleanup = () => mo.disconnect(); }
   view().focus({ preventScroll: true });          // screen readers land on the new page's content
 }
 function syncTopbar() { $("#topbar").classList.toggle("solid", window.scrollY > 24); }
@@ -204,7 +227,8 @@ function renderHome() {
     </section>
   </div>`;
   view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => { sessionStorageSafe("jump", a.dataset.jump); }));
-  Home.mountBand($("#results"), { M, treelineMean, gridHtml: sgid ? gridChip(sgid) : "" });
+  const q0 = pageParams();
+  Home.mountBand($("#results"), { M, treelineMean, gridHtml: sgid ? gridChip(sgid) : "", start: { ssp: q0.ssp, hz: q0.hz }, onChange: (c) => setParams({ ssp: c.ssp, hz: c.hz }) });
   Home.mountPhotos(view(), photos);
   initHeroVideo();
   initReveal();
@@ -279,7 +303,16 @@ function renderTreeline() {
 /* ---- Decision ---- */
 function renderDecision() {
   const ae = state.M.aegis;
-  if (!ae) { view().innerHTML = `<div class="wrap"><p>No portfolio has been computed.</p></div>`; return; }
+  if (!ae) {
+    const why = (state.M.provenance.aegis && state.M.provenance.aegis.withheld) || [];
+    view().innerHTML = `<div class="wrap"><h1>Decision</h1>
+      <div class="callout"><strong>The planting portfolio is being recomputed.</strong> The earlier portfolio was built on scenario results that have since been corrected, so it is withheld rather than shown from superseded inputs.${why.length ? ` <span class="small">(${why.map((w) => esc(w.replace(/^[\w.-]+\.yaml: /, ""))).join("; ")})</span>` : ""}</div>
+      <h2>What it will show</h2>
+      <p class="lead">For each planting unit, a choice of species group and planting method that maximises a mix of the expected benefit and the average benefit in the worst 20% of the 45 climate-model \u00D7 path \u00D7 horizon scenarios (conditional value at risk, \u03B1 = 0.8, \u03BB = 0.5), under a budget. It reports how much expected benefit the robust choice gives up (the price of robustness) and the efficient frontier between the two.</p>
+      <p>The assumptions behind benefit and cost, and what is still a placeholder, are on the <a href="#/method" data-jump="aegis">Method</a> and <a href="#/status">Status &amp; limits</a> pages.</p></div>`;
+    view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => sessionStorageSafe("jump", a.dataset.jump)));
+    return;
+  }
   const sw = ae.budget_sweep, fr = ae.frontier;
   const money = (v) => "$" + (v >= 1e6 ? (v / 1e6).toFixed(v % 1e6 ? 1 : 0) + "M" : v.toLocaleString("en"));
   const identical = sw.every((r) => r.n_units_planted === sw[0].n_units_planted && Math.abs(r.expected - sw[0].expected) < 1e-6);

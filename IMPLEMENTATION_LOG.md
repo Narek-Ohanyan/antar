@@ -2069,3 +2069,12 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
 * **Corrections found on the way.** The Method page's plain-language text still said humidity and wind were not changed in the scenarios, which contradicted the
   technical text and the corrected pipeline; fixed. The home page said "seven engines" because the list included Treeline change, which is part of MERISTEM; it now
   lists the six engines. Engine states are stored once in `methodology.json` and read by both the cards and the flow chart.
+
+### Second pass on the visual refresh (same day)
+
+* Audit against the design checklist: no horizontal overflow at 375, 820 and 1440 px; text and control colour pairs measured (`tests/test_contrast.py`, both themes, all >= 4.5:1);
+  photo dialog, search palette and scenario selector checked by keyboard; reduced motion honoured by the global rule.
+* Added: the relief figure's space is reserved before it loads (no layout jump); the chosen path and horizon live in the address and are restored from it; a CSV of every headline
+  number (all paths and horizons, with the model range and the grid); credited photograph banners on four inner pages.
+* **Decision page.** It was a bare line, "No portfolio has been computed", with no title: the AEGIS result is withheld on purpose (it was built on the superseded constant atmosphere).
+  It now says so, in plain words, and describes what the page will show; the numbers return after the dense AEGIS rerun.

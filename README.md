@@ -61,6 +61,9 @@ data by design: they demonstrate mechanisms, not skill.
 * The state of each engine (run, reduced scope, built but not applied) is written once, in `ui/data/methodology.json`; the home-page cards and the flow
   chart on the Method page (`scripts/build_architecture_svg.py`) both read it.
 * Ctrl K or ⌘K (or `/`) opens a search box that jumps to any page, map layer or marz.
+* The Treeline, Decision, Models and Method pages open with one of the same photographs behind the title, credited on the banner. The headline band's
+  emissions path and horizon are kept in the address (`#/home?ssp=ssp370&hz=2080`), and a button downloads every headline number as CSV.
+* `tests/test_contrast.py` reads the colour tokens from `ui/styles.css` and checks WCAG contrast for the pairs the pages use, in both themes.
 
 ## Conventions
 
