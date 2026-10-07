@@ -481,11 +481,18 @@ def build():
             cost = {i["name"]: i["cost_per_ha"] for i in INTERVENTIONS}
         except Exception:  # pragma: no cover
             cost = {}
-        sweep = [{"budget_usd": float(k.replace("$", "").replace(",", "")), **{a: r(b, 2) if a != "n_units_planted" else b for a, b in v.items()}}
-                 for k, v in ae["budget_sweep"].items()]
+        sweep = []
+        for k, v in ae["budget_sweep"].items():
+            row = {"budget_usd": float(k.replace("$", "").replace(",", ""))}
+            for a, val in v.items():
+                if a == "selected":
+                    continue                       # the treated cells go to data/aegis_units.json, loaded only by the Decision page
+                row[a] = val if (isinstance(val, (dict, str, bool)) or a == "n_units_planted") else r(val, 6 if a == "mip_gap" else 2)
+            sweep.append(row)
         fr = ae["lambda_frontier_at_representative_budget"]
         aegis = {"grid": gid, "scenario_source": ae["scenario_source"], "n_scenarios": ae["n_scenarios"],
                  "n_units": ae["n_units"], "n_eligible_units": ae.get("n_eligible_units"), "unit_area_ha": ae.get("unit_area_ha"),
+                 "eligible_area_ha": ae.get("eligible_area_ha"), "representative_budget_usd": ae.get("representative_budget_usd", 45_000_000.0),
                  "value_per_ha_year_usd": ae["value_per_ha_year_usd"], "incremental_share": ae.get("incremental_share"),
                  "net_value_per_ha_year_usd": ae.get("net_value_per_ha_year_usd"),
                  "scope_note": ae["scope_note"], "budget_sweep": sweep,
@@ -493,10 +500,19 @@ def build():
                  "planting_cost_sensitivity": ae.get("planting_cost_sensitivity"),
                  "frontier": {"lambdas": fr.get("lambdas"), "expected": [r(v, 2) for v in fr.get("expected", [])],
                               "cvar": [r(v, 2) for v in fr.get("cvar", [])],
-                              "price_of_robustness": r(fr.get("price_of_robustness"), 4)},
+                              "price_of_robustness": r(fr.get("price_of_robustness"), 4), "resolution_usd": r(fr.get("resolution_usd"), 0),
+                              "solve_optimal": fr.get("solve_optimal"), "solve_mip_gap": fr.get("solve_mip_gap")},
                  "options": [{**o, "cost_per_ha_usd": cost.get(o["intervention"]),
                               "group_label": GROUPS.get(o["group"], {}).get("label", o["group"])}
                              for o in ae["option_labels"]]}
+
+    units_path = OUT / "aegis_units.json"
+    if aegis and ae.get("units"):
+        dump({"units": ae["units"], "intervention_ids": ae["intervention_ids"],
+              "budgets": [{"budget_usd": float(k.replace("$", "").replace(",", "")), "selected": v.get("selected", [])} for k, v in ae["budget_sweep"].items()]}, units_path)
+        aegis["units_file"] = "aegis_units.json"
+    elif units_path.exists():
+        units_path.unlink()                        # never leave the cells of a withheld or older portfolio behind
 
     # ---- MERISTEM / MNEME / variogram ---------------------------------------------------------
     mer = load("meristem_adult_niche.yaml")
@@ -648,7 +664,7 @@ def stamp_index():
     file after they change (a cached app.js showed an outdated warning after it had been corrected)."""
     import hashlib
     ui = Path(__file__).resolve().parent
-    files = ([ui / n for n in ("styles.css", "charts.js", "raster.js", "interp.js", "map.js", "place.js", "math.js", "home.js", "palette.js", "app.js")] + sorted((ui / "data").glob("*.json"))
+    files = ([ui / n for n in ("styles.css", "charts.js", "raster.js", "interp.js", "map.js", "place.js", "math.js", "home.js", "decision.js", "palette.js", "app.js")] + sorted((ui / "data").glob("*.json"))
              + sorted((ui / "assets" / "map").glob("*")) + [ui / "assets" / "architecture.svg", ui / "assets" / "relief.svg"] + sorted((ui / "assets" / "photos").glob("*.*")) + sorted((ui / "assets" / "katex").glob("*.*")))
     h = hashlib.sha1()
     for f in files:

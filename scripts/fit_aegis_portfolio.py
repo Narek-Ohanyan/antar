@@ -54,8 +54,9 @@ from rasterio.warp import transform as warp_transform
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run_topohydro_grid import get_access_token, drive_vsicurl_url  # noqa: E402
+from run_topohydro_grid import get_access_token, drive_vsicurl_url, BBOX, CHELSA_GRID_SHAPE, DENSE_STRIDE  # noqa: E402
 from antar.decision.optimize import robust_portfolio, efficient_frontier  # noqa: E402
+from antar.decision.units import cell_area_ha  # noqa: E402
 from antar.io.armenia_mask import inside_armenia  # noqa: E402
 import time  # noqa: E402
 
@@ -72,8 +73,15 @@ VALUE_PER_HA_YEAR = 417.0  # real, World Bank 2023 -- national-average ecosystem
 # absolute benefit by a third; the ramp is not applied here (all benefits are steady-state, year 6 onward). A constant factor does not change which plan is
 # optimal, only the benefit totals.
 INCREMENTAL_SHARE = 0.75
-AREA_PER_UNIT_HA = 1.0     # real convention stated in the concept note itself (Sec. 9): "management
-                            # units (aggregated 30m cells, roughly 1 ha)"
+AREA_PER_UNIT_HA = 1.0     # the concept note's own convention (Sec. 9): "management units (aggregated 30m cells, roughly 1 ha)"; kept behind --one-ha-units
+                            # to reproduce the earlier result. With one hectare per node no budget below tens of millions ever binds (see the Decision page).
+# Solver settings. Cells are nearly identical in benefit (about 3,200 ha, ~99% survival), so proving a tight gap only separates cells that differ by far less than the
+# uncertainty of the 417 USD/ha/yr value. The budget sweep is accepted within 0.5% of the proven bound; the frontier, whose two ends differ by very little, is solved much more
+# tightly so that the price of robustness can be told from solver noise. Whether each solve reached its gap is recorded.
+SWEEP_REL_GAP, SWEEP_TIME_S = 5e-3, 180
+FRONTIER_REL_GAP, FRONTIER_TIME_S = 1e-4, 180
+SENS_REL_GAP, SENS_TIME_S = 1e-2, 120
+GRID_STRIDE = 40           # CHELSA pixels between the nodes of the coarse validation grid (the dense grid's is DENSE_STRIDE)
 LAND_TENURE_FILE_ID = "1s9ENmIU67yyi9SJcXoOtrmERYTE-i9zN"
 
 # Real cost per hectare by intervention method (World Bank 2023 / Armenia's Landscape Restoration
@@ -188,6 +196,24 @@ def load_future_projections(dense=False):
     return lats, lons, group_names, viability, scenario_names
 
 
+
+def allocation_summary(plan, area, cost, option_labels):
+    """What a plan treats: units, hectares and cost in all, and the share by intervention method and by species group."""
+    x = np.asarray(plan["x"]) > 0.5
+    ha, usd = x * area[:, None], x * area[:, None] * cost
+    out = {"n_units_planted": int(x.sum()), "area_ha": float(ha.sum()), "cost_usd": float(usd.sum()), "by_intervention": {}, "by_group": {}}
+    groups = list(dict.fromkeys(o["group"] for o in option_labels))
+    methods = list(dict.fromkeys(o["intervention"] for o in option_labels))
+    # [unit index, index into units.group_ids, index into intervention_ids] for every treated cell; the map on the Decision page draws these
+    out["selected"] = [[int(u), groups.index(option_labels[j]["group"]), methods.index(option_labels[j]["intervention"])] for u, j in zip(*np.nonzero(x))]
+    for j, o in enumerate(option_labels):
+        if x[:, j].any():
+            for key, name in (("by_intervention", o["intervention"]), ("by_group", o["group"])):
+                d = out[key].setdefault(name, {"units": 0, "area_ha": 0.0})
+                d["units"] += int(x[:, j].sum()); d["area_ha"] += float(ha[:, j].sum())
+    return out
+
+
 def main():
     dense = "--dense" in sys.argv
     out_path = OUT_PATH_DENSE if dense else OUT_PATH
@@ -238,7 +264,14 @@ def main():
             option_labels.append({"group": g, "intervention": interv["name"], "cost_basis": interv["cost_basis"]})
             j += 1
 
-    area = np.full(n, AREA_PER_UNIT_HA)
+    # A unit is the grid cell its node stands for (stride x stride CHELSA pixels of 30 arcseconds), treated whole or not at all; the node's viability and
+    # eligibility are taken to represent the whole cell. --one-ha-units restores the earlier convention of one hectare per node.
+    one_ha = "--one-ha-units" in sys.argv
+    stride = DENSE_STRIDE if dense else GRID_STRIDE
+    px_lat, px_lon = (BBOX[3] - BBOX[1]) / CHELSA_GRID_SHAPE[0], (BBOX[2] - BBOX[0]) / CHELSA_GRID_SHAPE[1]
+    area = np.full(n, AREA_PER_UNIT_HA) if one_ha else cell_area_ha(lats, stride * px_lat, stride * px_lon)
+    print(f"  unit area: {'1 ha per node (--one-ha-units)' if one_ha else f'cell of {stride}x{stride} CHELSA pixels'}; {area.min():,.0f} to {area.max():,.0f} ha, "
+          f"eligible land {area[eligible_mask].sum():,.0f} ha", flush=True)
 
     results = {
         "run_date": __import__("datetime").date.today().isoformat(),
@@ -247,7 +280,20 @@ def main():
         "scenario_names": scenario_names,
         "n_units": n,
         "n_eligible_units": int(eligible_mask.sum()),
-        "unit_area_ha": float(AREA_PER_UNIT_HA),
+        "unit_area_ha": {"min": float(area.min()), "mean": float(area.mean()), "max": float(area.max()),
+                         "basis": ("1 ha per node (the concept note's convention)" if one_ha else
+                                   f"the grid cell a node stands for: {stride} x {stride} CHELSA pixels of 30 arcseconds, treated whole or not at all")},
+        "eligible_area_ha": float(area[eligible_mask].sum()),
+        "intervention_ids": [i["name"] for i in INTERVENTIONS],
+        "units": {
+            "lat": [round(float(v), 5) for v in lats], "lon": [round(float(v), 5) for v in lons], "area_ha": [round(float(v), 1) for v in area],
+            "eligible": [bool(v) for v in eligible_mask], "group_ids": list(group_names),
+            "cell_deg": {"dlat": float(stride * px_lat), "dlon": float(stride * px_lon)},
+            "viability_mean": {g: [round(float(v), 4) for v in viability[g].mean(axis=1)] for g in group_names},
+            "viability_worst20": {g: [round(float(v), 4) for v in np.sort(viability[g], axis=1)[:, :max(int(np.ceil(0.2 * C)), 1)].mean(axis=1)] for g in group_names},
+        },
+        "representative_budget_usd": float(REPRESENTATIVE_BUDGET_USD),
+        "solver": {"sweep": {"mip_rel_gap": SWEEP_REL_GAP, "time_limit_s": SWEEP_TIME_S}, "frontier": {"mip_rel_gap": FRONTIER_REL_GAP, "time_limit_s": FRONTIER_TIME_S}, "sensitivity": {"mip_rel_gap": SENS_REL_GAP, "time_limit_s": SENS_TIME_S}},
         "n_sampled_cells_total": n_total,
         "n_cells_dropped_outside_armenia": n_total - n,
         "value_per_ha_year_usd": VALUE_PER_HA_YEAR,
@@ -255,7 +301,8 @@ def main():
         "net_value_per_ha_year_usd": VALUE_PER_HA_YEAR * INCREMENTAL_SHARE,
         "option_labels": option_labels,
         "cost_table": [{k: v for k, v in i.items()} for i in INTERVENTIONS],
-        "scope_note": ("Benefit varies only by functional group (REFUGIUM viability) times one national value, "
+        "scope_note": ("A planting unit is the grid cell around a model node (about 3,000 ha on the dense grid), treated whole or not at all, with the node's viability and eligibility standing for the whole cell. "
+                        "Benefit varies only by functional group (REFUGIUM viability) times one national value, "
                         "417 USD/ha/yr x 75% (the share a restored degraded hectare adds, World Bank 2023); cost varies "
                         "only by intervention method -- the "
                         "two are independent by construction since no real data or model connects "
@@ -274,25 +321,27 @@ def main():
     print(f"=== Budget sweep (lambda=0.5, real levels ${BUDGET_LEVELS_USD}) ===", flush=True)
     for budget in BUDGET_LEVELS_USD:
         try:
-            plan = robust_portfolio(benefit, area, cost, budget, lam=0.5, eligible=eligible)
-            results["budget_sweep"][f"${budget:,.0f}"] = {
-                "expected": plan["expected"], "cvar": plan["cvar"],
-                "n_units_planted": int(plan["x"].sum()),
-            }
-            print(f"  ${budget:,.0f}: expected={plan['expected']:.1f}, cvar={plan['cvar']:.1f}, "
-                  f"{int(plan['x'].sum())} units planted", flush=True)
+            plan = robust_portfolio(benefit, area, cost, budget, lam=0.5, eligible=eligible, time_limit=SWEEP_TIME_S, mip_rel_gap=SWEEP_REL_GAP)
+            alloc = allocation_summary(plan, area, cost, option_labels)
+            results["budget_sweep"][f"${budget:,.0f}"] = {"expected": plan["expected"], "cvar": plan["cvar"], **alloc, "optimal": plan["optimal"], "mip_gap": plan["mip_gap"]}
+            print(f"  ${budget:,.0f}: expected={plan['expected']:.1f}, cvar={plan['cvar']:.1f}, {alloc['n_units_planted']} units, "
+                  f"{alloc['area_ha']:,.0f} ha, cost ${alloc['cost_usd']:,.0f}; methods {sorted(alloc['by_intervention'])}", flush=True)
         except Exception as e:
             results["budget_sweep"][f"${budget:,.0f}"] = {"error": str(e)}
             print(f"  ${budget:,.0f}: FAILED ({e})", flush=True)
 
     print(f"=== Mean-CVaR efficient frontier at the real representative budget (${REPRESENTATIVE_BUDGET_USD:,.0f}) ===", flush=True)
     try:
-        frontier = efficient_frontier(benefit, area, cost, REPRESENTATIVE_BUDGET_USD, eligible=eligible)
+        frontier = efficient_frontier(benefit, area, cost, REPRESENTATIVE_BUDGET_USD, eligible=eligible, time_limit=FRONTIER_TIME_S, mip_rel_gap=FRONTIER_REL_GAP)
         results["lambda_frontier_at_representative_budget"] = {
             "lambdas": frontier["lambdas"].tolist(),
             "expected": frontier["expected"].tolist(),
             "cvar": frontier["cvar"].tolist(),
             "price_of_robustness": frontier["price_of_robustness"],
+            "solve_optimal": [bool(p["optimal"]) for p in frontier["plans"]],
+            "solve_mip_gap": [p["mip_gap"] for p in frontier["plans"]],
+            # the smallest difference between two plans that the solves can tell from noise: the largest (gap x expected benefit) among them
+            "resolution_usd": float(max((p["mip_gap"] or 0.0) * p["expected"] for p in frontier["plans"])),
         }
         print(f"  price of robustness: {frontier['price_of_robustness']:.2f}", flush=True)
     except Exception as e:
@@ -307,7 +356,7 @@ def main():
         c2 = cost.copy()
         c2[:, planting_cols] = next(i for i in INTERVENTIONS if i["name"] == "degraded_forest_planting")[key]
         try:
-            plan = robust_portfolio(benefit, area, c2, REPRESENTATIVE_BUDGET_USD, lam=0.5, eligible=eligible)
+            plan = robust_portfolio(benefit, area, c2, REPRESENTATIVE_BUDGET_USD, lam=0.5, eligible=eligible, time_limit=SENS_TIME_S, mip_rel_gap=SENS_REL_GAP)
             results["planting_cost_sensitivity"][label] = {
                 "planting_cost_usd_per_ha": float(c2[0, planting_cols[0]]), "expected": plan["expected"], "cvar": plan["cvar"],
                 "n_units_planted": int(plan["x"].sum()), "n_units_planting_option": int(plan["x"][:, planting_cols].sum())}

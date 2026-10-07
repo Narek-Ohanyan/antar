@@ -19,17 +19,59 @@ from scipy.optimize import Bounds, LinearConstraint, milp
 from scipy.sparse import lil_matrix
 
 
+
+def non_dominated_options(benefit, cost, eligible=None):
+    """Indices of the options worth keeping: drops every option that another option beats or ties.
+
+    Option k makes option j unnecessary when, in every unit where j is allowed, k is allowed too, costs no more per hectare and gives at least the same benefit in
+    every scenario (a tie in everything keeps the lower index). Any plan that uses j in a unit can use k there instead without costing more or benefiting less, so
+    the optimum is unchanged. Only valid when no constraint couples units to specific options (no option-share cap, no water caps).
+    """
+    benefit = np.asarray(benefit, dtype=float)
+    cost = np.asarray(cost, dtype=float)
+    U, J, C = benefit.shape
+    elig = np.ones((U, J), dtype=bool) if eligible is None else np.asarray(eligible, dtype=bool)
+    keep = np.ones(J, dtype=bool)
+    for j in range(J):
+        for k in range(J):
+            if k == j or not keep[k]:
+                continue
+            rows = elig[:, j]
+            if not rows.any():
+                keep[j] = False
+                break
+            if not elig[rows, k].all() or (cost[rows, k] > cost[rows, j]).any() or (benefit[rows, k, :] < benefit[rows, j, :]).any():
+                continue
+            identical = (cost[rows, k] == cost[rows, j]).all() and (benefit[rows, k, :] == benefit[rows, j, :]).all() and (elig[:, k] == elig[:, j]).all()
+            if not identical or k < j:
+                keep[j] = False
+                break
+    return np.flatnonzero(keep)
+
+
 def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: float = 0.5, alpha: float = 0.8,
                      max_share: float = 1.0, min_area: float = 0.0, water_use=None, water_caps=None, basin=None,
-                     eligible=None):
+                     eligible=None, presolve: bool = True, time_limit: float | None = None, mip_rel_gap: float | None = None):
     """Solve the portfolio problem.
 
     benefit : (U, J, C) per-hectare benefit of option j in unit u under scenario c
     area    : (U,) hectares;  cost : (U, J) per-hectare cost;  budget : total cost cap
     water_use : (U, J) per-hectare extra water use; water_caps : {basin_id: cap}; basin : (U,) basin id
     eligible : (U, J) boolean mask; options with False can never be selected
-    Returns dict(x (U,J) binary, expected, cvar, scenario_benefit (C,)).
+    presolve : drop options another option beats or ties (see :func:`non_dominated_options`); exact, and skipped when an option-share cap or water caps couple the options.
+    time_limit : seconds for the MILP solver (None = no limit); mip_rel_gap : stop when the proven bound is within this relative gap of the best plan found (None = solver default).
+    The result says whether optimality was proved and the gap that remained.
+    Returns dict(x (U,J) binary, expected, cvar, scenario_benefit (C,), optimal (bool), mip_gap, n_options_solved).
     """
+    if presolve and max_share >= 1.0 and not water_caps:
+        keep = non_dominated_options(benefit, cost, eligible)
+        if len(keep) < np.asarray(benefit).shape[1]:
+            sub = robust_portfolio(np.asarray(benefit)[:, keep, :], area, np.asarray(cost)[:, keep], budget, scenario_weights=scenario_weights, lam=lam, alpha=alpha,
+                                   max_share=max_share, min_area=min_area, eligible=None if eligible is None else np.asarray(eligible)[:, keep], presolve=False,
+                                   time_limit=time_limit, mip_rel_gap=mip_rel_gap)
+            x = np.zeros(np.asarray(benefit).shape[:2])
+            x[:, keep] = sub["x"]
+            return {**sub, "x": x}
     benefit = np.asarray(benefit, dtype=float)
     U, J, C = benefit.shape
     area = np.asarray(area, dtype=float)
@@ -84,14 +126,20 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
     lb = np.r_[np.zeros(nx), -np.inf, np.zeros(C)]
     xub = np.ones(nx) if eligible is None else np.asarray(eligible, dtype=float).reshape(-1)
     ub = np.r_[xub, np.inf, np.full(C, np.inf)]
-    res = milp(obj, constraints=cons, integrality=integrality, bounds=Bounds(lb, ub))
-    if not res.success:
+    options = {}
+    if time_limit is not None:
+        options["time_limit"] = float(time_limit)
+    if mip_rel_gap is not None:
+        options["mip_rel_gap"] = float(mip_rel_gap)
+    res = milp(obj, constraints=cons, integrality=integrality, bounds=Bounds(lb, ub), options=options)
+    if res.x is None:
         raise RuntimeError(f"MILP failed: {res.message}")
     x = np.round(res.x[:nx]).reshape(U, J)
     bc = coef.T @ x.reshape(-1)
     srt = np.sort(bc)
     k = max(int(np.ceil((1 - alpha) * C)), 1)
-    return {"x": x, "expected": float(bc @ w), "cvar": float(srt[:k].mean()), "scenario_benefit": bc}
+    return {"x": x, "expected": float(bc @ w), "cvar": float(srt[:k].mean()), "scenario_benefit": bc, "optimal": bool(res.status == 0),
+            "mip_gap": None if getattr(res, "mip_gap", None) is None else float(res.mip_gap), "n_options_solved": int(J)}
 
 
 def efficient_frontier(benefit, area, cost, budget, lambdas=(0.0, 0.2, 0.4, 0.6, 0.8, 1.0),

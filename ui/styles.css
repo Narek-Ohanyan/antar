@@ -613,3 +613,37 @@ body.has-ban main::before { display: none; }
 
 .fcard > header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .cgrid { font: 500 .64rem/1 var(--mono); letter-spacing: .06em; color: var(--band-muted); white-space: nowrap; }
+
+/* ---------- Decision page: the portfolio on a map ---------- */
+.dec-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 14px 20px; margin: 18px 0 14px; }
+.dec-controls label { margin: 0; }
+.dec-budget { font: 600 1.7rem/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; min-width: 4.5ch; }
+.dec-controls input[type=range] { flex: 1 1 260px; min-height: 44px; accent-color: var(--accent); }
+.dec-ticks { display: flex; justify-content: space-between; flex: 1 1 100%; margin: -6px 0 0; font: 400 .74rem var(--mono); color: var(--muted); }
+.dec-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); gap: 18px; align-items: start; }
+#dmap { height: min(72vh, 680px); min-height: 420px; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface-2); }
+.dec-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: .84rem; }
+.dec-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.dec-legend i, .sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(255, 255, 255, .55); flex: none; }
+.dec-legend i.elig { background: rgba(40, 40, 40, .3); border-color: var(--border-strong); }
+.dec-legend i.inel { background: transparent; border: 1px solid rgba(0, 0, 0, .3); }
+.dec-side { display: grid; gap: 14px; }
+.dec-side .card { padding: 16px 18px; }
+.dec-side h3 { margin: 0 0 8px; font: 700 .72rem/1 var(--font); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.dstats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 14px; margin: 0; }
+.dstats dt { font: 700 .66rem/1.2 var(--font); text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+.dstats dd { margin: 3px 0 0; font: 600 1.35rem/1.1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+.dstats small { display: block; margin-top: 3px; font: 400 .74rem/1.3 var(--font); color: var(--muted); }
+.dg { display: grid; grid-template-columns: 14px minmax(70px, 1fr) minmax(60px, 2fr) auto; align-items: center; gap: 8px; margin: 6px 0; font-size: .86rem; }
+.dgb { height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.dgb i { display: block; height: 100%; }
+.dgv { font: 400 .8rem var(--mono); color: var(--muted); }
+#dmethods ul { margin: 0; padding-left: 1.1em; font-size: .86rem; }
+#dmarz table { font-size: .84rem; }
+#dmarz th, #dmarz td { padding: 5px 8px; }
+#dcell { min-height: 8.5em; font-size: .86rem; line-height: 1.5; }
+.dv { list-style: none; margin: 6px 0 0; padding: 0; }
+.dv li { display: flex; gap: 8px; align-items: baseline; margin: 3px 0; color: var(--muted); }
+.dec-details { margin-top: 20px; }
+.dec-details > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font: 600 1.25rem/1.2 var(--serif); }
+@media (max-width: 960px) { .dec-grid { grid-template-columns: minmax(0, 1fr); } #dmap { height: 60vh; min-height: 340px; } }

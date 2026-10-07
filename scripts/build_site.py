@@ -65,6 +65,8 @@ def check_bundle(out):
         if not (out / f).is_file():
             bad.append(f"{f} is missing")
     manifest = json.loads((out / "data" / "manifest.json").read_text()) if (out / "data" / "manifest.json").exists() else {}
+    if (manifest.get("aegis") or {}).get("units_file") and not (out / "data" / manifest["aegis"]["units_file"]).is_file():
+        bad.append(f"data/{manifest['aegis']['units_file']} is missing (the Decision page map needs it)")
     for gid, info in (manifest.get("grids") or {}).items():
         if not (out / "data" / info["file"]).is_file():
             bad.append(f"grid {gid}: data/{info['file']} is missing")

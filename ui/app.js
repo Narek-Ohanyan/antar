@@ -302,7 +302,7 @@ function renderTreeline() {
 }
 
 /* ---- Decision ---- */
-function renderDecision() {
+async function renderDecision() {
   const ae = state.M.aegis;
   if (!ae) {
     const why = (state.M.provenance.aegis && state.M.provenance.aegis.withheld) || [];
@@ -314,33 +314,78 @@ function renderDecision() {
     view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => sessionStorageSafe("jump", a.dataset.jump)));
     return;
   }
+  let A = null, U = null;
+  if (ae.units_file) {
+    view().innerHTML = `<div class="wrap"><div class="loading">Loading\u2026</div></div>`;
+    try {
+      [A, U] = await Promise.all([loadMapAssets(), fetch("data/" + ae.units_file + "?v=" + (window.ANTAR_BUILD || "dev")).then((r) => { if (!r.ok) throw new Error("the portfolio cells could not be loaded (HTTP " + r.status + ")"); return r.json(); })]);
+    } catch (e) { view().innerHTML = `<div class="wrap"><h1>Decision</h1><div class="callout bad"><strong>The portfolio map could not be loaded.</strong> ${esc(e.message)}</div></div>`; return; }
+    if (!location.hash.startsWith("#/decision")) return;
+  }
   const sw = ae.budget_sweep, fr = ae.frontier;
   const money = (v) => "$" + (v >= 1e6 ? (v / 1e6).toFixed(v % 1e6 ? 1 : 0) + "M" : v.toLocaleString("en"));
+  const ha = (v) => (v >= 1e5 ? Math.round(v / 1e3).toLocaleString("en") + " thousand ha" : Math.round(v).toLocaleString("en") + " ha");
+  const unit = ae.unit_area_ha && typeof ae.unit_area_ha === "object" ? ae.unit_area_ha : { min: ae.unit_area_ha || 1, mean: ae.unit_area_ha || 1, max: ae.unit_area_ha || 1 };
+  const eligible = ae.n_eligible_units != null ? ae.n_eligible_units : Math.max(...sw.map((r) => r.n_units_planted));
+  const eligibleHa = ae.eligible_area_ha != null ? ae.eligible_area_ha : eligible * unit.mean;
+  const repBudget = ae.representative_budget_usd || 45e6, rep = sw.find((r) => r.budget_usd === repBudget) || sw[Math.min(1, sw.length - 1)];
+  const costs = (ae.cost_table || []).map((c) => c.cost_per_ha).filter(ok), minCost = costs.length ? Math.min(...costs) : null, maxCost = costs.length ? Math.max(...costs) : null;
   const identical = sw.every((r) => r.n_units_planted === sw[0].n_units_planted && Math.abs(r.expected - sw[0].expected) < 1e-6);
-  const costs = (ae.cost_table || []).map((c) => c.cost_per_ha).filter(ok), maxCost = costs.length ? Math.max(...costs) : null;
-  const eligible = ae.n_eligible_units != null ? ae.n_eligible_units : sw[0].n_units_planted, unitHa = ae.unit_area_ha != null ? ae.unit_area_ha : 1;
-  const minBudget = Math.min(...sw.map((r) => r.budget_usd)), maxTotal = maxCost != null ? eligible * unitHa * maxCost : null;
-  const nonBinding = maxTotal != null && maxTotal < minBudget;
+  const minBudget = Math.min(...sw.map((r) => r.budget_usd)), maxTotal = maxCost != null ? eligibleHa * maxCost : null;
+  const nonBinding = identical && maxTotal != null && maxTotal < minBudget;
+  const allTreatedAt = sw.filter((r) => r.n_units_planted >= eligible).map((r) => r.budget_usd).sort((x, y) => x - y)[0];
+  const groupName = Object.fromEntries(ae.options.map((o) => [o.group, o.group_label]));
   const costBasis = { sourced_armenian_cost_data: ["good", "Armenian cost data, range shown"], sourced_cheapest_mix: ["neutral", "World Bank cheapest option mix, shared"], sourced_most_expensive: ["neutral", "World Bank most expensive option"], blended: ["warn", "blended average, no individual figure"] };
   const ct = Object.fromEntries((ae.cost_table || []).map((c) => [c.name, c]));
+  const usedAtRep = rep && rep.by_intervention ? Object.keys(rep.by_intervention) : [];
+  const onlyCheapest = usedAtRep.length && minCost != null && usedAtRep.every((n) => ct[n] && ct[n].cost_per_ha === minCost);
+  const groupsAtRep = rep && rep.by_group ? Object.entries(rep.by_group).sort((x, y) => y[1].area_ha - x[1].area_ha).map(([g, v]) => `${esc((groupName[g] || g).replace(/\s*\(.*\)/, ""))} ${ha(v.area_ha)}`).join(", ") : "";
   const front = fr.lambdas ? Charts.line({ series: [{ name: "Expected benefit", color: "var(--c1)", points: fr.lambdas.map((l, k) => [l, fr.expected[k]]) }, { name: "CVaR (worst 20%)", color: "var(--c3)", dash: "6 4", points: fr.lambdas.map((l, k) => [l, fr.cvar[k]]) }], xlabel: "Risk-aversion λ (0 = mean only, 1 = worst-case only)", ylabel: "Benefit ($/yr)", yfmt: (v) => fmt(v, 0), xticks: fr.lambdas, xfmt: (v) => v.toFixed(1) }) : "";
-  const byGroup = {};
-  ae.options.forEach((o) => (byGroup[o.group_label] = byGroup[o.group_label] || []).push(o));
   const methods = [...new Map(ae.options.map((o) => [o.intervention, o])).values()];
-  view().innerHTML = `<div class="wrap"><h1>Decision: scenario-robust planting portfolio</h1>
-    <p class="lead muted">${ae.n_units} candidate units, ${ae.options.length} options (functional group × intervention method), evaluated against ${ae.n_scenarios} climate scenarios. Choose at most one option per unit to maximise a blend of expected benefit and worst-case (CVaR) benefit within a budget.</p>
+  const unproven = sw.filter((r) => r.optimal === false);
+  const solverNote = unproven.length ? ` <span class="chip warn">${unproven.map((r) => money(r.budget_usd)).join(", ")}: solver stopped${unproven.every((r) => r.mip_gap != null) ? ` within ${(100 * Math.max(...unproven.map((r) => r.mip_gap))).toFixed(1)}% of the best possible` : ""}</span>` : "";
+  const priceResolved = fr.resolution_usd != null ? Math.abs(fr.price_of_robustness) > fr.resolution_usd : Math.abs(fr.price_of_robustness) >= 0.005;
+  const priceText = priceResolved ? `${fmt(fr.price_of_robustness, 2)}` : "\u2248 0";
+  const priceSub = priceResolved ? "expected benefit given up to hedge the worst 20% of scenarios" : `expected benefit given up to hedge the worst 20% of scenarios: below what the solver can resolve${fr.resolution_usd ? ` (\u00B1${money(fr.resolution_usd)}/yr)` : ""}`;
+  const topGroup = rep && rep.by_group ? Object.entries(rep.by_group).sort((x, y) => y[1].area_ha - x[1].area_ha)[0] : null;
+  const topShare = topGroup && rep.area_ha ? topGroup[1].area_ha / rep.area_ha : null;
+  let topBetter = null;
+  if (U && topGroup) { const uu = U.units, el = uu.eligible.map((e, i) => (e ? i : -1)).filter((i) => i >= 0); topBetter = el.filter((i) => uu.group_ids.every((g) => uu.viability_mean[topGroup[0]][i] >= uu.viability_mean[g][i])).length / el.length; }
+  const speciesNote = topGroup && topShare >= 0.99 ? `Every treated cell gets <b>${esc((groupName[topGroup[0]] || topGroup[0]).replace(/\s*\(.*\)/, ""))}</b>${topBetter != null ? `: it has the highest average survival in ${Math.round(100 * topBetter)}% of the eligible cells` : ""}. This layer sees hydraulic survival only; whether that species would establish and grow in a cell (its niche) is not part of it, so read the map as <i>where survival per dollar is highest</i>, not as a planting prescription.` : "";
+  const callout = nonBinding
+    ? `<div class="callout info"><strong>Why every budget gives the same answer.</strong> Each unit is ${fmt(unit.mean, 0)} ha and ${eligible} are eligible. Even the most expensive method on all of them costs ${money(maxTotal)}, less than the smallest budget tested (${money(minBudget)}); those budgets are the scale of a 50,000 ha programme (World Bank 2023), so money never binds here. Benefit depends only on the species group, never on the method, so the methods are interchangeable in this result and the method reported for a unit is a tie, not a finding.</div>`
+    : `<div class="callout info"><strong>What the budget buys.</strong> A unit is the grid cell around a model node (${fmt(unit.min, 0)}–${fmt(unit.max, 0)} ha, treated whole or not at all, with the node's viability standing for the whole cell); ${eligible} cells, ${ha(eligibleHa)}, are eligible. ${allTreatedAt ? `At ${money(allTreatedAt)} and above every eligible cell is treated; below that the budget decides how many.` : "The budget decides how many are treated at every level tested."} ${rep && rep.n_units_planted != null ? `At ${money(rep.budget_usd)}: ${rep.n_units_planted} cells, ${ha(rep.area_ha)}${groupsAtRep ? ` (${groupsAtRep})` : ""}.` : ""} ${speciesNote ? speciesNote + " " : ""}${onlyCheapest ? `Every treated cell uses the cheapest method (${money(minCost)}/ha), because benefit depends only on the species group and never on the method: the methods differ only in cost here, so this shows what is cheapest, not what works best.` : "Benefit depends only on the species group, never on the method, so the choice among methods reflects cost, not effect."}${solverNote}</div>`;
+  const repIdx = Math.max(0, sw.indexOf(rep));
+  const frontierBlock = `<details class="dec-details"><summary>Mean–CVaR frontier at a ${money(repBudget)} budget</summary><div class="card">${front}<p class="small muted">The gap between the two lines is what hedging against bad scenarios costs. ${fr.price_of_robustness != null && fr.price_of_robustness < 0.005 ? `Here it is ${fmt(fr.price_of_robustness, 2)}: the same allocation is best on average and in the worst 20% of the ${ae.n_scenarios} scenarios, because viability differs little between them, so there is little downside to hedge.` : `Here it is ${fmt(fr.price_of_robustness, 2)} $/yr.`}</p></div></details>`;
+  const sweepBlock = `<details class="dec-details"><summary>Budget sweep</summary><div class="card tablewrap"><table><thead><tr><th>Budget</th><th class="num">Units treated</th><th class="num">Area</th><th class="num">Cost</th><th class="num">Expected benefit</th><th class="num">CVaR</th><th>Methods used</th></tr></thead><tbody>${sw.map((r) => `<tr><td>${money(r.budget_usd)}</td><td class="num">${r.n_units_planted}</td><td class="num">${r.area_ha != null ? ha(r.area_ha) : "—"}</td><td class="num">${r.cost_usd != null ? money(r.cost_usd) : "—"}</td><td class="num">${fmt(r.expected, 1)}</td><td class="num">${fmt(r.cvar, 1)}</td><td class="small">${r.by_intervention ? Object.keys(r.by_intervention).map((n) => esc(n.replace(/_/g, " "))).join(", ") || "—" : "—"}</td></tr>`).join("")}</tbody></table></div></details>`;
+  const methodsBlock = `<details class="dec-details"><summary>Intervention methods and costs</summary><div class="card tablewrap"><table><thead><tr><th>Method</th><th class="num">Cost per hectare</th><th>Cost basis</th></tr></thead><tbody>${methods.map((o) => { const c = ct[o.intervention] || {}, b = costBasis[o.cost_basis] || ["warn", String(o.cost_basis || "").replace(/_/g, " ")]; return `<tr><td>${esc(o.intervention.replace(/_/g, " "))}</td><td class="num">${o.cost_per_ha_usd != null ? "$" + o.cost_per_ha_usd.toLocaleString("en") : "—"}${c.cost_low != null ? `<br><span class="small muted">$${c.cost_low.toLocaleString("en")}–$${c.cost_high.toLocaleString("en")}</span>` : ""}</td><td>${chip(b[0], b[1])}${c.source ? `<br><span class="small muted">${esc(c.source)}</span>` : ""}</td></tr>`; }).join("")}</tbody></table>
+      <p class="small muted" style="margin-top:8px">Benefit = viability × $${ae.value_per_ha_year_usd}/ha/yr (national ecosystem-services value)${ae.incremental_share != null ? ` × ${Math.round(100 * ae.incremental_share)}% (the share a restored degraded hectare adds) = $${fmt(ae.net_value_per_ha_year_usd, 2)}/ha/yr at full viability` : ""}, times the cell's area. Eligible units exclude protected areas and heavily human-modified land.</p></div></details>`;
+  const scopeBlock = `<details class="dec-details"><summary>What is and isn't modelled</summary><div class="callout">${esc(ae.scope_note)}</div></details>`;
+  const mapBlock = U ? `<div class="card dec-controls"><label for="dslider">Budget</label><output class="dec-budget" id="dbudget" for="dslider"></output>
+      <input type="range" id="dslider" min="0" max="${sw.length - 1}" step="1" value="${repIdx}" aria-label="Budget level, from the smallest to the largest tested">
+      <div class="dec-ticks" aria-hidden="true">${sw.map((r) => `<span>${money(r.budget_usd)}</span>`).join("")}</div></div>
+    <div class="dec-grid">
+      <div><div id="dmap" role="application" aria-label="Map of the grid cells the portfolio treats at the chosen budget; the table by marz and the CSV hold the same information"></div><div class="dec-legend" id="dlegend"></div>
+        <p class="small muted">Each square is the area around one model node. The plan treats a cell whole or not at all, and the node's survival values stand for the whole cell. Click a cell to pin what it shows.</p></div>
+      <aside class="dec-side">
+        <div class="card"><dl class="dstats" id="dstats"></dl></div>
+        <div class="card"><h3>Species groups, by treated area</h3><div id="dgroups"></div></div>
+        <div class="card"><h3>Methods used</h3><div id="dmethods"></div></div>
+        <div class="card"><h3>This cell</h3><div id="dcell"></div></div>
+        <div class="card tablewrap"><h3>By marz</h3><div id="dmarz"></div></div>
+        <button type="button" class="btn secondary" id="dcsv">Download the treated cells (CSV)</button>
+      </aside></div>` : "";
+  view().innerHTML = `<div class="wrap"><h1>Decision: where to plant what</h1>
+    <p class="lead muted">Which grid cells a budget-constrained, scenario-robust plan treats, and with which species group. It maximises half the expected benefit and half the average benefit in the worst 20% of the ${ae.n_scenarios} climate scenarios, and chooses at most one option (species group × method) per cell.</p>
     ${banner()}
-    <div class="grid cols-3">
-      <div class="card stat"><div class="num">${fmt(sw[0].expected, 0)}</div><div class="cap">expected benefit, $/yr (at every budget)</div><div class="sub">CVaR ${fmt(sw[0].cvar, 0)}</div></div>
-      <div class="card stat"><div class="num">${fmt(fr.price_of_robustness, 2)}</div><div class="cap">price of robustness</div><div class="sub">expected benefit given up to hedge the worst 20% of scenarios</div></div>
-      <div class="card stat"><div class="num">${sw[0].n_units_planted}</div><div class="cap">units given an option${identical ? ", at every budget" : ""}</div><div class="sub">${eligible} of ${ae.n_units} candidate units are eligible · ${gridChip(ae.grid)}</div></div>
-    </div>
-    ${identical ? `<div class="callout info"><strong>Why every budget gives the same answer.</strong> Each unit is ${fmt(unitHa, 0)} ha (one model node) and ${eligible} are eligible. ${nonBinding ? `Even the most expensive method on all of them costs ${money(maxTotal)}, less than the smallest budget tested (${money(minBudget)}); those budgets are the scale of a 50,000 ha programme (World Bank 2023), so money never binds here.` : "The budget does not change the allocation here."} Benefit depends only on the species group, never on the method, so the methods are interchangeable in this result: which method is reported for a unit is a tie, not a finding. Budgets would start to bind only if each unit stood for a larger area, and methods could be told apart only with data that link a method to survival.</div>` : ""}
-    <div class="callout"><strong>What is and isn't modelled.</strong> ${esc(ae.scope_note)}</div>
-    <h2>Mean–CVaR frontier at a $45M budget</h2><div class="card">${front}<p class="small muted">The gap between the two lines is what hedging against bad scenarios costs. ${fr.price_of_robustness != null && fr.price_of_robustness < 0.005 ? `Here it is ${fmt(fr.price_of_robustness, 2)}: the same allocation is best on average and in the worst 20% of the ${ae.n_scenarios} scenarios, because viability differs little between them, so there is little downside to hedge.` : `Here it is ${fmt(fr.price_of_robustness, 2)}.`}</p></div>
-    <h2>Budget sweep</h2><div class="card tablewrap"><table><thead><tr><th>Budget</th><th class="num">Expected benefit</th><th class="num">CVaR</th><th class="num">Units planted</th></tr></thead><tbody>${sw.map((r) => `<tr><td>${money(r.budget_usd)}</td><td class="num">${fmt(r.expected, 1)}</td><td class="num">${fmt(r.cvar, 1)}</td><td class="num">${r.n_units_planted}</td></tr>`).join("")}</tbody></table></div>
-    <h2>Intervention methods and costs</h2><div class="card tablewrap"><table><thead><tr><th>Method</th><th class="num">Cost per hectare</th><th>Cost basis</th></tr></thead><tbody>${methods.map((o) => { const c = ct[o.intervention] || {}, b = costBasis[o.cost_basis] || ["warn", String(o.cost_basis || "").replace(/_/g, " ")]; return `<tr><td>${esc(o.intervention.replace(/_/g, " "))}</td><td class="num">${o.cost_per_ha_usd != null ? "$" + o.cost_per_ha_usd.toLocaleString("en") : "\u2014"}${c.cost_low != null ? `<br><span class="small muted">$${c.cost_low.toLocaleString("en")}\u2013$${c.cost_high.toLocaleString("en")}</span>` : ""}</td><td>${chip(b[0], b[1])}${c.source ? `<br><span class="small muted">${esc(c.source)}</span>` : ""}</td></tr>`; }).join("")}</tbody></table>
-      <p class="small muted" style="margin-top:8px">Benefit = viability × $${ae.value_per_ha_year_usd}/ha/yr (national ecosystem-services value)${ae.incremental_share != null ? ` × ${Math.round(100 * ae.incremental_share)}% (the share a restored degraded hectare adds) = $${fmt(ae.net_value_per_ha_year_usd, 2)}/ha/yr at full viability` : ""}. Eligible units exclude protected areas and heavily human-modified land.</p></div></div>`;
+    ${mapBlock}
+    ${U ? "" : `<div class="grid cols-3">
+      <div class="card stat"><div class="num">${fmt(rep.expected, 0)}</div><div class="cap">expected benefit, $/yr${identical ? " (at every budget)" : ` at a ${money(rep.budget_usd)} budget`}</div><div class="sub">CVaR ${fmt(rep.cvar, 0)}</div></div>
+      <div class="card stat"><div class="num">${priceText}</div><div class="cap">price of robustness</div><div class="sub">${priceSub}</div></div>
+      <div class="card stat"><div class="num">${rep.n_units_planted}</div><div class="cap">units given an option${identical ? ", at every budget" : ` at ${money(rep.budget_usd)}`}</div><div class="sub">${eligible} of ${ae.n_units} candidate units are eligible · ${gridChip(ae.grid)}</div></div></div>`}
+    ${callout}
+    ${frontierBlock}${sweepBlock}${methodsBlock}${scopeBlock}</div>`;
+  if (U) Decision.mount(view(), { A, ae, units: U, sw, groupLabel: (g) => groupLabel(g) });
 }
 
 /* ---- Models & validation ---- */

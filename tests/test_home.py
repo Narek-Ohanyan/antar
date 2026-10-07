@@ -197,4 +197,14 @@ def test_each_card_names_its_own_node_count_even_when_they_differ():
 def test_the_decision_card_states_its_nodes_eligible_units_and_a_zero_price_plainly():
     M = dict(MANIFEST, aegis={"n_units": 854, "n_eligible_units": 424, "n_scenarios": 45, "frontier": {"price_of_robustness": 0.0}})
     html = node("const m=H.headlineModel(d.M,'ssp585','2100',2670);console.log(JSON.stringify(H.aegisCard(d.M.aegis,m)))", {"M": M})
-    assert "854 nodes" in html and "424 eligible" in html and "45 climate scenarios" in html and "price of robustness <b>0.00</b>" in html and "#/decision" in html
+    assert "854 nodes" in html and "424 eligible" in html and "45 climate scenarios" in html and "price of robustness <b>\u2248 0</b>" in html and "#/decision" in html
+
+
+def test_the_price_of_robustness_is_a_number_only_when_the_solver_can_resolve_it():
+    def card(frontier):
+        M = dict(MANIFEST, aegis={"n_units": 854, "n_eligible_units": 424, "n_scenarios": 45, "frontier": frontier})
+        return node("const m=H.headlineModel(d.M,'ssp585','2100',2670);console.log(JSON.stringify(H.aegisCard(d.M.aegis,m)))", {"M": M})
+    assert "\u2248 0" in card({"price_of_robustness": -426345.7, "resolution_usd": 750000})                 # negative and inside the noise: not a price
+    assert "\u2248 0" in card({"price_of_robustness": 120000, "resolution_usd": 750000})
+    big = card({"price_of_robustness": 2500000, "resolution_usd": 750000})
+    assert "<b>2,500,000 $/yr</b>" in big and "\u2248" not in big

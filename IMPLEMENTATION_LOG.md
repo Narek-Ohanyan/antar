@@ -2128,3 +2128,20 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
   50,000 ha programme's); and benefit depends on the species group only, so the methods are interchangeable and the method reported is a tie. The Decision page now says this from the numbers (eligible units, the
   largest possible total cost, the smallest budget) and the methodology lists it as a known gap. A decision on how to give the units real areas is open.
 * The grid chip no longer carries a hard-coded node count; the methodology text (AEGIS inputs and costs, treeline baseline check, sample size, the 2026-10-06 recomputation) now matches what was run.
+
+## 2026-10-07 (cont.) -- the Decision layer gets real areas, and the page becomes a map
+
+* **Why.** With one hectare per node, no budget ever bound and the page showed a flat result the author rightly did not like. The author chose to give each unit a real area and a map-first page.
+* **Units.** A unit is the grid cell its node stands for (7 x 7 CHELSA pixels of 30 arcseconds: 3,162 to 3,275 ha; `antar.decision.units.cell_area_ha`, exact spherical rectangle, tested), treated whole or not at all; the node's
+  survival and eligibility stand for the whole cell. `--one-ha-units` reproduces the earlier convention. 424 cells (1,359,528 ha) are eligible.
+* **Optimiser.** `non_dominated_options` removes options that another option beats or ties on every cell and scenario (exact; tested against the full problem on 18 random binding-budget cases) and the MILP takes a time limit and
+  a relative gap and reports whether it proved optimality. The first attempt with a 0.1% gap did not finish a single solve in 14 minutes: with near-identical cells, proving a tighter gap only separates cells that differ by far less
+  than the uncertainty of the benefit value. Sweep: 0.5%; frontier: 0.01%; every solve's status and gap are stored.
+* **Result (dense grid).** Budgets now bind: 15 cells (48,940 ha, about the 50,000 ha programme) at 9.3 M USD, 75 cells (241,935 ha) at 45 M, 167 at 100 M, and all 424 cells from about 253 M up. Every treated cell gets pine, by natural regeneration.
+  Both are structural, not findings about forests: pine has the highest hydraulic survival in all eligible cells (and the niche, whether pine grows there, is not in this layer); and benefit does not depend on the method, so the cheapest wins.
+  The price of robustness is below what the solver can resolve (a first run with a loose gap gave a negative value, impossible for a true optimum, which exposed this); the page and the home card say "about 0, below solver resolution" and never print
+  a number that is inside the noise.
+* **Page.** `ui/decision.js`: a budget slider over the five budgets, the treated cells on the Place explorer's base map coloured by species group, eligible and ineligible cells, a side panel (cells, area, cost, benefit, species groups,
+  methods, the cell under the pointer, a table by marz) and a CSV of the treated cells; the long text is folded into details. Every sentence about species, method and solver status is computed from the result.
+  `data/aegis_units.json` carries the cells and is loaded by this page only. Tests: node tests of the lookup, CSV and marz table, and consistency checks that tie every exported cell to the totals and the budget.
+* **Next for this layer:** apply the MERISTEM niche (after its refit with real per-group water deficit) so that a species is only chosen where it can grow; without it "pine everywhere" is the honest outcome of survival alone.

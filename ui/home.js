@@ -239,6 +239,13 @@
     </article>`;
   }
 
+  /* The price of robustness is shown as a number only when it is larger than the solver can resolve (the Decision page uses the same rule). */
+  function priceLine(f) {
+    if (!f || !fin(f.price_of_robustness)) return "";
+    const resolved = fin(f.resolution_usd) ? Math.abs(f.price_of_robustness) > f.resolution_usd : Math.abs(f.price_of_robustness) >= 0.005;
+    return `<p class="fdelta flat"><span aria-hidden="true">\u25AC</span> price of robustness ${resolved ? `<b>${thousands(f.price_of_robustness)} $/yr</b>` : "<b>\u2248 0</b> (below what the solver can resolve)"}</p>`;
+  }
+
   function aegisCard(ae, m) {
     if (!ae) return "";
     return `<article class="fcard">
@@ -246,7 +253,7 @@
       <h3>Planting portfolio</h3>
       <p class="fnum">${esc(String(ae.n_units))}</p>
       <p class="fwhat">candidate planting units${ae.n_eligible_units != null ? `, ${esc(String(ae.n_eligible_units))} eligible,` : ""} evaluated against ${esc(String(ae.n_scenarios))} climate scenarios</p>
-      ${ae.frontier && fin(ae.frontier.price_of_robustness) ? `<p class="fdelta flat"><span aria-hidden="true">▬</span> price of robustness <b>${(+ae.frontier.price_of_robustness).toFixed(2)}</b></p>` : ""}
+      ${priceLine(ae.frontier)}
       <a class="flink" href="#/decision">See the portfolio <span aria-hidden="true">→</span></a>
     </article>`;
   }
