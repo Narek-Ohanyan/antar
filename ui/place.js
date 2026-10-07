@@ -24,7 +24,7 @@ async function renderSite(p) {
   const rname = (r) => (r ? (r.name === "Yerevan" ? "Yerevan (city)" : r.name + " marz") : "outside Armenia");
 
   view().innerHTML = `<div class="wrap"><h1>Place explorer</h1>${banner()}
-    <p class="lead muted" style="max-width:820px">Click anywhere in Armenia, or choose a whole marz, to see every quantity for that place today and under each emissions path (lines are the mean of the five climate models; shaded bands span the lowest to the highest model). Values come from the same interpolated surface as the map.</p>
+    <p class="lead muted">Click anywhere in Armenia, or choose a whole marz, to see every quantity for that place today and under each emissions path (lines are the mean of the five climate models; shaded bands span the lowest to the highest model). Values come from the same interpolated surface as the map.</p>
     <div class="grid" style="grid-template-columns:minmax(280px,420px) 1fr;align-items:start">
       <div class="card"><div id="pmap" style="height:380px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2)"></div>
         <label for="marz">Show</label><select id="marz"><option value="0">A specific place (click the map)</option>${G.regions.map((r) => `<option value="${r.id}">${esc(r.name === "Yerevan" ? "Yerevan (city)" : r.name + " marz")} — average</option>`).join("")}</select>

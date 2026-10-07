@@ -220,7 +220,7 @@ function renderTreeline() {
   }));
   const rows = Object.keys(SSP).map((ssp) => `<tr><td>${SSP[ssp]}</td>${HORIZONS.map((h) => { const s = S[`${ssp}__${h}`]; return `<td class="num">${s.ensemble_mean_shift_m >= 0 ? "+" : ""}${fmt(s.ensemble_mean_shift_m, 0)} <span class="muted">(${fmt(s.ensemble_min_shift_m, 0)} to ${fmt(s.ensemble_max_shift_m, 0)})</span></td>`; }).join("")}</tr>`).join("");
   view().innerHTML = `<div class="wrap"><h1>Treeline change</h1>
-    <p class="lead muted" style="max-width:780px">The climatic treeline is the elevation above which growing-season temperature falls below ${tl.threshold_c} °C. Warming moves it uphill. Below, its shift relative to the 2019 climate across five climate models, three emissions paths and three horizons.</p>
+    <p class="lead muted">The climatic treeline is the elevation above which growing-season temperature falls below ${tl.threshold_c} °C. Warming moves it uphill. Below, its shift relative to the 2019 climate across five climate models, three emissions paths and three horizons.</p>
     ${banner()}
     <div class="card"><h3>Mean shift of the climatic treeline across sampled cells (metres, + = uphill)</h3>
       ${Charts.line({ series, xticks: [2019, 2050, 2080, 2100], xlabel: "Horizon", ylabel: "Shift vs 2019 (m)", yfmt: (v) => fmt(v, 0), xfmt: (v) => (v === 2019 ? "2019" : String(v)) })}
@@ -245,7 +245,7 @@ function renderDecision() {
   ae.options.forEach((o) => (byGroup[o.group_label] = byGroup[o.group_label] || []).push(o));
   const methods = [...new Map(ae.options.map((o) => [o.intervention, o])).values()];
   view().innerHTML = `<div class="wrap"><h1>Decision: scenario-robust planting portfolio</h1>
-    <p class="lead muted" style="max-width:780px">${ae.n_units} candidate units, ${ae.options.length} options (functional group × intervention method), evaluated against ${ae.n_scenarios} climate scenarios. Choose at most one option per unit to maximise a blend of expected benefit and worst-case (CVaR) benefit within a budget.</p>
+    <p class="lead muted">${ae.n_units} candidate units, ${ae.options.length} options (functional group × intervention method), evaluated against ${ae.n_scenarios} climate scenarios. Choose at most one option per unit to maximise a blend of expected benefit and worst-case (CVaR) benefit within a budget.</p>
     ${banner()}
     <div class="grid cols-3">
       <div class="card stat"><div class="num">${fmt(sw[0].expected, 0)}</div><div class="cap">expected benefit, $/yr (at every budget)</div><div class="sub">CVaR ${fmt(sw[0].cvar, 0)}</div></div>
@@ -300,7 +300,7 @@ function renderMethod() {
   const flow = `<figure class="flow" aria-label="Flow chart of the six engines"><div class="flow-svg" id="flowsvg"></div></figure>`;
   const body = () => `<div class="callout info"><strong>${plain ? "Plain-language view." : "Technical view."}</strong> ${esc(plain ? m.intro.plain : m.intro.technical)}</div>` + flow +
     m.engines.map((e) => `<section class="card engine" id="${e.id}" style="margin-bottom:14px"><h2 style="margin-top:0">${esc(e.name)}</h2><p>${chip("neutral", "status")} <span class="small">${esc(e.status)}</span></p><ul class="${plain ? "plainbox" : ""}">${(plain ? e.plain : e.technical).map((t) => `<li>${plain ? esc(t) : Tex.text(t)}</li>`).join("")}</ul></section>`).join("");
-  view().innerHTML = `<div class="wrap"><h1>Methodology</h1><p class="muted" style="max-width:760px">What is actually implemented, engine by engine. Switch to the plain-language view for an everyday-analogy explanation of each mechanism; the technical view keeps the equations and parameters.</p>
+  view().innerHTML = `<div class="wrap"><h1>Methodology</h1><p class="muted">What is actually implemented, engine by engine. Switch to the plain-language view for an everyday-analogy explanation of each mechanism; the technical view keeps the equations and parameters.</p>
     <label class="toggle"><input type="checkbox" id="plain"> Explain it simply</label><div id="mbody" style="margin-top:14px"></div></div>`;
   $("#plain").checked = plain;
   const draw = () => {
@@ -323,7 +323,7 @@ function mapAvailability() {
   const full = plan.filter((x) => x.scenario && (x.baseline || x.baseline === null)).length, base = plan.filter((x) => x.baseline && !x.scenario).length;
   const mark = (v) => (v === null ? '<span class="muted">n/a</span>' : v ? chip("good", "ready") : chip("warn", "waiting"));
   const rows = plan.map((x) => `<tr><td>${esc(x.label)}</td><td>${esc(x.group ? state.M.groups[x.group].short : "all")}</td><td>${mark(x.baseline)}</td><td>${mark(x.scenario)}</td><td class="small">${x.baseline === false ? `<code>${esc(x.baseline_from)}</code> (2019)` : ""}${x.baseline === false && !x.scenario ? "<br>" : ""}${!x.scenario ? `<code>${esc(x.scenario_from)}</code> (scenarios)` : ""}</td></tr>`).join("");
-  return `<h2>Which maps have results</h2><p class="small muted" style="max-width:780px">${plan.length} maps are planned. ${full} have both 2019 and scenario results now; ${base} have 2019 only; the rest are waiting for the run named in the last column. Waiting maps are listed in the map's menu as "2019 only for now" or "no results yet" rather than shown empty.</p>
+  return `<h2>Which maps have results</h2><p class="small muted">${plan.length} maps are planned. ${full} have both 2019 and scenario results now; ${base} have 2019 only; the rest are waiting for the run named in the last column. Waiting maps are listed in the map's menu as "2019 only for now" or "no results yet" rather than shown empty.</p>
     <div class="card tablewrap"><table><thead><tr><th>Map</th><th>Species</th><th>2019</th><th>Scenarios</th><th>Produced by</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
