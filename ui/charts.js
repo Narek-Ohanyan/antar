@@ -35,19 +35,19 @@ const Charts = (() => {
     return g;
   }
 
-  function legend(items, x, y) {
+  function legend(items, x, y, k = 1) {
     let g = "", dx = 0;
     for (const it of items) {
       g += `<g transform="translate(${x + dx} ${y})"><line x1="0" x2="18" y1="0" y2="0" stroke="${it.color}" stroke-width="3" ${it.dash ? `stroke-dasharray="${it.dash}"` : ""}/>` +
            `<text class="tick" x="24" y="4">${esc(it.name)}</text></g>`;
-      dx += 34 + it.name.length * 6.4;
+      dx += (34 + it.name.length * 6.4) * k;
     }
     return g;
   }
 
   /* series: [{name,color,dash,points:[[x,y,lo?,hi?]], marker?}]  */
-  function line({ series, xlabel, ylabel, xticks, yfmt, xfmt, ymin, ymax, width = 640, height = 340, legendOn = true }) {
-    const f = frame(width, height, { t: legendOn ? 34 : 14, r: 16, b: 44, l: 64 });
+  function line({ series, xlabel, ylabel, xticks, yfmt, xfmt, ymin, ymax, width = 640, height = 340, legendOn = true, big = false }) {
+    const f = frame(width, height, { t: legendOn ? 34 : 14, r: 16, b: 44, l: big ? (width < 560 ? 66 : 78) : 64 });
     const all = series.flatMap((s) => s.points);
     const xv = all.map((p) => p[0]);
     const yv = all.flatMap((p) => [p[1], p[2] ?? p[1], p[3] ?? p[1]]).filter((v) => v != null && isFinite(v));
@@ -67,11 +67,11 @@ const Charts = (() => {
         body += `<polygon points="${up.concat(dn).join(" ")}" fill="${s.color}" opacity="0.16"/>`;
       }
       const pts = s.points.filter((p) => p[1] != null);
-      body += `<polyline fill="none" stroke="${s.color}" stroke-width="2.4" stroke-linejoin="round" ${s.dash ? `stroke-dasharray="${s.dash}"` : ""} points="${pts.map((p) => `${X(p[0])},${Y(p[1])}`).join(" ")}"/>`;
-      for (const p of pts) body += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3.4" fill="${s.color}"><title>${esc(s.name)}: ${esc((yfmt || fmtTick)(p[1]))}${p[2] != null ? ` (range ${esc((yfmt || fmtTick)(p[2]))} – ${esc((yfmt || fmtTick)(p[3]))})` : ""}</title></circle>`;
+      body += `<polyline fill="none" stroke="${s.color}" stroke-width="${big ? 3.4 : 2.4}" stroke-linejoin="round" ${s.dash ? `stroke-dasharray="${s.dash}"` : ""} points="${pts.map((p) => `${X(p[0])},${Y(p[1])}`).join(" ")}"/>`;
+      for (const p of pts) body += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="${big ? 5.2 : 3.4}" fill="${s.color}"><title>${esc(s.name)}: ${esc((yfmt || fmtTick)(p[1]))}${p[2] != null ? ` (range ${esc((yfmt || fmtTick)(p[2]))} – ${esc((yfmt || fmtTick)(p[3]))})` : ""}</title></circle>`;
     }
-    if (legendOn) body += legend(series.map((s) => ({ name: s.name, color: s.color, dash: s.dash })), f.m.l, 14);
-    return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img">${body}</svg>`;
+    if (legendOn) body += legend(series.map((s) => ({ name: s.name, color: s.color, dash: s.dash })), f.m.l, big ? 16 : 14, big ? (width < 560 ? 1.05 : 1.32) : 1);
+    return `<svg class="chart${big ? " big" : ""}" viewBox="0 0 ${width} ${height}" role="img">${body}</svg>`;
   }
 
   /* items: [{label, value, lo?, hi?, color?, note?}]  horizontal bars from a zero line */
@@ -118,5 +118,28 @@ const Charts = (() => {
     return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img">${g}</svg>`;
   }
 
-  return { line, bars, scatter, niceTicks, esc };
+  /* Enlarged view of a chart in a modal dialog (native <dialog>: Escape closes it, focus is trapped and returns to the opener,
+     a click outside or on the close button closes it). `body` is trusted HTML built by the caller from its own data. */
+  function closeZoom(dlg) {
+    const o = dlg._opener;
+    if (dlg.open) dlg.close();
+    if (o && o.isConnected) o.focus({ preventScroll: true });      // Escape gets this from the browser; the close button and the backdrop get it here
+  }
+
+  function zoom({ title, body, opener }) {
+    let dlg = document.getElementById("zoomdlg");
+    if (!dlg) {
+      dlg = document.createElement("dialog");
+      dlg.id = "zoomdlg"; dlg.className = "zoom"; dlg.setAttribute("aria-labelledby", "zoomttl");
+      document.body.appendChild(dlg);
+      dlg.addEventListener("click", (e) => { if (e.target === dlg) closeZoom(dlg); });              // a click on the backdrop
+    }
+    dlg._opener = opener || document.activeElement;
+    dlg.innerHTML = `<div class="zoom-head"><h3 id="zoomttl">${esc(title)}</h3><button type="button" class="zoom-x" aria-label="Close the enlarged chart">&times;</button></div><div class="zoom-body">${body}</div>`;
+    dlg.querySelector(".zoom-x").addEventListener("click", () => closeZoom(dlg));
+    if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+    dlg.scrollTop = 0;
+  }
+
+  return { line, bars, scatter, niceTicks, esc, zoom };
 })();

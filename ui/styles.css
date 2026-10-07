@@ -335,3 +335,21 @@ footer { margin-top: clamp(56px, 9vw, 112px); border-top: 1px solid var(--border
 }
 :root[data-theme="dark"] .fig-arch { --svg-built: #22314a; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fig-arch { --svg-built: #22314a; } }
+
+/* ---------- enlarged chart (Charts.zoom) ---------- */
+.zoomable { position: relative; cursor: zoom-in; transition: border-color .15s var(--ease), box-shadow .15s var(--ease); }
+.zoomable:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.zoom-hint { position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; color: var(--muted); opacity: 0; transition: opacity .15s var(--ease); }
+.zoomable:hover .zoom-hint, .zoomable:focus-visible .zoom-hint { opacity: 1; }
+@media (hover: none) { .zoom-hint { opacity: .8; } }
+dialog.zoom { width: min(1040px, calc(100vw - 16px)); max-width: calc(100vw - 16px); max-height: 94vh; padding: 0; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .55); overflow: auto; overscroll-behavior: contain; }
+dialog.zoom::backdrop { background: rgba(10, 15, 13, .62); backdrop-filter: blur(2px); }
+.zoom-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.zoom-head h3 { margin: 0; font-size: 1.3rem; }
+.zoom-x { min-width: 44px; min-height: 44px; border: 1px solid var(--border-strong); border-radius: 4px; background: none; color: var(--text); font-size: 1.7rem; line-height: 1; cursor: pointer; }
+.zoom-x:hover { background: var(--surface-2); }
+.zoom-body { padding: 14px 20px 22px; }
+.zoom-table { margin-top: 14px; font-size: .9rem; }
+html:has(dialog.zoom[open]) { overflow: hidden; }          /* the page behind the enlarged chart does not scroll */
+svg.chart.big .tick { font-size: 14px; }
+svg.chart.big .label { font-size: 14.5px; }

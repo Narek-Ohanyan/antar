@@ -103,7 +103,8 @@ async function renderSite(p) {
     $("#ptable").innerHTML = `<table><tbody>${ENGINE_ORDER.filter((e) => byEngine[e]).map((e) => `<tr><th colspan="2">${esc(ENGINE_TITLE[e] || e)}</th></tr>` + byEngine[e].map(([m, v]) => `<tr><td>${esc(m.label)}</td><td class="num">${fa(v)} ${esc(m.binary ? "(share)" : m.unit || "")}</td></tr>`).join("")).join("")}</tbody></table>`;
 
     // scenario charts, every quantity that has scenario results
-    const cards = [], pending = [];
+    const cards = [], pending = [], specs = [];
+    zoomSpecs = specs;
     for (const pl of plan) {
       if (!relevant(pl.id)) continue;
       const src = scenarioSource(pl.id);
@@ -117,12 +118,38 @@ async function renderSite(p) {
           return vs.length ? [h, mean(vs), Math.min(...vs), Math.max(...vs)] : [h, null, null, null];
         })) }));
       const meta = M.layers[pl.id] || {}, unit = pl.id === "treeline_shift" ? "m" : meta.binary ? "share of models" : meta.unit || "";
-      cards.push(`<div class="card"><h3 style="font-size:.98rem">${esc(pl.label)}</h3>${Charts.line({ series, xticks: [2019, 2050, 2080, 2100], ylabel: unit, yfmt: fa, xfmt: String, width: 440, height: 270, legendOn: false, ...(meta.binary || /^(pviab|robust)_/.test(pl.id) ? { ymin: 0, ymax: 1 } : {}) })}</div>`);
+      const opts = { series, xticks: [2019, 2050, 2080, 2100], ylabel: unit, yfmt: fa, xfmt: String, ...(meta.binary || /^(pviab|robust)_/.test(pl.id) ? { ymin: 0, ymax: 1 } : {}) };
+      specs.push({ label: pl.label, unit, opts, series });
+      cards.push(`<div class="card zoomable" role="button" tabindex="0" data-zoom="${specs.length - 1}" aria-label="Enlarge the chart: ${esc(pl.label)}" title="Click to enlarge"><h3 style="font-size:.98rem">${esc(pl.label)}</h3>${Charts.line({ ...opts, width: 440, height: 270, legendOn: false })}<svg class="zoom-hint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></div>`);
     }
     $("#pcharts").innerHTML = cards.join("") || `<p class="muted">No scenario results exist for this selection.</p>`;
-    $("#pleg").innerHTML = Object.keys(SSP).map((s) => `<span class="swatch" style="margin-right:14px"><i style="background:${cssVar("--c" + (s === "ssp126" ? 1 : s === "ssp370" ? 2 : 3))}"></i>${SSP[s]}</span>`).join("") + `<span class="muted">the 2019 point is the baseline run</span>`;
+    $("#pleg").innerHTML = Object.keys(SSP).map((s) => `<span class="swatch" style="margin-right:14px"><i style="background:${cssVar("--c" + (s === "ssp126" ? 1 : s === "ssp370" ? 2 : 3))}"></i>${SSP[s]}</span>`).join("") + `<span class="muted">the 2019 point is the baseline run &middot; click a chart to enlarge it</span>`;
     $("#ppending").innerHTML = pending.length ? `<div class="callout" style="margin-top:14px"><strong>Not computed yet (${pending.length}):</strong> ${pending.map((x) => esc(x.label)).join("; ")}. ${[...new Set(pending.map((x) => x.scenario_from))].map((f) => `<code>${esc(f)}</code>`).join(" and ")} produce them in the next dense run.</div>` : "";
   }
+
+  /* Click (or Enter / Space) on a projection chart opens it enlarged, with the numbers under it. */
+  let zoomSpecs = [];
+  const openZoom = (card) => {
+    const sp = zoomSpecs[+card.dataset.zoom];
+    if (!sp) return;
+    const avail = Math.min(window.innerWidth - 16, 1040) - 42;                               // the dialog's inner width, so text is drawn at its true size
+    const cw = Math.round(Math.max(290, Math.min(960, avail))), ch = Math.round(Math.max(300, Math.min(520, cw * 0.58)));
+    const rowHtml = sp.series.map((s) => `<tr><th scope="row"><span class="swatch"><i style="background:${s.color}"></i>${esc(s.name)}</span></th>${[2019, 2050, 2080, 2100].map((h) => {
+      const p = s.points.find((q) => q[0] === h);
+      return `<td class="num">${p && ok(p[1]) ? fa(p[1]) + (p[2] != null && p[3] != null && p[2] !== p[3] ? `<br><span class="muted small">${fa(p[2])} to ${fa(p[3])}</span>` : "") : "&mdash;"}</td>`;
+    }).join("")}</tr>`).join("");
+    const where = $("#where") ? $("#where").textContent.trim() : "";
+    Charts.zoom({
+      title: sp.label,
+      opener: card,
+      body: `<p class="small muted" style="margin:0 0 6px">${esc(where)}${where ? " &middot; " : ""}lines: mean of the five climate models; shaded band: lowest to highest model; the 2019 point is the baseline run. Unit: ${esc(sp.unit || "none")}.</p>` +
+        Charts.line({ ...sp.opts, width: cw, height: ch, legendOn: true, big: true }) +
+        `<div class="tablewrap"><table class="zoom-table"><thead><tr><th scope="col">Emissions path</th><th class="num" scope="col">2019</th><th class="num" scope="col">2050</th><th class="num" scope="col">2080</th><th class="num" scope="col">2100</th></tr></thead><tbody>${rowHtml}</tbody></table></div>`,
+    });
+  };
+  const pc = $("#pcharts");
+  pc.addEventListener("click", (e) => { const c = e.target.closest(".zoomable"); if (c) openZoom(c); });
+  pc.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("zoomable")) { e.preventDefault(); openZoom(e.target); } });
 
   map.on("click", (e) => { if (!regionAt(e.latlng.lat, e.latlng.lng)) return; sel.marz = 0; sel.lat = e.latlng.lat; sel.lon = e.latlng.lng; update(); });
   $("#marz").addEventListener("change", (e) => { sel.marz = +e.target.value; update(); });
