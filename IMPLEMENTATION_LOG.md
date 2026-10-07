@@ -2108,3 +2108,12 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
   time (`scripts/stamp_map_assets.py` -> `assets/map/checksums.json`), and a mismatch throws, so an altered image can no longer draw wrong values silently. `deploy/.htaccess` marks them `no-transform`.
   Tests: checksum equals zlib's; every shipped raster matches; real Apache serves the `.bin` files byte for byte even to a browser that announces WebP support.
 * **Lesson.** A deployment check must request the way a browser does (its `Accept` header) and compare bytes, not only status codes.
+
+### Live site verified (2026-10-07, build 05894d384a, website commit ca712ec)
+
+* All nine map rasters, requested with a browser's `Accept` header, are byte-identical to the local files; the live home page gives the same highlighted contours as localhost (paths of 18,226 and 5,820
+  characters, 2,670 m -> 3,132 m); the Map and Place explorer load with the same elevation range (383-3,912 m) and 12 region ids; the checksum guard passes; the console is clean.
+* In a browser the CDN serves the data Brotli-compressed over HTTP/3: the 7.7 MB dense grid file travels as 2.4 MB (about 1.7 s here), the manifest as 13 KB.
+* Host behaviour to know: the CDN answers curl with an explicit `Accept-Encoding: gzip` header with 403, on narekohanyan.com as well as on antar.narekohanyan.com; browsers are not affected. Probe the site with
+  a browser-like request (or without that header), not with curl's bare `-H "Accept-Encoding: gzip"`.
+* The 57 MB `configs/fitted/future_projections_dense.yaml` is in git (GitHub warns above 50 MB); gzip it if it grows.
