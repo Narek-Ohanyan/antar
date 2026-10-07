@@ -330,8 +330,7 @@ function mapAvailability() {
 function renderStatus() {
   const m = state.meth, M = state.M;
   const prov = Object.entries(M.provenance).map(([k, p]) => `<tr><td>${esc(p.dataset)}</td><td><code>${esc(p.file || "missing")}</code></td><td>${p.grid ? gridChip(p.grid) : "—"}</td><td class="num">${p.n_cells ?? "—"}</td><td>${(p.rejected || []).concat(p.withheld || []).map((r) => `<span class="small">${esc(r)}</span>`).join("<br>")}</td></tr>`).join("");
-  view().innerHTML = `<div class="wrap"><h1>Status &amp; limits</h1><p class="muted" style="max-width:760px">What is fitted, what is reduced in scope, and what is still a placeholder. Nothing is hidden because it is incomplete.</p>
-    <h2>Engines</h2><div class="card tablewrap"><table><thead><tr><th>Engine</th><th>State</th></tr></thead><tbody>${m.engines.map((e) => `<tr><td><a href="#/method" data-jump="${e.id}">${esc(e.name)}</a></td><td>${esc(e.status)}</td></tr>`).join("")}</tbody></table></div>
+  view().innerHTML = `<div class="wrap"><h1>Status &amp; limits</h1><h2>Engines</h2><div class="card tablewrap"><table><thead><tr><th>Engine</th><th>State</th></tr></thead><tbody>${m.engines.map((e) => `<tr><td><a href="#/method" data-jump="${e.id}">${esc(e.name)}</a></td><td>${esc(e.status)}</td></tr>`).join("")}</tbody></table></div>
     ${mapAvailability()}
     <h2>Placeholders and assumptions</h2><div class="card tablewrap"><table><thead><tr><th>Quantity</th><th>Value used</th><th>Affects</th><th>State</th></tr></thead><tbody>${m.placeholders.map((p) => `<tr><td>${esc(p.name)}</td><td>${esc(p.value)}</td><td>${esc(p.effect)}</td><td>${esc(p.state)}</td></tr>`).join("")}</tbody></table></div>
     <h2>Known gaps</h2><div class="card"><ul>${m.known_gaps.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>
@@ -343,8 +342,7 @@ function renderStatus() {
 /* ---- References ---- */
 function renderRefs() {
   const refs = state.M.references;
-  view().innerHTML = `<div class="wrap"><h1>References</h1><p class="muted">Every dataset behind the results, with the citation and licence recorded when it was obtained (${refs.length} entries).</p>
-    <input type="search" id="rq" placeholder="Filter by dataset, source or citation…" style="width:min(520px,100%)"><div id="rl" class="card" style="margin-top:12px"></div></div>`;
+  view().innerHTML = `<div class="wrap"><h1>References</h1><input type="search" id="rq" placeholder="Filter by dataset, source or citation…" style="width:min(520px,100%)"><div id="rl" class="card" style="margin-top:12px"></div></div>`;
   const draw = (q) => {
     const f = refs.filter((r) => !q || [r.dataset, r.source, r.citation].join(" ").toLowerCase().includes(q.toLowerCase()));
     $("#rl").innerHTML = f.length ? f.map((r) => `<div class="refitem"><div class="t">${esc(r.dataset || "")}</div><div class="small">${esc(r.citation)}</div><div class="small muted">${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a> · ` : ""}${r.license ? "Licence: " + esc(r.license) + " · " : ""}${r.accessed ? "accessed " + esc(r.accessed) : ""}</div></div>`).join("") : `<p class="muted">No matches.</p>`;
