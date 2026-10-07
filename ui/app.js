@@ -228,7 +228,7 @@ function renderHome() {
   </div>`;
   view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => { sessionStorageSafe("jump", a.dataset.jump); }));
   const q0 = pageParams();
-  Home.mountBand($("#results"), { M, treelineMean, gridHtml: sgid ? gridChip(sgid) : "", start: { ssp: q0.ssp, hz: q0.hz }, onChange: (c) => setParams({ ssp: c.ssp, hz: c.hz }) });
+  Home.mountBand($("#results"), { M, treelineMean, gridHtml: sgid ? gridChip(sgid) : "", gridIds: { viability: sgid, treeline: M.treeline && M.treeline.grid, aegis: M.aegis && M.aegis.grid }, start: { ssp: q0.ssp, hz: q0.hz }, onChange: (c) => setParams({ ssp: c.ssp, hz: c.hz }) });
   Home.mountPhotos(view(), photos);
   initHeroVideo();
   initReveal();

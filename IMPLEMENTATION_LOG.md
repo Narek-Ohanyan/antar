@@ -2088,3 +2088,13 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
   tested on a real Apache 2.4 with TLS (`tests/test_site_bundle.py`): redirects keep the query string, `/index.html` goes to `/`, the page is always revalidated, scripts and data are cached
   for an hour, images and fonts for a week, text is compressed, video supports ranges, folders are not listed. The publisher is guarded and tested on temporary repositories.
 * **Confirmed by the author:** the Acknowledgments sentence about local climate impact profiles for every municipality; AEGIS costs other than planting stay blended averages, labelled as such.
+
+## 2026-10-07 (cont.) -- dense scenario run finished and processed
+
+* The 45-member scenario run on the dense grid finished (13:23): 45 members x 3 species groups x 857 cells. `scripts/drop_invalid_nodes.py --files scenarios` removed the 3 nodes TOPOHYDRO rejects
+  (405 cell records, 3 x 3 x 45), leaving 854 per group, as in the XYLEM and REFUGIUM dense files.
+* `scripts/recompute_late_frost.py --apply --only dense` rewrote late-frost days under the budburst-to-warmest-day definition: all 38,430 rows matched one of the two definitions before writing
+  (mean 34.4 -> 0.0 days); the file carries `late_frost_definition`.
+* Headline numbers on the dense grid (SSP5-8.5, 2100, ensemble mean, change against 2019): broadleaf 98.0% (-1.2 pp), oak 90.7% (-4.0 pp), pine 100.0% (0.0 pp); on the 25-node grid they were -1.3, -4.7 and 0.0 pp.
+  The treeline change is still the 25-node result (`compute_treeline_change.py --dense` needs the Drive terrain), so the cards now name the number of nodes behind each of them.
+* Still open: dense treeline change, dense AEGIS (and its text), the dense MNEME panel, the MERISTEM refit.

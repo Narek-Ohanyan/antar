@@ -610,3 +610,6 @@ body.has-ban main::before { display: none; }
 .pageban .credit { display: block; font-size: .72rem; line-height: 1.35; color: rgba(255, 255, 255, .88); max-width: 120ch; }
 .pageban .credit a { color: #fff; pointer-events: auto; text-decoration: underline; text-underline-offset: 2px; }
 .pageban .credit a:focus-visible { outline-color: #fff; }
+
+.fcard > header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.cgrid { font: 500 .64rem/1 var(--mono); letter-spacing: .06em; color: var(--band-muted); white-space: nowrap; }

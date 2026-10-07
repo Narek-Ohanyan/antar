@@ -125,7 +125,7 @@
     return { mean: cur.ensemble_mean_shift_m, min: cur.ensemble_min_shift_m, max: cur.ensemble_max_shift_m, n: cur.n_gcms, series, lo, hi, grid: M.treeline.grid };
   }
 
-  function headlineModel(M, ssp, hz, treelineMean) {
+  function headlineModel(M, ssp, hz, treelineMean, gridIds) {
     const groups = Object.keys(M.groups).map((g) => groupModel(M, g, ssp, hz)).filter((g) => g.base != null);
     const tl = treelineModel(M, ssp, hz);
     const withNow = groups.filter((g) => g.deltaPp != null);
@@ -136,7 +136,9 @@
     else if (withNow.length) lead = `Under ${SSP_NAME[ssp]} by ${hz}, one-year hydraulic survival changes by ${parts} against 2019.`;
     else lead = "Scenario results are not available yet; the 2019 values are shown.";
     const treelineNow = fin(treelineMean) ? treelineMean : null;
-    return { ssp, hz, groups, treeline: tl, lead, treelineNowM: treelineNow, treelineLaterM: treelineNow != null && tl ? treelineNow + tl.mean : null };
+    const nodes = (id) => (id && M.grids && M.grids[id] && M.grids[id].n_cells ? `${M.grids[id].n_cells} nodes` : "");
+    const gids = gridIds || {};
+    return { ssp, hz, groups, treeline: tl, lead, gridLabel: { viability: nodes(gids.viability), treeline: nodes(gids.treeline), aegis: nodes(gids.aegis) }, treelineNowM: treelineNow, treelineLaterM: treelineNow != null && tl ? treelineNow + tl.mean : null };
   }
 
   /* ---------------- small trend chart ---------------- */
@@ -208,7 +210,7 @@
     const arrow = dir === "down" ? "▼" : dir === "up" ? "▲" : "▬";
     const mapLink = `#/map?q=viab_${g.id}&mode=scen&ssp=${m.ssp}&hz=${m.hz}&gcm=ens`;
     return `<article class="fcard">
-      <header><span class="eyebrow">XYLEM \u00B7 REFUGIUM</span></header>
+      <header><span class="eyebrow">XYLEM \u00B7 REFUGIUM</span>${m.gridLabel && m.gridLabel.viability ? `<span class="cgrid">${esc(m.gridLabel.viability)}</span>` : ""}</header>
       <h3>${esc(g.short)}</h3>
       <p class="fnum" aria-label="${g.cur ? pct(g.cur.mean) + " percent" : pct(g.base) + " percent"}">${g.cur ? pct(g.cur.mean) : pct(g.base)}<small>%</small></p>
       <p class="fwhat">${g.cur ? `mean one-year hydraulic survival, ${SSP_NAME[m.ssp]} in ${m.hz}` : "mean one-year hydraulic survival, 2019"}</p>
@@ -227,7 +229,7 @@
       label: trendLabel("Climatic treeline shift", m.ssp, tl.series, (v) => signed(v, 0, " m")),
     }) : "";
     return `<article class="fcard tl">
-      <header><span class="eyebrow">MERISTEM \u00B7 TREELINE</span></header>
+      <header><span class="eyebrow">MERISTEM \u00B7 TREELINE</span>${m.gridLabel && m.gridLabel.treeline ? `<span class="cgrid">${esc(m.gridLabel.treeline)}</span>` : ""}</header>
       <h3>Climatic treeline</h3>
       <p class="fnum" aria-label="${signed(tl.mean, 0, " metres")}">${signed(tl.mean, 0)}<small> m</small></p>
       <p class="fwhat">uphill shift of the potential treeline, ${SSP_NAME[m.ssp]} in ${m.hz}</p>
@@ -308,7 +310,7 @@
         <div class="fcards" id="fcards"></div>
         <div class="band-foot">
           <p class="pathkey" aria-hidden="true"><span><i class="s126"></i>SSP1-2.6</span><span><i class="s370"></i>SSP3-7.0</span><span><i class="s585"></i>SSP5-8.5</span><span>solid line and shading: the chosen path and its model range; dashed: the other two</span></p>
-          <p class="small">${gridHtml} Means and ranges are taken across 5 climate models for the chosen emissions path and horizon; the 2019 value is the model's own baseline year.</p>
+          <p class="small">${gridHtml} Each card names the number of model nodes behind it. Means and ranges are taken across 5 climate models for the chosen emissions path and horizon; the 2019 value is the model's own baseline year.</p>
           <p class="band-dl"><button type="button" class="dl-btn" id="dl-csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>Download these numbers (CSV)</button><span class="small"> all three paths and all horizons, with the model range</span></p>
           <details class="howto"><summary>How to read these numbers</summary>
             <dl>
@@ -324,7 +326,7 @@
     </div>`;
   }
 
-  function mountBand(host, { M, treelineMean, gridHtml, start, onChange }) {
+  function mountBand(host, { M, treelineMean, gridHtml, gridIds, start, onChange }) {
     const first = { ssp: SSPS.includes(start && start.ssp) ? start.ssp : "ssp585", hz: HORIZONS.includes(start && start.hz) ? start.hz : "2100" };
     host.innerHTML = bandMarkup(M, gridHtml, first);
     const cards = sel(host, "#fcards"), lead = sel(host, "#res-lead"), fig = sel(host, "#relief"), art = sel(host, "#relief-art"), cap = sel(host, "#relief-cap");
@@ -337,9 +339,9 @@
     };
     function draw() {
       const { ssp, hz } = current();
-      const m = headlineModel(M, ssp, hz, treelineMean);
+      const m = headlineModel(M, ssp, hz, treelineMean, gridIds);
       const idx = HORIZONS.indexOf(hz);
-      cards.innerHTML = m.groups.map((g) => viabilityCard(g, m, idx)).join("") + (m.treeline ? treelineCard(m.treeline, m, idx) : "") + aegisCard(M.aegis);
+      cards.innerHTML = m.groups.map((g) => viabilityCard(g, m, idx)).join("") + (m.treeline ? treelineCard(m.treeline, m, idx) : "") + aegisCard(M.aegis, m);
       cards.classList.remove("tick"); void cards.offsetWidth; cards.classList.add("tick");
       lead.textContent = m.lead;
       if (relief && m.treelineNowM != null) {

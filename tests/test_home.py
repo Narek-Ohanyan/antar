@@ -71,6 +71,7 @@ def test_downsample_keeps_means_and_blanks_mostly_empty_blocks():
 
 
 MANIFEST = {
+    "grids": {"validation": {"n_cells": 25}, "dense": {"n_cells": 854}},
     "groups": {"a": {"short": "alpha", "label": "Alpha"}, "b": {"short": "beta", "label": "Beta"}},
     "baseline_viability_2019": {"a": 0.99, "b": 0.90},
     "scenario_summary": {g: {s: {h: {"mean": base - dx * (i + 1), "min": base - dx * (i + 1) - .01, "max": base - dx * (i + 1) + .01, "n_gcms": 5}
@@ -182,3 +183,11 @@ def test_the_csv_holds_every_headline_number_and_parses_back():
 def test_the_csv_quotes_awkward_text():
     text = node("const M=JSON.parse(JSON.stringify(d.M));M.groups.a.short='odd, \"name\"';console.log(JSON.stringify(H.headlineCsv(M)))", {"M": MANIFEST})
     assert '"odd, ""name"""' in text
+
+
+def test_each_card_names_the_grid_behind_it_even_when_they_differ():
+    html = node("const m=H.headlineModel(d.M,'ssp585','2100',2670,{viability:'dense',treeline:'validation'});console.log(JSON.stringify(m.groups.map(g=>H.viabilityCard(g,m,2)).join('')+'|'+H.treelineCard(m.treeline,m,2)))", {"M": MANIFEST})
+    viab, tl = html.split("|")
+    assert viab.count("854 nodes") == 2 and "25 nodes" not in viab and tl.count("25 nodes") == 1 and "854 nodes" not in tl
+    none = node("const m=H.headlineModel(d.M,'ssp585','2100',2670);console.log(JSON.stringify(H.viabilityCard(m.groups[0],m,2)))", {"M": MANIFEST})
+    assert "cgrid" not in none
