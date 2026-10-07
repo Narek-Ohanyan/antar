@@ -404,6 +404,7 @@ def build():
                            gate=lambda d: forcing_current(d, strict=True))
     provenance["future_projections"] = info
     scen_summary = None
+    fp_in = []
     if fp:
         G = grids[gid]
         member_keys = sorted(fp["members"].keys())
@@ -484,8 +485,12 @@ def build():
                  for k, v in ae["budget_sweep"].items()]
         fr = ae["lambda_frontier_at_representative_budget"]
         aegis = {"grid": gid, "scenario_source": ae["scenario_source"], "n_scenarios": ae["n_scenarios"],
-                 "n_units": ae["n_units"], "value_per_ha_year_usd": ae["value_per_ha_year_usd"],
+                 "n_units": ae["n_units"], "n_eligible_units": ae.get("n_eligible_units"), "unit_area_ha": ae.get("unit_area_ha"),
+                 "value_per_ha_year_usd": ae["value_per_ha_year_usd"], "incremental_share": ae.get("incremental_share"),
+                 "net_value_per_ha_year_usd": ae.get("net_value_per_ha_year_usd"),
                  "scope_note": ae["scope_note"], "budget_sweep": sweep,
+                 "cost_table": [{k: c.get(k) for k in ("name", "cost_per_ha", "cost_low", "cost_high", "cost_basis", "source")} for c in ae.get("cost_table", [])],
+                 "planting_cost_sensitivity": ae.get("planting_cost_sensitivity"),
                  "frontier": {"lambdas": fr.get("lambdas"), "expected": [r(v, 2) for v in fr.get("expected", [])],
                               "cvar": [r(v, 2) for v in fr.get("cvar", [])],
                               "price_of_robustness": r(fr.get("price_of_robustness"), 4)},
@@ -613,6 +618,8 @@ def build():
         "engines": engines,
         "treeline": treeline_summary,
         "scenario_summary": scen_summary,
+        "node_counts": {"viability": int(sum(fp_in)) if scen_summary else None, "treeline": treeline_summary["n_cells_armenia"] if treeline_summary else None,
+                        "aegis": aegis["n_units"] if aegis else None},          # the number of model nodes each headline family is taken over (they differ: terrain alone reaches nodes the water balance cannot)
         "baseline_viability_2019": baseline_viab,
         "ecosystem_validation": ecosystem,
         "aegis": aegis,

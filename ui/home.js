@@ -125,7 +125,7 @@
     return { mean: cur.ensemble_mean_shift_m, min: cur.ensemble_min_shift_m, max: cur.ensemble_max_shift_m, n: cur.n_gcms, series, lo, hi, grid: M.treeline.grid };
   }
 
-  function headlineModel(M, ssp, hz, treelineMean, gridIds) {
+  function headlineModel(M, ssp, hz, treelineMean) {
     const groups = Object.keys(M.groups).map((g) => groupModel(M, g, ssp, hz)).filter((g) => g.base != null);
     const tl = treelineModel(M, ssp, hz);
     const withNow = groups.filter((g) => g.deltaPp != null);
@@ -136,9 +136,8 @@
     else if (withNow.length) lead = `Under ${SSP_NAME[ssp]} by ${hz}, one-year hydraulic survival changes by ${parts} against 2019.`;
     else lead = "Scenario results are not available yet; the 2019 values are shown.";
     const treelineNow = fin(treelineMean) ? treelineMean : null;
-    const nodes = (id) => (id && M.grids && M.grids[id] && M.grids[id].n_cells ? `${M.grids[id].n_cells} nodes` : "");
-    const gids = gridIds || {};
-    return { ssp, hz, groups, treeline: tl, lead, gridLabel: { viability: nodes(gids.viability), treeline: nodes(gids.treeline), aegis: nodes(gids.aegis) }, treelineNowM: treelineNow, treelineLaterM: treelineNow != null && tl ? treelineNow + tl.mean : null };
+    const nc = M.node_counts || {}, nodes = (n) => (n ? `${n} nodes` : "");
+    return { ssp, hz, groups, treeline: tl, lead, gridLabel: { viability: nodes(nc.viability), treeline: nodes(nc.treeline), aegis: nodes(nc.aegis) }, treelineNowM: treelineNow, treelineLaterM: treelineNow != null && tl ? treelineNow + tl.mean : null };
   }
 
   /* ---------------- small trend chart ---------------- */
@@ -240,13 +239,13 @@
     </article>`;
   }
 
-  function aegisCard(ae) {
+  function aegisCard(ae, m) {
     if (!ae) return "";
     return `<article class="fcard">
-      <header><span class="eyebrow">AEGIS · DECISION</span></header>
+      <header><span class="eyebrow">AEGIS · DECISION</span>${m && m.gridLabel && m.gridLabel.aegis ? `<span class="cgrid">${esc(m.gridLabel.aegis)}</span>` : ""}</header>
       <h3>Planting portfolio</h3>
       <p class="fnum">${esc(String(ae.n_units))}</p>
-      <p class="fwhat">planting units evaluated against ${esc(String(ae.n_scenarios))} climate scenarios</p>
+      <p class="fwhat">candidate planting units${ae.n_eligible_units != null ? `, ${esc(String(ae.n_eligible_units))} eligible,` : ""} evaluated against ${esc(String(ae.n_scenarios))} climate scenarios</p>
       ${ae.frontier && fin(ae.frontier.price_of_robustness) ? `<p class="fdelta flat"><span aria-hidden="true">▬</span> price of robustness <b>${(+ae.frontier.price_of_robustness).toFixed(2)}</b></p>` : ""}
       <a class="flink" href="#/decision">See the portfolio <span aria-hidden="true">→</span></a>
     </article>`;
@@ -320,7 +319,7 @@
     </div>`;
   }
 
-  function mountBand(host, { M, treelineMean, gridHtml, gridIds, start, onChange }) {
+  function mountBand(host, { M, treelineMean, gridHtml, start, onChange }) {
     const first = { ssp: SSPS.includes(start && start.ssp) ? start.ssp : "ssp585", hz: HORIZONS.includes(start && start.hz) ? start.hz : "2100" };
     host.innerHTML = bandMarkup(M, gridHtml, first);
     const cards = sel(host, "#fcards"), lead = sel(host, "#res-lead"), fig = sel(host, "#relief"), art = sel(host, "#relief-art"), cap = sel(host, "#relief-cap");
@@ -333,7 +332,7 @@
     };
     function draw() {
       const { ssp, hz } = current();
-      const m = headlineModel(M, ssp, hz, treelineMean, gridIds);
+      const m = headlineModel(M, ssp, hz, treelineMean);
       const idx = HORIZONS.indexOf(hz);
       cards.innerHTML = m.groups.map((g) => viabilityCard(g, m, idx)).join("") + (m.treeline ? treelineCard(m.treeline, m, idx) : "") + aegisCard(M.aegis, m);
       cards.classList.remove("tick"); void cards.offsetWidth; cards.classList.add("tick");

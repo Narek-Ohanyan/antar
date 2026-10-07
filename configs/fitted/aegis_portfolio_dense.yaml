@@ -1,0 +1,255 @@
+run_date: '2026-10-07'
+scenario_source: future_projections
+n_scenarios: 45
+scenario_names:
+- gfdl-esm4__ssp126__2050
+- gfdl-esm4__ssp126__2080
+- gfdl-esm4__ssp126__2100
+- gfdl-esm4__ssp370__2050
+- gfdl-esm4__ssp370__2080
+- gfdl-esm4__ssp370__2100
+- gfdl-esm4__ssp585__2050
+- gfdl-esm4__ssp585__2080
+- gfdl-esm4__ssp585__2100
+- ipsl-cm6a-lr__ssp126__2050
+- ipsl-cm6a-lr__ssp126__2080
+- ipsl-cm6a-lr__ssp126__2100
+- ipsl-cm6a-lr__ssp370__2050
+- ipsl-cm6a-lr__ssp370__2080
+- ipsl-cm6a-lr__ssp370__2100
+- ipsl-cm6a-lr__ssp585__2050
+- ipsl-cm6a-lr__ssp585__2080
+- ipsl-cm6a-lr__ssp585__2100
+- mpi-esm1-2-hr__ssp126__2050
+- mpi-esm1-2-hr__ssp126__2080
+- mpi-esm1-2-hr__ssp126__2100
+- mpi-esm1-2-hr__ssp370__2050
+- mpi-esm1-2-hr__ssp370__2080
+- mpi-esm1-2-hr__ssp370__2100
+- mpi-esm1-2-hr__ssp585__2050
+- mpi-esm1-2-hr__ssp585__2080
+- mpi-esm1-2-hr__ssp585__2100
+- mri-esm2-0__ssp126__2050
+- mri-esm2-0__ssp126__2080
+- mri-esm2-0__ssp126__2100
+- mri-esm2-0__ssp370__2050
+- mri-esm2-0__ssp370__2080
+- mri-esm2-0__ssp370__2100
+- mri-esm2-0__ssp585__2050
+- mri-esm2-0__ssp585__2080
+- mri-esm2-0__ssp585__2100
+- ukesm1-0-ll__ssp126__2050
+- ukesm1-0-ll__ssp126__2080
+- ukesm1-0-ll__ssp126__2100
+- ukesm1-0-ll__ssp370__2050
+- ukesm1-0-ll__ssp370__2080
+- ukesm1-0-ll__ssp370__2100
+- ukesm1-0-ll__ssp585__2050
+- ukesm1-0-ll__ssp585__2080
+- ukesm1-0-ll__ssp585__2100
+n_units: 854
+n_eligible_units: 424
+unit_area_ha: 1.0
+n_sampled_cells_total: 854
+n_cells_dropped_outside_armenia: 0
+value_per_ha_year_usd: 417.0
+incremental_share: 0.75
+net_value_per_ha_year_usd: 312.75
+option_labels:
+- group: mesic_diffuse_porous_broadleaf
+  intervention: degraded_forest_planting
+  cost_basis: sourced_armenian_cost_data
+- group: mesic_diffuse_porous_broadleaf
+  intervention: natural_regeneration
+  cost_basis: sourced_cheapest_mix
+- group: mesic_diffuse_porous_broadleaf
+  intervention: coppicing_oak
+  cost_basis: sourced_cheapest_mix
+- group: mesic_diffuse_porous_broadleaf
+  intervention: pine_thinning
+  cost_basis: blended
+- group: mesic_diffuse_porous_broadleaf
+  intervention: wildfire_prevention
+  cost_basis: sourced_cheapest_mix
+- group: mesic_diffuse_porous_broadleaf
+  intervention: anti_erosion_plantation
+  cost_basis: blended
+- group: mesic_diffuse_porous_broadleaf
+  intervention: windbreaks_hedgerows
+  cost_basis: sourced_most_expensive
+- group: mesic_diffuse_porous_broadleaf
+  intervention: mining_site_reclamation
+  cost_basis: blended
+- group: ring_porous_oak
+  intervention: degraded_forest_planting
+  cost_basis: sourced_armenian_cost_data
+- group: ring_porous_oak
+  intervention: natural_regeneration
+  cost_basis: sourced_cheapest_mix
+- group: ring_porous_oak
+  intervention: coppicing_oak
+  cost_basis: sourced_cheapest_mix
+- group: ring_porous_oak
+  intervention: pine_thinning
+  cost_basis: blended
+- group: ring_porous_oak
+  intervention: wildfire_prevention
+  cost_basis: sourced_cheapest_mix
+- group: ring_porous_oak
+  intervention: anti_erosion_plantation
+  cost_basis: blended
+- group: ring_porous_oak
+  intervention: windbreaks_hedgerows
+  cost_basis: sourced_most_expensive
+- group: ring_porous_oak
+  intervention: mining_site_reclamation
+  cost_basis: blended
+- group: pine
+  intervention: degraded_forest_planting
+  cost_basis: sourced_armenian_cost_data
+- group: pine
+  intervention: natural_regeneration
+  cost_basis: sourced_cheapest_mix
+- group: pine
+  intervention: coppicing_oak
+  cost_basis: sourced_cheapest_mix
+- group: pine
+  intervention: pine_thinning
+  cost_basis: blended
+- group: pine
+  intervention: wildfire_prevention
+  cost_basis: sourced_cheapest_mix
+- group: pine
+  intervention: anti_erosion_plantation
+  cost_basis: blended
+- group: pine
+  intervention: windbreaks_hedgerows
+  cost_basis: sourced_most_expensive
+- group: pine
+  intervention: mining_site_reclamation
+  cost_basis: blended
+cost_table:
+- name: degraded_forest_planting
+  cost_per_ha: 6800.0
+  cost_low: 3300.0
+  cost_high: 12600.0
+  cost_basis: sourced_armenian_cost_data
+  source: 'Central: 2.6 million AMD per hectare, the Ministry of Environment''s average
+    cost to establish a hectare of forest including five years of maintenance, mowing,
+    fencing and nursery work (Hetq, 1 December 2025; about US$6,800 at that article''s
+    own conversion). Low: EUR 2,945 per hectare, planting with survival taken into
+    account, KfW ex-post evaluation of the IKI Caucasus natural-forest programme (2017;
+    about US$3,300, prices of 2013-2016). High: about US$12,600 per hectare, the items
+    of an itemised intensive planting site in Armenia''s Adaptation Fund proposal
+    (2025), excluding irrigation and soil works.'
+- name: natural_regeneration
+  cost_per_ha: 186.0
+  cost_basis: sourced_cheapest_mix
+  source: 'World Bank (2023): the cheapest real option mix, US$9.3 million for 50,000
+    ha; the KfW evaluation also finds natural regeneration much cheaper than planting,
+    fencing being the main cost.'
+- name: coppicing_oak
+  cost_per_ha: 186.0
+  cost_basis: sourced_cheapest_mix
+  source: 'World Bank (2023): the cheapest real option mix (shared with natural regeneration
+    and wildfire prevention).'
+- name: pine_thinning
+  cost_per_ha: 900.0
+  cost_basis: blended
+  source: 'World Bank (2023): the average over all eight options, US$45 million for
+    50,000 ha; no individual figure found.'
+- name: wildfire_prevention
+  cost_per_ha: 186.0
+  cost_basis: sourced_cheapest_mix
+  source: 'World Bank (2023): the cheapest real option mix (shared with natural regeneration
+    and coppicing).'
+- name: anti_erosion_plantation
+  cost_per_ha: 900.0
+  cost_basis: blended
+  source: 'World Bank (2023): the average over all eight options; no individual figure
+    found.'
+- name: windbreaks_hedgerows
+  cost_per_ha: 13260.0
+  cost_basis: sourced_most_expensive
+  source: 'World Bank (2023): the most expensive single option, US$663 million for
+    50,000 ha.'
+- name: mining_site_reclamation
+  cost_per_ha: 900.0
+  cost_basis: blended
+  source: 'World Bank (2023): the average over all eight options; no individual figure
+    found.'
+scope_note: Benefit varies only by functional group (REFUGIUM viability) times one
+  national value, 417 USD/ha/yr x 75% (the share a restored degraded hectare adds,
+  World Bank 2023); cost varies only by intervention method -- the two are independent
+  by construction since no real data or model connects method to viability. Planting
+  uses Armenian cost data (range shown); 3 of 8 methods use a blended real average
+  cost (no individual figure was found) and 3 share the cheapest-mix figure -- see
+  cost_table. water_use/water_caps/basin intentionally omitted -- no real figure exists
+  for any planting option's water use. Eligibility = real WDPA (not protected) AND
+  real Ecosystem Map of Armenia human-modified exclusion (not >50% settlements/cropland/buildings/quarries
+  in a local 500m window) -- deliberately does NOT exclude already-forested cells,
+  since 3 of the 8 real methods (coppicing_oak, pine_thinning, wildfire_prevention)
+  target existing forest.
+budget_sweep:
+  $9,300,000:
+    expected: 132587.2384749999
+    cvar: 132564.6996249999
+    n_units_planted: 424
+  $45,000,000:
+    expected: 132587.2384749999
+    cvar: 132564.6996249999
+    n_units_planted: 424
+  $100,000,000:
+    expected: 132587.2384749999
+    cvar: 132564.6996249999
+    n_units_planted: 424
+  $300,000,000:
+    expected: 132587.2384749999
+    cvar: 132564.6996249999
+    n_units_planted: 424
+  $663,000,000:
+    expected: 132587.2384749999
+    cvar: 132564.6996249999
+    n_units_planted: 424
+lambda_frontier_at_representative_budget:
+  lambdas:
+  - 0.0
+  - 0.2
+  - 0.4
+  - 0.6
+  - 0.8
+  - 1.0
+  expected:
+  - 132587.2384749999
+  - 132587.2384749999
+  - 132587.2384749999
+  - 132587.2384749999
+  - 132587.2384749999
+  - 132587.2384749999
+  cvar:
+  - 132564.6996249999
+  - 132564.6996249999
+  - 132564.6996249999
+  - 132564.6996249999
+  - 132564.6996249999
+  - 132564.6996249999
+  price_of_robustness: 0.0
+planting_cost_sensitivity:
+  low:
+    planting_cost_usd_per_ha: 3300.0
+    expected: 132587.2384749999
+    cvar: 132564.6996249999
+    n_units_planted: 424
+    n_units_planting_option: 0
+  central:
+    planting_cost_usd_per_ha: 6800.0
+    expected: 132587.2384749999
+    cvar: 132564.6996249999
+    n_units_planted: 424
+    n_units_planting_option: 0
+  high:
+    planting_cost_usd_per_ha: 12600.0
+    expected: 132587.2384749999
+    cvar: 132564.6996249999
+    n_units_planted: 424
+    n_units_planting_option: 0

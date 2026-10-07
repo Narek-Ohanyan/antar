@@ -10,8 +10,8 @@ only to the one quantity treeline needs, so no Monte Carlo and no soil/ERA5 stre
    t_mean_c = downscale_temperature(t_mean_ref, z_cell, z_ref, gamma_of_day) and then
    GST = mean(t_mean_c[t_mean_c >= 0.9]) (`indices.growing_season_mean_temperature`). Both are
    called here directly, on the same real CHELSA-daily 2019 reference series, with the same real
-   fitted monthly lapse rate -- not a re-derivation. Only terrain (elevation, z_ref_m) is streamed
-   (80 or 1044 points), because those two numbers are the only non-CHELSA inputs to that formula.
+   fitted monthly lapse rate -- not a re-derivation. Only terrain (elevation, z_ref_m) is needed
+   (read from the cached static inputs; streamed from Drive only the first time), because those two numbers are the only non-CHELSA inputs to that formula.
 2. Baseline check, stated not assumed: the reproduced 2019 GST must match the value the full
    pipeline stored in `treeline_diagnostic_2019.yaml` for the same cell. The maximum absolute
    difference is recorded in the output and the run aborts if it exceeds 0.05 degC.
@@ -28,7 +28,7 @@ decades", Sec. 8.1), not a forecast of where forest will stand; the thermal thre
 the global Koerner-Paulsen default, not an Armenia-specific calibration; one representative year per
 horizon, with 2019's real weather sequence perturbed by the monthly delta.
 
-`--dense` runs the 1044-point grid and writes a separate file.
+`--dense` runs the Armenia-only dense grid and writes a separate file.
 """
 import sys
 from pathlib import Path
@@ -41,7 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import datetime  # noqa: E402
 
 from run_topohydro_grid import (  # noqa: E402
-    grid_latlon, extract_terrain, get_access_token, _load_chelsa_arrays,
+    grid_latlon, extract_static_grid_inputs, _load_chelsa_arrays,
     GRID_ROWS, GRID_COLS, DENSE_GRID_ROWS, DENSE_GRID_COLS,
 )
 from run_future_projections import compute_deltas, GCMS, SCENARIOS, HORIZONS  # noqa: E402
@@ -80,8 +80,9 @@ def main():
 
     lats, lons, chelsa_row, chelsa_col = grid_latlon(grid_rows, grid_cols)
     n = len(lats)
-    print(f"=== {n} grid points ({'DENSE' if dense else 'validation'}); streaming terrain only ===", flush=True)
-    elevation, _, _, _, z_ref_m, _, _ = extract_terrain(get_access_token(), lats, lons)
+    print(f"=== {n} grid points ({'DENSE' if dense else 'validation'}); terrain from the cached static inputs ===", flush=True)
+    static = extract_static_grid_inputs(grid_rows, grid_cols)         # streamed from Drive once and cached (data/_cache/static_*.npz); no Drive access when the cache exists
+    elevation, z_ref_m = static["elevation"], static["z_ref_m"]
     ok = ~np.isnan(elevation)
     print(f"  {int(ok.sum())}/{n} points have real terrain", flush=True)
 

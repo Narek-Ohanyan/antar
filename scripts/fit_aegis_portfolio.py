@@ -246,6 +246,8 @@ def main():
         "n_scenarios": C,
         "scenario_names": scenario_names,
         "n_units": n,
+        "n_eligible_units": int(eligible_mask.sum()),
+        "unit_area_ha": float(AREA_PER_UNIT_HA),
         "n_sampled_cells_total": n_total,
         "n_cells_dropped_outside_armenia": n_total - n,
         "value_per_ha_year_usd": VALUE_PER_HA_YEAR,

@@ -71,7 +71,8 @@ def test_downsample_keeps_means_and_blanks_mostly_empty_blocks():
 
 
 MANIFEST = {
-    "grids": {"validation": {"n_cells": 25}, "dense": {"n_cells": 854}},
+    "grids": {"validation": {"n_cells": 25}, "dense": {"n_cells": 921}},
+    "node_counts": {"viability": 854, "treeline": 921, "aegis": 854},
     "groups": {"a": {"short": "alpha", "label": "Alpha"}, "b": {"short": "beta", "label": "Beta"}},
     "baseline_viability_2019": {"a": 0.99, "b": 0.90},
     "scenario_summary": {g: {s: {h: {"mean": base - dx * (i + 1), "min": base - dx * (i + 1) - .01, "max": base - dx * (i + 1) + .01, "n_gcms": 5}
@@ -185,9 +186,15 @@ def test_the_csv_quotes_awkward_text():
     assert '"odd, ""name"""' in text
 
 
-def test_each_card_names_the_grid_behind_it_even_when_they_differ():
-    html = node("const m=H.headlineModel(d.M,'ssp585','2100',2670,{viability:'dense',treeline:'validation'});console.log(JSON.stringify(m.groups.map(g=>H.viabilityCard(g,m,2)).join('')+'|'+H.treelineCard(m.treeline,m,2)))", {"M": MANIFEST})
+def test_each_card_names_its_own_node_count_even_when_they_differ():
+    html = node("const m=H.headlineModel(d.M,'ssp585','2100',2670);console.log(JSON.stringify(m.groups.map(g=>H.viabilityCard(g,m,2)).join('')+'|'+H.treelineCard(m.treeline,m,2)))", {"M": MANIFEST})
     viab, tl = html.split("|")
-    assert viab.count("854 nodes") == 2 and "25 nodes" not in viab and tl.count("25 nodes") == 1 and "854 nodes" not in tl
-    none = node("const m=H.headlineModel(d.M,'ssp585','2100',2670);console.log(JSON.stringify(H.viabilityCard(m.groups[0],m,2)))", {"M": MANIFEST})
+    assert viab.count("854 nodes") == 2 and "921" not in viab and tl.count("921 nodes") == 1 and "854" not in tl
+    none = node("const M=JSON.parse(JSON.stringify(d.M));delete M.node_counts;const m=H.headlineModel(M,'ssp585','2100',2670);console.log(JSON.stringify(H.viabilityCard(m.groups[0],m,2)))", {"M": MANIFEST})
     assert "cgrid" not in none
+
+
+def test_the_decision_card_states_its_nodes_eligible_units_and_a_zero_price_plainly():
+    M = dict(MANIFEST, aegis={"n_units": 854, "n_eligible_units": 424, "n_scenarios": 45, "frontier": {"price_of_robustness": 0.0}})
+    html = node("const m=H.headlineModel(d.M,'ssp585','2100',2670);console.log(JSON.stringify(H.aegisCard(d.M.aegis,m)))", {"M": M})
+    assert "854 nodes" in html and "424 eligible" in html and "45 climate scenarios" in html and "price of robustness <b>0.00</b>" in html and "#/decision" in html

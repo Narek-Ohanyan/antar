@@ -15,7 +15,8 @@ const ok = (v) => v != null && isFinite(v);
 function fmt(v, d = 3) { return ok(v) ? (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString("en") : +Number(v).toFixed(d) + "") : "—"; }
 const pct = (v, d = 1) => (ok(v) ? (100 * v).toFixed(d) + "%" : "—");
 const chip = (kind, text) => `<span class="chip ${kind}">${esc(text)}</span>`;
-const gridChip = (gid) => chip(gid === "dense" ? "good" : "neutral", gid === "dense" ? "921-node dense grid" : "25-node validation grid");
+/* Which grid a result comes from. The node count is not in the label: it differs by quantity (terrain alone reaches nodes the water balance cannot), so every card and panel states its own. */
+const gridChip = (gid) => chip(gid === "dense" ? "good" : "neutral", gid === "dense" ? "dense grid" : "validation grid");
 const groupLabel = (g) => (state.M.groups[g] ? state.M.groups[g].label : g);
 function pageParams() { const q = location.hash.split("?")[1] || ""; return Object.fromEntries(new URLSearchParams(q)); }
 function setParams(p) { const base = location.hash.split("?")[0]; history.replaceState(null, "", base + "?" + new URLSearchParams(p).toString()); }
@@ -131,7 +132,7 @@ function banner() {
   const M = state.M, rej = Object.values(M.provenance).flatMap((p) => p.rejected || []);
   const grids = Object.keys(M.grids);
   let h = "";
-  if (!grids.includes("dense")) h += `<div class="callout info"><strong>Grid in use:</strong> every layer currently comes from the 25-node validation grid (the Armenian cells of a coarse 80-point sample). A denser 921-node Armenia-only grid is being computed; a dense result is adopted only once it covers the grid almost completely.</div>`;
+  if (!grids.includes("dense")) h += `<div class="callout info"><strong>Grid in use:</strong> every layer currently comes from the coarse validation grid (a sample of nodes about 37 km apart). A denser Armenia-only grid is being computed; a dense result is adopted only once it covers the grid almost completely.</div>`;
   if (rej.length) h += `<div class="callout"><strong>Dense result rejected:</strong> ${rej.map(esc).join("; ")}</div>`;
   return h;
 }
@@ -159,7 +160,7 @@ function renderHome() {
   const treelineMean = tlv.length ? mean(tlv) : null;
   const nMembers = M.scenario_summary ? Object.values(M.scenario_summary).reduce((n, g) => Math.max(n, Object.values(g).reduce((m, s) => m + Object.values(s).reduce((k, h) => k + (h.n_gcms || 0), 0), 0)), 0) : 0;
   const ledger = `<dl class="ledger">
-    <div><dt>Model nodes</dt><dd>${sgid ? M.grids[sgid].n_cells : "\u2014"}<small>${sgid === "dense" ? "dense grid" : "validation grid"}</small></dd></div>
+    <div><dt>Model nodes</dt><dd>${(M.node_counts && M.node_counts.viability) || (sgid ? M.grids[sgid].n_cells : "\u2014")}<small>${sgid === "dense" ? "dense grid" : "validation grid"}</small></dd></div>
     <div><dt>Climate members</dt><dd>${nMembers || "\u2014"}<small>5 models \u00D7 3 paths \u00D7 3 horizons</small></dd></div>
     <div><dt>Species groups</dt><dd>${Object.keys(M.groups).length}<small>hydraulic traits</small></dd></div>
     <div><dt>Engines</dt><dd>${engines.length}<small>chained, each tested</small></dd></div>
@@ -228,7 +229,7 @@ function renderHome() {
   </div>`;
   view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => { sessionStorageSafe("jump", a.dataset.jump); }));
   const q0 = pageParams();
-  Home.mountBand($("#results"), { M, treelineMean, gridHtml: sgid ? gridChip(sgid) : "", gridIds: { viability: sgid, treeline: M.treeline && M.treeline.grid, aegis: M.aegis && M.aegis.grid }, start: { ssp: q0.ssp, hz: q0.hz }, onChange: (c) => setParams({ ssp: c.ssp, hz: c.hz }) });
+  Home.mountBand($("#results"), { M, treelineMean, gridHtml: sgid ? gridChip(sgid) : "", start: { ssp: q0.ssp, hz: q0.hz }, onChange: (c) => setParams({ ssp: c.ssp, hz: c.hz }) });
   Home.mountPhotos(view(), photos);
   initHeroVideo();
   initReveal();
@@ -316,6 +317,12 @@ function renderDecision() {
   const sw = ae.budget_sweep, fr = ae.frontier;
   const money = (v) => "$" + (v >= 1e6 ? (v / 1e6).toFixed(v % 1e6 ? 1 : 0) + "M" : v.toLocaleString("en"));
   const identical = sw.every((r) => r.n_units_planted === sw[0].n_units_planted && Math.abs(r.expected - sw[0].expected) < 1e-6);
+  const costs = (ae.cost_table || []).map((c) => c.cost_per_ha).filter(ok), maxCost = costs.length ? Math.max(...costs) : null;
+  const eligible = ae.n_eligible_units != null ? ae.n_eligible_units : sw[0].n_units_planted, unitHa = ae.unit_area_ha != null ? ae.unit_area_ha : 1;
+  const minBudget = Math.min(...sw.map((r) => r.budget_usd)), maxTotal = maxCost != null ? eligible * unitHa * maxCost : null;
+  const nonBinding = maxTotal != null && maxTotal < minBudget;
+  const costBasis = { sourced_armenian_cost_data: ["good", "Armenian cost data, range shown"], sourced_cheapest_mix: ["neutral", "World Bank cheapest option mix, shared"], sourced_most_expensive: ["neutral", "World Bank most expensive option"], blended: ["warn", "blended average, no individual figure"] };
+  const ct = Object.fromEntries((ae.cost_table || []).map((c) => [c.name, c]));
   const front = fr.lambdas ? Charts.line({ series: [{ name: "Expected benefit", color: "var(--c1)", points: fr.lambdas.map((l, k) => [l, fr.expected[k]]) }, { name: "CVaR (worst 20%)", color: "var(--c3)", dash: "6 4", points: fr.lambdas.map((l, k) => [l, fr.cvar[k]]) }], xlabel: "Risk-aversion λ (0 = mean only, 1 = worst-case only)", ylabel: "Benefit ($/yr)", yfmt: (v) => fmt(v, 0), xticks: fr.lambdas, xfmt: (v) => v.toFixed(1) }) : "";
   const byGroup = {};
   ae.options.forEach((o) => (byGroup[o.group_label] = byGroup[o.group_label] || []).push(o));
@@ -326,14 +333,14 @@ function renderDecision() {
     <div class="grid cols-3">
       <div class="card stat"><div class="num">${fmt(sw[0].expected, 0)}</div><div class="cap">expected benefit, $/yr (at every budget)</div><div class="sub">CVaR ${fmt(sw[0].cvar, 0)}</div></div>
       <div class="card stat"><div class="num">${fmt(fr.price_of_robustness, 2)}</div><div class="cap">price of robustness</div><div class="sub">expected benefit given up to hedge the worst 20% of scenarios</div></div>
-      <div class="card stat"><div class="num">${sw[0].n_units_planted}</div><div class="cap">units planted at every budget</div><div class="sub">${gridChip(ae.grid)}</div></div>
+      <div class="card stat"><div class="num">${sw[0].n_units_planted}</div><div class="cap">units given an option${identical ? ", at every budget" : ""}</div><div class="sub">${eligible} of ${ae.n_units} candidate units are eligible · ${gridChip(ae.grid)}</div></div>
     </div>
-    ${identical ? `<div class="callout info"><strong>Why every budget gives the same answer.</strong> Even the most expensive option, across all eligible units, costs less than the smallest budget tested, so money is not the binding constraint at this sample size. The choice would start to depend on budget only with many more candidate units.</div>` : ""}
+    ${identical ? `<div class="callout info"><strong>Why every budget gives the same answer.</strong> Each unit is ${fmt(unitHa, 0)} ha (one model node) and ${eligible} are eligible. ${nonBinding ? `Even the most expensive method on all of them costs ${money(maxTotal)}, less than the smallest budget tested (${money(minBudget)}); those budgets are the scale of a 50,000 ha programme (World Bank 2023), so money never binds here.` : "The budget does not change the allocation here."} Benefit depends only on the species group, never on the method, so the methods are interchangeable in this result: which method is reported for a unit is a tie, not a finding. Budgets would start to bind only if each unit stood for a larger area, and methods could be told apart only with data that link a method to survival.</div>` : ""}
     <div class="callout"><strong>What is and isn't modelled.</strong> ${esc(ae.scope_note)}</div>
-    <h2>Mean–CVaR frontier at a $45M budget</h2><div class="card">${front}<p class="small muted">The gap between the two lines is what hedging against bad scenarios costs. They are almost identical here because viability barely differs across the 45 scenarios, so there is little downside to hedge.</p></div>
+    <h2>Mean–CVaR frontier at a $45M budget</h2><div class="card">${front}<p class="small muted">The gap between the two lines is what hedging against bad scenarios costs. ${fr.price_of_robustness != null && fr.price_of_robustness < 0.005 ? `Here it is ${fmt(fr.price_of_robustness, 2)}: the same allocation is best on average and in the worst 20% of the ${ae.n_scenarios} scenarios, because viability differs little between them, so there is little downside to hedge.` : `Here it is ${fmt(fr.price_of_robustness, 2)}.`}</p></div>
     <h2>Budget sweep</h2><div class="card tablewrap"><table><thead><tr><th>Budget</th><th class="num">Expected benefit</th><th class="num">CVaR</th><th class="num">Units planted</th></tr></thead><tbody>${sw.map((r) => `<tr><td>${money(r.budget_usd)}</td><td class="num">${fmt(r.expected, 1)}</td><td class="num">${fmt(r.cvar, 1)}</td><td class="num">${r.n_units_planted}</td></tr>`).join("")}</tbody></table></div>
-    <h2>Intervention methods and costs</h2><div class="card tablewrap"><table><thead><tr><th>Method</th><th class="num">Cost per hectare</th><th>Cost basis</th></tr></thead><tbody>${methods.map((o) => `<tr><td>${esc(o.intervention.replace(/_/g, " "))}</td><td class="num">${o.cost_per_ha_usd != null ? "$" + o.cost_per_ha_usd.toLocaleString("en") : "—"}</td><td>${chip(o.cost_basis === "blended" ? "warn" : "good", o.cost_basis === "blended" ? "blended average (no individual figure)" : o.cost_basis.replace(/_/g, " "))}</td></tr>`).join("")}</tbody></table>
-      <p class="small muted" style="margin-top:8px">Benefit = viability × $${ae.value_per_ha_year_usd}/ha/yr (national ecosystem-services value). Eligible units exclude protected areas and heavily human-modified land.</p></div></div>`;
+    <h2>Intervention methods and costs</h2><div class="card tablewrap"><table><thead><tr><th>Method</th><th class="num">Cost per hectare</th><th>Cost basis</th></tr></thead><tbody>${methods.map((o) => { const c = ct[o.intervention] || {}, b = costBasis[o.cost_basis] || ["warn", String(o.cost_basis || "").replace(/_/g, " ")]; return `<tr><td>${esc(o.intervention.replace(/_/g, " "))}</td><td class="num">${o.cost_per_ha_usd != null ? "$" + o.cost_per_ha_usd.toLocaleString("en") : "\u2014"}${c.cost_low != null ? `<br><span class="small muted">$${c.cost_low.toLocaleString("en")}\u2013$${c.cost_high.toLocaleString("en")}</span>` : ""}</td><td>${chip(b[0], b[1])}${c.source ? `<br><span class="small muted">${esc(c.source)}</span>` : ""}</td></tr>`; }).join("")}</tbody></table>
+      <p class="small muted" style="margin-top:8px">Benefit = viability × $${ae.value_per_ha_year_usd}/ha/yr (national ecosystem-services value)${ae.incremental_share != null ? ` × ${Math.round(100 * ae.incremental_share)}% (the share a restored degraded hectare adds) = $${fmt(ae.net_value_per_ha_year_usd, 2)}/ha/yr at full viability` : ""}. Eligible units exclude protected areas and heavily human-modified land.</p></div></div>`;
 }
 
 /* ---- Models & validation ---- */

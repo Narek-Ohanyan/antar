@@ -2117,3 +2117,14 @@ dense files (854 cells per group now); the dense scenario file gets the same tre
 * Host behaviour to know: the CDN answers curl with an explicit `Accept-Encoding: gzip` header with 403, on narekohanyan.com as well as on antar.narekohanyan.com; browsers are not affected. Probe the site with
   a browser-like request (or without that header), not with curl's bare `-H "Accept-Encoding: gzip"`.
 * The 57 MB `configs/fitted/future_projections_dense.yaml` is in git (GitHub warns above 50 MB); gzip it if it grows.
+
+## 2026-10-07 (cont.) -- dense treeline and dense AEGIS
+
+* **Dense treeline change** (`treeline_change_dense.yaml`, 921 nodes): `compute_treeline_change.py` now reads terrain from the cached static inputs instead of streaming it from Drive. Proved safe first: rerunning the
+  25-node case with the cached terrain reproduced the stored result in every field except the run date. SSP5-8.5 in 2100: +470 m (models +316 to +678 m) on 921 nodes, against +462 m (+319 to +676 m) on 25.
+  The dense run also covers the 67 nodes whose soil or ERA5-Land data are incomplete, because the treeline needs only terrain, so the headline cards now state their own node counts (854 for survival, 921 for the treeline).
+* **Dense AEGIS** (`aegis_portfolio_dense.yaml`): 854 candidate units, 424 eligible (inside Armenia, not protected, plantable), 45 scenarios. Result: the same allocation at every budget from 9.3 M to 663 M USD, price of
+  robustness 0.00, no planting unit. This is degenerate by construction, not a bug: a unit is one hectare, so even the most expensive method on all 424 units costs 5.6 M USD, below the smallest budget (budgets are a
+  50,000 ha programme's); and benefit depends on the species group only, so the methods are interchangeable and the method reported is a tie. The Decision page now says this from the numbers (eligible units, the
+  largest possible total cost, the smallest budget) and the methodology lists it as a known gap. A decision on how to give the units real areas is open.
+* The grid chip no longer carries a hard-coded node count; the methodology text (AEGIS inputs and costs, treeline baseline check, sample size, the 2026-10-06 recomputation) now matches what was run.
