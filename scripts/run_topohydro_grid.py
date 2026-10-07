@@ -348,6 +348,16 @@ def extract_soils(token, lats, lons):
     return clay_pct, sand_pct, soc_g_kg
 
 
+def soil_complete(soil, *raw):
+    """True where every soil input and every derived hydraulic parameter is finite. ``valid_soil`` used to test only the clay value: at three
+    dense-grid nodes clay was present but a derived parameter (theta_sat, theta_fc, theta_lim, psi_sat, b) came out NaN, the water balance was NaN
+    and, because NaN >= 1 is False, XYLEM reported a hazard of exactly 0 (perfect viability) for them."""
+    ok = np.ones(np.shape(next(iter(soil.values()))), dtype=bool)
+    for v in list(soil.values()) + list(raw):
+        ok &= np.isfinite(v)
+    return ok
+
+
 def era5_complete(wind10, ssrd, strd, dewpoint_k, pressure_pa):
     """True where every ERA5-Land band the water balance needs is finite. Wind alone is not enough: three dense-grid nodes had a wind value
     but no radiation or dew point, so their water balance was NaN and, because NaN >= 1 is False, XYLEM reported a hazard of exactly 0
@@ -458,7 +468,7 @@ def extract_static_grid_inputs(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
             "lats": lats, "lons": lons, "chelsa_row": chelsa_row, "chelsa_col": chelsa_col, "token": None,
             "elevation": z["elevation"], "slope": z["slope"], "aspect": z["aspect"], "concavity": z["concavity"],
             "z_ref_m": z["z_ref_m"], "row_px": z["row_px"], "col_px": z["col_px"],
-            "soil": {k[6:]: z[k] for k in z.files if k.startswith("soil__")}, "valid_soil": z["valid_soil"],
+            "soil": {k[6:]: z[k] for k in z.files if k.startswith("soil__")}, "valid_soil": z["valid_soil"] & soil_complete({k[6:]: z[k] for k in z.files if k.startswith("soil__")}),
         }
 
     token = get_access_token()
@@ -470,9 +480,9 @@ def extract_static_grid_inputs(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
 
     print("=== Soils (streamed, no full download) ===", flush=True)
     clay_pct, sand_pct, soc_g_kg = extract_soils(token, lats, lons)
-    valid_soil = ~np.isnan(clay_pct)
-    print(f"  {valid_soil.sum()}/{n} points have real soil data", flush=True)
     soil = soil_hydraulic_parameters(sand_pct, clay_pct, soc_g_kg)
+    valid_soil = soil_complete(soil, clay_pct, sand_pct, soc_g_kg)
+    print(f"  {valid_soil.sum()}/{n} points have real soil data", flush=True)
 
     out = {
         "lats": lats, "lons": lons, "chelsa_row": chelsa_row, "chelsa_col": chelsa_col,

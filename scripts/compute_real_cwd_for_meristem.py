@@ -230,9 +230,9 @@ def main():
     print("=== Terrain + soils (local, transient full download, fast local extraction) ===", flush=True)
     elevation, slope, aspect, concavity, z_ref_m, row_px, col_px, clay_pct, sand_pct, soc_g_kg = \
         extract_terrain_soils_local(lats, lons, token)
-    valid_soil = ~np.isnan(clay_pct)
-    print(f"  {valid_soil.sum()}/{n} points have real soil data", flush=True)
     soil = soil_hydraulic_parameters(sand_pct, clay_pct, soc_g_kg)
+    valid_soil = np.isfinite(clay_pct) & np.isfinite(sand_pct) & np.isfinite(soc_g_kg) & np.all([np.isfinite(v) for v in soil.values()], axis=0)
+    print(f"  {valid_soil.sum()}/{n} points have real soil data", flush=True)
     # Real per-group w_max_mm (cheap, local): each real functional group's own rooting depth,
     # not one flat value shared by every species -- see run_topohydro_grid.py's module docstring.
     w_max_mm_by_group = {g: (soil["theta_fc"] - soil["theta_lim"]) * rd

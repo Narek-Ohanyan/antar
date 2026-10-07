@@ -2023,3 +2023,13 @@ municipality" (the WSL page speaks only of "improved climate services"). The sta
   (`skipped_nonfinite_water_balance`); `tests/test_era5_mask.py`. The validation grid and the validation-grid scenario file contain no NaN, so they are
   unaffected. The dense TOPOHYDRO, XYLEM and REFUGIUM outputs committed earlier today contain the three bad nodes; they are being recomputed (dense chain
   restarted, MNEME dense with it) together with the dense scenario run, which was restarted from scratch with the fixed mask.
+
+### Correction, 2026-10-07: the cause of the three spurious zero hazards was the soil, not ERA5-Land
+
+The entry above blamed missing ERA5-Land radiation and dew point. Checking the cached inputs showed all five ERA5-Land bands and the ISIMIP atmosphere factors are finite at the
+three nodes; what is NaN is the soil hydraulic parameters (theta_sat, theta_fc, theta_lim, psi_sat, b) derived from SoilGrids. `valid_soil` tested only the clay value, so the nodes
+ran. Real fix: `soil_complete()` requires every raw soil value and every derived parameter to be finite, at extraction and when the cached inputs are loaded
+(`tests/test_node_masks.py`). The ERA5 check (`era5_complete()`) stays as a sensible guard but was not the cause. The XYLEM and REFUGIUM dense outputs and the dense scenario run
+were computed with the old mask; rather than recompute hours of Monte Carlo, `scripts/drop_invalid_nodes.py` removes the three nodes TOPOHYDRO rejects from them and recomputes the
+summary fields (nodes are independent and seeded by grid index, so the remaining nodes are exactly what a rerun would give). It has been applied to the XYLEM and REFUGIUM
+dense files (854 cells per group now); the dense scenario file gets the same treatment when that run finishes. The dense MNEME panel was restarted so that it uses the fixed mask.

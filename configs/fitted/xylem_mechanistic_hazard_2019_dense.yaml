@@ -21,8 +21,8 @@ groups:
     hyper_sd_source_n:
       p50: 81
       slope: 44
-    n_cells: 857
-    h_mech_mean_across_cells: 0.00811808634772462
+    n_cells: 854
+    h_mech_mean_across_cells: 0.008146604215456675
     cells:
     - lat: 41.27916666666667
       lon: 44.979166666666664
@@ -1061,13 +1061,6 @@ groups:
       h_mech_max: 0.54
       h_mech_outer_spread_sd: 0.10156677606382908
     - lat: 40.87083333333333
-      lon: 43.75416666666666
-      elevation_m: 1699.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
-    - lat: 40.87083333333333
       lon: 43.8125
       elevation_m: 1734.0
       h_mech_mean: 0.023399999999999994
@@ -1340,13 +1333,6 @@ groups:
       h_mech_min: 0.0
       h_mech_max: 0.005
       h_mech_outer_spread_sd: 0.0007000000000000001
-    - lat: 40.8125
-      lon: 44.22083333333333
-      elevation_m: 1619.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
     - lat: 40.8125
       lon: 44.27916666666667
       elevation_m: 1620.0
@@ -4904,13 +4890,6 @@ groups:
       h_mech_max: 0.045
       h_mech_outer_spread_sd: 0.010176443386566841
     - lat: 39.762499999999996
-      lon: 45.62083333333334
-      elevation_m: 1794.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
-    - lat: 39.762499999999996
       lon: 45.67916666666667
       elevation_m: 2449.0
       h_mech_mean: 0.0118
@@ -6035,8 +6014,8 @@ groups:
     hyper_sd_source_n:
       p50: 37
       slope: 16
-    n_cells: 857
-    h_mech_mean_across_cells: 0.053220303383897306
+    n_cells: 854
+    h_mech_mean_across_cells: 0.05340725995316158
     cells:
     - lat: 41.27916666666667
       lon: 44.979166666666664
@@ -7075,13 +7054,6 @@ groups:
       h_mech_max: 1.0
       h_mech_outer_spread_sd: 0.27378219445391266
     - lat: 40.87083333333333
-      lon: 43.75416666666666
-      elevation_m: 1699.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
-    - lat: 40.87083333333333
       lon: 43.8125
       elevation_m: 1734.0
       h_mech_mean: 0.07479999999999999
@@ -7354,13 +7326,6 @@ groups:
       h_mech_min: 0.0
       h_mech_max: 0.35
       h_mech_outer_spread_sd: 0.06603453641845303
-    - lat: 40.8125
-      lon: 44.22083333333333
-      elevation_m: 1619.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
     - lat: 40.8125
       lon: 44.27916666666667
       elevation_m: 1620.0
@@ -10918,13 +10883,6 @@ groups:
       h_mech_max: 0.995
       h_mech_outer_spread_sd: 0.19004799393837335
     - lat: 39.762499999999996
-      lon: 45.62083333333334
-      elevation_m: 1794.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
-    - lat: 39.762499999999996
       lon: 45.67916666666667
       elevation_m: 2449.0
       h_mech_mean: 0.1208
@@ -12049,8 +12007,8 @@ groups:
     hyper_sd_source_n:
       p50: 51
       slope: 31
-    n_cells: 857
-    h_mech_mean_across_cells: 4.632438739789965e-05
+    n_cells: 854
+    h_mech_mean_across_cells: 4.648711943793911e-05
     cells:
     - lat: 41.27916666666667
       lon: 44.979166666666664
@@ -13089,13 +13047,6 @@ groups:
       h_mech_max: 0.005
       h_mech_outer_spread_sd: 0.0007000000000000001
     - lat: 40.87083333333333
-      lon: 43.75416666666666
-      elevation_m: 1699.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
-    - lat: 40.87083333333333
       lon: 43.8125
       elevation_m: 1734.0
       h_mech_mean: 0.0
@@ -13364,13 +13315,6 @@ groups:
     - lat: 40.8125
       lon: 44.1625
       elevation_m: 1946.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
-    - lat: 40.8125
-      lon: 44.22083333333333
-      elevation_m: 1619.0
       h_mech_mean: 0.0
       h_mech_min: 0.0
       h_mech_max: 0.0
@@ -16932,13 +16876,6 @@ groups:
       h_mech_max: 0.0
       h_mech_outer_spread_sd: 0.0
     - lat: 39.762499999999996
-      lon: 45.62083333333334
-      elevation_m: 1794.0
-      h_mech_mean: 0.0
-      h_mech_min: 0.0
-      h_mech_max: 0.0
-      h_mech_outer_spread_sd: 0.0
-    - lat: 39.762499999999996
       lon: 45.67916666666667
       elevation_m: 2449.0
       h_mech_mean: 0.0001
@@ -18054,3 +17991,5 @@ groups:
   juniper_arid_conifer:
     status: skipped_no_real_trait_variance_estimate
     example_taxa: Juniperus polycarpos; J. excelsa
+dropped_nodes: 9 cell records of nodes TOPOHYDRO rejected (non-finite soil parameters)
+  removed by scripts/drop_invalid_nodes.py

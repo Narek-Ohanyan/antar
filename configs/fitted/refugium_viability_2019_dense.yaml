@@ -14,10 +14,10 @@ groups:
   mesic_diffuse_porous_broadleaf:
     status: ok
     example_taxa: Fagus orientalis; Carpinus betulus
-    n_cells: 857
-    n_robust_refugia_criterion_a: 857
-    mean_viability_across_cells: 0.9918819136522754
-    mean_refugium_score_across_cells: 0.9999598891481914
+    n_cells: 854
+    n_robust_refugia_criterion_a: 854
+    mean_viability_across_cells: 0.9918533957845433
+    mean_refugium_score_across_cells: 0.9999597482435598
     cells:
     - lat: 41.27916666666667
       lon: 44.979166666666664
@@ -1796,18 +1796,6 @@ groups:
       wsi: 66.72333381663454
       psi_min_mpa: -0.6883916826361319
     - lat: 40.87083333333333
-      lon: 43.75416666666666
-      elevation_m: 1699.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
-    - lat: 40.87083333333333
       lon: 43.8125
       elevation_m: 1734.0
       viability_ensemble_mean: 0.9765999999999999
@@ -2275,18 +2263,6 @@ groups:
       cwd_mm: 25.651705089734744
       wsi: 29.10476459828614
       psi_min_mpa: -0.45362434615791375
-    - lat: 40.8125
-      lon: 44.22083333333333
-      elevation_m: 1619.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
     - lat: 40.8125
       lon: 44.27916666666667
       elevation_m: 1620.0
@@ -8384,18 +8360,6 @@ groups:
       wsi: 102.15226456444768
       psi_min_mpa: -0.9410320040536521
     - lat: 39.762499999999996
-      lon: 45.62083333333334
-      elevation_m: 1794.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
-    - lat: 39.762499999999996
       lon: 45.67916666666667
       elevation_m: 2449.0
       viability_ensemble_mean: 0.9882
@@ -10306,10 +10270,10 @@ groups:
   ring_porous_oak:
     status: ok
     example_taxa: Quercus macranthera; Q. iberica
-    n_cells: 857
-    n_robust_refugia_criterion_a: 857
-    mean_viability_across_cells: 0.9467796966161025
-    mean_refugium_score_across_cells: 0.9916109976662778
+    n_cells: 854
+    n_robust_refugia_criterion_a: 854
+    mean_viability_across_cells: 0.9465927400468385
+    mean_refugium_score_across_cells: 0.9915815281030445
     cells:
     - lat: 41.27916666666667
       lon: 44.979166666666664
@@ -12088,18 +12052,6 @@ groups:
       wsi: 66.72333381663454
       psi_min_mpa: -0.6883916826361319
     - lat: 40.87083333333333
-      lon: 43.75416666666666
-      elevation_m: 1699.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
-    - lat: 40.87083333333333
       lon: 43.8125
       elevation_m: 1734.0
       viability_ensemble_mean: 0.9251999999999999
@@ -12567,18 +12519,6 @@ groups:
       cwd_mm: 25.651705089734744
       wsi: 29.10476459828614
       psi_min_mpa: -0.45362434615791375
-    - lat: 40.8125
-      lon: 44.22083333333333
-      elevation_m: 1619.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
     - lat: 40.8125
       lon: 44.27916666666667
       elevation_m: 1620.0
@@ -18676,18 +18616,6 @@ groups:
       wsi: 102.15226456444768
       psi_min_mpa: -0.9410320040536521
     - lat: 39.762499999999996
-      lon: 45.62083333333334
-      elevation_m: 1794.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
-    - lat: 39.762499999999996
       lon: 45.67916666666667
       elevation_m: 2449.0
       viability_ensemble_mean: 0.8792
@@ -20598,9 +20526,9 @@ groups:
   pine:
     status: ok
     example_taxa: Pinus kochiana
-    n_cells: 857
-    n_robust_refugia_criterion_a: 857
-    mean_viability_across_cells: 0.9999536756126021
+    n_cells: 854
+    n_robust_refugia_criterion_a: 854
+    mean_viability_across_cells: 0.999953512880562
     mean_refugium_score_across_cells: 1.0
     cells:
     - lat: 41.27916666666667
@@ -22380,18 +22308,6 @@ groups:
       wsi: 31.748151585966795
       psi_min_mpa: -0.4738841872831024
     - lat: 40.87083333333333
-      lon: 43.75416666666666
-      elevation_m: 1699.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
-    - lat: 40.87083333333333
       lon: 43.8125
       elevation_m: 1734.0
       viability_ensemble_mean: 1.0
@@ -22859,18 +22775,6 @@ groups:
       cwd_mm: 0.0
       wsi: 0.0
       psi_min_mpa: -0.24357317199189077
-    - lat: 40.8125
-      lon: 44.22083333333333
-      elevation_m: 1619.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
     - lat: 40.8125
       lon: 44.27916666666667
       elevation_m: 1620.0
@@ -28968,18 +28872,6 @@ groups:
       wsi: 72.5106809633985
       psi_min_mpa: -0.6599275494424764
     - lat: 39.762499999999996
-      lon: 45.62083333333334
-      elevation_m: 1794.0
-      viability_ensemble_mean: 1.0
-      viability_ensemble_min: 1.0
-      viability_ensemble_max: 1.0
-      refugium_score: 1.0
-      robust_refugium_criterion_a: true
-      p_viable: 1.0
-      cwd_mm: .nan
-      wsi: 365.0
-      psi_min_mpa: .nan
-    - lat: 39.762499999999996
       lon: 45.67916666666667
       elevation_m: 2449.0
       viability_ensemble_mean: 0.9999000000000001
@@ -30889,3 +30781,5 @@ groups:
       psi_min_mpa: -0.8444020060289473
   juniper_arid_conifer:
     status: skipped_no_real_trait_variance_estimate
+dropped_nodes: 9 cell records of nodes TOPOHYDRO rejected (non-finite soil parameters)
+  removed by scripts/drop_invalid_nodes.py
