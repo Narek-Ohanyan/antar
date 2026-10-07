@@ -69,7 +69,25 @@ const PAGES = {
 };
 const NAV = [["home", "Overview"], ["map", "Map"], ["treeline", "Treeline"], ["site", "Place explorer"], ["decision", "Decision"], ["models", "Models"], ["method", "Method"], ["status", "Status & limits"], ["refs", "References"], ["ack", "Acknowledgments"]];
 
+/* Phones: the ten pages live in a menu opened by the button in the bar (large tap targets); it closes on a choice, on Escape and on a tap outside. */
+function setMenu(open) {
+  const btn = $("#menu"), nav = $("#mainnav");
+  if (!btn || !nav) return;
+  nav.classList.toggle("open", open);
+  btn.setAttribute("aria-expanded", String(open));
+  btn.setAttribute("aria-label", open ? "Close the menu" : "Open the menu");
+  document.body.classList.toggle("menu-open", open);
+}
+function initMenu() {
+  const btn = $("#menu");
+  btn.addEventListener("click", () => setMenu(btn.getAttribute("aria-expanded") !== "true"));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && btn.getAttribute("aria-expanded") === "true") { setMenu(false); btn.focus(); } });
+  document.addEventListener("click", (e) => { if (btn.getAttribute("aria-expanded") === "true" && !e.target.closest("#mainnav, #menu")) setMenu(false); });
+  window.matchMedia("(min-width: 761px)").addEventListener("change", () => setMenu(false));
+}
+
 function route() {
+  setMenu(false);
   const page = (location.hash.replace(/^#\//, "").split("?")[0]) || "home";
   const fn = PAGES[page] || renderHome;
   $("nav").innerHTML = NAV.map(([k, t]) => `<a href="#/${k}" class="${k === page ? "active" : ""}">${t}</a>`).join("");
@@ -281,8 +299,7 @@ function renderModels() {
   view().innerHTML = `<div class="wrap"><h1>Models &amp; validation</h1>${banner()}
     <h2>MERISTEM — species niche</h2>
     ${me ? `<div class="card tablewrap"><table><thead><tr><th>Species</th><th>Status</th><th class="num">Presences</th><th class="num">Mean Boyce</th><th>Per-fold Boyce</th></tr></thead><tbody>${speciesRows}</tbody></table>
-      <p class="small muted" style="margin-top:8px">Boyce index under spatial block cross-validation: +1 = predictions track presences, 0 = no better than random, negative = worse. Folds are coloured accordingly.</p></div>
-      <div class="callout"><strong>Caveat.</strong> ${esc(me.cwd_caveat)}</div>` : "<p>MERISTEM has not been fitted.</p>"}
+      <p class="small muted" style="margin-top:8px">Boyce index under spatial block cross-validation: +1 = predictions track presences, 0 = no better than random, negative = worse. Folds are coloured accordingly.</p></div>` : "<p>MERISTEM has not been fitted.</p>"}
     <h2>MNEME — observed dieback</h2>
     ${mn ? `<div class="card"><div class="grid cols-4"><div class="stat"><div class="num">${mn.n_points_valid_kndvi ?? "—"}/${mn.n_points ?? "—"}</div><div class="cap">points with a usable satellite series</div></div><div class="stat"><div class="num">${(mn.n_person_years ?? 0).toLocaleString("en")}</div><div class="cap">person-years</div></div><div class="stat"><div class="num">${mn.n_events ?? "—"}</div><div class="cap">observed dieback events</div></div><div class="stat"><div class="num">${mn.status === "fitted" ? chip("good", "fitted") : chip("bad", "no fit")}</div><div class="cap">${esc((mn.status || "").replace(/_/g, " "))}</div></div></div>
       <p class="small muted" style="margin-top:10px">${esc(mn.scope_note || "")}</p></div>` : "<p>MNEME has not been run.</p>"}
@@ -316,26 +333,11 @@ function renderMethod() {
 }
 
 /* ---- Status & limits ---- */
-/* Which maps have results, which are waiting on a run, and which script produces what is missing. */
-function mapAvailability() {
-  const plan = state.M.map_plan || [];
-  if (!plan.length) return "";
-  const full = plan.filter((x) => x.scenario && (x.baseline || x.baseline === null)).length, base = plan.filter((x) => x.baseline && !x.scenario).length;
-  const mark = (v) => (v === null ? '<span class="muted">n/a</span>' : v ? chip("good", "ready") : chip("warn", "waiting"));
-  const rows = plan.map((x) => `<tr><td>${esc(x.label)}</td><td>${esc(x.group ? state.M.groups[x.group].short : "all")}</td><td>${mark(x.baseline)}</td><td>${mark(x.scenario)}</td><td class="small">${x.baseline === false ? `<code>${esc(x.baseline_from)}</code> (2019)` : ""}${x.baseline === false && !x.scenario ? "<br>" : ""}${!x.scenario ? `<code>${esc(x.scenario_from)}</code> (scenarios)` : ""}</td></tr>`).join("");
-  return `<h2>Which maps have results</h2><p class="small muted">${plan.length} maps are planned. ${full} have both 2019 and scenario results now; ${base} have 2019 only; the rest are waiting for the run named in the last column. Waiting maps are listed in the map's menu as "2019 only for now" or "no results yet" rather than shown empty.</p>
-    <div class="card tablewrap"><table><thead><tr><th>Map</th><th>Species</th><th>2019</th><th>Scenarios</th><th>Produced by</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-}
-
 function renderStatus() {
-  const m = state.meth, M = state.M;
-  const prov = Object.entries(M.provenance).map(([k, p]) => `<tr><td>${esc(p.dataset)}</td><td><code>${esc(p.file || "missing")}</code></td><td>${p.grid ? gridChip(p.grid) : "—"}</td><td class="num">${p.n_cells ?? "—"}</td><td>${(p.rejected || []).concat(p.withheld || []).map((r) => `<span class="small">${esc(r)}</span>`).join("<br>")}</td></tr>`).join("");
+  const m = state.meth;
   view().innerHTML = `<div class="wrap"><h1>Status &amp; limits</h1><h2>Engines</h2><div class="card tablewrap"><table><thead><tr><th>Engine</th><th>State</th></tr></thead><tbody>${m.engines.map((e) => `<tr><td><a href="#/method" data-jump="${e.id}">${esc(e.name)}</a></td><td>${esc(e.status)}</td></tr>`).join("")}</tbody></table></div>
-    ${mapAvailability()}
     <h2>Placeholders and assumptions</h2><div class="card tablewrap"><table><thead><tr><th>Quantity</th><th>Value used</th><th>Affects</th><th>State</th></tr></thead><tbody>${m.placeholders.map((p) => `<tr><td>${esc(p.name)}</td><td>${esc(p.value)}</td><td>${esc(p.effect)}</td><td>${esc(p.state)}</td></tr>`).join("")}</tbody></table></div>
-    <h2>Known gaps</h2><div class="card"><ul>${m.known_gaps.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>
-    <h2>Data lineage — which file each result comes from</h2><div class="card tablewrap"><table><thead><tr><th>Result</th><th>File used</th><th>Grid</th><th class="num">Cells</th><th>Notes</th></tr></thead><tbody>${prov}</tbody></table>
-      <p class="small muted" style="margin-top:8px">Generated ${esc(M.generated)}. A dense-grid file is used only if it covers at least ${Math.round(100 * M.dense_min_coverage)}% of the dense grid; otherwise it is listed here as rejected.</p></div></div>`;
+    <h2>Known gaps</h2><div class="card"><ul>${m.known_gaps.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div></div>`;
   view().querySelectorAll("[data-jump]").forEach((a) => a.addEventListener("click", () => sessionStorageSafe("jump", a.dataset.jump)));
 }
 
@@ -454,4 +456,4 @@ function toggleTheme() {
   try { localStorage.setItem("antar_theme", next); } catch (e) { /* ignore */ }
 }
 try { const t = localStorage.getItem("antar_theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) { /* ignore */ }
-document.addEventListener("DOMContentLoaded", () => { $("#theme").addEventListener("click", toggleTheme); initCite(); init(); });
+document.addEventListener("DOMContentLoaded", () => { $("#theme").addEventListener("click", toggleTheme); initMenu(); initCite(); init(); });

@@ -264,9 +264,7 @@ def main():
                             "not uniform random, shared across all species' fits.",
         "n_background_total": int(len(background_ll)),
         "features": FEATURE_NAMES,
-        "cwd_caveat": "cwd_approx_mm = petmean - bio12 (annual, CHELSA-BIOCLIM+), a simplified "
-                      "proxy -- not the real AET-based CWD, which needs TOPOHYDRO's full water "
-                      "balance (not yet run against real data). Replace once that exists.",
+        "cwd_caveat": ("cwd_approx_mm = petmean - bio12 (annual, CHELSA-BIOCLIM+), a simplified proxy -- not the water-balance climatic water deficit (CWD = sum of PET - AET). TOPOHYDRO's water balance now exists at the model's grid nodes, but these niche models have not been refit with it: that needs the water balance computed at each of the 3,524 occurrence and background points, which is queued. Until then the niche scores use the proxy."),
         "pooling_note": "An earlier version of this fit pooled all 7 species into one presence "
                         "class and got a weak, unstable result (mean Boyce 0.25, one fold "
                         "negative) -- diagnosed as pooling ecologically disparate species "

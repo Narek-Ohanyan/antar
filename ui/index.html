@@ -10,14 +10,17 @@
   <link rel="preload" href="assets/fonts/source-sans-3-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="icon" href="assets/antar_logo.jpeg">
-  <link rel="stylesheet" href="styles.css?v=5bb65bf350">
+  <link rel="stylesheet" href="styles.css?v=25a77671aa">
 </head>
 <body>
   <a class="skip" href="#view">Skip to main content</a>
   <header class="topbar" id="topbar">
     <div class="wrap">
       <a class="brand" href="#/home" aria-label="ANTAR — home"><img class="brand-logo" src="assets/antar_logo.jpeg" alt="ANTAR"></a>
-      <nav aria-label="Main"></nav>
+      <nav id="mainnav" aria-label="Main"></nav>
+      <button class="menu-btn" id="menu" type="button" aria-expanded="false" aria-controls="mainnav" aria-label="Open the menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="m-open" d="M4 7h16M4 12h16M4 17h16"/><path class="m-close" d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
       <button class="theme-btn" id="theme" type="button" title="Switch light / dark theme" aria-label="Switch light or dark theme">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor" stroke="none"/></svg>
       </button>
@@ -56,13 +59,13 @@
     </div>
     <div class="legal"><div class="wrap">© 2026 Narek Ohanyan. All rights reserved. Third-party data, fonts and libraries keep their own licences.</div></div>
   </footer>
-  <script>window.ANTAR_BUILD = "5bb65bf350";</script>
+  <script>window.ANTAR_BUILD = "25a77671aa";</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="charts.js?v=5bb65bf350"></script>
-  <script src="interp.js?v=5bb65bf350"></script>
-  <script src="map.js?v=5bb65bf350"></script>
-  <script src="place.js?v=5bb65bf350"></script>
-  <script src="math.js?v=5bb65bf350"></script>
-  <script src="app.js?v=5bb65bf350"></script>
+  <script src="charts.js?v=25a77671aa"></script>
+  <script src="interp.js?v=25a77671aa"></script>
+  <script src="map.js?v=25a77671aa"></script>
+  <script src="place.js?v=25a77671aa"></script>
+  <script src="math.js?v=25a77671aa"></script>
+  <script src="app.js?v=25a77671aa"></script>
 </body>
 </html>
