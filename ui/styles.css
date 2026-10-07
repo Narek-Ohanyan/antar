@@ -169,7 +169,7 @@ label { display: block; font-size: .72rem; font-weight: 700; text-transform: upp
 
 /* ---------- map and place explorer ---------- */
 .maplayout { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 20px; align-items: start; }
-@media (max-width: 900px) { .maplayout { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .maplayout { grid-template-columns: minmax(0, 1fr); } }   /* minmax(0,..): a select with a long option must not widen the page */
 #map { height: min(74vh, 720px); min-height: 400px; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface-2); }
 .legend { margin-top: 12px; }
 .legend .bar { height: 12px; border-radius: 2px; border: 1px solid var(--border); }
@@ -213,6 +213,7 @@ svg.chart .whisker { stroke: var(--text); stroke-width: 1.6; opacity: .7; }
 .engine li { margin-bottom: .6em; }
 .plainbox li { font-size: 1.04rem; }
 .refitem { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.refitem { overflow-wrap: anywhere; }       /* dataset identifiers such as aegis_ecosystem_services_value_and_restoration_cost have no break points */
 .refitem .t { font-weight: 700; }
 .loading { padding: 80px 0; text-align: center; color: var(--muted); }
 
