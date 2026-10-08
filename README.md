@@ -17,7 +17,7 @@ Version 2.0.0. The honest summary of what it can and cannot say is on the site's
 
 ```bash
 pip install -e ".[dev]"      # numpy, scipy, pandas, scikit-learn, pyyaml (+ pytest, matplotlib)
-python -m pytest             # the full suite takes several minutes (it starts a real Apache to test the deployment rules)
+python -m pytest             # about a minute on a fresh checkout (it builds the web data first and starts a real Apache to test the deployment rules); tests that need the raw rasters are skipped
 python ui/build_data.py      # builds the web data from configs/fitted/ (needs only pyyaml and numpy)
 python scripts/serve_ui.py   # http://localhost:8765
 ```
