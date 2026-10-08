@@ -63,7 +63,11 @@
     };
     const marzOfCell = u.lat.map((la, i) => regionAt(la, u.lon[i]));
     const ctx = { groupLabel, methodCost: (m) => (costOf[m] != null ? costOf[m] : null), methods, marzOf: (i) => marzOfCell[i] };
-    const bySel = new Map(units.budgets.map((b) => [b.budget_usd, b.selected]));
+    /* A cap on the share of any one species group is a second, optional dimension: each cap has its own sweep over the budgets. A cap whose solves failed is not offered. */
+    const capsOk = Object.entries(ae.diversity_sweep || {}).filter(([cap, rows]) => rows.length === sw.length && rows.every((r) => r.n_units_planted != null) && (units.capped || {})[cap]);
+    const sweeps = { none: sw, ...Object.fromEntries(capsOk) };
+    const selectionsOf = (cap) => new Map((cap === "none" ? units.budgets : units.capped[cap]).map((b) => [b.budget_usd, b.selected]));
+    let capNow = "none", curSweep = sw, bySel = selectionsOf("none");
     const $ = (q) => host.querySelector(q);
     const short = (g) => groupLabel(g).replace(/\s*\(.*\)/, "");
     const cssv = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -109,13 +113,14 @@
     }
 
     function render(idx) {
-      const r = sw[idx];
+      const r = curSweep[idx], base = sw[idx];
       paint(r.budget_usd);
       $("#dbudget").textContent = money(r.budget_usd);
-      $("#dslider").setAttribute("aria-valuetext", `${money(r.budget_usd)}: ${r.n_units_planted} cells, ${ha(r.area_ha)}`);
+      $("#dslider").setAttribute("aria-valuetext", `${money(r.budget_usd)}: ${r.n_units_planted} cells, ${ha(r.area_ha)}${capNow === "none" ? "" : `, no species group above ${Math.round(100 * +capNow)}% of the treated area`}`);
       $("#dstats").innerHTML = `<div><dt>Cells treated</dt><dd>${r.n_units_planted}<small>of ${ae.n_eligible_units} candidates</small></dd></div><div><dt>Open land treated</dt><dd>${ha(r.area_ha)}</dd></div>
         <div><dt>Cost</dt><dd>${money(r.cost_usd)}<small>of the ${money(r.budget_usd)} budget</small></dd></div><div><dt>Expected benefit</dt><dd>${Math.round(r.expected).toLocaleString("en")}<small>$/yr</small></dd></div>
-        <div><dt>Worst 20% of scenarios</dt><dd>${Math.round(r.cvar).toLocaleString("en")}<small>$/yr</small></dd></div>`;
+        <div><dt>Worst 20% of scenarios</dt><dd>${Math.round(r.cvar).toLocaleString("en")}<small>$/yr</small></dd></div>` +
+        (capNow !== "none" && base.expected > 0 ? `<div><dt>Cost of the cap</dt><dd>${(100 * (1 - r.expected / base.expected)).toFixed(1)}%<small>of the expected benefit without a cap</small></dd></div>` : "");
       side();
       $("#dcell").innerHTML = '<span class="muted">Point at a cell on the map to see what it holds.</span>';
     }
@@ -133,8 +138,12 @@
     map.on("click", (e) => { const i = cellAt(u, e.latlng.lat, e.latlng.lng); pinned = i === pinned ? -1 : i; $("#dcell").innerHTML = describe(i); });
     map.on("mouseout", () => { if (pinned < 0) $("#dcell").innerHTML = describe(-1); });
 
-    const slider = $("#dslider");
+    const slider = $("#dslider"), capSel = $("#dcap");
     slider.addEventListener("input", () => { pinned = -1; render(+slider.value); });
+    if (capSel) {
+      capSel.innerHTML = [["none", "No limit"]].concat(Object.keys(sweeps).filter((k) => k !== "none").map((k) => [k, `${Math.round(100 * +k)}% of the treated area`])).map(([k, t]) => `<option value="${k}">${esc(t)}</option>`).join("");
+      capSel.addEventListener("change", () => { capNow = capSel.value; curSweep = sweeps[capNow]; bySel = selectionsOf(capNow); pinned = -1; render(+slider.value); });
+    }
     $("#dcsv").addEventListener("click", () => {
       const url = URL.createObjectURL(new Blob([csv(current.rows)], { type: "text/csv;charset=utf-8" }));
       const a = document.createElement("a"); a.href = url; a.download = `antar_portfolio_${Math.round(current.budget / 1e6)}M.csv`; document.body.appendChild(a); a.click(); a.remove();

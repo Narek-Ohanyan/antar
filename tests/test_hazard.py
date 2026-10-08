@@ -270,3 +270,34 @@ def test_gating_weights_and_blend():
     assert h[0] == pytest.approx(0.2)
     h = gating.blend_hazards(np.array([0.01]), np.array([0.2]), np.array([1.0]))
     assert h[0] == pytest.approx(0.01)
+
+
+def test_a_flagged_harvest_is_not_read_as_dieback_in_the_years_after_it():
+    n = 22
+    x = np.full(n, 0.6)
+    x += 0.005 * np.sin(np.arange(n))                  # a little spread, so the trailing sd is positive
+    x[12:] = 0.05                                      # harvest in year 12, the stand stays cleared
+    nd = np.ones(n, dtype=bool)
+    nd[12] = False
+    ev = observation.dieback_event(x, nd, trailing_window=10, recovery_seasons=2)
+    assert not ev.any()                                # not at 12 (flagged), and not at 13+ (a continuation of the same collapse)
+
+
+def test_a_loss_flagged_in_the_year_before_the_onset_still_suppresses_it():
+    n = 22
+    x = np.full(n, 0.6) + 0.005 * np.sin(np.arange(n))
+    x[13:] = 0.05                                      # the composite only shows the collapse in year 13 ...
+    nd = np.ones(n, dtype=bool)
+    nd[12] = False                                     # ... but the loss was recorded in year 12
+    assert not observation.dieback_event(x, nd, trailing_window=10).any()
+    assert observation.dieback_event(x, nd, trailing_window=10, disturbance_lookback=0)[13]     # with no lookback the onset would be accepted
+
+
+def test_a_continuing_decline_is_one_event_when_the_run_start_is_required():
+    n = 24
+    x = np.full(n, 0.6) + 0.005 * np.sin(np.arange(n))
+    x[12:] = 0.05
+    nd = np.ones(n, dtype=bool)
+    ev = observation.dieback_event(x, nd, trailing_window=10)
+    assert ev[12] and ev.sum() == 1
+    assert observation.dieback_event(x, nd, trailing_window=10, require_run_start=False).sum() > 1

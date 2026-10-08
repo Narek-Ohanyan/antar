@@ -245,6 +245,8 @@ class DriveCoverageError(RuntimeError):
     its own coverage. Fail loudly instead and let the caller retry once Drive recovers."""
 
 
+TERRAIN_CHUNK = 100          # points read per open connection
+TERRAIN_POINT_TRIES = 3      # reads of one point before it is left NaN
 MAX_LOST_FRACTION = 0.03  # >3% of points lost to read failures (beyond legitimately-missing soil) = abort
 RETRY_SLEEPS_S = [5, 30, 120]  # exponential-ish backoff: a Drive disruption can last minutes, not seconds
 
@@ -254,58 +256,68 @@ def drive_vsicurl_url(file_id: str) -> str:
 
 
 def extract_terrain(token, lats, lons):
-    """Real per-point terrain windows (concavity + coarse z_ref), retried per-point with a fresh
+    """Real per-point terrain windows (concavity + coarse z_ref), retried per point with a fresh
     connection/token on transient failure. One connection serving all N points was fine at 80
     points but a real risk at the 1044-point dense grid: any single transient vsicurl failure
     partway through would previously crash the whole function and lose all prior points' work --
-    a real concern for an unattended multi-hour overnight run. Re-opening per point costs a little
-    overhead but bounds the real damage of one bad point to that point alone (left NaN after 3
-    failed attempts), not a full restart."""
-    xs, ys = None, None
+    a real concern for an unattended multi-hour overnight run. Points are read in chunks of
+    ``TERRAIN_CHUNK`` on one open connection (opening the raster once per point cost most of the time
+    at thousands of points); a read that fails is retried on a fresh connection and a point that
+    fails ``TERRAIN_POINT_TRIES`` times is left NaN, so one bad point cannot lose the others."""
     n = len(lats)
     elevation, slope, aspect, concavity, z_ref = (np.full(n, np.nan) for _ in range(5))
     row_px, col_px = np.zeros(n, dtype=int), np.zeros(n, dtype=int)
     failed_points = []
+    tries = np.zeros(n, dtype=int)
 
-    for i in range(n):
-        last_err = None
-        for attempt in range(3):
+    def read_point(src, i):
+        x, y = warp_transform("EPSG:4326", src.crs, [lons[i]], [lats[i]])
+        x, y = x[0], y[0]
+        row, col = src.index(x, y)
+        row_px[i], col_px[i] = row, col
+
+        cw = CONCAVITY_WINDOW_PX
+        r0, r1 = max(0, row - cw), min(src.height, row + cw + 1)
+        c0, c1 = max(0, col - cw), min(src.width, col + cw + 1)
+        elev_win = src.read(1, window=Window(c0, r0, c1 - c0, r1 - r0))
+        slope_win = src.read(2, window=Window(c0, r0, c1 - c0, r1 - r0))
+        aspect_win = src.read(3, window=Window(c0, r0, c1 - c0, r1 - r0))
+        lr, lc = row - r0, col - c0
+        elevation[i] = elev_win[lr, lc]
+        slope[i] = slope_win[lr, lc]
+        aspect[i] = aspect_win[lr, lc]
+        concavity[i] = concavity_index(elev_win)[lr, lc]
+
+        rw = COARSE_REF_WINDOW_PX
+        r0c, r1c = max(0, row - rw), min(src.height, row + rw + 1)
+        c0c, c1c = max(0, col - rw), min(src.width, col + rw + 1)
+        coarse_win = src.read(1, window=Window(c0c, r0c, c1c - c0c, r1c - r0c))
+        z_ref[i] = float(np.nanmean(coarse_win))
+
+    for start in range(0, n, TERRAIN_CHUNK):
+        pending = list(range(start, min(n, start + TERRAIN_CHUNK)))
+        while pending:
             try:
                 fresh_token = get_access_token()
                 url = drive_vsicurl_url(TERRAIN_DRIVE_ID)
                 with rasterio.Env(GDAL_HTTP_HEADERS=f"Authorization: Bearer {fresh_token}", GDAL_DISABLE_READDIR_ON_OPEN="YES", GDAL_HTTP_TIMEOUT=30, GDAL_HTTP_CONNECTTIMEOUT=10):
                     with rasterio.open(url) as src:
-                        x, y = warp_transform("EPSG:4326", src.crs, [lons[i]], [lats[i]])
-                        x, y = x[0], y[0]
-                        row, col = src.index(x, y)
-                        row_px[i], col_px[i] = row, col
-
-                        cw = CONCAVITY_WINDOW_PX
-                        r0, r1 = max(0, row - cw), min(src.height, row + cw + 1)
-                        c0, c1 = max(0, col - cw), min(src.width, col + cw + 1)
-                        elev_win = src.read(1, window=Window(c0, r0, c1 - c0, r1 - r0))
-                        slope_win = src.read(2, window=Window(c0, r0, c1 - c0, r1 - r0))
-                        aspect_win = src.read(3, window=Window(c0, r0, c1 - c0, r1 - r0))
-                        lr, lc = row - r0, col - c0
-                        elevation[i] = elev_win[lr, lc]
-                        slope[i] = slope_win[lr, lc]
-                        aspect[i] = aspect_win[lr, lc]
-                        concavity[i] = concavity_index(elev_win)[lr, lc]
-
-                        rw = COARSE_REF_WINDOW_PX
-                        r0c, r1c = max(0, row - rw), min(src.height, row + rw + 1)
-                        c0c, c1c = max(0, col - rw), min(src.width, col + rw + 1)
-                        coarse_win = src.read(1, window=Window(c0c, r0c, c1c - c0c, r1c - r0c))
-                        z_ref[i] = float(np.nanmean(coarse_win))
-                last_err = None
-                break
-            except rasterio.errors.RasterioIOError as e:
-                last_err = e
+                        while pending:
+                            i = pending[0]
+                            try:
+                                read_point(src, i)
+                            except rasterio.errors.RasterioIOError:
+                                tries[i] += 1
+                                if tries[i] >= TERRAIN_POINT_TRIES:
+                                    failed_points.append(i)
+                                    pending.pop(0)
+                                    continue
+                                raise                      # reopen the connection and try the point again
+                            pending.pop(0)
+            except rasterio.errors.RasterioIOError:
                 time.sleep(2)
-        if last_err is not None:
-            failed_points.append(i)
-        if (i + 1) % 200 == 0:
-            print(f"    terrain: {i + 1}/{n}", flush=True)
+        if (start + TERRAIN_CHUNK) % 200 < TERRAIN_CHUNK:
+            print(f"    terrain: {min(n, start + TERRAIN_CHUNK)}/{n}", flush=True)
     if failed_points:
         print(f"  terrain: {len(failed_points)} point(s) failed all retries, left NaN", flush=True)
         if len(failed_points) / n > MAX_LOST_FRACTION:
@@ -494,6 +506,37 @@ def extract_static_grid_inputs(grid_rows=GRID_ROWS, grid_cols=GRID_COLS):
                       "row_px": row_px, "col_px": col_px, "valid_soil": valid_soil, **{f"soil__{k}": v for k, v in soil.items()}})
     print(f"=== cached static inputs -> {cache.name} ===", flush=True)
     return out
+
+
+def extract_static_points(lats, lons):
+    """The same static inputs as :func:`extract_static_grid_inputs`, for any list of points (species records, background points): terrain, soils and the pixel indices ERA5-Land needs.
+
+    A point's CHELSA cell is the 30-arcsecond pixel that holds it. Cached by the point set, like the grid inputs.
+    """
+    lats, lons = np.asarray(lats, dtype=float), np.asarray(lons, dtype=float)
+    n = len(lats)
+    pixel = (BBOX[3] - BBOX[1]) / CHELSA_GRID_SHAPE[0]
+    chelsa_row = np.clip(np.floor((BBOX[3] - lats) / pixel).astype(int), 0, CHELSA_GRID_SHAPE[0] - 1)
+    chelsa_col = np.clip(np.floor((lons - BBOX[0]) / pixel).astype(int), 0, CHELSA_GRID_SHAPE[1] - 1)
+    cache = CACHE_DIR / f"staticpts_{_points_key(lats, lons)}.npz"
+    if cache.exists():
+        z = np.load(cache)
+        soil = {k[6:]: z[k] for k in z.files if k.startswith("soil__")}
+        print(f"=== static inputs for {n} points loaded from {cache.name} (no Drive access) ===", flush=True)
+        return {"lats": lats, "lons": lons, "chelsa_row": chelsa_row, "chelsa_col": chelsa_col, "token": None, "elevation": z["elevation"], "slope": z["slope"], "aspect": z["aspect"],
+                "concavity": z["concavity"], "z_ref_m": z["z_ref_m"], "row_px": z["row_px"], "col_px": z["col_px"], "soil": soil, "valid_soil": z["valid_soil"] & soil_complete(soil)}
+    token = get_access_token()
+    print(f"=== Terrain for {n} points (streamed) ===", flush=True)
+    elevation, slope, aspect, concavity, z_ref_m, row_px, col_px = extract_terrain(token, lats, lons)
+    print("=== Soils (streamed) ===", flush=True)
+    clay_pct, sand_pct, soc_g_kg = extract_soils(token, lats, lons)
+    soil = soil_hydraulic_parameters(sand_pct, clay_pct, soc_g_kg)
+    valid_soil = soil_complete(soil, clay_pct, sand_pct, soc_g_kg)
+    print(f"  {valid_soil.sum()}/{n} points have real soil data", flush=True)
+    _save_npz(cache, {"elevation": elevation, "slope": slope, "aspect": aspect, "concavity": concavity, "z_ref_m": z_ref_m, "row_px": row_px, "col_px": col_px,
+                      "valid_soil": valid_soil, **{f"soil__{k}": v for k, v in soil.items()}})
+    return {"lats": lats, "lons": lons, "chelsa_row": chelsa_row, "chelsa_col": chelsa_col, "token": token, "elevation": elevation, "slope": slope, "aspect": aspect,
+            "concavity": concavity, "z_ref_m": z_ref_m, "row_px": row_px, "col_px": col_px, "soil": soil, "valid_soil": valid_soil}
 
 
 _CHELSA_CACHE: dict = {}

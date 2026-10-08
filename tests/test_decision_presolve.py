@@ -91,3 +91,59 @@ def test_the_presolve_is_still_exact_when_options_have_different_areas(seed):
     b = robust_portfolio(benefit, A, cost, budget, lam=0.5, presolve=True)
     assert (0.5 * b["expected"] + 0.5 * b["cvar"]) == pytest.approx(0.5 * a["expected"] + 0.5 * a["cvar"], rel=1e-7, abs=1e-7)
     assert float((b["x"] * A * cost).sum()) <= budget + 1e-6
+
+
+# ---- species-group share cap -------------------------------------------------------------------------------------------------------------------
+
+def group_problem(seed, U=14, C=4):
+    """Three options of group 0 (the same benefit at different costs) and two of group 1 (a worse benefit): without a cap the plan uses group 0 only."""
+    rng = np.random.default_rng(seed)
+    b0, b1 = rng.uniform(0.7, 1.0, (U, 1, C)), rng.uniform(0.2, 0.6, (U, 1, C))
+    benefit = np.concatenate([b0, b0, b0, b1, b1], axis=1)
+    cost = np.tile(np.array([3.0, 1.0, 2.0, 2.0, 1.0]), (U, 1))
+    area = rng.uniform(1.0, 3.0, U)
+    return benefit, area, cost, np.array([0, 0, 0, 1, 1])
+
+
+def group_shares(p, area, group):
+    planted = (p["x"] * area[:, None]).sum()
+    return {int(g): float((p["x"][:, group == g] * area[:, None]).sum() / planted) for g in np.unique(group)}
+
+
+def test_without_a_cap_the_better_group_takes_everything_and_with_one_it_does_not():
+    benefit, area, cost, group = group_problem(0)
+    free = robust_portfolio(benefit, area, cost, 1e9, group=group)
+    assert group_shares(free, area, group)[0] == pytest.approx(1.0)
+    capped = robust_portfolio(benefit, area, cost, 1e9, group=group, group_max_share=0.6)
+    sh = group_shares(capped, area, group)
+    assert sh[0] <= 0.6 + 1e-9 and sh[1] >= 0.4 - 1e-9
+    assert capped["expected"] < free["expected"]                               # diversity costs benefit
+
+
+def test_a_cap_below_one_over_the_number_of_groups_is_infeasible_unless_nothing_is_planted():
+    benefit, area, cost, group = group_problem(1)
+    p = robust_portfolio(benefit, area, cost, 1e9, group=group, group_max_share=0.4)       # two groups cannot each stay under 40 % of a plan
+    assert p["x"].sum() == 0
+
+
+@pytest.mark.parametrize("seed", range(4))
+@pytest.mark.parametrize("cap", [0.6, 0.75])               # not 0.5: with two groups that would force their areas to be exactly equal, a subset-sum problem
+def test_the_group_cap_optimum_is_the_same_with_and_without_the_presolve(seed, cap):
+    benefit, area, cost, group = group_problem(seed)
+    budget = 0.5 * float((area[:, None] * cost).max(axis=1).sum())
+    a = robust_portfolio(benefit, area, cost, budget, group=group, group_max_share=cap, presolve=False)
+    b = robust_portfolio(benefit, area, cost, budget, group=group, group_max_share=cap, presolve=True)
+    assert b["n_options_solved"] < a["n_options_solved"] == benefit.shape[1]            # the costlier copies inside each group are dropped
+    obj = lambda q: 0.5 * q["expected"] + 0.5 * q["cvar"]
+    assert obj(b) == pytest.approx(obj(a), rel=1e-7, abs=1e-7)
+    assert max(group_shares(b, area, group).values()) <= cap + 1e-9
+
+
+def test_dominance_never_crosses_groups_or_unequal_areas_when_a_group_cap_is_active():
+    benefit = np.ones((3, 2, 2))
+    cost = np.array([[1.0, 5.0]] * 3)
+    assert list(non_dominated_options(benefit, cost)) == [0]                                                   # no cap: the dearer copy goes
+    assert list(non_dominated_options(benefit, cost, group=np.array([0, 1]), area=np.ones((3, 2)))) == [0, 1]  # different groups: both stay
+    assert list(non_dominated_options(benefit, cost, group=np.array([0, 0]), area=np.ones((3, 2)))) == [0]     # same group, same area: dropped
+    areas = np.array([[2.0, 1.0]] * 3)
+    assert list(non_dominated_options(benefit, cost, group=np.array([0, 0]), area=areas)) == [0, 1]             # the copy acts on a different area, so the swap would move the group total

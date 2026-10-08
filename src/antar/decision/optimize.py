@@ -9,6 +9,7 @@ Benefit in scenario c:  B_c = sum_{u,j} A_u b_{ujc} x_{uj}     (b = viability x 
     s.t.       sum_j x_{uj} <= 1                     one option per unit
                sum_{u,j} A_u cost_{uj} x_{uj} <= budget
                area(option j) <= max_share * total planted area   (response diversity)
+               area(options of group g) <= group_max_share * total planted area   (species-group diversity)
                x_{uj} <= e_{uj}                      eligibility (outside applicability region / legally excluded -> 0)
                optional per-basin water-use cap
 """
@@ -20,18 +21,23 @@ from scipy.sparse import lil_matrix
 
 
 
-def non_dominated_options(benefit, cost, eligible=None):
+def non_dominated_options(benefit, cost, eligible=None, group=None, area=None):
     """Indices of the options worth keeping: drops every option that another option beats or ties.
 
     Option k makes option j unnecessary when, in every unit where j is allowed, k is allowed too, costs no more per hectare and gives at least the same benefit in
     every scenario (a tie in everything keeps the lower index). Any plan that uses j in a unit can use k there instead without costing more or benefiting less, so
     the optimum is unchanged. Only valid when no constraint couples units to specific options (no option-share cap, no water caps).
+
+    With a species-group cap, pass ``group`` (J,) and ``area`` (U, J): option k then makes option j unnecessary only when both belong to the same group and act on the same area in
+    every unit where j is allowed, so the swap leaves every group's planted area, and hence the cap, unchanged.
     """
     benefit = np.asarray(benefit, dtype=float)
     cost = np.asarray(cost, dtype=float)
     U, J, C = benefit.shape
     elig = np.ones((U, J), dtype=bool) if eligible is None else np.asarray(eligible, dtype=bool)
     keep = np.ones(J, dtype=bool)
+    grp = None if group is None else np.asarray(group)
+    ar = None if area is None else np.asarray(area, dtype=float)
     for j in range(J):
         for k in range(J):
             if k == j or not keep[k]:
@@ -40,6 +46,8 @@ def non_dominated_options(benefit, cost, eligible=None):
             if not rows.any():
                 keep[j] = False
                 break
+            if grp is not None and (grp[k] != grp[j] or (ar is not None and (ar[rows, k] != ar[rows, j]).any())):
+                continue
             if not elig[rows, k].all() or (cost[rows, k] > cost[rows, j]).any() or (benefit[rows, k, :] < benefit[rows, j, :]).any():
                 continue
             identical = (cost[rows, k] == cost[rows, j]).all() and (benefit[rows, k, :] == benefit[rows, j, :]).all() and (elig[:, k] == elig[:, j]).all()
@@ -51,7 +59,8 @@ def non_dominated_options(benefit, cost, eligible=None):
 
 def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: float = 0.5, alpha: float = 0.8,
                      max_share: float = 1.0, min_area: float = 0.0, water_use=None, water_caps=None, basin=None,
-                     eligible=None, presolve: bool = True, time_limit: float | None = None, mip_rel_gap: float | None = None):
+                     eligible=None, presolve: bool = True, time_limit: float | None = None, mip_rel_gap: float | None = None,
+                     group=None, group_max_share: float = 1.0):
     """Solve the portfolio problem.
 
     benefit : (U, J, C) per-hectare benefit of option j in unit u under scenario c
@@ -59,19 +68,25 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
               cost : (U, J) per-hectare cost;  budget : total cost cap
     water_use : (U, J) per-hectare extra water use; water_caps : {basin_id: cap}; basin : (U,) basin id
     eligible : (U, J) boolean mask; options with False can never be selected
-    presolve : drop options another option beats or ties (see :func:`non_dominated_options`); exact, and skipped when an option-share cap or water caps couple the options.
+    group, group_max_share : ``group`` (J,) gives each option a species-group id; the options of one group together may take at most ``group_max_share`` of the planted area (1 = no cap).
+    presolve : drop options another option beats or ties (see :func:`non_dominated_options`); exact, and skipped when an option-share cap or water caps couple the options. With a group cap only
+               options of the same group on identical areas are compared.
     time_limit : seconds for the MILP solver (None = no limit); mip_rel_gap : stop when the proven bound is within this relative gap of the best plan found (None = solver default).
     The result says whether optimality was proved and the gap that remained.
     Returns dict(x (U,J) binary, expected, cvar, scenario_benefit (C,), optimal (bool), mip_gap, n_options_solved).
     """
+    capped = group is not None and group_max_share < 1.0
     if presolve and max_share >= 1.0 and not water_caps:
         a2 = np.asarray(area, dtype=float)
         a2 = a2[:, None] if a2.ndim == 1 else a2
-        keep = non_dominated_options(np.asarray(benefit, dtype=float) * a2[:, :, None], np.asarray(cost, dtype=float) * a2, eligible)       # dominance on what a plan gets and pays in total
+        a2 = a2 * np.ones((1, np.asarray(benefit).shape[1]))
+        keep = non_dominated_options(np.asarray(benefit, dtype=float) * a2[:, :, None], np.asarray(cost, dtype=float) * a2, eligible,
+                                     group=np.asarray(group) if capped else None, area=a2 if capped else None)       # dominance on what a plan gets and pays in total
         if len(keep) < np.asarray(benefit).shape[1]:
             sub = robust_portfolio(np.asarray(benefit)[:, keep, :], np.asarray(area, dtype=float) if np.ndim(area) == 1 else np.asarray(area)[:, keep], np.asarray(cost)[:, keep], budget, scenario_weights=scenario_weights, lam=lam, alpha=alpha,
                                    max_share=max_share, min_area=min_area, eligible=None if eligible is None else np.asarray(eligible)[:, keep], presolve=False,
-                                   time_limit=time_limit, mip_rel_gap=mip_rel_gap)
+                                   time_limit=time_limit, mip_rel_gap=mip_rel_gap,
+                                   group=None if group is None else np.asarray(group)[keep], group_max_share=group_max_share)
             x = np.zeros(np.asarray(benefit).shape[:2])
             x[:, keep] = sub["x"]
             return {**sub, "x": x}
@@ -96,7 +111,8 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
     obj[is_:] = lam * w / (1 - alpha)
 
     rows, lo, hi = [], [], []
-    A_mat = lil_matrix((U + C + 1 + J + (len(water_caps) if water_caps else 0), n))
+    group_ids = np.unique(np.asarray(group)) if capped else np.array([], dtype=int)
+    A_mat = lil_matrix((U + C + 1 + J + len(group_ids) + (len(water_caps) if water_caps else 0), n))
     r = 0
     for u in range(U):                                   # one option per unit
         A_mat[r, u * J:(u + 1) * J] = 1
@@ -113,6 +129,12 @@ def robust_portfolio(benefit, area, cost, budget, scenario_weights=None, lam: fl
         col = np.zeros(nx)
         col[j::J] = A[:, j]
         A_mat[r, :nx] = col - max_share * total_area_expr
+        lo.append(-np.inf); hi.append(0.0); r += 1
+    for gid in group_ids:                                # species-group diversity: the group's area share of everything planted
+        col = np.zeros(nx)
+        for j in np.flatnonzero(np.asarray(group) == gid):
+            col[j::J] = A[:, j]
+        A_mat[r, :nx] = col - group_max_share * total_area_expr
         lo.append(-np.inf); hi.append(0.0); r += 1
     if water_caps:
         for b, cap in water_caps.items():

@@ -56,8 +56,13 @@ TARGET_SPECIES = [
 ]
 
 SOILS_DRIVE_FILE_ID = "18LRnI4Nsnlj6ks1UClGDe4BdufqUG24n"  # configs/manifests/gee_exports.yaml
-FEATURE_NAMES = ["bio06_winter_min_C", "gdd5", "vpdmean_Pa", "cwd_approx_mm",
+FEATURE_NAMES = ["bio06_winter_min_C", "gdd5", "vpdmean_Pa", "cwd_mm",
                   "clay_0_30cm_mean", "sand_0_30cm_mean", "silt_0_30cm_mean", "soc_0_30cm_mean"]
+CWD_COLUMN = FEATURE_NAMES.index("cwd_mm")
+REAL_CWD_PATH = DATA_DIR / "_real_cwd_for_meristem.npz"
+PRESENCE_OMISSION = 0.10      # the score below which a tenth of a species' own records fall is the presence threshold used when the model is applied (antar.niche.application)
+SPECIES_GROUP = {"Fagus orientalis": "mesic_diffuse_porous_broadleaf", "Carpinus betulus": "mesic_diffuse_porous_broadleaf", "Quercus macranthera": "ring_porous_oak",
+                 "Quercus iberica": "ring_porous_oak", "Pinus kochiana": "pine", "Juniperus polycarpos": "juniper_arid_conifer", "Juniperus excelsa": "juniper_arid_conifer"}
 
 
 def latlon_to_rc(lat, lon):
@@ -191,6 +196,38 @@ def build_or_load_features():
     return result
 
 
+def with_real_cwd(features):
+    """Replace the climatic-water-deficit column (the proxy ``petmean - bio12`` in the cache) by the real water-balance CWD of each point for the species' own functional group
+    (``compute_real_cwd_for_meristem.py``). The cache holds the points in a fixed order (each species' records, then the shared background); the real-CWD file keeps that order."""
+    z = np.load(REAL_CWD_PATH, allow_pickle=True)
+    labels = list(z["groups"])
+    out = {}
+    order = list(TARGET_SPECIES) + ["background"]
+    offsets, start = {}, 0
+    for k in order:
+        n = len(features[k][0])
+        offsets[k] = (start, start + n)
+        start += n
+    if start != len(labels):
+        raise ValueError(f"the real-CWD file has {len(labels)} points but the feature cache has {start}")
+    for k in order:
+        a, b = offsets[k]
+        if set(labels[a:b]) != {k} and b > a:
+            raise ValueError(f"the real-CWD file's points {a}:{b} are not '{k}' records")
+    for sp in TARGET_SPECIES:
+        ll, X = features[sp]
+        a, b = offsets[sp]
+        X = X.copy()
+        if len(X):
+            X[:, CWD_COLUMN] = z[f"real_cwd_mm__{SPECIES_GROUP[sp]}"][a:b]
+        bll, bX = features["background"]
+        a, b = offsets["background"]
+        bX = bX.copy()
+        bX[:, CWD_COLUMN] = z[f"real_cwd_mm__{SPECIES_GROUP[sp]}"][a:b]
+        out[sp] = (ll, X, bll, bX)
+    return out
+
+
 def fit_one_species(species, presence_ll, presence_X, background_ll, background_X):
     valid_p = np.all(np.isfinite(presence_X), axis=1)
     presence_ll, presence_X = presence_ll[valid_p], presence_X[valid_p]
@@ -224,6 +261,8 @@ def fit_one_species(species, presence_ll, presence_X, background_ll, background_
 
     final_model = fit_presence_background(presence_X, background_X)
     valid_scores = [s for s in boyce_scores if s is not None]
+    presence_scores = final_model.predict_proba(presence_X)[:, 1]
+    threshold = float(np.quantile(presence_scores, PRESENCE_OMISSION))
     return {
         "status": "fitted",
         "n_presence_after_nan_drop": int(len(presence_X)),
@@ -233,21 +272,23 @@ def fit_one_species(species, presence_ll, presence_X, background_ll, background_
             "boyce_index_per_fold": boyce_scores,
             "boyce_index_mean": round(float(np.mean(valid_scores)), 3) if valid_scores else None,
         },
-        "coefficients": {n: round(float(c), 5) for n, c in zip(FEATURE_NAMES, final_model.coef_[0])},
-        "intercept": round(float(final_model.intercept_[0]), 5),
+        "coefficients": {n: float(c) for n, c in zip(FEATURE_NAMES, final_model.coef_[0])},
+        "intercept": float(final_model.intercept_[0]),
+        "presence_threshold": {"omission": PRESENCE_OMISSION, "score": threshold, "n_records_below": int((presence_scores < threshold).sum())},
     }
 
 
 def main():
     features = build_or_load_features()
-    background_ll, background_X = features["background"]
-    print(f"\n=== Fitting per-species models against {len(background_ll)} shared background points ===", flush=True)
+    per_species = with_real_cwd(features)
+    background_ll = features["background"][0]
+    print(f"\n=== Fitting per-species models against {len(background_ll)} shared background points (real water-balance CWD of each species' group) ===", flush=True)
 
     results = {}
     for sp in TARGET_SPECIES:
-        presence_ll, presence_X = features[sp]
+        presence_ll, presence_X, bg_ll, bg_X = per_species[sp]
         print(f"\n--- {sp} ({len(presence_ll)} raw presence points) ---", flush=True)
-        r = fit_one_species(sp, presence_ll, presence_X, background_ll, background_X)
+        r = fit_one_species(sp, presence_ll, presence_X, bg_ll, bg_X)
         results[sp] = r
         if r["status"] == "fitted":
             print(f"  Boyce index per fold: {r['spatial_block_cv']['boyce_index_per_fold']}", flush=True)
@@ -256,7 +297,7 @@ def main():
             print(f"  {r['reason']}", flush=True)
 
     output = {
-        "fit_date": "2026-09-30",
+        "fit_date": __import__("datetime").date.today().isoformat(),
         "method": "Per-species penalised (L2) presence-background logistic regression "
                   "(antar.niche.adult.fit_presence_background), spatial-block CV (5-fold, "
                   "0.25deg blocks), scored with the continuous Boyce index.",
@@ -264,7 +305,8 @@ def main():
                             "not uniform random, shared across all species' fits.",
         "n_background_total": int(len(background_ll)),
         "features": FEATURE_NAMES,
-        "cwd_caveat": ("cwd_approx_mm = petmean - bio12 (annual, CHELSA-BIOCLIM+), a simplified proxy -- not the water-balance climatic water deficit (CWD = sum of PET - AET). TOPOHYDRO's water balance now exists at the model's grid nodes, but these niche models have not been refit with it: that needs the water balance computed at each of the 3,524 occurrence and background points, which is queued. Until then the niche scores use the proxy."),
+        "cwd_caveat": ("cwd_mm is the real water-balance climatic water deficit (TOPOHYDRO, PM-FAO56) for 2019 at each record, computed with the species group's own rooting depth (Canadell et al. 1996). "
+                       "The other climate predictors are 1981-2010 CHELSA-BIOCLIM+ normals, so one year of water deficit sits beside climatological predictors; 2019 is the project's single reference year."),
         "pooling_note": "An earlier version of this fit pooled all 7 species into one presence "
                         "class and got a weak, unstable result (mean Boyce 0.25, one fold "
                         "negative) -- diagnosed as pooling ecologically disparate species "
@@ -274,6 +316,7 @@ def main():
     }
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     import yaml
+    output["species_group"] = SPECIES_GROUP
     OUT_PATH.write_text(yaml.safe_dump(output, sort_keys=False))
     print(f"\nWrote {OUT_PATH}", flush=True)
 

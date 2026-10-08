@@ -97,3 +97,39 @@ def test_the_exported_cells_add_up_to_the_totals_the_page_shows():
         usd = sum(treated[i] * cost[U["intervention_ids"][m]] for i, _, m in b["selected"])
         assert area == pytest.approx(row["area_ha"], rel=1e-3) and usd == pytest.approx(row["cost_usd"], rel=1e-3)
         assert usd <= row["budget_usd"] * (1 + 1e-9)                                                  # the plan never spends more than the budget
+
+
+@pytest.mark.skipif(not built, reason="no portfolio built")
+def test_with_the_niche_every_treated_cell_is_within_the_niche_of_its_group_today():
+    U = json.loads(units_path.read_text())
+    u = U["units"]
+    if not u.get("niche_now"):
+        pytest.skip("this portfolio was built without the niche")
+    assert set(u["niche_now"]) == set(u["group_ids"]) and all(len(v) == len(u["lat"]) for v in u["niche_now"].values())
+    for b in U["budgets"] + [x for rows in (U.get("capped") or {}).values() for x in rows]:
+        for i, gi, _ in b["selected"]:
+            assert u["niche_now"][u["group_ids"][gi]][i] == 1                                        # a group is planted only where it can grow today
+            assert u["niche_member_share"][u["group_ids"][gi]][i] > 0                                # and it gives some benefit in some scenario
+
+
+@pytest.mark.skipif(not built, reason="no portfolio built")
+def test_a_capped_plan_never_gives_one_group_more_than_its_share_and_never_beats_the_uncapped_plan():
+    M, U = json.loads(manifest_path.read_text())["aegis"], json.loads(units_path.read_text())
+    if not U.get("capped"):
+        pytest.skip("no species-group caps in this portfolio")
+    u = U["units"]
+    treated = u.get("open_ha", u["area_ha"])
+    assert set(U["capped"]) == set(M["diversity_sweep"])
+    for cap, rows in U["capped"].items():
+        sweep = M["diversity_sweep"][cap]
+        assert [b["budget_usd"] for b in rows] == [r["budget_usd"] for r in M["budget_sweep"]]
+        for b, row, base in zip(rows, sweep, M["budget_sweep"]):
+            assert len(b["selected"]) == row["n_units_planted"]
+            total = sum(treated[i] for i, _, _ in b["selected"])
+            by_group = {}
+            for i, gi, _ in b["selected"]:
+                by_group[gi] = by_group.get(gi, 0.0) + treated[i]
+            if total:
+                assert max(by_group.values()) / total <= float(cap) + 1e-9                           # the cap holds
+            # the objective (half the mean, half the worst fifth) cannot be higher than without the cap; the solves are tight enough (0.01%) to see it
+            assert 0.5 * row["expected"] + 0.5 * row["cvar"] <= (0.5 * base["expected"] + 0.5 * base["cvar"]) * (1 + 3e-4)

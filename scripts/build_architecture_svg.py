@@ -141,7 +141,7 @@ def build():
     f.arrow([(0, -5.83), (0, -6.5)], dashed=True)
     f.arrow([(-3.4, -5.83), (-3.4, -7.1), (-2.7, -7.1)], dashed=True)
     f.box(0, -9.1, 9.4, 1.25, [("t", "REFUGIUM — viability, refugia, analogues"),
-                                ("x", "V^{(1)} = 1 − h^{mech}; robust refugium, criterion (a); risk-averse score"),
+                                ("x", "V^{(1)} = 1 − h^{mech}; robust refugium, criteria (a)(b)(c); risk-averse score"),
                                 ("s", "other hazards, height factor, criteria (b), (c), analogues: not computed")], st["refugium"])
     f.arrow([(-5.8, -5.83), (-5.8, -8.1), (-4.0, -8.1), (-4.0, -8.47)], label="h^{mech} (used)", label_at=(-5.7, -7.35))
     f.arrow([(0, -7.68), (0, -8.47)], dashed=True, label="h^{hyd}", label_at=(0.1, -8.1))

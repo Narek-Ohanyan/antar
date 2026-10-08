@@ -77,7 +77,7 @@ INCREMENTAL_SHARE = 0.75
 # Solver settings. Cells are nearly identical in benefit (about 3,200 ha, ~99% survival), so proving a tight gap only separates cells that differ by far less than the
 # uncertainty of the 417 USD/ha/yr value. The budget sweep is accepted within 0.5% of the proven bound; the frontier, whose two ends differ by very little, is solved much more
 # tightly so that the price of robustness can be told from solver noise. Whether each solve reached its gap is recorded.
-SWEEP_REL_GAP, SWEEP_TIME_S = 5e-3, 180
+SWEEP_REL_GAP, SWEEP_TIME_S = 1e-4, 300           # with the niche applied only two species groups remain after the presolve, so tight gaps solve quickly; a loose gap let a capped plan look better than the uncapped one
 FRONTIER_REL_GAP, FRONTIER_TIME_S = 1e-4, 180
 SENS_REL_GAP, SENS_TIME_S = 1e-2, 120
 GRID_STRIDE = 40           # CHELSA pixels between the nodes of the coarse validation grid (the dense grid's is DENSE_STRIDE)
@@ -115,6 +115,10 @@ for _i in INTERVENTIONS:
     _i["role"] = ROLE[_i["name"]]
 RANKED = [i for i in INTERVENTIONS if i["role"] == "restoration"]
 MIN_OPEN_SHARE = 0.10      # a cell is a candidate only if at least this share of it is open land (a cell that is nearly all forest, woodland or water has nothing to restore)
+
+# A species group may take at most this share of the area a plan treats; 1.0 is no cap. With two groups a cap of 0.5 would force their areas to be exactly equal, so the caps stay clear of that.
+GROUP_CAPS = [0.8, 0.65]
+NICHE_PATH = CONFIG_DIR / "fitted" / "meristem_niche_nodes_dense.yaml"
 
 # Real budget range (World Bank 2023): $9.3M (cheapest real option mix) to $663M (most expensive
 # single real option) for the 50,000 ha NDC target; $45M is the real figure tied to the
@@ -208,6 +212,32 @@ def load_future_projections(dense=False):
 
 
 
+def load_niche_support(lats, lons, scenario_names):
+    """Where each species group is within its climate niche (scripts/apply_meristem_niche.py), matched to these units by position.
+
+    Returns {group: {"status": "applied", "species_used", "baseline" (n,) bool, "members" (n, C) 0/1} or {"status": "not_assessed", "reason"}}, or None when the file does not exist.
+    A unit the niche file does not cover is not supported.
+    """
+    if not NICHE_PATH.exists():
+        return None
+    d = yaml.load(open(NICHE_PATH), Loader=yaml.CSafeLoader)
+    pos = {(round(a, 6), round(b, 6)): i for i, (a, b) in enumerate(zip(d["cells"]["lat"], d["cells"]["lon"]))}
+    idx = np.array([pos.get((round(float(a), 6), round(float(b), 6)), -1) for a, b in zip(lats, lons)])
+    ok = idx >= 0
+    out = {}
+    for g, e in d["groups"].items():
+        if e["status"] != "applied":
+            out[g] = {"status": "not_assessed", "reason": e["reason"]}
+            continue
+        base = np.zeros(len(lats), dtype=bool)
+        base[ok] = np.asarray(e["baseline"], dtype=bool)[idx[ok]]
+        mem = np.zeros((len(lats), len(scenario_names)))
+        for c, name in enumerate(scenario_names):
+            mem[ok, c] = np.asarray(e["members"][name], dtype=float)[idx[ok]]
+        out[g] = {"status": "applied", "species_used": e["species_used"], "baseline": base, "members": mem}
+    return out
+
+
 def allocation_summary(plan, area, cost, option_labels):
     """What a plan treats: units, hectares and cost in all, and the share by intervention method and by species group."""
     x = np.asarray(plan["x"]) > 0.5
@@ -255,6 +285,17 @@ def main():
 
     n = len(lats)
     C = len(scenario_names)
+    niche = load_niche_support(lats, lons, scenario_names) if dense else None
+    all_groups = list(group_names)
+    not_ranked_groups = []
+    if niche is not None:
+        for g in all_groups:
+            if niche.get(g, {"status": "not_assessed", "reason": "no niche result for this group"})["status"] != "applied":
+                not_ranked_groups.append({"name": g, "reason": niche.get(g, {}).get("reason", "no niche result for this group")})
+        group_names = [g for g in all_groups if g not in {x["name"] for x in not_ranked_groups}]
+        print(f"=== Niche applied: groups ranked {group_names}; not ranked {[x['name'] for x in not_ranked_groups]} ===", flush=True)
+    else:
+        print("=== meristem_niche_nodes_dense.yaml not found: survival only, no niche (stated in the output) ===", flush=True)
     J = len(group_names) * len(RANKED)
     print(f"=== {n} real units, {J} options ({len(group_names)} groups x {len(RANKED)} ranked restoration methods), "
           f"{C} scenarios ===", flush=True)
@@ -287,11 +328,13 @@ def main():
     option_labels = []
     j = 0
     for g in group_names:
+        support = np.ones((n, C)) if niche is None else niche[g]["members"]
+        planted_now = np.ones(n, dtype=bool) if niche is None else niche[g]["baseline"]
         for interv in RANKED:
-            benefit[:, j, :] = viability[g] * VALUE_PER_HA_YEAR * INCREMENTAL_SHARE
+            benefit[:, j, :] = viability[g] * support * VALUE_PER_HA_YEAR * INCREMENTAL_SHARE         # a member in which the species is outside its niche gives no benefit
             cost[:, j] = interv["cost_per_ha"]
             area[:, j] = open_ha
-            eligible[:, j] = candidate
+            eligible[:, j] = candidate & planted_now                                               # planted only where the species is within its niche today
             option_labels.append({"group": g, "intervention": interv["name"], "cost_basis": interv["cost_basis"]})
             j += 1
 
@@ -315,9 +358,18 @@ def main():
             "woodland_share": [round(float(v), 3) for v in covered["woodland"]], "water_share": [round(float(v), 3) for v in covered["water"]],
             "eligible": [bool(v) for v in candidate], "group_ids": list(group_names),
             "cell_deg": {"dlat": float(stride * px_lat), "dlon": float(stride * px_lon)},
+            "niche_now": {g: [int(v) for v in niche[g]["baseline"]] for g in group_names} if niche is not None else {},
+            "niche_member_share": {g: [round(float(v), 3) for v in niche[g]["members"].mean(axis=1)] for g in group_names} if niche is not None else {},
             "viability_mean": {g: [round(float(v), 4) for v in viability[g].mean(axis=1)] for g in group_names},
             "viability_worst20": {g: [round(float(v), 4) for v in np.sort(viability[g], axis=1)[:, :max(int(np.ceil(0.2 * C)), 1)].mean(axis=1)] for g in group_names},
         },
+        "niche": {"applied": niche is not None, "min_boyce_gate": 0.30,
+                  "groups": {g: ({"status": "applied", "species_used": niche[g]["species_used"], "n_cells_supported_now": int(niche[g]["baseline"].sum()),
+                                  "n_candidate_cells_supported_now": int((niche[g]["baseline"] & candidate).sum())} if niche[g]["status"] == "applied" else {"status": "not_assessed", "reason": niche[g]["reason"]})
+                             for g in all_groups} if niche is not None else {}},
+        "not_ranked_groups": not_ranked_groups,
+        "n_candidate_cells_with_a_supported_group": int((candidate & (np.any([niche[g]["baseline"] for g in group_names], axis=0) if niche is not None and group_names else np.ones(n, dtype=bool))).sum()),
+        "group_caps": GROUP_CAPS,
         "representative_budget_usd": float(REPRESENTATIVE_BUDGET_USD),
         "solver": {"sweep": {"mip_rel_gap": SWEEP_REL_GAP, "time_limit_s": SWEEP_TIME_S}, "frontier": {"mip_rel_gap": FRONTIER_REL_GAP, "time_limit_s": FRONTIER_TIME_S}, "sensitivity": {"mip_rel_gap": SENS_REL_GAP, "time_limit_s": SENS_TIME_S}},
         "n_sampled_cells_total": n_total,
@@ -329,9 +381,11 @@ def main():
         "cost_table": [{k: v for k, v in i.items()} for i in INTERVENTIONS],
         "scope_note": ("A planting unit is the grid cell around a model node (about 3,200 ha on the dense grid), treated whole or not at all, with the node's viability and eligibility "
                         "standing for the whole cell. Only the four restoration methods are ranked, and each acts on the cell's open land (its area minus forest, woodland and water, from the "
-                        "national Ecosystem Map averaged over the cell); a cell needs at least 10% open land. Benefit varies only by functional group (REFUGIUM viability) times one national "
+                        "national Ecosystem Map averaged over the cell); a cell needs at least 10% open land. A species group is ranked only if a MERISTEM niche model passes the quality gate (mean "
+                        "Boyce index at least 0.30), and it is eligible in a cell only where that model puts it within its niche today; in a scenario member in which the cell leaves the niche its "
+                        "benefit there is zero. Benefit varies only by functional group (REFUGIUM viability times niche support) times one national "
                         "value, 417 USD/ha/yr x 75% (the share a restored degraded hectare adds, World Bank 2023); cost varies only by intervention method -- the two are independent by "
-                        "construction since no real data or model connects method to survival. Planting uses Armenian cost data (range shown); the other restoration methods use World Bank "
+                        "construction since no real data or model connects method to survival. An optional cap limits the share of the treated area that one species group may take. Planting uses Armenian cost data (range shown); the other restoration methods use World Bank "
                         "2023 figures (cheapest mix, an all-method average, the most expensive option). Coppicing, pine thinning and wildfire prevention act on existing forest and are not "
                         "ranked: no figure exists for the benefit of maintaining forest. Mining reclamation is not ranked: there is no data on where the sites are. Water use, water caps and "
                         "basins are omitted: no real figure exists for any option's water use. Eligibility = real WDPA (not protected) AND real Ecosystem Map human-modified exclusion "
@@ -350,6 +404,24 @@ def main():
         except Exception as e:
             results["budget_sweep"][f"${budget:,.0f}"] = {"error": str(e)}
             print(f"  ${budget:,.0f}: FAILED ({e})", flush=True)
+
+    results["diversity_sweep"] = {}
+    if len(group_names) >= 2:
+        group_of_option = np.array([group_names.index(o["group"]) for o in option_labels])
+        print(f"=== Species-group caps {GROUP_CAPS} at every budget ===", flush=True)
+        for cap in GROUP_CAPS:
+            results["diversity_sweep"][f"{cap:g}"] = {}
+            for budget in BUDGET_LEVELS_USD:
+                try:
+                    plan = robust_portfolio(benefit, area, cost, budget, lam=0.5, eligible=eligible, time_limit=SWEEP_TIME_S, mip_rel_gap=SWEEP_REL_GAP, group=group_of_option, group_max_share=cap)
+                    alloc = allocation_summary(plan, area, cost, option_labels)
+                    results["diversity_sweep"][f"{cap:g}"][f"${budget:,.0f}"] = {"expected": plan["expected"], "cvar": plan["cvar"], **alloc, "optimal": plan["optimal"], "mip_gap": plan["mip_gap"]}
+                    print(f"  cap {cap:g}, ${budget:,.0f}: expected={plan['expected']:.1f}, {alloc['n_units_planted']} units, groups { {k: v['units'] for k, v in alloc['by_group'].items()} }", flush=True)
+                except Exception as e:
+                    results["diversity_sweep"][f"{cap:g}"][f"${budget:,.0f}"] = {"error": str(e)}
+                    print(f"  cap {cap:g}, ${budget:,.0f}: FAILED ({e})", flush=True)
+    else:
+        results["diversity_note"] = "only one species group is ranked, so a cap on the share of any one group has nothing to spread across"
 
     print(f"=== Mean-CVaR efficient frontier at the real representative budget (${REPRESENTATIVE_BUDGET_USD:,.0f}) ===", flush=True)
     try:

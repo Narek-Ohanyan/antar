@@ -1,0 +1,308 @@
+run_date: '2026-10-08'
+grid: dense_armenia_stride7
+panel_years:
+- 2010
+- 2019
+what: vitality response (standardised kNDVI anomaly), not mortality
+n_pixel_years: 387402
+n_pixels: 53773
+n_cells: 215
+n_excluded_recent_disturbance: 9676
+anomaly_sd:
+  cwd_mm: 65.0217869215835
+  vpd24_mean_kpa: 0.034559816833951276
+  gdd_annual: 121.28892220285717
+  t_mean_c_annual: 0.7899845747796865
+mean_z: 0.28867492150387325
+sd_z: 0.9834855826452559
+model_a:
+  n_obs: 387402
+  n_pixels: 53773
+  n_cells: 215
+  n_clusters:
+    node: 215
+    year: 10
+  r2_within: 0.0027182100272814536
+  terms:
+  - term: cwd anomaly
+    coef: 0.04599269418860704
+    se_node: 0.022470212278778975
+    se_year: 0.08032845251220311
+    se_used: 0.08032845251220311
+    ci95:
+    - -0.13572289003836868
+    - 0.22770827841558278
+    p: 0.5809632762775203
+leave_one_year_out:
+  cwd_only:
+    r2_out_of_sample: -0.01808421154433204
+    n_test: 387295
+  all_four:
+    r2_out_of_sample: 0.12939955115333313
+    n_test: 387295
+model_b:
+  n_obs: 387402
+  n_pixels: 53773
+  n_cells: 215
+  n_clusters:
+    node: 215
+    year: 10
+  r2_within: 0.17915304173417435
+  terms:
+  - term: cwd_mm anomaly
+    coef: -0.10064359047391994
+    se_node: 0.028245625175522468
+    se_year: 0.030642463235080616
+    se_used: 0.030642463235080616
+    ci95:
+    - -0.1699616581669382
+    - -0.03132552278090167
+    p: 0.009461823502388765
+  - term: vpd24_mean_kpa anomaly
+    coef: 0.37274936957886246
+    se_node: 0.03391336424625791
+    se_year: 0.05978050144682496
+    se_used: 0.05978050144682496
+    ci95:
+    - 0.23751648003525894
+    - 0.507982259122466
+    p: 0.0001522862445262501
+  - term: gdd_annual anomaly
+    coef: -0.8347084809359332
+    se_node: 0.07129272540915747
+    se_year: 0.1946473052475357
+    se_used: 0.1946473052475357
+    ci95:
+    - -1.2750312767210148
+    - -0.3943856851508517
+    p: 0.0020250822475232854
+  - term: t_mean_c_annual anomaly
+    coef: 0.33147877804620174
+    se_node: 0.052051995802259485
+    se_year: 0.1334453057427912
+    se_used: 0.1334453057427912
+    ci95:
+    - 0.029604523818350215
+    - 0.6333530322740533
+    p: 0.03476227513389734
+sensitivity:
+  pixel_and_year_fixed_effects:
+    coef: -0.11266289828830596
+    ci95:
+    - -0.2731718184372787
+    - 0.04784602186066682
+    p: 0.1467867811484214
+    n_obs: 387402
+    n_pixels: 53773
+  composites_with_at_least_5_valid_observations:
+    coef: 0.019526532297773912
+    ci95:
+    - -0.14629793089234822
+    - 0.18535099548789602
+    p: 0.7959500442962368
+    n_obs: 356772
+    n_pixels: 53744
+  years_2014_2019:
+    coef: 0.09918421972942475
+    ci95:
+    - -0.14673615798481932
+    - 0.3451045974436688
+    p: 0.34736091237789857
+    n_obs: 312809
+    n_pixels: 52816
+  year_effect_removed_from_the_series:
+    coef: -0.054628390953766766
+    ci95:
+    - -0.16828090833205878
+    - 0.05902412642452525
+    p: 0.30515087364999827
+    n_obs: 387402
+    n_pixels: 53773
+model_c_height:
+  n_obs: 387402
+  n_pixels: 53773
+  n_cells: 215
+  n_clusters:
+    node: 215
+    year: 10
+  r2_within: 0.021488832734448682
+  terms:
+  - term: cwd anomaly
+    coef: 0.07427625210419686
+    se_node: 0.022504600715842343
+    se_year: 0.08107720682939354
+    se_used: 0.08107720682939354
+    ci95:
+    - -0.10913313206458727
+    - 0.257685636272981
+    p: 0.3834958566458462
+  - term: cwd anomaly x canopy height (SD)
+    coef: 0.11612069745981723
+    se_node: 0.017413373118167493
+    se_year: 0.03550898371767593
+    se_used: 0.03550898371767593
+    ci95:
+    - 0.03579379559919181
+    - 0.19644759932044265
+    p: 0.009679965399070574
+  height_mean_sd_m:
+  - 17.909494092007115
+  - 8.139210181820145
+response_by_anomaly_bin:
+- anomaly_mean: -1.3720910440826068
+  z_mean: 0.5019486480154106
+  z_se: 0.0575943860926941
+  n_cell_years: 368
+- anomaly_mean: -0.46617917559831584
+  z_mean: 0.2511764487878614
+  z_se: 0.04541636944785819
+  n_cell_years: 367
+- anomaly_mean: -0.03962418428494381
+  z_mean: 0.4053504677043112
+  z_se: 0.054725613082875275
+  n_cell_years: 368
+- anomaly_mean: 0.5938922425084886
+  z_mean: 0.4318030149105935
+  z_se: 0.030929012925780815
+  n_cell_years: 367
+- anomaly_mean: 1.5764818029104843
+  z_mean: 0.4208754882706484
+  z_se: 0.027444059148123937
+  n_cell_years: 368
+xylem_check:
+  mesic_diffuse_porous_broadleaf:
+    n_pixels: 24347
+    n_cells: 115
+    status: ok
+    model:
+      n_obs: 165933
+      n_pixels: 24347
+      n_cells: 115
+      n_clusters:
+        node: 115
+        year: 10
+      r2_within: 0.03517975759835679
+      terms:
+      - term: cwd anomaly
+        coef: 0.16808143466449454
+        se_node: 0.052858985409859414
+        se_year: 0.09525709108606613
+        se_used: 0.09525709108606613
+        ci95:
+        - -0.047405076243170974
+        - 0.38356794557216006
+        p: 0.11146845432487981
+      - term: cwd anomaly x XYLEM hazard rank
+        coef: 0.017099446165499188
+        se_node: 0.09321213442064531
+        se_year: 0.06345745722299861
+        se_used: 0.09321213442064531
+        ci95:
+        - -0.1937610513738727
+        - 0.22795994370487108
+        p: 0.8585139499625369
+    expected_sign: negative
+    verdict: inconclusive
+    by_hazard_tercile:
+    - tercile: 0
+      hazard_range:
+      - 0.0
+      - 0.0006000000000000001
+      n_pixels: 7703
+      n_cells: 38
+      slope: 0.16839132236357332
+      slope_ci95:
+      - -0.0558883097918475
+      - 0.39267095451899414
+    - tercile: 1
+      hazard_range:
+      - 0.0007000000000000001
+      - 0.0027
+      n_pixels: 8116
+      n_cells: 38
+      slope: 0.2184858867970983
+      slope_ci95:
+      - -0.022521348136885777
+      - 0.45949312173108237
+    - tercile: 2
+      hazard_range:
+      - 0.0030000000000000005
+      - 0.031799999999999995
+      n_pixels: 8528
+      n_cells: 39
+      slope: 0.1584920971518385
+      slope_ci95:
+      - -0.05230492825250524
+      - 0.3692891225561823
+    hazard_mean: 0.00436695652173913
+    hazard_sd: 0.007100896719112379
+  ring_porous_oak:
+    n_pixels: 28458
+    n_cells: 189
+    status: ok
+    model:
+      n_obs: 213730
+      n_pixels: 28458
+      n_cells: 189
+      n_clusters:
+        node: 189
+        year: 10
+      r2_within: 0.01663189084942107
+      terms:
+      - term: cwd anomaly
+        coef: 0.245226202804712
+        se_node: 0.0410082100864187
+        se_year: 0.053457434423025696
+        se_used: 0.053457434423025696
+        ci95:
+        - 0.12429708461984909
+        - 0.36615532098957493
+        p: 0.0013140413135412305
+      - term: cwd anomaly x XYLEM hazard rank
+        coef: -0.39127954283649946
+        se_node: 0.06676707599132617
+        se_year: 0.12152048489094078
+        se_used: 0.12152048489094078
+        ci95:
+        - -0.6661779781592522
+        - -0.11638110751374675
+        p: 0.01049166127451092
+    expected_sign: negative
+    verdict: supports
+    by_hazard_tercile:
+    - tercile: 0
+      hazard_range:
+      - 0.0033
+      - 0.036000000000000004
+      n_pixels: 9170
+      n_cells: 63
+      slope: 0.2055004371274933
+      slope_ci95:
+      - 0.027681062548353924
+      - 0.38331981170663265
+    - tercile: 1
+      hazard_range:
+      - 0.03619999999999999
+      - 0.0713
+      n_pixels: 8869
+      n_cells: 63
+      slope: 0.038875578511959524
+      slope_ci95:
+      - -0.12294600097316943
+      - 0.20069715799708848
+    - tercile: 2
+      hazard_range:
+      - 0.0714
+      - 0.1822
+      n_pixels: 10419
+      n_cells: 63
+      slope: -0.10424686099096515
+      slope_ci95:
+      - -0.3271344004981061
+      - 0.11864067851617581
+    hazard_mean: 0.05967671957671957
+    hazard_sd: 0.037974643278060764
+  pine:
+    n_pixels: 77
+    n_cells: 6
+    status: too_few_pixels_or_cells

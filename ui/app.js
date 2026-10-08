@@ -296,6 +296,7 @@ function renderTreeline() {
       <p class="small muted">Lines are the mean across the five climate models; shaded bands span the lowest and highest model. ${gridChip(tl.grid)}</p></div>
     <h2>Numbers</h2><div class="card tablewrap"><table><thead><tr><th>Emissions path</th>${HORIZONS.map((h) => `<th class="num">${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>
       <p class="small muted" style="margin-top:8px">Ensemble mean shift in metres, with the range across the five models in brackets.</p></div>
+    ${partitionBlock(state.M.uncertainty, ["treeline_shift_m", "warming_c"])}
     <div class="callout"><strong>A climatic ceiling, not a forecast.</strong> This is where temperature would permit trees, not where forest will stand: realised treelines lag climate by decades. The ${tl.threshold_c} °C threshold is the global Körner–Paulsen value, not an Armenia calibration, and the lapse rate used is the fitted April–September value (${fmt(tl.gamma_k_per_km, 2)} K/km).</div>
     <div class="callout"><strong>Why a few cells show a drop under warming.</strong> Growing-season temperature is the mean over days that clear 0.9 °C. Warming adds cold early-spring and late-autumn days to that set, which can pull the mean down even though every day warmed. ${pct(tl.frac_pairs_negative, 1)} of cell × model pairs show a negative shift, mostly under low warming. Treat small negative values as roughly "no change".</div>
     <p><a class="btn" href="#/map?q=treeline_shift&mode=scen&ssp=ssp585&hz=2100&gcm=ens">See the 2100 SSP5-8.5 shift on the map</a></p></div>`;
@@ -333,7 +334,8 @@ async function renderDecision() {
   const identical = sw.every((r) => r.n_units_planted === sw[0].n_units_planted && Math.abs(r.expected - sw[0].expected) < 1e-6);
   const minBudget = Math.min(...sw.map((r) => r.budget_usd)), maxTotal = maxCost != null ? eligibleHa * maxCost : null;
   const nonBinding = identical && maxTotal != null && maxTotal < minBudget;
-  const allTreatedAt = sw.filter((r) => r.n_units_planted >= eligible).map((r) => r.budget_usd).sort((x, y) => x - y)[0];
+  const reachable = ae.n_candidate_cells_with_a_supported_group != null ? ae.n_candidate_cells_with_a_supported_group : eligible;          // cells where at least one ranked group is within its niche
+  const allTreatedAt = sw.filter((r) => r.n_units_planted >= reachable).map((r) => r.budget_usd).sort((x, y) => x - y)[0];
   const groupName = Object.fromEntries(ae.options.map((o) => [o.group, o.group_label]));
   const costBasis = { sourced_armenian_cost_data: ["good", "Armenian cost data, range shown"], sourced_cheapest_mix: ["neutral", "World Bank cheapest option mix, shared"], sourced_most_expensive: ["neutral", "World Bank most expensive option"], blended: ["warn", "blended average, no individual figure"] };
   const ct = Object.fromEntries((ae.cost_table || []).map((c) => [c.name, c]));
@@ -351,11 +353,34 @@ async function renderDecision() {
   const topShare = topGroup && rep.area_ha ? topGroup[1].area_ha / rep.area_ha : null;
   let topBetter = null;
   if (U && topGroup) { const uu = U.units, el = uu.eligible.map((e, i) => (e ? i : -1)).filter((i) => i >= 0); topBetter = el.filter((i) => uu.group_ids.every((g) => uu.viability_mean[topGroup[0]][i] >= uu.viability_mean[g][i])).length / el.length; }
-  const speciesNote = topGroup && topShare >= 0.99 ? `Every treated cell gets <b>${esc((groupName[topGroup[0]] || topGroup[0]).replace(/\s*\(.*\)/, ""))}</b>${topBetter != null ? `: it has the highest average survival in ${Math.round(100 * topBetter)}% of the candidate cells` : ""}. This layer sees hydraulic survival only; whether that species would establish and grow in a cell (its niche) is not part of it, so read the map as <i>where survival per dollar is highest</i>, not as a planting prescription.` : "";
+  const lab = (g) => (groupName[g] || g).replace(/\s*\(.*\)/, "");
+  const speciesNote = (() => {
+    const nicheOn = ae.niche && ae.niche.applied, parts = [];
+    if (nicheOn) parts.push("A species group is planted only where its niche model says it can grow in today's climate, and in a scenario in which the cell leaves that niche the benefit there is zero.");
+    if (rep && rep.by_group && rep.area_ha) {
+      const used = Object.entries(rep.by_group).sort((x, y) => y[1].area_ha - x[1].area_ha);
+      parts.push(`By treated area: ${used.map(([g, v]) => `${esc(lab(g))} ${Math.round(100 * v.area_ha / rep.area_ha)}%`).join(", ")}.`);
+      const ranked = [...new Set(ae.options.map((o) => o.group))], top = used[0] && used[0][0];
+      for (const g of ranked.filter((x) => !rep.by_group[x])) {
+        let why = "";
+        if (U && nicheOn && top && U.units.niche_now && U.units.niche_now[g]) {
+          const uu = U.units, el = uu.eligible.map((e, i) => (e ? i : -1)).filter((i) => i >= 0);
+          const eb = (gg, i) => (uu.niche_now[gg][i] ? uu.viability_mean[gg][i] * uu.niche_member_share[gg][i] : 0);          // survival x the share of scenarios in which the cell is within the niche
+          const inNiche = el.filter((i) => uu.niche_now[g][i]).length, better = el.filter((i) => eb(g, i) > eb(top, i)).length;
+          why = `: it is within its niche in ${inNiche} of the ${el.length} candidate cells and has the higher expected benefit than ${esc(lab(top))} in ${better} of them`;
+        }
+        parts.push(`${esc(lab(g))} is ranked but chosen in no cell at ${money(rep.budget_usd)}${why}.`);
+      }
+    }
+    for (const x of ae.not_ranked_groups || []) parts.push(`<b>${esc(groupLabel(x.name).replace(/\s*\(.*\)/, ""))}</b> is not ranked: ${esc(x.reason)}.`);
+    parts.push(nicheOn ? "Survival here is hydraulic only and the niche comes from the species' recorded occurrences; establishment and growth are not modelled, so read the map as where survival and niche support per dollar are highest, not as a planting prescription."
+                      : "This layer sees hydraulic survival only; whether a species would establish and grow in a cell (its niche) is not part of it, so read the map as <i>where survival per dollar is highest</i>, not as a planting prescription.");
+    return parts.join(" ");
+  })();
   const notRankedNote = (ae.not_ranked || []).length ? ` <b>Not ranked</b>: ${ae.not_ranked.map((n) => esc(n.name.replace(/_/g, " "))).join(", ")}; coppicing, thinning and fire prevention act on existing forest and no figure exists for the benefit of maintaining forest, and mining reclamation has no site data.` : "";
   const callout = nonBinding
     ? `<div class="callout info"><strong>Why every budget gives the same answer.</strong> Each unit is ${fmt(unit.mean, 0)} ha and ${eligible} are eligible. Even the most expensive method on all of them costs ${money(maxTotal)}, less than the smallest budget tested (${money(minBudget)}); those budgets are the scale of a 50,000 ha programme (World Bank 2023), so money never binds here. Benefit depends only on the species group, never on the method, so the methods are interchangeable in this result and the method reported for a unit is a tie, not a finding.</div>`
-    : `<div class="callout info"><strong>What the budget buys.</strong> A unit is the grid cell around a model node (${fmt(unit.min, 0)}–${fmt(unit.max, 0)} ha, treated whole or not at all, with the node's survival standing for the whole cell). Restoration acts on a cell's open land only, not on forest, woodland or water; ${eligible} cells with at least ${Math.round(100 * (ae.min_open_share || 0))}% open land (${ha(eligibleHa)} of open land) are candidates. ${allTreatedAt ? `At ${money(allTreatedAt)} and above every candidate cell is treated; below that the budget decides how many.` : "The budget decides how many are treated at every level tested."} ${rep && rep.n_units_planted != null ? `At ${money(rep.budget_usd)}: ${rep.n_units_planted} cells, ${ha(rep.area_ha)}${groupsAtRep ? ` (${groupsAtRep})` : ""}.` : ""} ${speciesNote ? speciesNote + " " : ""}${onlyCheapest ? `Every treated cell uses the cheapest method (${money(minCost)}/ha), because benefit depends only on the species group and never on the method: the methods differ only in cost here, so this shows what is cheapest, not what works best.` : "Benefit depends only on the species group, never on the method, so the choice among methods reflects cost, not effect."}${notRankedNote}${solverNote}</div>`;
+    : `<div class="callout info"><strong>What the budget buys.</strong> A unit is the grid cell around a model node (${fmt(unit.min, 0)}–${fmt(unit.max, 0)} ha, treated whole or not at all, with the node's survival standing for the whole cell). Restoration acts on a cell's open land only, not on forest, woodland or water; ${eligible} cells with at least ${Math.round(100 * (ae.min_open_share || 0))}% open land (${ha(eligibleHa)} of open land) are candidates. ${allTreatedAt ? (reachable < eligible ? `At ${money(allTreatedAt)} and above all ${reachable} cells where a ranked group is within its niche are treated (the other ${eligible - reachable} candidates suit neither group today); below that the budget decides how many.` : `At ${money(allTreatedAt)} and above every candidate cell is treated; below that the budget decides how many.`) : "The budget decides how many are treated at every level tested."} ${rep && rep.n_units_planted != null ? `At ${money(rep.budget_usd)}: ${rep.n_units_planted} cells, ${ha(rep.area_ha)}${groupsAtRep ? ` (${groupsAtRep})` : ""}.` : ""} ${speciesNote ? speciesNote + " " : ""}${onlyCheapest ? `Every treated cell uses the cheapest method (${money(minCost)}/ha), because benefit depends only on the species group and never on the method: the methods differ only in cost here, so this shows what is cheapest, not what works best.` : "Benefit depends only on the species group, never on the method, so the choice among methods reflects cost, not effect."}${notRankedNote}${solverNote}</div>`;
   const repIdx = Math.max(0, sw.indexOf(rep));
   const frontierBlock = `<details class="dec-details"><summary>Mean–CVaR frontier at a ${money(repBudget)} budget</summary><div class="card">${front}<p class="small muted">The gap between the two lines is what hedging against bad scenarios costs. ${fr.price_of_robustness != null && fr.price_of_robustness < 0.005 ? `Here it is ${fmt(fr.price_of_robustness, 2)}: the same allocation is best on average and in the worst 20% of the ${ae.n_scenarios} scenarios, because viability differs little between them, so there is little downside to hedge.` : `Here it is ${fmt(fr.price_of_robustness, 2)} $/yr.`}</p></div></details>`;
   const sweepBlock = `<details class="dec-details"><summary>Budget sweep</summary><div class="card tablewrap"><table><thead><tr><th>Budget</th><th class="num">Units treated</th><th class="num">Area</th><th class="num">Cost</th><th class="num">Expected benefit</th><th class="num">CVaR</th><th>Methods used</th></tr></thead><tbody>${sw.map((r) => `<tr><td>${money(r.budget_usd)}</td><td class="num">${r.n_units_planted}</td><td class="num">${r.area_ha != null ? ha(r.area_ha) : "—"}</td><td class="num">${r.cost_usd != null ? money(r.cost_usd) : "—"}</td><td class="num">${fmt(r.expected, 1)}</td><td class="num">${fmt(r.cvar, 1)}</td><td class="small">${r.by_intervention ? Object.keys(r.by_intervention).map((n) => esc(n.replace(/_/g, " "))).join(", ") || "—" : "—"}</td></tr>`).join("")}</tbody></table></div></details>`;
@@ -364,7 +389,9 @@ async function renderDecision() {
   const scopeBlock = `<details class="dec-details"><summary>What is and isn't modelled</summary><div class="callout">${esc(ae.scope_note)}</div></details>`;
   const mapBlock = U ? `<div class="card dec-controls"><label for="dslider">Budget</label><output class="dec-budget" id="dbudget" for="dslider"></output>
       <input type="range" id="dslider" min="0" max="${sw.length - 1}" step="1" value="${repIdx}" aria-label="Budget level, from the smallest to the largest tested">
-      <div class="dec-ticks" aria-hidden="true">${sw.map((r) => `<span>${money(r.budget_usd)}</span>`).join("")}</div></div>
+      <div class="dec-ticks" aria-hidden="true">${sw.map((r) => `<span>${money(r.budget_usd)}</span>`).join("")}</div>
+      ${Object.keys(ae.diversity_sweep || {}).length ? `<div class="dec-cap"><label for="dcap">Largest share of the treated area one species group may take</label><select id="dcap" aria-describedby="dcaphelp"></select>
+        <span class="small muted" id="dcaphelp">A limit spreads the plan over more species groups, at some cost in expected benefit.</span></div>` : ""}</div>
     <div class="dec-grid">
       <div><div id="dmap" role="application" aria-label="Map of the grid cells the portfolio treats at the chosen budget; the table by marz and the CSV hold the same information"></div><div class="dec-legend" id="dlegend"></div>
         <p class="small muted">Each square is the area around one model node. The plan treats a cell whole or not at all, acting on its open land only (not forest, woodland or water), and the node's survival values stand for the whole cell. Click a cell to pin what it shows.</p></div>
@@ -389,12 +416,91 @@ async function renderDecision() {
   if (U) Decision.mount(view(), { A, ae, units: U, sw, groupLabel: (g) => groupLabel(g) });
 }
 
+
+/* ---- MNEME: the forest-pixel panel, its event count, and the vitality response ---- */
+const sgn = (v, d = 2) => (ok(v) ? (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(d) : "—");
+const ciText = (c, d = 2) => (c ? `${sgn(c[0], d)} to ${sgn(c[1], d)}` : "—");
+function mnemeBlock(mn) {
+  if (!mn) return "<p>MNEME has not been run.</p>";
+  const v = mn.vitality, mc = mn.mirror_check || {}, ye = mn.year_effect_removed || {}, need = (mn.min_events_per_predictor || 10) * (mn.design_columns || []).length;
+  const rate = ok(mn.event_rate_per_pixel_year) ? `${pct(mn.event_rate_per_pixel_year, 3)} per pixel-year (95% interval ${pct(mn.event_rate_ci95[0], 3)} to ${pct(mn.event_rate_ci95[1], 3)})` : "—";
+  const cards = `<div class="grid cols-4">
+    <div class="stat"><div class="num">${(mn.n_pixels ?? 0).toLocaleString("en")}</div><div class="cap">forest pixels (30 m) in ${mn.n_cells} climate cells</div></div>
+    <div class="stat"><div class="num">${(mn.n_person_years ?? 0).toLocaleString("en")}</div><div class="cap">pixel-years, ${mn.panel_years[0]}–${mn.panel_years[mn.panel_years.length - 1]}</div></div>
+    <div class="stat"><div class="num">${mn.n_events}</div><div class="cap">dieback onsets (strict rule) in ${mn.n_cells_with_event} cells</div></div>
+    <div class="stat"><div class="num">${mn.status === "fitted" ? chip("good", "fitted") : chip("warn", "no hazard fitted")}</div><div class="cap">${mn.status === "fitted" ? "stacked hazard model" : mn.status === "events_not_distinguishable_from_noise" ? `${mn.n_events} events, but declines are not clearly more than rises` : `needs ${need} events, has ${mn.n_events}`}</div></div></div>`;
+  const rule = `<p class="small" style="margin-top:12px">Forest pixels are 30 m pixels whose nine 10 m sub-points are all closed forest on the national Ecosystem Map; ${mn.pixels_per_cell_cap >= 1000 ? `every such pixel of each 30-arcsecond climate cell is used (${(mn.n_qualifying_pixels ?? mn.n_pixels).toLocaleString("en")} in all)` : `up to ${mn.pixels_per_cell_cap ?? 25} are drawn at random in each 30-arcsecond climate cell`}, and a cell shares its climate. An onset is the start of a decline of the standardised kNDVI anomaly below −2 against the pixel's own previous ten years, with no harvest or fire flagged in the year or the year before and no recovery above −1 in the next two years. Each pixel counts once. The strict rule finds ${mn.n_events} onsets, ${rate}; without the harvest and fire flags it would find ${mn.n_events_if_flags_ignored}.</p>`;
+  const sensor = mc.pixels_with_onset_of_rise != null ? `<div class="callout"><strong>The satellite record cannot yet separate dieback from changes in the record itself.</strong> The composites rest on a median of one to eight valid observations before 2014 and thirteen to thirty-one after, and the average anomaly steps up in 2013. Run on the mirrored series, the same rule finds ${mc.pixels_with_onset_of_rise} pixels with a persistent <em>rise</em> against ${mc.pixels_with_onset_of_decline} with a persistent decline (pixels with a complete series). With the year effect shared by all pixels removed, the rule finds ${ye.n_events} onsets, but still more rises (${mc.year_effect_removed.pixels_with_onset_of_rise}) than declines (${mc.year_effect_removed.pixels_with_onset_of_decline}), so those are not read as dieback either. Real events are rare, noise is not, and no hazard is claimed.</div>` : "";
+  if (!v) return cards + rule + sensor + `<p class="small muted">${esc(mn.scope_note || "")}</p>`;
+  const A = v.model_a.terms[0], loyo = v.leave_one_year_out;
+  const sens = v.sensitivity || {}, SL = { pixel_and_year_fixed_effects: "with year fixed effects", composites_with_at_least_5_valid_observations: "composites with ≥ 5 observations", years_2014_2019: "2014–2019 only", year_effect_removed_from_the_series: "year effect removed from the series" };
+  const items = [{ label: "all pixel-years", value: A.coef, lo: A.ci95[0], hi: A.ci95[1], color: "var(--c1)" }].concat(Object.keys(SL).filter((k) => sens[k] && sens[k].coef != null).map((k) => ({ label: SL[k], value: sens[k].coef, lo: sens[k].ci95[0], hi: sens[k].ci95[1], color: "var(--c2)" })));
+  const chart = Charts.bars({ items, xlabel: "Change in vitality anomaly per SD of water-deficit anomaly (95% interval)", xfmt: (x) => fmt(x, 2), rowH: 36 });
+  const bins = v.response_by_anomaly_bin || [];
+  const binChart = bins.length ? Charts.line({ series: [{ name: "mean vitality anomaly", color: "var(--c1)", points: bins.map((b) => [b.anomaly_mean, b.z_mean, b.z_mean - 1.96 * (b.z_se || 0), b.z_mean + 1.96 * (b.z_se || 0)]) }], xlabel: "Water-deficit anomaly of the cell and year (SD; drier →)", ylabel: "Vitality anomaly (SD)", yfmt: (x) => fmt(x, 2), xfmt: (x) => fmt(x, 1), legendOn: false, height: 300 }) : "";
+  const xg = Object.entries(v.xylem_check || {}).map(([g, x]) => {
+    if (x.status !== "ok") return `<tr><td>${esc(groupLabel(g))}</td><td class="num">${x.n_pixels}</td><td class="num">${x.n_cells}</td><td colspan="3">${chip("neutral", "not tested")} <span class="small muted">${x.status === "too_few_pixels_or_cells" ? "too few pixels or cells" : "no spread in the hazard values"}</span></td></tr>`;
+    const t = x.model.terms[1], tl = (x.by_hazard_tercile || []).map((q) => sgn(q.slope, 2)).join(" · ");
+    const kind = x.verdict === "supports" ? "good" : x.verdict === "contradicts" ? "bad" : "neutral";
+    return `<tr><td>${esc(groupLabel(g))}</td><td class="num">${x.n_pixels}</td><td class="num">${x.n_cells}</td><td class="num">${sgn(t.coef)} <span class="muted">(${ciText(t.ci95)})</span></td><td>${tl || "—"}</td><td>${chip(kind, x.verdict)}</td></tr>`;
+  }).join("");
+  const B = v.model_b && v.model_b.terms ? v.model_b.terms : null, Ch = v.model_c_height && v.model_c_height.terms ? v.model_c_height.terms[1] : null;
+  return cards + rule + sensor + `
+    <h3>Vitality response to drought, without needing events</h3>
+    <p>Even where events are too few, every pixel-year has a vitality anomaly, so the response to the weather of the year can be estimated directly. Each pixel is compared only with itself (pixel fixed effects) and the climate is the year-to-year departure of the cell's climatic water deficit, in standard deviations (1 SD = ${fmt(v.anomaly_sd.cwd_mm, 0)} mm). This is a vitality response, not mortality: a dry year can lower greenness without killing a tree.</p>
+    <div class="card"><h3>Does a drier year lower the vitality anomaly?</h3>${chart}
+      <p class="small">${v.n_pixel_years.toLocaleString("en")} pixel-years in ${v.n_pixels.toLocaleString("en")} pixels (${v.n_excluded_recent_disturbance.toLocaleString("en")} left out because a harvest or fire was flagged in the previous ten years). Primary estimate ${sgn(A.coef, 3)} (${ciText(A.ci95, 3)}, p = ${fmt(A.p, 2)}): <strong>no detectable response</strong>, and the water-deficit anomaly alone does not predict an unseen year (leave-one-year-out R² ${sgn(loyo.cwd_only.r2_out_of_sample, 3)}). Standard errors are the larger of those clustered by cell and by year; with ten years the year-clustered ones decide.
+      ${loyo.all_four ? ` The four climate anomalies together predict an unseen year somewhat (R² ${fmt(loyo.all_four.r2_out_of_sample, 3)}), but with collinear, opposite-signed coefficients${B ? ` (growing degree days ${sgn(B[2].coef)}, vapour-pressure deficit ${sgn(B[1].coef)})` : ""}, which a sensor step that follows the warming trend can also produce, so it is not read as a drought response.` : ""}${Ch ? ` Taller stands respond less negatively (${sgn(Ch.coef)} per SD of canopy height, p = ${fmt(Ch.p, 2)}; exploratory).` : ""}</p></div>
+    ${binChart ? `<div class="card"><h3>The same, in five bins of the anomaly</h3>${binChart}<p class="small muted">Mean vitality anomaly of cell-years in each fifth of the water-deficit anomaly, with a 95% band. A flat line is the absence of a response.</p></div>` : ""}
+    <h3>Does the response follow XYLEM's ranking of drought stress?</h3>
+    <p>XYLEM ranks cells by the share of trees whose hydraulic system fails in 2019. If the ranking is right, the vitality of a species group should fall more steeply in a dry year where XYLEM's hazard is higher. The expectation was fixed in advance: a negative interaction between the anomaly and the within-group rank of the hazard. The three numbers on the right are the response in the lowest, middle and highest third of the hazard.</p>
+    <div class="card tablewrap"><table><thead><tr><th>Group</th><th class="num">pixels</th><th class="num">cells</th><th class="num">interaction</th><th>response by hazard third</th><th>reading</th></tr></thead><tbody>${xg}</tbody></table>
+      <p class="small muted" style="margin-top:8px">${Object.entries(v.xylem_check || {}).map(([g, x]) => `${esc(groupLabel(g).replace(/\s*\(.*\)/, ""))}: ${x.status === "ok" ? esc(x.verdict) : "not tested (too few forest pixels or cells)"}`).join("; ")}. A group passing is modest evidence that the ranking carries information, not a validation of the hazard values; with ten years of climate the year-clustered standard errors are wide.</p></div>
+    <p class="small muted">${esc(mn.scope_note || "")}</p>`;
+}
+
+
+/* ---- where the spread of the 45-member ensemble comes from (variance fractions, median over nodes) ---- */
+const PART_PARTS = { gcm: ["Climate model", "s-gcm"], ssp: ["Emissions path", "s-ssp"], horizon: ["Horizon", "s-horizon"], interaction: ["Interactions", "s-inter"] };
+function stackBar(parts, vals) {
+  const total = parts.reduce((t, k) => t + (vals[k] || 0), 0) || 1;
+  return `<div class="stack" role="img" aria-label="${esc(parts.map((k) => `${PART_PARTS[k][0]} ${Math.round(100 * (vals[k] || 0) / total)}%`).join(", "))}">${parts.map((k) => { const w = 100 * (vals[k] || 0) / total; return `<span class="${PART_PARTS[k][1]}" style="width:${w}%" title="${esc(PART_PARTS[k][0])}: ${w.toFixed(0)}%">${w >= 9 ? w.toFixed(0) + "%" : ""}</span>`; }).join("")}</div>`;
+}
+function partitionBlock(unc, ids) {
+  if (!unc) return "";
+  const rows = ids.filter((id) => unc.metrics[id]).map((id) => {
+    const m = unc.metrics[id], p = m.pooled, h = m.by_horizon["2100"];
+    const hz = { gcm: h.gcm, ssp: h.ssp, interaction: h.interaction };
+    return `<div class="part-row"><div class="lab">${esc(m.label)}<small>${esc(m.unit)} · ensemble SD ${fmt(m.ensemble_sd, 2)}</small></div>
+      <div>${stackBar(["gcm", "ssp", "horizon", "interaction"], p)}<div style="height:5px"></div>${stackBar(["gcm", "ssp", "interaction"], hz)}</div></div>`;
+  }).join("");
+  const key = ["gcm", "ssp", "horizon", "interaction"].map((k) => `<span><i class="${PART_PARTS[k][1]}" style="background:var(--${{ "s-gcm": "c1", "s-ssp": "c2", "s-horizon": "c3", "s-inter": "c4" }[PART_PARTS[k][1]]})"></i>${PART_PARTS[k][0]}</span>`).join("");
+  return `<div class="card"><h3>Where the spread of the ensemble comes from</h3>
+    <p class="small">Share of the variance among the 45 members (5 climate models × 3 emissions paths × 3 horizons) that belongs to each factor, as the median over grid nodes. In each pair the upper bar splits all members, so the horizon counts as a source of spread; the lower bar splits the members at 2100 only, between climate model and emissions path.</p>
+    <div class="part-key">${key}</div><div class="part">${rows}</div>
+    <p class="small muted">${esc(unc.internal_variability_note)} The interactions bar is everything the three main effects do not explain: paths that diverge with time, models that respond differently to a path, and the remainder. Method: main-effect variance fractions (Hawkins &amp; Sutton 2009; Lehner et al. 2020).</p></div>`;
+}
+
+
+/* ---- where each species group is within its niche (the gate, then the nodes) ---- */
+function nicheSupportBlock(me) {
+  const gs = me && me.group_support;
+  if (!gs) return "";
+  const lines = Object.entries(gs).map(([g, e]) => {
+    if (e.status !== "applied") return `<li><strong>${esc(groupLabel(g))}</strong>: ${chip("neutral", "not assessed")} ${esc(e.reason || "no niche model")}. It is not ranked in the decision layer, because a group with no niche model cannot be shown to grow anywhere.</li>`;
+    const f = e.by_path_and_horizon || {}, k = "ssp585__2100", lo = f[k] ? f[k][0] : null, hi = f[k] ? f[k][2] : null;
+    return `<li><strong>${esc(groupLabel(g))}</strong>: ${chip("good", "assessed")} from ${e.species_used.map((s) => `<em>${esc(s)}</em>`).join(" and ")}; within the niche at ${e.n_supported_baseline} of ${e.n_nodes} grid nodes in the 2019 climate${lo != null ? `, and at between ${lo} and ${hi} nodes in 2100 under SSP5-8.5 (depending on the climate model)` : ""}.</li>`;
+  }).join("");
+  return `<div class="card"><h3>Where each species group can grow</h3><ul>${lines}</ul>
+    <p class="small muted">Future values use the winter minimum and growing degree days of CHELSA-BIOCLIM+ for the member's period (2041–2070 for 2050, 2071–2100 for 2080 and 2100), the member's own water deficit and unchanged soils; the vapour-pressure deficit has no future layer and is scaled with the warming at constant relative humidity, which understates the rise in a drying climate.</p></div>`;
+}
+
 /* ---- Models & validation ---- */
 function renderModels() {
   const M = state.M, me = M.meristem, mn = M.mneme, ev = M.ecosystem_validation, vg = M.variogram;
   const speciesRows = me ? Object.entries(me.species).map(([sp, v]) => {
     const folds = (v.boyce_folds || []).map((f) => `<span class="chip ${f >= 0.3 ? "good" : f >= 0 ? "neutral" : "bad"}">${f.toFixed(2)}</span>`).join(" ");
-    return `<tr><td><em>${esc(sp)}</em></td><td>${v.status === "fitted" ? chip("good", "fitted") : chip("warn", v.status.replace(/_/g, " "))}</td><td class="num">${v.n_presence}</td><td class="num">${v.boyce_mean != null ? v.boyce_mean.toFixed(2) : "—"}</td><td>${folds || "—"}</td></tr>`;
+    return `<tr><td><em>${esc(sp)}</em></td><td>${v.status === "fitted" ? chip("good", "fitted") : chip("warn", v.status.replace(/_/g, " "))}</td><td class="num">${v.n_presence}</td><td class="num">${v.boyce_mean != null ? v.boyce_mean.toFixed(2) : "—"}</td><td>${folds || "—"}</td>${me.min_boyce_gate != null ? `<td>${v.passes_gate === true ? chip("good", "used") : chip("neutral", "not used")}</td>` : ""}</tr>`;
   }).join("") : "";
   const evRows = ev ? Object.entries(ev.validation).map(([g, v]) => `<tr><td>${esc(groupLabel(g))}</td><td class="num">${ok(v.spearman_rho) ? v.spearman_rho.toFixed(2) : "undefined"}</td><td class="num">${ok(v.p_value) ? v.p_value.toFixed(3) : "—"}</td><td class="num">${v.n}</td><td class="num">${pct(v.mean_observed_forest_cover_fraction, 1)}</td></tr>`).join("") : "";
   let vgHtml = "";
@@ -409,11 +515,13 @@ function renderModels() {
   }
   view().innerHTML = `<div class="wrap"><h1>Models &amp; validation</h1>${banner()}
     <h2>MERISTEM — species niche</h2>
-    ${me ? `<div class="card tablewrap"><table><thead><tr><th>Species</th><th>Status</th><th class="num">Presences</th><th class="num">Mean Boyce</th><th>Per-fold Boyce</th></tr></thead><tbody>${speciesRows}</tbody></table>
-      <p class="small muted" style="margin-top:8px">Boyce index under spatial block cross-validation: +1 = predictions track presences, 0 = no better than random, negative = worse. Folds are coloured accordingly.</p></div>` : "<p>MERISTEM has not been fitted.</p>"}
+    ${me ? `<div class="card tablewrap"><table><thead><tr><th>Species</th><th>Status</th><th class="num">Presences</th><th class="num">Mean Boyce</th><th>Per-fold Boyce</th>${me.min_boyce_gate != null ? "<th>In the decision layer</th>" : ""}</tr></thead><tbody>${speciesRows}</tbody></table>
+      <p class="small muted" style="margin-top:8px">Boyce index under spatial block cross-validation: +1 = predictions track presences, 0 = no better than random, negative = worse. Folds are coloured accordingly. The water-deficit predictor is the real water-balance value of the species' group at each record (2019), not the earlier PET-minus-precipitation proxy.${me.min_boyce_gate != null ? ` A model feeds the decision layer only if its mean Boyce index is at least ${me.min_boyce_gate}; a site is then within the niche when the fitted score reaches the score below which ${Math.round(100 * me.presence_omission)}% of the species' own records fall.` : ""}</p></div>
+      ${nicheSupportBlock(me)}` : "<p>MERISTEM has not been fitted.</p>"}
     <h2>MNEME — observed dieback</h2>
-    ${mn ? `<div class="card"><div class="grid cols-4"><div class="stat"><div class="num">${mn.n_points_valid_kndvi ?? "—"}/${mn.n_points ?? "—"}</div><div class="cap">points with a usable satellite series</div></div><div class="stat"><div class="num">${(mn.n_person_years ?? 0).toLocaleString("en")}</div><div class="cap">person-years</div></div><div class="stat"><div class="num">${mn.n_events ?? "—"}</div><div class="cap">observed dieback events</div></div><div class="stat"><div class="num">${mn.status === "fitted" ? chip("good", "fitted") : chip("bad", "no fit")}</div><div class="cap">${esc((mn.status || "").replace(/_/g, " "))}</div></div></div>
-      <p class="small muted" style="margin-top:10px">${esc(mn.scope_note || "")}</p></div>` : "<p>MNEME has not been run.</p>"}
+    ${mnemeBlock(mn)}
+    <h2>Scenario uncertainty</h2>
+    ${partitionBlock(M.uncertainty, ["treeline_shift_m", "warming_c", "precip_change_pct", "cwd_change_oak_mm", "viability_change_oak"])}
     <h2>Does predicted viability track mapped forest?</h2>
     ${ev ? `<div class="card tablewrap"><table><thead><tr><th>Group</th><th class="num">Spearman ρ</th><th class="num">p</th><th class="num">cells</th><th class="num">mean mapped cover</th></tr></thead><tbody>${evRows}</tbody></table>
       <p class="small muted" style="margin-top:8px">REFUGIUM viability against the real Ecosystem Map of Armenia's forest classes in a ${ev.window_radius_m} m window. ${ev.n_outside} of ${ev.n_cells_total} cells fall outside Armenia's border and are excluded. ρ is undefined for pine because no mapped pine cover falls in any sampled window.</p></div>` : ""}

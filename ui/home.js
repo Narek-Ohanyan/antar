@@ -252,7 +252,7 @@
       <header><span class="eyebrow">AEGIS · DECISION</span>${m && m.gridLabel && m.gridLabel.aegis ? `<span class="cgrid">${esc(m.gridLabel.aegis)}</span>` : ""}</header>
       <h3>Planting portfolio</h3>
       <p class="fnum">${esc(String(ae.n_units))}</p>
-      <p class="fwhat">candidate planting units${ae.n_eligible_units != null ? `, ${esc(String(ae.n_eligible_units))} eligible,` : ""} evaluated against ${esc(String(ae.n_scenarios))} climate scenarios</p>
+      <p class="fwhat">candidate planting units${ae.n_eligible_units != null ? `, ${esc(String(ae.n_eligible_units))} eligible${ae.n_candidate_cells_with_a_supported_group != null && ae.n_candidate_cells_with_a_supported_group < ae.n_eligible_units ? ` (${esc(String(ae.n_candidate_cells_with_a_supported_group))} within a ranked species group's niche)` : ""},` : ""} evaluated against ${esc(String(ae.n_scenarios))} climate scenarios</p>
       ${priceLine(ae.frontier)}
       <a class="flink" href="#/decision">See the portfolio <span aria-hidden="true">→</span></a>
     </article>`;

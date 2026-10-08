@@ -135,3 +135,17 @@ The author further acknowledges Alen Amirkhanian, Director of the AUA Acopian Ce
 [Forest Restoration and Climate Change in Armenia (FORACCA)](https://www.wsl.ch/en/projects/foracca/) is a Swiss-funded programme that supports reforestation on community lands, climate-smart forest management and climate-resilient development in Armenia. It is funded by the Swiss Agency for Development and Cooperation (SDC) (10 years, 2023–2033, CHF 10 million; main phase 2025–2028) and implemented by the Forest Alliance, a consortium of Armenian NGOs led by Shen NGO, the Swiss Federal Research Institute WSL and the Food and Agriculture Organization of the United Nations (FAO). Its aims are to advance scientific understanding of Armenia's capacity to address climate change and sustainably manage its forests; to promote climate-smart practices in rural areas; and to ensure evidence-based policymaking for climate adaptation and efficient forest management. The project provides new climate services for Armenia, including high-resolution climate scenarios and local climate impact profiles for every municipality.
 
 Sources: [WSL](https://www.wsl.ch/en/projects/foracca/), [Armenpress](https://armenpress.am/en/article/1126549); checked 2026-10-06.
+
+## Reproducing the MNEME and MERISTEM results
+
+```bash
+python scripts/extract_mneme_forest_pixels.py --dense --pixels-per-node=100000   # forest pixels of every climate cell: kNDVI, harvest/fire layer, height (reads Google Drive)
+python scripts/fit_mneme_hazard_panel.py --dense --pixels-per-node=100000        # climate of the cells, event labels, mirrored-series check, hazard fit when it is allowed
+python scripts/fit_mneme_vitality_response.py                                     # vitality response to drought and the check of XYLEM's ranking (local)
+python scripts/compute_real_cwd_for_meristem.py                                   # real water-balance deficit at the 3,524 species points (reads Google Drive)
+python scripts/fit_meristem_adult_niche.py && python scripts/apply_meristem_niche.py
+python scripts/compute_refugium_criteria.py && python scripts/compute_uncertainty_partition.py
+python scripts/fit_aegis_portfolio.py --dense                                     # the portfolio, with the niche and the species-group caps
+```
+
+`scripts/run_meristem_then_mneme_all.sh` chains the Drive-heavy steps so that two jobs never read Drive at once. The harvest/fire layer is `antar_disturbance_ancillary_v2` (the first export was wrong; see `IMPLEMENTATION_LOG.md`).

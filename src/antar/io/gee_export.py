@@ -217,16 +217,23 @@ def export_disturbance_ancillary(
     scale_m: float,
     drive_folder: str = "antar_gee_exports",
     hansen_asset: str = "UMD/hansen/global_forest_change_2023_v1_11",
+    description: str = "antar_disturbance_ancillary",
 ):
     """Per-year 'no_disturbance' boolean layer: NOT(Hansen GFC loss that year OR any
     MODIS MCD64A1 burn that year). This is exactly the ``no_disturbance`` input
     :func:`antar.hazard.observation.dieback_event` expects -- computed here, never
     inferred from the vitality signal itself, so that a real dieback event is never
     misread as (or masked by) a harvest/fire event and vice versa.
+
+    Correction (2026-10-07): the first export of this layer was wrong. Hansen's ``lossyear`` band is *masked* where nothing was lost, not zero, so ``lossyear.eq(k)`` was
+    masked at every pixel without a loss, the Or/Not chain stayed masked, and the exported byte layer read 0 ("disturbed") for every pixel without a loss in any year after
+    2000 and 1 only at pixels that were lost in some other year. The dieback rule can only fire where this layer is 1, so it could never fire, and the earlier "no dieback
+    events" result came from the layer, not from the forests. ``unmask(0)`` below makes "no loss" an explicit 0. Hansen v1.11 ends in 2023: for 2024 the layer says "no
+    loss", which means unknown, not undisturbed.
     """
     aoi = ee.Geometry.Rectangle(list(bbox_wgs84))
     gfc = ee.Image(hansen_asset)
-    lossyear = gfc.select("lossyear")  # 0 = no loss; 1..N = loss in (2000 + value)
+    lossyear = gfc.select("lossyear").unmask(0)  # 0 = no loss; 1..N = loss in (2000 + value); unmask: the band is masked, not zero, where there was no loss
 
     bands = {}
     for y in range(year_start, year_end + 1):
@@ -245,7 +252,7 @@ def export_disturbance_ancillary(
 
     image = ee.Image.cat(list(bands.values())).toByte()
     task = ee.batch.Export.image.toDrive(
-        image=image, description="antar_disturbance_ancillary", folder=drive_folder,
+        image=image, description=description, folder=drive_folder,
         region=aoi, crs=crs, scale=scale_m, maxPixels=1e13,
     )
     task.start()

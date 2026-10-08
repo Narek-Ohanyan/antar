@@ -20,7 +20,9 @@ ROOT = Path(__file__).resolve().parent.parent
 UI = ROOT / "ui"
 HTACCESS = ROOT / "deploy" / ".htaccess"
 ROBOTS = "User-agent: *\nAllow: /\n"
-MAX_BYTES = 16_000_000
+# A guard against shipping something huge by mistake (a raw result file is tens of megabytes), not a page-weight budget: the browser receives the data compressed (grid_dense.json, 9.8 MB, is
+# about 2.3 MB gzipped) and loads it on the map pages only.
+MAX_BYTES = 20_000_000
 
 # files the scripts fetch at run time (they are not named in index.html)
 FETCHED = ["data/manifest.json", "data/methodology.json", "assets/relief.svg", "assets/architecture.svg", "assets/katex/katex.min.js", "assets/katex/katex.min.css",

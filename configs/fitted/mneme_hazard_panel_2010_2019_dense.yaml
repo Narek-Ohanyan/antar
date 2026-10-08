@@ -1,0 +1,90 @@
+run_date: '2026-10-08'
+grid: dense_armenia_stride7
+design: forest pixels (closed forest on the Ecosystem Map), every qualifying pixel
+  of each climate cell
+pixels_per_cell_cap: 100000
+n_qualifying_pixels: 57504
+panel_years:
+- 2010
+- 2011
+- 2012
+- 2013
+- 2014
+- 2015
+- 2016
+- 2017
+- 2018
+- 2019
+n_points: 219
+n_pixels: 57504
+n_points_valid_kndvi: 57504
+n_cells: 219
+n_person_years: 570175
+n_pixel_years_total: 570871
+n_events: 162
+n_events_if_flags_ignored: 166
+n_pixels_with_event: 162
+n_cells_with_event: 39
+event_rate_per_pixel_year: 0.00028412329547945807
+event_rate_ci95:
+- 0.00024206031278644596
+- 0.00033139292295730944
+event_rate_upper_bound_95_one_sided: null
+year_effect_removed:
+  n_events: 1171
+  n_person_years: 566382
+  event_rate_per_pixel_year: 0.002067509207566625
+  event_rate_ci95:
+  - 0.0019508846371228761
+  - 0.002189272993951481
+  note: the strict rule on series from which the year effect common to the forest
+    pixels was removed (sensor and composite changes step all pixels together); a
+    country-wide drought is removed with it, so this is a check next to the unadjusted
+    rule, not a replacement
+mirror_check:
+  n_pixels_with_full_series: 18500
+  pixels_with_onset_of_decline: 92
+  pixels_with_onset_of_rise: 1370
+  year_effect_removed:
+    pixels_with_onset_of_decline: 518
+    pixels_with_onset_of_rise: 989
+  note: 'the dieback rule on the vitality series alone (harvest/fire flags ignored),
+    and on the mirrored series, which counts persistent rises; clearly more declines
+    than rises would be the signature of real dieback. In the real record rises outnumber
+    declines: the unadjusted series carries a sensor-driven upward step, so the rule
+    is not read as a dieback detector without the year-effect-removed variant'
+forest_class_pixels:
+  31: 26563
+  32: 12044
+  33: 8731
+  34: 8115
+  35: 1013
+  36: 89
+  37: 949
+design_columns:
+- cwd_mm_dev
+- vpd24_mean_kpa_dev
+- gdd_annual_dev
+- t_mean_c_annual_dev
+- cwd_mm_bar
+- vpd24_mean_kpa_bar
+- gdd_annual_bar
+- t_mean_c_annual_bar
+- height_m
+min_events_per_predictor: 10
+rule: z < -2 against the pixel's own previous 10 years, starting a decline (previous
+  year not below -2), no harvest or fire flag in the year or the year before, and
+  no recovery above -1 in the next 2 years; first onset only
+scope_note: 'Climate-only Mundlak design (cwd_mm, vpd24_mean_kpa, gdd_annual, t_mean_c_annual,
+  each split within/between by climate cell) plus the 2019 canopy height of the pixel;
+  no stand age, lagged-drought cross-basis or stand-interaction terms, because no
+  such data exist for Armenian plots. Misclassification correction (Se/Sp) is not
+  applied: no labelled sample exists. Pixels of one cell share their climate, so person-years
+  are not independent and the event-rate interval is narrower than the data justify.'
+decline_to_rise_ratio: 0.06715328467153285
+min_decline_to_rise_ratio: 2.0
+status: events_not_distinguishable_from_noise
+status_detail: '162 events, enough for the fit, but the same rule finds 92 pixels
+  with a decline and 1370 with a rise on the mirrored series (ratio 0.07; at least
+  2 is required): the events cannot be told from variation in the record, so no hazard
+  is fitted'

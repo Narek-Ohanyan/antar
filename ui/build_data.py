@@ -49,7 +49,7 @@ GROUPS = {
 HYDRO_FIELDS = [("cwd_mm", "cwd", "Climatic water deficit", "mm", 1), ("wsi", "wsi", "Water-stress integral", "", 2),
                 ("psi_min_mpa", "psimin", "Minimum soil water potential", "MPa", 2)]
 # For colouring change maps: which direction is favourable for the forest. Matched on the layer-id prefix.
-GOOD_DIRECTION = [("viab_", "high"), ("pviab_", "high"), ("robust_", "high"), ("refscore_", "high"), ("hmech_sd", None),
+GOOD_DIRECTION = [("viab_", "high"), ("pviab_", "high"), ("robust_", "high"), ("robustfull_", "high"), ("aoa_", "high"), ("buffer_", "high"), ("refscore_", "high"), ("hmech_sd", None),
                   ("hmech_", "low"), ("cwd_", "low"), ("wsi", "low"), ("psimin_", "high"), ("psi_min", "high"),
                   ("treeline_margin", "high"), ("treeline_shift", "high"), ("treeline_2019", "high")]
 ROOTING_DEPTH_M = {"mesic_diffuse_porous_broadleaf": 2.9, "ring_porous_oak": 2.9, "pine": 3.9,
@@ -213,11 +213,12 @@ def build_map_plan(layers, series_ids):
     produces what is missing. This is what the Status page shows, so 'no data' is never unexplained."""
     FP, XY, RF, TOPO, TL = ("run_future_projections.py", "fit_xylem_mechanistic_hazard.py", "fit_refugium_viability.py",
                             "run_topohydro_grid.py", "compute_treeline_change.py")
+    CR = "compute_refugium_criteria.py"
     plan = []
 
     def engine_of(lid):
         pre = lid.split("_")[0]
-        return {"hmech": "XYLEM", "viab": "REFUGIUM", "pviab": "REFUGIUM", "refscore": "REFUGIUM", "robust": "REFUGIUM", "treeline": "Treeline"}.get(pre, "TOPOHYDRO")
+        return {"hmech": "XYLEM", "viab": "REFUGIUM", "pviab": "REFUGIUM", "refscore": "REFUGIUM", "robust": "REFUGIUM", "robustfull": "REFUGIUM", "buffer": "REFUGIUM", "aoa": "REFUGIUM", "treeline": "Treeline"}.get(pre, "TOPOHYDRO")
 
     def add(lid, label, group, base_from, scen_from):
         good = next((d for pre, d in GOOD_DIRECTION if lid.startswith(pre)), None)
@@ -238,7 +239,9 @@ def build_map_plan(layers, series_ids):
         for lid, label, bf in [("cwd", "Climatic water deficit", RF), ("wsi", "Water-stress integral", RF), ("psimin", "Minimum soil water potential", RF),
                                ("hmech", "Hydraulic-failure hazard", XY), ("hmech_sd", "Hazard uncertainty (trait-knowledge spread)", XY),
                                ("viab", "Viability", RF), ("pviab", "Probability that viability stays above the threshold", RF),
-                               ("refscore", "Risk-averse refugium score", RF), ("robust", "Robust refugium (criterion a)", RF)]:
+                               ("refscore", "Risk-averse refugium score", RF), ("robust", "Robust refugium (criterion a)", RF),
+                               ("buffer", "Buffer index (criterion b)", CR), ("aoa", "Inside the area of applicability (criterion c)", CR),
+                               ("robustfull", "Robust refugium, all three criteria", CR)]:
             add(f"{lid}_{g}", f"{label} — {short}", g, bf, FP)
     for lid, label in [("treeline_2019", "Potential treeline elevation"), ("treeline_margin", "Headroom below climatic treeline"),
                        ("treeline_above", "Above own climatic treeline")]:
@@ -355,6 +358,20 @@ def build():
             baseline_viab[gname] = r(np.mean(vals), 4) if vals else None
             refugium_arm[gname] = {"mean_viability": baseline_viab[gname], "n_cells": int(ins.sum()),
                                    "n_robust": int(sum(1 for c, i in zip(g["cells"], ins) if i and c["robust_refugium_criterion_a"]))}
+        crit = load("refugium_criteria_dense.yaml") if gid == "dense" else None
+        if crit:
+            for gname, cg in crit["groups"].items():
+                if cg["status"] != "ok":
+                    continue                       # no area of applicability can be built for this group, so there is no layer to draw (the Models and Method pages say so)
+                short = GROUPS[gname]["short"]
+                note = ""
+                for c in cg["cells"]:
+                    k = G.touch(c["lat"], c["lon"])
+                    if c["buffer_index"] is not None:
+                        G.set(f"buffer_{gname}", k, r(c["buffer_index"], 2), {"label": f"Buffer index (2019), criterion (b) — {short}", "unit": "SD", "engine": "REFUGIUM", "group": gname})
+                    G.set(f"aoa_{gname}", k, 1 if c["inside_aoa"] else 0, {"label": f"Inside the area of applicability (2019), criterion (c) — {short}{note}", "unit": "0/1", "engine": "REFUGIUM", "group": gname, "binary": True})
+                    G.set(f"robustfull_{gname}", k, 1 if c["robust_full"] else 0, {"label": f"Robust refugium, all three criteria (2019) — {short}{note}", "unit": "0/1", "engine": "REFUGIUM", "group": gname, "binary": True})
+            refugium_arm["criteria"] = {gname: {"status": cg["status"], "n_aoa_training_cells": cg["n_aoa_training_nodes"], **cg["baseline"]} for gname, cg in crit["groups"].items()}
         engines["refugium"] = {"grid": gid, "v_star": rf.get("v_star"), "rho": rf.get("rho"), "lam": rf.get("lam"),
                                "groups": refugium_arm,
                                "scope_note": rf.get("scope_note")}
@@ -424,6 +441,15 @@ def build():
                 if all(fld in c for cells in rows for c in cells):
                     conv = (lambda v: int(bool(v))) if fld == "robust_criterion_a" else (lambda v, nd=nd: r(v, nd))
                     series[f"{lid}_{gn}"] = [[conv(c[fld]) for c in cells] for cells in rows]
+        crit_s = load("refugium_criteria_dense.yaml") if gid == "dense" else None
+        if crit_s:
+            for gname, cg in crit_s["groups"].items():
+                if gname not in gnames or cg["status"] != "ok":
+                    continue
+                pos = {key(c["lat"], c["lon"]): i for i, c in enumerate(cg["cells"])}
+                idx = [pos.get(ck) for ck in cell_keys]
+                for lid, field in (("robustfull", "robust_full"), ("aoa", "inside_aoa")):
+                    series[f"{lid}_{gname}"] = [[None if i is None else cg["members"][m][field][i] for i in idx] for m in member_keys]
         if all("climate" in fp["members"][m] for m in member_keys):
             for fld, lid, nd in [("t_mean_c", "t_mean", 2), ("precip_mm", "precip", 0), ("gdd", "gdd", 0),
                                  ("gsl_days", "gsl", 0)]:
@@ -481,14 +507,18 @@ def build():
             cost = {i["name"]: i["cost_per_ha"] for i in INTERVENTIONS}
         except Exception:  # pragma: no cover
             cost = {}
-        sweep = []
-        for k, v in ae["budget_sweep"].items():
-            row = {"budget_usd": float(k.replace("$", "").replace(",", ""))}
-            for a, val in v.items():
-                if a == "selected":
-                    continue                       # the treated cells go to data/aegis_units.json, loaded only by the Decision page
-                row[a] = val if (isinstance(val, (dict, str, bool)) or a == "n_units_planted") else r(val, 6 if a == "mip_gap" else 2)
-            sweep.append(row)
+        def sweep_rows(src):
+            rows = []
+            for k, v in src.items():
+                row = {"budget_usd": float(k.replace("$", "").replace(",", ""))}
+                for a, val in v.items():
+                    if a == "selected":
+                        continue                       # the treated cells go to data/aegis_units.json, loaded only by the Decision page
+                    row[a] = val if (isinstance(val, (dict, str, bool)) or a == "n_units_planted") else r(val, 6 if a == "mip_gap" else 2)
+                rows.append(row)
+            return rows
+        sweep = sweep_rows(ae["budget_sweep"])
+        diversity = {cap: sweep_rows(src) for cap, src in (ae.get("diversity_sweep") or {}).items()}
         fr = ae["lambda_frontier_at_representative_budget"]
         aegis = {"grid": gid, "scenario_source": ae["scenario_source"], "n_scenarios": ae["n_scenarios"],
                  "n_units": ae["n_units"], "n_eligible_units": ae.get("n_eligible_units"), "unit_area_ha": ae.get("unit_area_ha"),
@@ -497,7 +527,8 @@ def build():
                  "net_value_per_ha_year_usd": ae.get("net_value_per_ha_year_usd"),
                  "scope_note": ae["scope_note"], "budget_sweep": sweep,
                  "cost_table": [{k: c.get(k) for k in ("name", "cost_per_ha", "cost_low", "cost_high", "cost_basis", "source", "role")} for c in ae.get("cost_table", [])],
-                 "not_ranked": ae.get("not_ranked", []), "min_open_share": ae.get("min_open_share"), "n_eligible_before_land_cover": ae.get("n_eligible_before_land_cover"),
+                 "not_ranked": ae.get("not_ranked", []), "niche": ae.get("niche"), "not_ranked_groups": ae.get("not_ranked_groups", []), "n_candidate_cells_with_a_supported_group": ae.get("n_candidate_cells_with_a_supported_group"), "group_caps": ae.get("group_caps", []),
+                 "diversity_sweep": diversity, "diversity_note": ae.get("diversity_note"), "min_open_share": ae.get("min_open_share"), "n_eligible_before_land_cover": ae.get("n_eligible_before_land_cover"),
                  "planting_cost_sensitivity": ae.get("planting_cost_sensitivity"),
                  "frontier": {"lambdas": fr.get("lambdas"), "expected": [r(v, 2) for v in fr.get("expected", [])],
                               "cvar": [r(v, 2) for v in fr.get("cvar", [])],
@@ -510,7 +541,9 @@ def build():
     units_path = OUT / "aegis_units.json"
     if aegis and ae.get("units"):
         dump({"units": ae["units"], "intervention_ids": ae["intervention_ids"],
-              "budgets": [{"budget_usd": float(k.replace("$", "").replace(",", "")), "selected": v.get("selected", [])} for k, v in ae["budget_sweep"].items()]}, units_path)
+              "budgets": [{"budget_usd": float(k.replace("$", "").replace(",", "")), "selected": v.get("selected", [])} for k, v in ae["budget_sweep"].items()],
+              "capped": {cap: [{"budget_usd": float(k.replace("$", "").replace(",", "")), "selected": v.get("selected", [])} for k, v in src.items()]
+                         for cap, src in (ae.get("diversity_sweep") or {}).items()}}, units_path)
         aegis["units_file"] = "aegis_units.json"
     elif units_path.exists():
         units_path.unlink()                        # never leave the cells of a withheld or older portfolio behind
@@ -525,11 +558,42 @@ def build():
                              "boyce_mean": (v.get("spatial_block_cv") or {}).get("boyce_index_mean"),
                              "boyce_folds": (v.get("spatial_block_cv") or {}).get("boyce_index_per_fold")}
                         for sp, v in mer["species"].items()}}
-    mn, gid, info = choose("MNEME hazard panel", "mneme_hazard_panel_2010_2019.yaml",
-                           "mneme_hazard_panel_2010_2019_dense.yaml", lambda d: d.get("n_points_valid_kndvi", 0))
-    provenance["mneme"] = info
-    mneme = {k: mn[k] for k in ("grid", "n_points", "n_points_valid_kndvi", "n_person_years", "n_events",
-                                "n_spatial_blocks", "status", "scope_note") if k in mn} if mn else None
+        nn = load("meristem_niche_nodes_dense.yaml")
+        if nn:
+            meristem["min_boyce_gate"] = nn["min_boyce_gate"]
+            meristem["presence_omission"] = nn["presence_omission"]
+            for sp, v in nn["species"].items():
+                if sp in meristem["species"]:
+                    meristem["species"][sp]["passes_gate"] = v["passes_gate"]
+            meristem["group_support"] = {g: {"status": e["status"], "species_used": e.get("species_used", []), "n_supported_baseline": e.get("n_supported_baseline"), "n_nodes": e["n_nodes"],
+                                              "reason": e.get("reason"), "by_path_and_horizon": e.get("n_supported_by_path_and_horizon")} for g, e in nn["groups"].items()}
+    mn, vit = load("mneme_hazard_panel_2010_2019_dense.yaml"), load("mneme_vitality_response_dense.yaml")
+    provenance["mneme"] = {"dataset": "MNEME forest-pixel panel", "file": "mneme_hazard_panel_2010_2019_dense.yaml" if mn else None, "grid": "forest pixels (up to 25 per climate cell)", "rejected": [], "withheld": []}
+    mneme = None
+    if mn:
+        mneme = {k: mn[k] for k in ("grid", "design", "panel_years", "n_points", "n_pixels", "n_cells", "n_person_years", "n_events", "n_events_if_flags_ignored", "n_pixels_with_event",
+                                    "n_cells_with_event", "pixels_per_cell_cap", "n_qualifying_pixels", "event_rate_per_pixel_year", "event_rate_ci95", "year_effect_removed", "mirror_check", "forest_class_pixels", "min_events_per_predictor",
+                                    "design_columns", "rule", "status", "status_detail", "decline_to_rise_ratio", "min_decline_to_rise_ratio", "scope_note", "glm_coefficients", "oof_auc_stacked") if k in mn}
+        if vit:
+            def rd(o):
+                if isinstance(o, float):
+                    return round(o, 4)
+                if isinstance(o, dict):
+                    return {k: rd(v) for k, v in o.items()}
+                if isinstance(o, list):
+                    return [rd(v) for v in o]
+                return o
+            mneme["vitality"] = rd({k: vit[k] for k in ("what", "n_pixel_years", "n_pixels", "n_cells", "n_excluded_recent_disturbance", "anomaly_sd", "model_a", "model_b", "model_c_height",
+                                                        "leave_one_year_out", "sensitivity", "response_by_anomaly_bin", "xylem_check") if k in vit})
+    up = load("uncertainty_partition_dense.yaml")
+    uncertainty = None
+    if up:
+        def med(d):
+            return {k: (None if v is None else r(v["median"], 3)) for k, v in d.items()}
+        uncertainty = {"design": up["design"], "method": up["method"], "internal_variability_note": up["internal_variability_note"], "grid": "dense",
+                       "metrics": {mid: {"label": m["label"], "unit": m["unit"], "n_nodes_used": m["n_nodes_used"], "n_nodes": m["n_nodes"], "pooled": med(m["pooled"]),
+                                         "by_horizon": {str(h): med(v) for h, v in m["by_horizon"].items()}, "ensemble_sd": r(m["ensemble_sd"], 3)} for mid, m in up["metrics"].items()}}
+    provenance["uncertainty_partition"] = {"dataset": "Ensemble uncertainty partition", "file": "uncertainty_partition_dense.yaml" if up else None, "grid": "dense", "rejected": [], "withheld": []}
     vg, gid, info = choose("Variogram", "variogram.yaml", "variogram_dense.yaml", lambda d: d.get("n_points", 0))
     provenance["variogram"] = info
     variogram = vg
@@ -642,6 +706,7 @@ def build():
         "aegis": aegis,
         "meristem": meristem,
         "mneme": mneme,
+        "uncertainty": uncertainty,
         "variogram": variogram,
         "references": refs,
         "photos": photos,
