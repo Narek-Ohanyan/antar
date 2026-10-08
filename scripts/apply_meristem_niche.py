@@ -26,6 +26,7 @@ from rasterio.warp import transform as warp_transform
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from antar.io import fitted as fitted_io  # noqa: E402
 from antar.niche import application as A  # noqa: E402
 from run_topohydro_grid import CACHE_DIR, DENSE_GRID_COLS, DENSE_GRID_ROWS, SOILS_DRIVE_ID, drive_vsicurl_url, extract_static_grid_inputs, get_access_token  # noqa: E402
 
@@ -44,7 +45,7 @@ def key(lat, lon):
 
 
 def load(name):
-    return yaml.load(open(FITTED / name), Loader=yaml.CSafeLoader)
+    return fitted_io.read_yaml(FITTED / name)
 
 
 def soils_at(lats, lons):

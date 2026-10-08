@@ -17,4 +17,4 @@ Everything in here is written for clarity and testability first.  Heavy I/O
 (GEE exports, Zarr/COG handling) lives in ``antar.io`` as documented stubs.
 """
 
-__version__ = "2.0.0-alpha"
+__version__ = "2.0.0"

@@ -1,0 +1,87 @@
+# Sources the results use that had no citation of their own on the References page: the Earth Engine products behind the vitality record, the harvest and fire layer, terrain, soils and
+# ERA5-Land, and the ISIMIP3a atmosphere shape. Only works whose bibliographic details are certain are given; access dates are those of the Drive exports. Generated with yaml.safe_dump so it always parses.
+- variable: hansen_global_forest_change_loss_year
+  source: Hansen et al. Global Forest Change (University of Maryland, Google, USGS, NASA), via Google Earth Engine
+  version: 2023 release (Earth Engine asset UMD/hansen/global_forest_change_2023_v1_11)
+  url: https://developers.google.com/earth-engine/datasets/catalog/UMD_hansen_global_forest_change_2023_v1_11
+  citation: Hansen, M.C., Potapov, P.V., Moore, R., Hancher, M., Turubanova, S.A., Tyukavina, A., Thau, D., Stehman, S.V., Goetz, S.J., Loveland, T.R., Kommareddy, A., Egorov, A., Chini, L., Justice, C.O.,
+    Townshend, J.R.G. (2013). High-resolution global maps of 21st-century forest cover change. Science 342, 850-853. https://doi.org/10.1126/science.1244693
+  license: CC BY 4.0
+  access_date: '2026-10-07'
+  notes: Loss year, used with MODIS burned area for the harvest and fire flag of MNEME. The layer is masked, not zero, where nothing was lost; the first export mishandled this (see IMPLEMENTATION_LOG.md).
+    Ends in 2023.
+- variable: modis_burned_area_mcd64a1
+  source: MODIS/Terra+Aqua Burned Area Monthly L3 Global 500 m (NASA LP DAAC), via Google Earth Engine
+  version: Collection 6.1 (MODIS/061/MCD64A1)
+  url: https://doi.org/10.5067/MODIS/MCD64A1.061
+  citation: Giglio, L., Justice, C., Boschetti, L., Roy, D. (2021). MODIS/Terra+Aqua Burned Area Monthly L3 Global 500m SIN Grid V061. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MCD64A1.061
+  license: NASA Earthdata open data policy (no restrictions)
+  access_date: '2026-10-07'
+  notes: Any burn in a year flags that year as disturbed.
+- variable: harmonized_landsat_sentinel2_surface_reflectance
+  source: Harmonized Landsat Sentinel-2 (HLS) v2.0, NASA, via Google Earth Engine
+  version: v2.0 (HLSL30 and HLSS30)
+  url: https://doi.org/10.5067/HLS/HLSL30.002
+  citation: Claverie, M., Ju, J., Masek, J.G., Dungan, J.L., Vermote, E.F., Roger, J.-C., Skakun, S.V., Justice, C. (2018). The Harmonized Landsat and Sentinel-2 surface reflectance data set. Remote Sensing
+    of Environment 219, 145-161. https://doi.org/10.1016/j.rse.2018.09.002
+  license: NASA Earthdata open data policy (no restrictions)
+  access_date: '2026-09-30'
+  notes: With Landsat Collection 2 Level-2 surface reflectance (USGS), the source of the Jul-Aug kNDVI composites 2000-2024 behind MNEME. The number of valid observations per composite changes through the
+    record.
+- variable: usgs_landsat_collection_2_level_2
+  source: U.S. Geological Survey, Landsat Collection 2 Level-2 surface reflectance (Landsat 5, 7, 8, 9), via Google Earth Engine
+  version: Collection 2
+  url: https://www.usgs.gov/landsat-missions/landsat-collection-2-level-2-science-products
+  citation: U.S. Geological Survey. Landsat Collection 2 Level-2 Science Products (surface reflectance). https://www.usgs.gov/landsat-missions/landsat-collection-2-level-2-science-products
+  license: public domain (USGS)
+  access_date: '2026-09-30'
+- variable: kndvi_vitality_index
+  source: kernel NDVI (kNDVI)
+  version: tanh(NDVI^2)
+  url: https://doi.org/10.1126/sciadv.abc7447
+  citation: Camps-Valls, G., Campos-Taberner, M., Moreno-Martínez, Á., Walther, S., Duveiller, G., Cescatti, A., Mahecha, M.D., Muñoz-Marí, J., García-Haro, F.J., Guanter, L., Jung, M., Gamon, J.A., Reichstein,
+    M., Running, S.W. (2021). A unified vegetation index for quantifying the terrestrial biosphere. Science Advances 7, eabc7447. https://doi.org/10.1126/sciadv.abc7447
+  license: not applicable (method)
+  access_date: '2026-09-30'
+- variable: sentinel2_vegetation_height_model_method
+  source: Method of the Sentinel-2 vegetation height model (S2-VHM)
+  version: n/a
+  url: https://doi.org/10.1016/j.srs.2023.100099
+  citation: 'Jiang et al. (2023), https://doi.org/10.1016/j.srs.2023.100099: the method paper named in the S2-VHM dataset record (Rueetschi and Ginzler 2025, EnviDat doi:10.16904/envidat.690).'
+  license: not applicable (method)
+  access_date: '2026-09-24'
+- variable: era5_land_atmosphere
+  source: ERA5-Land (Copernicus Climate Change Service / ECMWF), via Google Earth Engine
+  version: ERA5-Land hourly
+  url: https://doi.org/10.5194/essd-13-4349-2021
+  citation: 'Muñoz-Sabater, J., Dutra, E., Agustí-Panareda, A., Albergel, C., Arduini, G., Balsamo, G., Boussetta, S., Choulga, M., Harrigan, S., Hersbach, H., Martens, B., Miralles, D.G., Piles, M., Rodríguez-Fernández,
+    N.J., Zsoter, E., Buontempo, C., Thépaut, J.-N. (2021). ERA5-Land: a state-of-the-art global reanalysis dataset for land applications. Earth System Science Data 13, 4349-4383. https://doi.org/10.5194/essd-13-4349-2021'
+  license: Copernicus licence (free, with attribution)
+  access_date: '2026-09-30'
+  notes: Annual means of wind, shortwave, longwave, dew point and surface pressure per cell; the seasonal cycle and its change come from ISIMIP (below).
+- variable: soilgrids_2_0
+  source: SoilGrids 2.0 (ISRIC - World Soil Information), via Google Earth Engine
+  version: '2.0'
+  url: https://doi.org/10.5194/soil-7-217-2021
+  citation: 'Poggio, L., de Sousa, L.M., Batjes, N.H., Heuvelink, G.B.M., Kempen, B., Ribeiro, E., Rossiter, D. (2021). SoilGrids 2.0: producing soil information for the globe with quantified spatial uncertainty.
+    SOIL 7, 217-240. https://doi.org/10.5194/soil-7-217-2021'
+  license: CC BY 4.0
+  access_date: '2026-09-30'
+- variable: srtm_elevation
+  source: Shuttle Radar Topography Mission 1 arc-second (NASA/USGS), via Google Earth Engine
+  version: USGS/SRTMGL1_003
+  url: https://doi.org/10.1029/2005RG000183
+  citation: Farr, T.G., Rosen, P.A., Caro, E., Crippen, R., Duren, R., Hensley, S., Kobrick, M., Paller, M., Rodriguez, E., Roth, L., Seal, D., Shaffer, S., Shimada, J., Umland, J., Werner, M., Oskin, M.,
+    Burbank, D., Alsdorf, D. (2007). The Shuttle Radar Topography Mission. Reviews of Geophysics 45, RG2004. https://doi.org/10.1029/2005RG000183
+  license: public domain (NASA/USGS)
+  access_date: '2026-09-30'
+  notes: Elevation, slope and aspect at 30 m; used instead of Copernicus GLO-30, whose Earth Engine copy covers only part of Armenia.
+- variable: isimip3a_obsclim_gswp3_w5e5_atmosphere
+  source: ISIMIP3a observation-based climate input data (GSWP3-W5E5), ISIMIP Repository
+  version: ISIMIP3a obsclim
+  url: https://data.isimip.org/
+  citation: ISIMIP3a obsclim atmospheric climate input data, GSWP3-W5E5 (daily, 2011-2019), ISIMIP Repository, https://data.isimip.org/ ; built on GSWP3 (Kim, H. 2017, Global Soil Wetness Project Phase
+    3 Atmospheric Boundary Conditions, https://doi.org/10.20783/DIAS.501) adjusted to W5E5 (Lange, S. 2019, WFDE5 over land merged with ERA5 over the ocean, https://doi.org/10.5880/pik.2019.023)
+  license: CC BY 4.0
+  access_date: '2026-10-06'
+  notes: Gives the seasonal shape of shortwave, longwave, wind and vapour pressure (baseline 2015-2019); the ISIMIP3b change factors are in the isimip3b manifest.

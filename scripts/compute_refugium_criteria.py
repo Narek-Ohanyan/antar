@@ -21,6 +21,7 @@ from rasterio.windows import Window
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
+from antar.io import fitted as fitted_io  # noqa: E402
 from antar.viability import criteria as C  # noqa: E402
 
 FITTED = ROOT / "configs" / "fitted"
@@ -41,7 +42,7 @@ def key(lat, lon):
 
 
 def load(name):
-    return yaml.load(open(FITTED / name), Loader=yaml.CSafeLoader)
+    return fitted_io.read_yaml(FITTED / name)
 
 
 def forest_shares(lat, lon):

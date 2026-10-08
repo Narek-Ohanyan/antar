@@ -36,7 +36,7 @@ def test_citation_file_names_the_work_exactly():
 def test_footer_and_readme_carry_the_same_reference():
     footer = text_of("ui/index.html")
     readme = (ROOT / "README.md").read_text()
-    ref = f"Ohanyan, N. (2026). {NAME} (Version 2.0.0-alpha) [Computer software and web interface]. {URL} (source code: {REPO})"
+    ref = f"Ohanyan, N. (2026). {NAME} (Version 2.0.0) [Computer software and web interface]. {URL} (source code: {REPO})"
     assert ref in re.sub(r"\s+", " ", footer)
     assert ref.replace("*", "") in re.sub(r"\s+", " ", readme.replace("\n> ", " ").replace("*", ""))
     assert "© 2026 Narek Ohanyan. All rights reserved." in footer

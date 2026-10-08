@@ -1,20 +1,29 @@
 # ANTAR — Assessment of Niche, Treeline & Analogue Refugia
 
-ANTAR (Assessment of Niche, Treeline & Analogue Refugia) is a hybrid process-statistical framework for
-predicting where climate-resilient reforestation will hold in Armenia. This repo fixes the interfaces
-of the framework and implements, with tests, the numerical kernels the rest depends on.
-It is a **skeleton**, not the finished framework: data access and the full-scale pipeline steps are declared
-but not implemented, and the species traits in `configs/species_traits.csv` are **placeholders** that exercise
-the code. Nothing produced from them is a result.
+ANTAR is a hybrid process-statistical framework for finding where climate-resilient forest restoration will hold in Armenia. Six engines are chained: a daily water balance
+(TOPOHYDRO), a mechanistic hydraulic-failure hazard (XYLEM), a statistical dieback hazard (MNEME), species niches and the climatic treeline (MERISTEM), viability and robust refugia
+under 45 climate scenarios (REFUGIUM), and a budget-constrained, scenario-robust planting portfolio (AEGIS). Results are on a dense grid of 854 Armenian nodes (921 for the treeline),
+about 6.5 km apart, and are explored at **https://antar.narekohanyan.com**. Every result carries its caveats: what is a placeholder, what is not fitted, and why.
+
+Version 2.0.0. The honest summary of what it can and cannot say is on the site's *Models & validation* and *Status & limits* pages and in `IMPLEMENTATION_LOG.md`; in short:
+
+* **Run on real data:** the water balance and hydraulic hazard for 2019, 45 scenario members (5 climate models × 3 emissions paths × 3 horizons), the climatic treeline shift, species niches
+  (refitted with the real water deficit), refugium criteria (a), (b) and (c), the variance partition of the ensemble, and the CVaR-robust planting portfolio with species niches and an optional cap on the share of one species group.
+* **Built but not fitted:** MNEME's hazard model. The satellite vitality record finds 162 dieback onsets in 570,175 forest pixel-years, but cannot tell them from changes in the record itself (92 pixels with a persistent decline against 1,370 with a persistent rise), so no hazard is claimed. In its place a vitality-response analysis finds no detectable drought response overall and supports XYLEM's drought-stress ranking for oak only.
+* **Placeholders:** several hydraulic traits, the budburst threshold behind late frost, the calm-clear-night fraction; they are listed with their measured effect on the Status page.
+* **Not modelled:** growth and height (MERISTEM), stand connectivity, method-specific survival, water use. Deferred to version 2.1: TRY plant traits and CORDEX regional projections.
 
 ## Quick start
 
 ```bash
 pip install -e ".[dev]"      # numpy, scipy, pandas, scikit-learn, pyyaml (+ pytest, matplotlib)
-python -m pytest             # a few seconds
+python -m pytest             # the full suite takes several minutes (it starts a real Apache to test the deployment rules)
+python ui/build_data.py      # builds the web data from configs/fitted/ (needs only pyyaml and numpy)
+python scripts/serve_ui.py   # http://localhost:8765
 ```
 
 Optional extras: `.[geo]` (rasters, zarr), `.[bayes]` (PyMC), `.[ml]` (boosting, SHAP, conformal), `.[workflow]` (Snakemake, DVC).
+The fitted results the site shows are committed in `configs/fitted/`; the raw and derived rasters are not (see Data and reproduction).
 
 ## The six engines
 
@@ -41,14 +50,44 @@ Supporting, cross-cutting packages:
 never committed: they live in a local, gitignored `data/` directory and are tracked by manifest
 (`antar.io.manifest`) rather than by path.
 
-## Reproducing the figures
+## Data and reproduction
+
+Raw and derived rasters live in a local, gitignored `data/` directory and are tracked by manifest (`configs/manifests/`: source, version, URL, citation, licence, checksum), never by path.
+Large rasters are streamed from Google Drive (exports of Google Earth Engine; credentials are the Earth Engine OAuth file in `~/.config/earthengine/`, never stored in the repository).
+Reproducing everything from scratch takes days of compute; the order on the dense grid is:
+
+```bash
+python scripts/run_topohydro_grid.py --dense                       # daily water balance of the 2019 climate at the nodes
+python scripts/fit_xylem_mechanistic_hazard.py --dense             # hydraulic-failure hazard
+python scripts/fit_refugium_viability.py --dense                   # viability, risk-averse score, criterion (a)
+python scripts/run_future_projections.py --dense --workers 5       # the 45 scenario members (about a day)
+python scripts/compute_treeline_change.py --dense                  # climatic treeline shift
+python scripts/drop_invalid_nodes.py                               # removes nodes the water balance rejected
+python scripts/estimate_variogram.py --dense && python scripts/integrate_ecosystem_map.py
+python scripts/compute_refugium_criteria.py && python scripts/compute_uncertainty_partition.py
+```
+
+MNEME and MERISTEM (the Drive-heavy steps; `scripts/run_meristem_then_mneme_all.sh` chains them so that two jobs never read Drive at once):
+
+```bash
+python scripts/extract_mneme_forest_pixels.py --dense --pixels-per-node=100000   # forest pixels of every climate cell: kNDVI, harvest/fire layer, height
+python scripts/fit_mneme_hazard_panel.py --dense --pixels-per-node=100000        # climate of the cells, event labels, mirrored-series check, hazard fit when it is allowed
+python scripts/fit_mneme_vitality_response.py                                     # vitality response to drought and the check of XYLEM's ranking (local)
+python scripts/compute_real_cwd_for_meristem.py                                   # real water-balance deficit at the 3,524 species points
+python scripts/fit_meristem_adult_niche.py && python scripts/apply_meristem_niche.py
+python scripts/fit_aegis_portfolio.py --dense                                     # the portfolio, with the niche and the species-group caps
+python ui/build_data.py
+```
+
+The harvest/fire layer is `antar_disturbance_ancillary_v2` (the first export was wrong; see `IMPLEMENTATION_LOG.md`). `docs/mneme_data_request.md` says what observed dieback records would let MNEME be fitted and who may hold them.
+
+### Figures
 
 ```bash
 python scripts/make_figures.py --out docs/figures  # the hydraulic-engine and extrapolation-experiment figures
 ```
 
-The figures of the hydraulic engine and of the controlled extrapolation experiment use placeholder traits and synthetic
-data by design: they demonstrate mechanisms, not skill.
+They use placeholder traits and synthetic data by design: they demonstrate mechanisms, not skill.
 
 ## The web interface: artwork and photographs
 
@@ -91,7 +130,7 @@ rules and compression, and is tested against a real Apache in `tests/test_site_b
 
 ## Status
 
-Version 2.0.0-alpha.
+Version 2.0.0 (2026-10-08).
 
 ## Copyright
 
@@ -102,7 +141,7 @@ Version 2.0.0-alpha.
 
 Citing the work needs no permission. Please cite it as:
 
-> Ohanyan, N. (2026). *ANTAR — Assessment of Niche, Treeline & Analogue Refugia* (Version 2.0.0-alpha) [Computer software and web interface].
+> Ohanyan, N. (2026). *ANTAR — Assessment of Niche, Treeline & Analogue Refugia* (Version 2.0.0) [Computer software and web interface].
 > https://antar.narekohanyan.com (source code: https://github.com/Narek-Ohanyan/antar)
 
 ```bibtex
@@ -110,7 +149,7 @@ Citing the work needs no permission. Please cite it as:
   author       = {Ohanyan, Narek},
   title        = {{ANTAR} --- Assessment of Niche, Treeline \& Analogue Refugia},
   year         = {2026},
-  version      = {2.0.0-alpha},
+  version      = {2.0.0},
   howpublished = {Computer software and web interface},
   url          = {https://antar.narekohanyan.com},
   note         = {Source code: https://github.com/Narek-Ohanyan/antar}
@@ -136,16 +175,3 @@ The author further acknowledges Alen Amirkhanian, Director of the AUA Acopian Ce
 
 Sources: [WSL](https://www.wsl.ch/en/projects/foracca/), [Armenpress](https://armenpress.am/en/article/1126549); checked 2026-10-06.
 
-## Reproducing the MNEME and MERISTEM results
-
-```bash
-python scripts/extract_mneme_forest_pixels.py --dense --pixels-per-node=100000   # forest pixels of every climate cell: kNDVI, harvest/fire layer, height (reads Google Drive)
-python scripts/fit_mneme_hazard_panel.py --dense --pixels-per-node=100000        # climate of the cells, event labels, mirrored-series check, hazard fit when it is allowed
-python scripts/fit_mneme_vitality_response.py                                     # vitality response to drought and the check of XYLEM's ranking (local)
-python scripts/compute_real_cwd_for_meristem.py                                   # real water-balance deficit at the 3,524 species points (reads Google Drive)
-python scripts/fit_meristem_adult_niche.py && python scripts/apply_meristem_niche.py
-python scripts/compute_refugium_criteria.py && python scripts/compute_uncertainty_partition.py
-python scripts/fit_aegis_portfolio.py --dense                                     # the portfolio, with the niche and the species-group caps
-```
-
-`scripts/run_meristem_then_mneme_all.sh` chains the Drive-heavy steps so that two jobs never read Drive at once. The harvest/fire layer is `antar_disturbance_ancillary_v2` (the first export was wrong; see `IMPLEMENTATION_LOG.md`).

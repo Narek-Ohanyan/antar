@@ -64,6 +64,7 @@ from fit_xylem_mechanistic_hazard import load_functional_groups, PET_FORMULATION
 from fit_refugium_viability import V_STAR, RHO, LAM  # noqa: E402
 
 from antar.climate import downscale  # noqa: E402
+from antar.io import fitted as fitted_io  # noqa: E402
 from antar.climate.atmosphere import AtmosphereShape  # noqa: E402
 from antar.climate.forcing import topoclimate_forcing  # noqa: E402
 from antar.climate.radiation import net_radiation_from_era5  # noqa: E402
@@ -423,8 +424,7 @@ def main():
         "members": {k: results[k] for k in sorted(results)},
     }
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    Dumper = getattr(yaml, "CSafeDumper", yaml.SafeDumper)
-    out_path.write_text(yaml.dump(final, Dumper=Dumper, sort_keys=False, default_flow_style=False))
+    out_path = fitted_io.write_yaml(out_path, final)                  # the dense result is stored gzipped (antar.io.fitted)
     print(f"=== Wrote {out_path} ===", flush=True)
     for f in ckpt_dir.glob("*.json"):
         f.unlink()

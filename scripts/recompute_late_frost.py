@@ -26,6 +26,7 @@ from run_topohydro_grid import (  # noqa: E402
 from run_future_projections import compute_deltas  # noqa: E402
 
 from antar.climate.forcing import late_frost_days_from_reference  # noqa: E402
+from antar.io import fitted as fitted_io  # noqa: E402
 
 FITTED = Path(__file__).resolve().parent.parent / "configs" / "fitted"
 LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
@@ -102,11 +103,11 @@ def do_baseline(grid, spec, node_for, apply):
 
 
 def do_members(grid, spec, static, node_for, apply):
-    path = FITTED / spec["members"]
+    path = fitted_io.resolve(FITTED / spec["members"])
     if not path.exists():
         print(f"  {grid} scenarios: {path.name} does not exist yet; run this again once the run has finished", flush=True)
         return
-    data = yaml.load(open(path), Loader=LOADER)
+    data = fitted_io.read_yaml(path)
     index = {key(a, b): i for i, (a, b) in enumerate(zip(static["lats"], static["lons"]))}
     pairs = sorted({(m["gcm"], m["scenario"]) for m in data["members"].values()})
     stored, old_re, new, targets = [], [], [], []
@@ -129,8 +130,7 @@ def do_members(grid, spec, static, node_for, apply):
         for row, v in zip(targets, new):
             row["late_frost_days"] = int(v)
         data = {**{k: v for k, v in data.items() if k != "members"}, "late_frost_definition": DEFINITION, "members": data["members"]}
-        path.write_text(yaml.dump(data, Dumper=DUMPER, sort_keys=False, default_flow_style=False))
-        print(f"  wrote {path.name}", flush=True)
+        print(f"  wrote {fitted_io.write_yaml(FITTED / spec['members'], data).name}", flush=True)
 
 
 def main():

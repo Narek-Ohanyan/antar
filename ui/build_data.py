@@ -27,6 +27,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from antar.io.armenia_mask import inside_armenia, load_mask  # noqa: E402
+from antar.io import fitted as fitted_io  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 FITTED = ROOT / "configs" / "fitted"
@@ -62,11 +63,10 @@ except AttributeError:  # pragma: no cover
 
 
 def load(name):
-    path = FITTED / name
+    path = fitted_io.resolve(FITTED / name)
     if not path.exists():
         return None
-    with open(path) as f:
-        return yaml.load(f, Loader=_Loader)
+    return fitted_io.read_yaml(path)
 
 
 def r(x, nd=4):

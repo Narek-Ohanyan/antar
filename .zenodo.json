@@ -1,0 +1,10 @@
+{
+  "title": "ANTAR — Assessment of Niche, Treeline & Analogue Refugia",
+  "upload_type": "software",
+  "description": "ANTAR is a hybrid process-statistical framework for finding where climate-resilient forest restoration will hold in Armenia: a daily water balance, a mechanistic hydraulic-failure hazard, a statistical dieback hazard, species niches and the climatic treeline, viability and robust refugia under 45 climate scenarios, and a budget-constrained, scenario-robust planting portfolio. Source code, fitted results, tests and the documentation of what is and is not modelled. The interactive results are at https://antar.narekohanyan.com.",
+  "creators": [{"name": "Ohanyan, Narek"}],
+  "license": "other-closed",
+  "keywords": ["forest restoration", "climate change", "Armenia", "refugia", "treeline", "species distribution model", "hydraulic failure", "robust optimisation"],
+  "related_identifiers": [{"relation": "isSupplementTo", "identifier": "https://antar.narekohanyan.com", "scheme": "url"}],
+  "notes": "All rights reserved; citing needs no permission, other use does (see LICENSE). Third-party data and libraries keep their own licences."
+}

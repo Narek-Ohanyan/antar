@@ -12,6 +12,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
+from antar.io import fitted as fitted_io  # noqa: E402
 from antar.uncertainty.partition import partition_metric  # noqa: E402
 
 FITTED = ROOT / "configs" / "fitted"
@@ -20,7 +21,7 @@ OAK = "ring_porous_oak"                      # the group whose viability varies 
 
 
 def load(name):
-    return yaml.load(open(FITTED / name), Loader=yaml.CSafeLoader)
+    return fitted_io.read_yaml(FITTED / name)
 
 
 def key(lat, lon):

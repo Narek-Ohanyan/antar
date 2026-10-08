@@ -56,6 +56,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_topohydro_grid import get_access_token, drive_vsicurl_url, BBOX, CHELSA_GRID_SHAPE, DENSE_STRIDE  # noqa: E402
 from antar.decision.optimize import robust_portfolio, efficient_frontier  # noqa: E402
+from antar.io import fitted as fitted_io  # noqa: E402
 from antar.decision.units import cell_area_ha, cell_land_shares  # noqa: E402
 from PIL import Image  # noqa: E402
 from antar.io.armenia_mask import inside_armenia  # noqa: E402
@@ -189,10 +190,10 @@ def load_refugium_only():
 
 def load_future_projections(dense=False):
     """Real multi-scenario ensemble, if scripts/run_future_projections.py has finished."""
-    path = CONFIG_DIR / "fitted" / ("future_projections_dense.yaml" if dense else "future_projections.yaml")
+    path = fitted_io.resolve(CONFIG_DIR / "fitted" / ("future_projections_dense.yaml" if dense else "future_projections.yaml"))
     if not path.exists():
         return None
-    d = yaml.safe_load(open(path))
+    d = fitted_io.read_yaml(path)
     members = d["members"]
     scenario_names = sorted(members.keys())
     first = members[scenario_names[0]]

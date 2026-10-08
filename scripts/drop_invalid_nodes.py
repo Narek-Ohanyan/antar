@@ -14,6 +14,9 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+from antar.io import fitted as fitted_io  # noqa: E402
+
 FITTED = Path(__file__).resolve().parent.parent / "configs" / "fitted"
 LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 DUMPER = getattr(yaml, "CSafeDumper", yaml.SafeDumper)
@@ -90,15 +93,15 @@ def main():
     print(f"{len(bad)} nodes are not accepted by TOPOHYDRO's dense run")
     for name in wanted:
         fname, fn = TARGETS[name]
-        path = FITTED / fname
+        path = fitted_io.resolve(FITTED / fname)
         if not path.exists():
             print(f"  {fname}: not there yet, skipped")
             continue
-        doc = yaml.load(open(path), Loader=LOADER)
+        doc = fitted_io.read_yaml(path)
         removed = fn(doc, bad)
         if removed:
             doc["dropped_nodes"] = f"{removed} cell records of nodes TOPOHYDRO rejected (non-finite soil parameters) removed by scripts/drop_invalid_nodes.py"
-            path.write_text(yaml.dump(doc, Dumper=DUMPER, sort_keys=False, default_flow_style=False))
+            fitted_io.write_yaml(FITTED / fname, doc)
         print(f"  {fname}: {removed} cell records removed")
 
 

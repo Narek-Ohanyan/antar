@@ -9,8 +9,8 @@ authors:
   - family-names: Ohanyan
     given-names: Narek
     website: "https://www.narekohanyan.com"
-version: "2.0.0-alpha"
-date-released: "2026-10-06"
+version: "2.0.0"
+date-released: "2026-10-08"
 repository-code: "https://github.com/Narek-Ohanyan/antar"
 url: "https://antar.narekohanyan.com"
 copyright: "© 2026 Narek Ohanyan. All rights reserved."
@@ -21,6 +21,6 @@ preferred-citation:
     - family-names: Ohanyan
       given-names: Narek
   year: 2026
-  version: "2.0.0-alpha"
+  version: "2.0.0"
   url: "https://antar.narekohanyan.com"
   repository-code: "https://github.com/Narek-Ohanyan/antar"
