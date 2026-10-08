@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 NAME = "ANTAR — Assessment of Niche, Treeline & Analogue Refugia"
 URL = "https://antar.narekohanyan.com"
 REPO = "https://github.com/Narek-Ohanyan/antar"
+DOI = "10.5281/zenodo.23236944"       # Zenodo concept DOI (all versions); 10.5281/zenodo.23236945 is version 2.0.0
 
 
 def text_of(path):
@@ -36,7 +37,7 @@ def test_citation_file_names_the_work_exactly():
 def test_footer_and_readme_carry_the_same_reference():
     footer = text_of("ui/index.html")
     readme = (ROOT / "README.md").read_text()
-    ref = f"Ohanyan, N. (2026). {NAME} (Version 2.0.0) [Computer software and web interface]. {URL} (source code: {REPO})"
+    ref = f"Ohanyan, N. (2026). {NAME} (Version 2.0.0) [Computer software and web interface]. {URL} (source code: {REPO}). https://doi.org/{DOI}"
     assert ref in re.sub(r"\s+", " ", footer)
     assert ref.replace("*", "") in re.sub(r"\s+", " ", readme.replace("\n> ", " ").replace("*", ""))
     assert "© 2026 Narek Ohanyan. All rights reserved." in footer
@@ -44,6 +45,12 @@ def test_footer_and_readme_carry_the_same_reference():
     assert "Treeline \\& Analogue Refugia" in footer and "Treeline \\& Analogue Refugia" in readme      # the ampersand is escaped for LaTeX
 
 
-def test_no_doi_or_other_identifier_is_invented():
+def test_only_the_two_zenodo_dois_of_the_release_appear_and_nothing_else_looks_like_one():
+    """The two DOIs were issued by Zenodo for the v2.0.0 release (checked against zenodo.org/api on 2026-10-08): the concept DOI for all versions, and the one of version 2.0.0."""
+    allowed = {DOI, "10.5281/zenodo.23236945"}
     for p in ("CITATION.cff", "README.md", "ui/index.html"):
-        assert "doi.org" not in (ROOT / p).read_text().lower(), p
+        found = set(f.removesuffix(".svg") for f in re.findall(r"10\.\d{4,9}/[A-Za-z0-9._;()/:-]+?(?=[\"'<>\s,)}\]]|$)", (ROOT / p).read_text()))
+        assert found <= allowed, (p, found - allowed)
+        assert DOI in found, p
+    c = yaml.safe_load((ROOT / "CITATION.cff").read_text())
+    assert c["doi"] == DOI and {i["value"] for i in c["identifiers"]} == allowed and c["preferred-citation"]["doi"] == DOI

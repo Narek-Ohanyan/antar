@@ -5,6 +5,8 @@ ANTAR is a hybrid process-statistical framework for finding where climate-resili
 under 45 climate scenarios (REFUGIUM), and a budget-constrained, scenario-robust planting portfolio (AEGIS). Results are on a dense grid of 854 Armenian nodes (921 for the treeline),
 about 6.5 km apart, and are explored at **https://antar.narekohanyan.com**. Every result carries its caveats: what is a placeholder, what is not fitted, and why.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23236944.svg)](https://doi.org/10.5281/zenodo.23236944)
+
 Version 2.0.0. The honest summary of what it can and cannot say is on the site's *Models & validation* and *Status & limits* pages and in `IMPLEMENTATION_LOG.md`; in short:
 
 * **Run on real data:** the water balance and hydraulic hazard for 2019, 45 scenario members (5 climate models × 3 emissions paths × 3 horizons), the climatic treeline shift, species niches
@@ -142,7 +144,7 @@ Version 2.0.0 (2026-10-08).
 Citing the work needs no permission. Please cite it as:
 
 > Ohanyan, N. (2026). *ANTAR — Assessment of Niche, Treeline & Analogue Refugia* (Version 2.0.0) [Computer software and web interface].
-> https://antar.narekohanyan.com (source code: https://github.com/Narek-Ohanyan/antar)
+> https://antar.narekohanyan.com (source code: https://github.com/Narek-Ohanyan/antar). https://doi.org/10.5281/zenodo.23236944
 
 ```bibtex
 @misc{ohanyan2026antar,
@@ -152,6 +154,7 @@ Citing the work needs no permission. Please cite it as:
   version      = {2.0.0},
   howpublished = {Computer software and web interface},
   url          = {https://antar.narekohanyan.com},
+  doi          = {10.5281/zenodo.23236944},
   note         = {Source code: https://github.com/Narek-Ohanyan/antar}
 }
 ```
